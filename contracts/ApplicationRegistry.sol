@@ -5,7 +5,6 @@ import "./Work.sol";
 
 contract ApplicationRegistry is Ownable {
   Work public work;
-
   uint256 public applicationCount;
 
   mapping (address => uint256) public applicationIndex;
@@ -13,8 +12,8 @@ contract ApplicationRegistry is Ownable {
   mapping (uint256 => bytes32) public randomHash;
   mapping (uint256 => bytes) public hint;
   mapping (uint256 => address) public verifier;
-
   mapping (uint256 => bytes) public verifierSecret;
+  mapping (uint256 => bytes) public applicantSecret;
 
   event NewApplication(
     uint256 applicationId,
@@ -36,6 +35,7 @@ contract ApplicationRegistry is Ownable {
   }
 
   function apply (bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint) public {
+    require(applicationIndex[msg.sender] == 0, 'the applicant has not yet applied');
     applicationCount += 1;
     applicationIndex[msg.sender] = applicationCount;
     secretAndRandomHash[applicationCount] = _keccakOfSecretAndRandom;
@@ -54,5 +54,16 @@ contract ApplicationRegistry is Ownable {
     require(secret.length > 0, 'secret is not empty');
     verifierSecret[applicationId] = secret;
     emit VerificationSubmitted(applicationId, msg.sender, secret);
+  }
+
+  function reveal (bytes secret, uint256 randomNumber) public {
+    uint256 id = applicationIndex[msg.sender];
+    require(id != uint256(0), 'sender has an application');
+    require(verifierSecret[id].length > 0, 'verify has submitted their secret');
+    bytes32 srHash = keccak256(abi.encodePacked(secret, randomNumber));
+    bytes32 rHash = keccak256(abi.encodePacked(randomNumber));
+    require(srHash == secretAndRandomHash[id], 'secret and random hash matches');
+    require(rHash == randomHash[id], 'random hash matches');
+    applicantSecret[id] = secret;
   }
 }
