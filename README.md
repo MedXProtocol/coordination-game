@@ -37,3 +37,11 @@ User Experience
 Involving the doctor in the game theory side of things requires a lot of education, and is a strange experience. We need to make sure they know that if they are asked for their information to instead lie.
 
 Additionally, to incentivize them to do so we may have to partially refund them money.  Which is unfair to the system and should go towards the verifiers doing the work.
+
+## Voter
+
+Since the majority voters get 50% of the minority token voters tokens, there’s an interesting incentive to misdirect a small group of other voters:
+
+The maximum amount of rewards are earned if the majority is 51% and minority is 49%. So it’s actually in a voters interest to deceive a fellow voter if they think they’ll still get a >51% majority.
+
+The voters can't trust anyone.

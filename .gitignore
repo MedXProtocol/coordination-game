@@ -1,1 +1,6 @@
 node_modules
+build
+networks/*
+!networks/1.json
+!networks/3.json
+!networks/4.json
