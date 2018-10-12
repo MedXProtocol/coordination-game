@@ -9,6 +9,13 @@ contract('ApplicationRegistry', (accounts) => {
   const applicant = accounts[0]
   const verifier = accounts[1]
 
+  const secret = "This is the secret"
+  const random = "4312341235"
+  const hint = web3.utils.utf8ToHex("Totally bogus hint")
+
+  const secretRandomHash = web3.utils.soliditySha3(secret + random)
+  const randomHash = web3.utils.soliditySha3(random)
+
   before(async () => {
     applicationRegistry = await ApplicationRegistry.deployed()
     work = await Work.deployed()
@@ -23,14 +30,6 @@ contract('ApplicationRegistry', (accounts) => {
 
   describe('apply()', () => {
     it('should allow a user to apply', async () => {
-
-      const secret = "This is the secret"
-      const random = "4312341235"
-      const hint = web3.utils.utf8ToHex("Totally bogus hint")
-
-      const secretRandomHash = web3.utils.soliditySha3(secret + random)
-      const randomHash = web3.utils.soliditySha3(random)
-
       await applicationRegistry.apply(
         secretRandomHash,
         randomHash,
@@ -40,7 +39,7 @@ contract('ApplicationRegistry', (accounts) => {
         }
       )
 
-      const index = await applicationRegistry.applicationIndex(accounts[0])
+      const index = await applicationRegistry.applicationIndex(applicant)
       const storedSecretRandomHash = await applicationRegistry.secretAndRandomHash(index)
       const storedRandomHash = await applicationRegistry.randomHash(index)
       const storedHint = await applicationRegistry.hint(index)
@@ -50,6 +49,24 @@ contract('ApplicationRegistry', (accounts) => {
       assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
       assert.equal(storedHint, hint, 'hint matches')
       assert.equal(selectedVerifier, verifier, 'verifier matches')
+    })
+  })
+
+  describe('verify()', () => {
+    it('should allow the verifier to submit a secret', async () => {
+      await applicationRegistry.apply(
+        secretRandomHash,
+        randomHash,
+        hint,
+        {
+          from: applicant
+        }
+      )
+      const index = await applicationRegistry.applicationIndex(applicant)
+      const verifierSecret = web3.utils.utf8ToHex('This is the verifier secret')
+      await applicationRegistry.verify(index, verifierSecret, { from: verifier })
+      const storedVerifierSecret = await applicationRegistry.verifierSecret(index)
+      assert.equal(verifierSecret, storedVerifierSecret)
     })
   })
 })

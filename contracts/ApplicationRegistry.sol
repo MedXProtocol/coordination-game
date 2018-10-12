@@ -14,12 +14,21 @@ contract ApplicationRegistry is Ownable {
   mapping (uint256 => bytes) public hint;
   mapping (uint256 => address) public verifier;
 
+  mapping (uint256 => bytes) public verifierSecret;
+
   event NewApplication(
+    uint256 applicationId,
     address applicant,
     bytes32 secretAndRandomHash,
     bytes32 randomHash,
     bytes hint,
     address verifier
+  );
+
+  event VerificationSubmitted(
+    uint256 applicationId,
+    address verifier,
+    bytes secret
   );
 
   constructor (Work _work) public {
@@ -35,6 +44,15 @@ contract ApplicationRegistry is Ownable {
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
     require(v != address(0), 'verifier is available');
     verifier[applicationCount] = v;
-    emit NewApplication(msg.sender, _keccakOfSecretAndRandom, _keccakOfRandom, _hint, v);
+    emit NewApplication(applicationCount, msg.sender, _keccakOfSecretAndRandom, _keccakOfRandom, _hint, v);
+  }
+
+  function verify (uint256 applicationId, bytes secret) public {
+    require(applicationCount >= applicationId, 'application has been initialized');
+    require(msg.sender == verifier[applicationId], 'sender is verifier');
+    require(verifierSecret[applicationId].length == 0, 'verify has not already been called');
+    require(secret.length > 0, 'secret is not empty');
+    verifierSecret[applicationId] = secret;
+    emit VerificationSubmitted(applicationId, msg.sender, secret);
   }
 }
