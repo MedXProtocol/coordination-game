@@ -7,8 +7,6 @@ import "./Registry.sol";
 
 contract CoordinationGame is Ownable {
   Work work;
-  Registry registry;
-  Parameterizer parameterizer;
   uint256 public applicationCount;
 
   mapping (address => uint256) public applicationIndex;
@@ -39,10 +37,8 @@ contract CoordinationGame is Ownable {
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
   */
-  function init (Work _work, Registry _registry, Parameterizer _parameterizer) public {
+  function init (Work _work) public {
     work = _work;
-    registry = _registry;
-    parameterizer = _parameterizer;
   }
 
   /**
@@ -94,10 +90,10 @@ contract CoordinationGame is Ownable {
     require(rHash == randomHash[id], 'random hash matches');
     applicantSecret[id] = _secret;
 
-    registry.apply(bytes32(applicant[id]), parameterizer.get('minDeposit'), "");
     if (_secret != verifierSecret[id]) {
-      // immediate challenge
-      registry.challenge(bytes32(applicant[id]), "");
+      // lose
+    } else {
+      // win
     }
   }
 }

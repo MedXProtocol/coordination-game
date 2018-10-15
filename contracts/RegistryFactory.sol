@@ -16,7 +16,7 @@ contract RegistryFactory {
       _name
     );
     CoordinationGame coordinationGame = new CoordinationGame();
-    coordinationGame.init(_work, registry, _parameterizer);
+    coordinationGame.init(_work);
     registry.setCoordinationGame(coordinationGame);
 
     emit CreatedRegistry(msg.sender, address(registry));

@@ -10,7 +10,7 @@ const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
 
 contract('CoordinationGame', (accounts) => {
-  let coordinationGame, workToken, work, registry, parameterizer
+  let coordinationGame, workToken, work, parameterizer
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -46,8 +46,7 @@ contract('CoordinationGame', (accounts) => {
     RegistryFactory.new()
     
     coordinationGame = await CoordinationGame.new()
-    registry = await Registry.new()
-    await coordinationGame.init(work.address, registry.address)
+    await coordinationGame.init(work.address)
   })
 
   describe('apply()', () => {
