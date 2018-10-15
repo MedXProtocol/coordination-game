@@ -5,17 +5,21 @@
   "main": "index.js",
   "scripts": {
     "compile": "$(npm bin)/truffle compile",
-    "test": "$(npm bin)/truffle test"
+    "test": "$(npm bin)/truffle test",
+    "start": "./scripts/ganache.sh"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "abi-decoder": "^1.2.0",
     "debug": "^4.1.0",
-    "truffle": "^5.0.0-beta.1",
-    "truffle-deploy-registry": "^0.3.0",
+    "ethereumjs-abi": "^0.6.5",
+    "ganache-cli": "^6.1.8",
+    "truffle": "^4.1.14",
     "web3": "^1.0.0-beta.36"
   },
   "dependencies": {
-    "openzeppelin-solidity": "1.12.0"
+    "openzeppelin-solidity": "1.12.0",
+    "truffle-deploy-registry": "^0.4.1"
   }
 }

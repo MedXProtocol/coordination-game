@@ -12,13 +12,13 @@ contract('Work', (accounts) => {
   let work
   let initialStakerBalance
 
-  const requiredStake = web3.utils.toWei('100', 'ether')
+  const requiredStake = web3.toWei('100', 'ether')
 
   before(async () => {
     token = await WorkToken.deployed()
 
-    await token.mint(staker, web3.utils.toWei('1000', 'ether'))
-    await token.mint(staker2, web3.utils.toWei('1000', 'ether'))
+    await token.mint(staker, web3.toWei('1000', 'ether'))
+    await token.mint(staker2, web3.toWei('1000', 'ether'))
 
     work = await Work.new(token.address, requiredStake)
     await token.approve(work.address, requiredStake, { from: staker })

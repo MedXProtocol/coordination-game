@@ -1,4 +1,6 @@
 node_modules
+installed_contracts
+.ganache
 build
 networks/*
 !networks/1.json

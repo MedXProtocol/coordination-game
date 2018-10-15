@@ -1,0 +1,16 @@
+{
+  "package_name": "Coordination Game",
+  "version": "0.1.0",
+  "description": "Coordination Game between two players",
+  "authors": [
+    "Brendan Asselstine <mail.asselstine@gmail.com>"
+  ],
+  "keywords": [
+    "ethereum",
+    "contracts"
+  ],
+  "dependencies": {
+    "tcr": "^1.1.0"
+  },
+  "license": "MIT"
+}
