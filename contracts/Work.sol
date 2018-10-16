@@ -8,6 +8,7 @@ contract Work {
   uint256 public requiredStake;
   mapping (address => bool) public stakerAddresses;
   mapping (address => uint256) private stakerIndices;
+  mapping (address => uint256) private stakerAmounts;
 
   constructor (ERC20 _token, uint256 _requiredStake) public {
     require(_token != address(0), 'token is defined');

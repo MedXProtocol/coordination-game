@@ -93,12 +93,14 @@ contract CoordinationGame is Ownable {
   @param _applicationId The application that the verifier is submitting for
   @param _secret The secret that the verifier is guessing
   */
-  function verify (uint256 _applicationId, bytes32 _secret) public {
+  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public {
     require(applicationCount >= _applicationId, 'application has been initialized');
     require(msg.sender == verifiers[_applicationId], 'sender is verifier');
     require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
+
     verifierSecrets[_applicationId] = _secret;
+
     emit VerificationSubmitted(_applicationId, msg.sender, _secret);
   }
 
@@ -107,7 +109,7 @@ contract CoordinationGame is Ownable {
   @param _secret The applicant's secret
   @param _randomNumber The random number the applicant chose to obscure the secret
   */
-  function reveal(bytes32 _secret, uint256 _randomNumber) public {
+  function applicantRevealSecret(bytes32 _secret, uint256 _randomNumber) public {
     uint256 id = applicationIndices[msg.sender];
     require(id != uint256(0), 'sender has an application');
     require(verifierSecrets[id] != bytes32(0), 'verify has submitted their secret');
@@ -117,11 +119,15 @@ contract CoordinationGame is Ownable {
     require(rHash == randomHashes[id], 'random hash matches');
     applicantSecrets[id] = _secret;
 
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    tilRegistry.token().approve(address(tilRegistry), deposit);
+    tilRegistry.apply(applicants[id], bytes32(id), deposit, "");
+
     if (_secret != verifierSecrets[id]) {
-      emit ApplicantWon(id);
+      emit ApplicantLost(id);
       applicantLost(id);
     } else {
-      emit ApplicantLost(id);
+      emit ApplicantWon(id);
       applicantWon(id);
     }
   }
@@ -129,16 +135,12 @@ contract CoordinationGame is Ownable {
   function applicantWon(uint256 _applicantId) internal {
     address applicant = applicants[_applicantId];
     wins[applicant] += 1;
-
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    tilRegistry.token().approve(address(tilRegistry), deposit);
-    tilRegistry.apply(bytes32(_applicantId), deposit, "");
   }
 
   function applicantLost(uint256 _applicantId) internal {
     address applicant = applicants[_applicantId];
     losses[applicant] += 1;
 
-    // tilRegistry.challenge
+    // tilRegistry.token().approve();
   }
 }

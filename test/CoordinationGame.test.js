@@ -107,7 +107,7 @@ contract('CoordinationGame', (accounts) => {
     })
   })
 
-  describe('verify()', () => {
+  describe('verifierSubmitSecret()', () => {
     it('should allow the verifier to submit a secret', async () => {
       await coordinationGame.start(
         secretRandomHash,
@@ -117,18 +117,18 @@ contract('CoordinationGame', (accounts) => {
           from: applicant
         }
       )
-      debug('verify() applied')
+      debug('verifierSubmitSecret() applied')
       const index = await coordinationGame.applicationIndices(applicant)
-      debug('verify() applicationIndices')
-      debug(`verify() verify(${index}, ${secret})...`)
-      await coordinationGame.verify(index, secret, { from: verifier })
-      debug('verify() verify')
+      debug('verifierSubmitSecret() applicationIndices')
+      debug(`verifierSubmitSecret() verifierSubmitSecret(${index}, ${secret})...`)
+      await coordinationGame.verifierSubmitSecret(index, secret, { from: verifier })
+      debug('verifierSubmitSecret() verifierSubmitSecret')
       const storedVerifierSecret = await coordinationGame.verifierSecrets(index)
       assert.equal(secret, storedVerifierSecret)
     })
   })
 
-  describe('reveal()', () => {
+  describe('applicantRevealSecret()', () => {
     it('should allow the applicant to reveal their secret', async () => {
       await coordinationGame.start(
         secretRandomHash,
@@ -138,12 +138,12 @@ contract('CoordinationGame', (accounts) => {
           from: applicant
         }
       )
-      debug(`reveal() applicationIndices(${applicant})...`)
+      debug(`applicantRevealSecret() applicationIndices(${applicant})...`)
       const index = await coordinationGame.applicationIndices(applicant)
-      debug(`reveal() verify(${index}, ${secret})...`)
-      await coordinationGame.verify(index, secret, { from: verifier })
-      debug(`reveal() reveal(${secret}, ${random})...`)
-      await coordinationGame.reveal(secret, random.toString(), { from : applicant })
+      debug(`applicantRevealSecret() verifierSubmitSecret(${index}, ${secret})...`)
+      await coordinationGame.verifierSubmitSecret(index, secret, { from: verifier })
+      debug(`applicantRevealSecret() applicantRevealSecret(${secret}, ${random})...`)
+      await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
       const storedSecret = await coordinationGame.applicantSecrets(index)
       assert.equal(storedSecret, secret)
     })
