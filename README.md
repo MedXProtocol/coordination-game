@@ -1,5 +1,7 @@
 # MedX Protocol Coordination Game
 
+$ npm i && truffle install
+
 These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
 
 ## Usage

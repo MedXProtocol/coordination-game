@@ -1,0 +1,4 @@
+# You can automatically load this file using direnv: https://direnv.net/
+# or just `source .envrc`
+
+export HDWALLET_MNEMONIC="rescue tree music reform symbol caught adult sand sentence belt tooth later"

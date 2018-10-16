@@ -1,16 +1,22 @@
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
-const Registry = artifacts.require('Registry.sol')
 const Parameterizer = artifacts.require('Parameterizer.sol')
-const RegistryFactory = artifacts.require('RegistryFactory.sol')
-const abi = require('ethereumjs-abi')
+const TILRegistry = artifacts.require('TILRegistry.sol')
+const TILRegistryFactory = artifacts.require('TILRegistryFactory.sol')
 const Work = artifacts.require('Work.sol')
-const BN = require('bn.js')
 const WorkToken = artifacts.require('WorkToken.sol')
+
+const abi = require('ethereumjs-abi')
+const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
+const createTILRegistry = require('./support/createTILRegistry')
 
 contract('CoordinationGame', (accounts) => {
-  let coordinationGame, workToken, work, parameterizer
+  let coordinationGame,
+    workToken,
+    work,
+    parameterizer,
+    tilRegistry
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -43,10 +49,17 @@ contract('CoordinationGame', (accounts) => {
   })
 
   beforeEach(async () => {
-    RegistryFactory.new()
-    
-    coordinationGame = await CoordinationGame.new()
-    await coordinationGame.init(work.address)
+    tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
+    const addresses = await createRegistry(
+      tilRegistryFactoryInstance,
+      parameterizer.address,
+      work.address,
+      'TILRegistry'
+    )
+
+    const tilRegistryInstance = TILRegistry.at(addresses.tilRegistryAddress)
+    const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
+    coordinationGame = await CoordinationGame.at()
   })
 
   describe('apply()', () => {

@@ -3,21 +3,23 @@ pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "tcr/Parameterizer.sol";
 import "./Work.sol";
-import "./Registry.sol";
+import "./TILRegistry.sol";
 
 contract CoordinationGame is Ownable {
   Work work;
-  CoordinationGameManager manager;
+  TILRegistry tilRegistry;
   uint256 public applicationCount;
 
   mapping (address => uint256) public applicationIndex;
-  mapping (uint256 => address) public applicant;
-  mapping (uint256 => bytes32) public secretAndRandomHash;
-  mapping (uint256 => bytes32) public randomHash;
-  mapping (uint256 => bytes) public hint;
-  mapping (uint256 => address) public verifier;
-  mapping (uint256 => bytes32) public verifierSecret;
-  mapping (uint256 => bytes32) public applicantSecret;
+  mapping (uint256 => address) public applicants;
+  mapping (uint256 => bytes32) public secretAndRandomHashes;
+  mapping (uint256 => bytes32) public randomHashes;
+  mapping (uint256 => bytes) public hints;
+  mapping (uint256 => address) public verifiers;
+  mapping (uint256 => bytes32) public verifierSecrets;
+  mapping (uint256 => bytes32) public applicantSecrets;
+  mapping (address => uint256) wins;
+  mapping (address => uint256) losses;
 
   event NewApplication(
     uint256 indexed applicationId,
@@ -46,9 +48,9 @@ contract CoordinationGame is Ownable {
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
   */
-  function init (Work _work, CoordinationGameManager _manager) public {
+  function init(Work _work, TILRegistry _tilRegistry) public {
     work = _work;
-    manager = _manager;
+    tilRegistry = _tilRegistry;
   }
 
   /**
@@ -61,15 +63,16 @@ contract CoordinationGame is Ownable {
     require(applicationIndex[msg.sender] == 0, 'the applicant has not yet applied');
     applicationCount += 1;
     applicationIndex[msg.sender] = applicationCount;
-    applicant[applicationCount] = msg.sender;
-    secretAndRandomHash[applicationCount] = _keccakOfSecretAndRandom;
-    randomHash[applicationCount] = _keccakOfRandom;
-    hint[applicationCount] = _hint;
+    applicants[applicationCount] = msg.sender;
+    secretAndRandomHashes[applicationCount] = _keccakOfSecretAndRandom;
+    randomHashes[applicationCount] = _keccakOfRandom;
+    hints[applicationCount] = _hint;
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
     require(v != address(0), 'verifier is available');
-    verifier[applicationCount] = v;
+    verifiers[applicationCount] = v;
+    start(applicationCount);
+
     emit NewApplication(applicationCount, msg.sender, v, _keccakOfSecretAndRandom, _keccakOfRandom, _hint);
-    manager.start(this, applicationCount);
   }
 
   /**
@@ -79,10 +82,10 @@ contract CoordinationGame is Ownable {
   */
   function verify (uint256 _applicationId, bytes32 _secret) public {
     require(applicationCount >= _applicationId, 'application has been initialized');
-    require(msg.sender == verifier[_applicationId], 'sender is verifier');
-    require(verifierSecret[_applicationId] == bytes32(0), 'verify has not already been called');
+    require(msg.sender == verifiers[_applicationId], 'sender is verifier');
+    require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
-    verifierSecret[_applicationId] = _secret;
+    verifierSecrets[_applicationId] = _secret;
     emit VerificationSubmitted(_applicationId, msg.sender, _secret);
   }
 
@@ -94,19 +97,41 @@ contract CoordinationGame is Ownable {
   function reveal (bytes32 _secret, uint256 _randomNumber) public {
     uint256 id = applicationIndex[msg.sender];
     require(id != uint256(0), 'sender has an application');
-    require(verifierSecret[id] != bytes32(0), 'verify has submitted their secret');
+    require(verifierSecrets[id] != bytes32(0), 'verify has submitted their secret');
     bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
     bytes32 rHash = keccak256(abi.encodePacked(_randomNumber));
-    require(srHash == secretAndRandomHash[id], 'secret and random hash matches');
-    require(rHash == randomHash[id], 'random hash matches');
-    applicantSecret[id] = _secret;
+    require(srHash == secretAndRandomHashes[id], 'secret and random hash matches');
+    require(rHash == randomHashes[id], 'random hash matches');
+    applicantSecrets[id] = _secret;
 
-    if (_secret != verifierSecret[id]) {
+    if (_secret != verifierSecrets[id]) {
       emit ApplicantWon(id);
-      manager.applicantLost(this, id);
+      applicantLost(id);
     } else {
       emit ApplicantLost(id);
-      manager.applicantWon(this, id);
+      applicantWon(id);
     }
+  }
+
+  function start(uint256 _applicantId) internal {
+    address applicant = applicants[_applicantId];
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    tilRegistry.token().transferFrom(applicant, address(this), deposit);
+  }
+
+  function applicantWon(uint256 _applicantId) internal {
+    address applicant = applicants[_applicantId];
+    wins[applicant] += 1;
+
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    tilRegistry.apply(bytes32(_applicantId), deposit, "");
+    tilRegistry.transferOwnership(bytes32(_applicantId), applicant);
+  }
+
+  function applicantLost(uint256 _applicantId) internal {
+    address applicant = applicants[_applicantId];
+    losses[applicant] += 1;
+
+    // tilRegistry.challenge
   }
 }
