@@ -10,13 +10,13 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 2. The selected Verifier uses the hint to search for the secret
 3. The Verifier commits their answer to the blockchain within the timeframe.  The Applicant reveals their secret at this time.
 4. If the Verifier’s secret matches the applicant’s secret
-   1. The applicant is admitted to the registry.
-   2. The Verifier receives their reward.
-   3. The applicant is refunded a portion of their deposit.
+   1. The applicant is admitted to the registry
+   2. The Verifier receives their reward
+   3. The applicant is refunded a portion of their deposit
 5. Otherwise the Verifier rejects the applicant
    1. The application would then go to vote.  All of the verifiers would then vote on whether the applicant is legitimate and that the hint was enough to establish their identity.
    2. If the application is legitimate
-      1. The Voters split the entire Applicant’s deposit and the applicant is accepted.  The Verifier’s deposit is burned or sent to a reserve pool.  The voters in the minority lose half of their tokens, which are sent to the majority.
+      1. The Voters split the entire Applicant’s deposit and the applicant is accepted.  The Verifier’s deposit is sent to a reserve pool.  The voters in the minority lose half of their tokens, which are sent to the majority.
    3. Otherwise the voters reject the application
       1. The Voters split the entire Applicant’s deposit and the applicant is rejected. The split size is proportional to the majority vs minority.  The voters in the minority lose half of their tokens, which are sent to the majority.
 

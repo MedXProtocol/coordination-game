@@ -6,8 +6,8 @@ contract Work {
   ERC20 public token;
   address[] private stakers;
   uint256 public requiredStake;
-  mapping (address => bool) public addressStaked;
-  mapping (address => uint256) private stakerIndex;
+  mapping (address => bool) public stakerAddresses;
+  mapping (address => uint256) private stakerIndices;
 
   constructor (ERC20 _token, uint256 _requiredStake) public {
     require(_token != address(0), 'token is defined');
@@ -18,20 +18,20 @@ contract Work {
 
   function depositStake() public hasNotStaked(msg.sender) {
     uint256 index = stakers.push(msg.sender) - 1;
-    stakerIndex[msg.sender] = index;
-    addressStaked[msg.sender] = true;
+    stakerIndices[msg.sender] = index;
+    stakerAddresses[msg.sender] = true;
     require(token.allowance(msg.sender, address(this)) >= requiredStake, 'allowance is sufficient');
     token.transferFrom(msg.sender, address(this), requiredStake);
   }
 
   function withdrawStake() public hasStaked(msg.sender) {
-    addressStaked[msg.sender] = false;
-    uint256 index = stakerIndex[msg.sender];
+    stakerAddresses[msg.sender] = false;
+    uint256 index = stakerIndices[msg.sender];
     uint256 lastIndex = stakers.length - 1;
     if (index != lastIndex) {
       address lastStaker = stakers[lastIndex];
       stakers[index] = lastStaker;
-      stakerIndex[lastStaker] = index;
+      stakerIndices[lastStaker] = index;
     }
     stakers.length--;
     token.transfer(msg.sender, requiredStake);
@@ -43,12 +43,12 @@ contract Work {
   }
 
   modifier hasNotStaked(address _staker) {
-    require(!addressStaked[_staker], 'Staker has not staked');
+    require(!stakerAddresses[_staker], 'Staker has not staked');
     _;
   }
 
   modifier hasStaked(address _staker) {
-    require(addressStaked[_staker], 'Staker has staked');
+    require(stakerAddresses[_staker], 'Staker has staked');
     _;
   }
 }

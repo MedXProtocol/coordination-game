@@ -19,8 +19,8 @@ contract TILRegistryFactory {
   {
     TILRegistry tilRegistry = new TILRegistry();
     tilRegistry.init(
-      address(_parameterizer.token),
-      address(_parameterizer.voting),
+      address(_parameterizer.token()),
+      address(_parameterizer.voting()),
       address(_parameterizer),
       _name
     );

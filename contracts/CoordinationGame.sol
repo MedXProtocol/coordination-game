@@ -5,6 +5,11 @@ import "tcr/Parameterizer.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
 
+/**
+@title CoordinationGame
+@author Brendan Asselstine, Chuck Bergeron
+@notice This contract stores work tokens in a pool which are applicant deposits
+**/
 contract CoordinationGame is Ownable {
   Work work;
   TILRegistry tilRegistry;
@@ -54,23 +59,31 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-  @notice Creates an application on behalf of the message sender
+  @notice Creates an application on behalf of the message sender, this kicks off
+          the game for the applicant
   @param _keccakOfSecretAndRandom The hash of the secret and salt
   @param _keccakOfRandom The hash of the salt
   @param _hint The hint for the verifier to determine the secret
   */
-  function apply (bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint) public {
+  function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
+    public
+  {
     require(applicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
+
     applicationCount += 1;
     applicationIndices[msg.sender] = applicationCount;
     applicants[applicationCount] = msg.sender;
     secretAndRandomHashes[applicationCount] = _keccakOfSecretAndRandom;
     randomHashes[applicationCount] = _keccakOfRandom;
     hints[applicationCount] = _hint;
+
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
+
     require(v != address(0), 'verifier is available');
     verifiers[applicationCount] = v;
-    start(applicationCount);
+
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    tilRegistry.token().transferFrom(msg.sender, address(this), deposit);
 
     emit NewApplication(applicationCount, msg.sender, v, _keccakOfSecretAndRandom, _keccakOfRandom, _hint);
   }
@@ -94,7 +107,7 @@ contract CoordinationGame is Ownable {
   @param _secret The applicant's secret
   @param _randomNumber The random number the applicant chose to obscure the secret
   */
-  function reveal (bytes32 _secret, uint256 _randomNumber) public {
+  function reveal(bytes32 _secret, uint256 _randomNumber) public {
     uint256 id = applicationIndices[msg.sender];
     require(id != uint256(0), 'sender has an application');
     require(verifierSecrets[id] != bytes32(0), 'verify has submitted their secret');
@@ -111,12 +124,6 @@ contract CoordinationGame is Ownable {
       emit ApplicantLost(id);
       applicantWon(id);
     }
-  }
-
-  function start(uint256 _applicantId) internal {
-    address applicant = applicants[_applicantId];
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    // tilRegistry.token().transferFrom(applicant, address(this), deposit);
   }
 
   function applicantWon(uint256 _applicantId) internal {

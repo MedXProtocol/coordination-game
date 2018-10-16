@@ -42,7 +42,7 @@ contract('Work', (accounts) => {
       debug(`depositStake(): work.depositStake()`)
       assert.equal(await token.balanceOf(work.address), requiredStake)
       debug(`depositStake(): token.balanceOf(${work.address})`)
-      assert.equal(await work.addressStaked(staker), true)
+      assert.equal(await work.stakerAddresses(staker), true)
     })
   })
 
@@ -55,7 +55,7 @@ contract('Work', (accounts) => {
   describe('withdrawStake()', () => {
     it('should allow a staked user to withdraw their tokens', async () => {
       await work.withdrawStake({ from: staker })
-      assert.equal(await work.addressStaked(staker), false)
+      assert.equal(await work.stakerAddresses(staker), false)
       assert.equal(await token.balanceOf(work.address), '0')
       assert.equal((await token.balanceOf(staker)).toString(), initialStakerBalance.toString())
     })
@@ -70,7 +70,7 @@ contract('Work', (accounts) => {
         await work.withdrawStake({ from: staker })
         debug(`work.withdrawStake() from ${staker}`)
         assert.equal((await token.balanceOf(staker)).toString(), initialStakerBalance.toString())
-        assert.equal(await work.addressStaked(staker), false)
+        assert.equal(await work.stakerAddresses(staker), false)
 
         await token.approve(work.address, requiredStake, { from: staker })
         await work.depositStake({ from: staker })
@@ -79,7 +79,7 @@ contract('Work', (accounts) => {
           (await token.balanceOf(work.address)).toString(),
           new BN(requiredStake).mul(new BN(2)).toString()
         )
-        assert.equal(await work.addressStaked(staker), true)
+        assert.equal(await work.stakerAddresses(staker), true)
       })
     })
   })

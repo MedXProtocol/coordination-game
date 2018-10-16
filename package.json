@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile": "$(npm bin)/truffle compile",
-    "test": "$(npm bin)/truffle test",
+    "compile": "$(npm bin)/truffle compile && apply-registry build/contracts",
+    "test": "$(npm bin)/truffle test --network=test",
     "start": "./scripts/ganache.sh"
   },
   "author": "",

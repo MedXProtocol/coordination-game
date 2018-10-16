@@ -40,15 +40,27 @@ contract('CoordinationGame', (accounts) => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     stake = await work.requiredStake()
-    parameterizer = await Parameterizer.at((await tdr.findLastByContractName(web3.version.network, 'Parameterizer')).address)
-    debug(`Minting ${stake.toString()}...`)
+    const parameterizerAddress = (await tdr.findLastByContractName(
+      web3.version.network,
+      'Parameterizer'
+    )).address
+    parameterizer = await Parameterizer.at(parameterizerAddress)
+
+
+    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
+
+    debug(`Minting Stake to Verifier ${stake.toString()}...`)
     await workToken.mint(verifier, stake)
-    debug(`Approving ${stake.toString()} to ${work.address}...`)
+
+    debug(`Approving stake ${stake.toString()} to ${work.address}...`)
     await workToken.approve(work.address, stake, { from: verifier })
     await work.depositStake({ from: verifier })
   })
 
   beforeEach(async () => {
+    console.log('CRREATED REGISTRY WITH PARAMMMATERIZER ', parameterizer.address)
+    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
+
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
     const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
@@ -58,13 +70,23 @@ contract('CoordinationGame', (accounts) => {
     )
 
     const tilRegistryInstance = TILRegistry.at(addresses.tilRegistryAddress)
+    assert.equal((await tilRegistryInstance.token()), workToken.address, 'token addresses no match')
+
     const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
+
+    const deposit = await parameterizer.get('minDeposit')
+    debug(`Minting Deposit to Applicant ${deposit.toString()}...`)
+    await workToken.mint(applicant, deposit)
+
+    debug(`Approving CoordinationGame to spend ${deposit.toString()} for applicant...`)
+    await workToken.approve(coordinationGameAddress, deposit, { from: applicant })
+
   })
 
-  describe('apply()', () => {
-    it('should allow a user to apply', async () => {
-      await coordinationGame.apply(
+  describe('start()', () => {
+    it('should allow a user to start', async () => {
+      await coordinationGame.start(
         secretRandomHash,
         randomHash,
         hint,
@@ -88,7 +110,7 @@ contract('CoordinationGame', (accounts) => {
 
   describe('verify()', () => {
     it('should allow the verifier to submit a secret', async () => {
-      await coordinationGame.apply(
+      await coordinationGame.start(
         secretRandomHash,
         randomHash,
         hint,
@@ -109,7 +131,7 @@ contract('CoordinationGame', (accounts) => {
 
   describe('reveal()', () => {
     it('should allow the applicant to reveal their secret', async () => {
-      await coordinationGame.apply(
+      await coordinationGame.start(
         secretRandomHash,
         randomHash,
         hint,
