@@ -10,7 +10,7 @@ contract CoordinationGame is Ownable {
   TILRegistry tilRegistry;
   uint256 public applicationCount;
 
-  mapping (address => uint256) public applicationIndex;
+  mapping (address => uint256) public applicationIndices;
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
@@ -60,9 +60,9 @@ contract CoordinationGame is Ownable {
   @param _hint The hint for the verifier to determine the secret
   */
   function apply (bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint) public {
-    require(applicationIndex[msg.sender] == 0, 'the applicant has not yet applied');
+    require(applicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
     applicationCount += 1;
-    applicationIndex[msg.sender] = applicationCount;
+    applicationIndices[msg.sender] = applicationCount;
     applicants[applicationCount] = msg.sender;
     secretAndRandomHashes[applicationCount] = _keccakOfSecretAndRandom;
     randomHashes[applicationCount] = _keccakOfRandom;
@@ -95,7 +95,7 @@ contract CoordinationGame is Ownable {
   @param _randomNumber The random number the applicant chose to obscure the secret
   */
   function reveal (bytes32 _secret, uint256 _randomNumber) public {
-    uint256 id = applicationIndex[msg.sender];
+    uint256 id = applicationIndices[msg.sender];
     require(id != uint256(0), 'sender has an application');
     require(verifierSecrets[id] != bytes32(0), 'verify has submitted their secret');
     bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
@@ -116,7 +116,7 @@ contract CoordinationGame is Ownable {
   function start(uint256 _applicantId) internal {
     address applicant = applicants[_applicantId];
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    tilRegistry.token().transferFrom(applicant, address(this), deposit);
+    // tilRegistry.token().transferFrom(applicant, address(this), deposit);
   }
 
   function applicantWon(uint256 _applicantId) internal {
@@ -124,8 +124,8 @@ contract CoordinationGame is Ownable {
     wins[applicant] += 1;
 
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    tilRegistry.apply(bytes32(_applicantId), deposit, "");
-    tilRegistry.transferOwnership(bytes32(_applicantId), applicant);
+    // tilRegistry.apply(bytes32(_applicantId), deposit, "");
+    // tilRegistry.transferOwnership(bytes32(_applicantId), applicant);
   }
 
   function applicantLost(uint256 _applicantId) internal {

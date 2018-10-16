@@ -9,7 +9,7 @@ const abi = require('ethereumjs-abi')
 const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
-const createTILRegistry = require('./support/createTILRegistry')
+const createTILRegistry = require('../migrations/support/createTILRegistry')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
@@ -50,7 +50,7 @@ contract('CoordinationGame', (accounts) => {
 
   beforeEach(async () => {
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
-    const addresses = await createRegistry(
+    const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
       parameterizer.address,
       work.address,
@@ -59,7 +59,7 @@ contract('CoordinationGame', (accounts) => {
 
     const tilRegistryInstance = TILRegistry.at(addresses.tilRegistryAddress)
     const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
-    coordinationGame = await CoordinationGame.at()
+    coordinationGame = await CoordinationGame.at(coordinationGameAddress)
   })
 
   describe('apply()', () => {
@@ -73,11 +73,11 @@ contract('CoordinationGame', (accounts) => {
         }
       )
 
-      const index = await coordinationGame.applicationIndex(applicant)
-      const storedSecretRandomHash = await coordinationGame.secretAndRandomHash(index)
-      const storedRandomHash = await coordinationGame.randomHash(index)
-      const storedHint = await coordinationGame.hint(index)
-      const selectedVerifier = await coordinationGame.verifier(index)
+      const index = await coordinationGame.applicationIndices(applicant)
+      const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(index)
+      const storedRandomHash = await coordinationGame.randomHashes(index)
+      const storedHint = await coordinationGame.hints(index)
+      const selectedVerifier = await coordinationGame.verifiers(index)
 
       assert.equal(storedRandomHash, randomHash, 'random hash matches')
       assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
@@ -97,12 +97,12 @@ contract('CoordinationGame', (accounts) => {
         }
       )
       debug('verify() applied')
-      const index = await coordinationGame.applicationIndex(applicant)
-      debug('verify() applicationIndex')
+      const index = await coordinationGame.applicationIndices(applicant)
+      debug('verify() applicationIndices')
       debug(`verify() verify(${index}, ${secret})...`)
       await coordinationGame.verify(index, secret, { from: verifier })
       debug('verify() verify')
-      const storedVerifierSecret = await coordinationGame.verifierSecret(index)
+      const storedVerifierSecret = await coordinationGame.verifierSecrets(index)
       assert.equal(secret, storedVerifierSecret)
     })
   })
@@ -117,13 +117,13 @@ contract('CoordinationGame', (accounts) => {
           from: applicant
         }
       )
-      debug(`reveal() applicationIndex(${applicant})...`)
-      const index = await coordinationGame.applicationIndex(applicant)
+      debug(`reveal() applicationIndices(${applicant})...`)
+      const index = await coordinationGame.applicationIndices(applicant)
       debug(`reveal() verify(${index}, ${secret})...`)
       await coordinationGame.verify(index, secret, { from: verifier })
       debug(`reveal() reveal(${secret}, ${random})...`)
       await coordinationGame.reveal(secret, random.toString(), { from : applicant })
-      const storedSecret = await coordinationGame.applicantSecret(index)
+      const storedSecret = await coordinationGame.applicantSecrets(index)
       assert.equal(storedSecret, secret)
     })
   })
