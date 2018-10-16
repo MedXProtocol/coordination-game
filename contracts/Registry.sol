@@ -22,23 +22,28 @@ contract Registry is TCR, Ownable {
   @param _amount The number of tokens the applicant has staked
   @param _data Extra data
   */
-  function apply(bytes32 _listingHash, uint _amount, string _data) external onlyCoordinationGame {
-    require(!isWhitelisted(_listingHash));
-    require(!appWasMade(_listingHash));
-    require(_amount >= parameterizer.get("minDeposit"));
+  // function apply(bytes32 _listingHash, uint _amount, string _data) external onlyCoordinationGame {
+  //   require(!isWhitelisted(_listingHash));
+  //   require(!appWasMade(_listingHash));
+  //   require(_amount >= parameterizer.get("minDeposit"));
+  //
+  //   // Sets owner
+  //   Listing storage listing = listings[_listingHash];
+  //   // The owner is actually the _listingHash
+  //   listing.owner = address(_listingHash);
+  //
+  //   // Sets apply stage end time
+  //   listing.applicationExpiry = block.timestamp.add(parameterizer.get("applyStageLen"));
+  //   listing.unstakedDeposit = _amount;
+  //
+  //   // Transfers tokens from user to Registry contract
+  //   require(token.transferFrom(listing.owner, this, _amount));
+  //
+  //   emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);
+  // }
 
-    // Sets owner
-    Listing storage listing = listings[_listingHash];
-    // The owner is actually the _listingHash
-    listing.owner = address(_listingHash);
-
-    // Sets apply stage end time
-    listing.applicationExpiry = block.timestamp.add(parameterizer.get("applyStageLen"));
-    listing.unstakedDeposit = _amount;
-
-    // Transfers tokens from user to Registry contract
-    require(token.transferFrom(listing.owner, this, _amount));
-
-    emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);
+  function transferOwnership(bytes32 _listingHash, address _newOwner) external {
+    require(listing[_listingHash].owner == msg.sender, 'only the owner can transfer');
+    listing[_listingHash].owner = _newOwner;
   }
 }

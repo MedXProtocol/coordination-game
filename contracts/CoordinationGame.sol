@@ -7,6 +7,7 @@ import "./Registry.sol";
 
 contract CoordinationGame is Ownable {
   Work work;
+  CoordinationGameManager manager;
   uint256 public applicationCount;
 
   mapping (address => uint256) public applicationIndex;
@@ -19,26 +20,35 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => bytes32) public applicantSecret;
 
   event NewApplication(
-    uint256 applicationId,
-    address applicant,
+    uint256 indexed applicationId,
+    address indexed applicant,
+    address indexed verifier,
     bytes32 secretAndRandomHash,
     bytes32 randomHash,
-    bytes hint,
-    address verifier
+    bytes hint
   );
 
   event VerificationSubmitted(
-    uint256 applicationId,
+    uint256 indexed applicationId,
     address verifier,
     bytes32 secret
+  );
+
+  event ApplicantWon(
+    uint256 indexed applicationId
+  );
+
+  event ApplicantLost(
+    uint256 indexed applicationId
   );
 
   /**
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
   */
-  function init (Work _work) public {
+  function init (Work _work, CoordinationGameManager _manager) public {
     work = _work;
+    manager = _manager;
   }
 
   /**
@@ -58,7 +68,8 @@ contract CoordinationGame is Ownable {
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
     require(v != address(0), 'verifier is available');
     verifier[applicationCount] = v;
-    emit NewApplication(applicationCount, msg.sender, _keccakOfSecretAndRandom, _keccakOfRandom, _hint, v);
+    emit NewApplication(applicationCount, msg.sender, v, _keccakOfSecretAndRandom, _keccakOfRandom, _hint);
+    manager.start(this, applicationCount);
   }
 
   /**
@@ -91,9 +102,11 @@ contract CoordinationGame is Ownable {
     applicantSecret[id] = _secret;
 
     if (_secret != verifierSecret[id]) {
-      // lose
+      emit ApplicantWon(id);
+      manager.applicantLost(this, id);
     } else {
-      // win
+      emit ApplicantLost(id);
+      manager.applicantWon(this, id);
     }
   }
 }
