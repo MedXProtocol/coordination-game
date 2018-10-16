@@ -131,8 +131,8 @@ contract CoordinationGame is Ownable {
     wins[applicant] += 1;
 
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    // tilRegistry.apply(bytes32(_applicantId), deposit, "");
-    // tilRegistry.transferOwnership(bytes32(_applicantId), applicant);
+    tilRegistry.token().approve(address(tilRegistry), deposit);
+    tilRegistry.apply(bytes32(_applicantId), deposit, "");
   }
 
   function applicantLost(uint256 _applicantId) internal {

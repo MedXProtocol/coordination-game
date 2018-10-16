@@ -23,8 +23,8 @@ contract TILRegistry is Registry, Ownable {
   @param _data Extra data
   */
   function apply(bytes32 _listingHash, uint _amount, string _data) external onlyCoordinationGame {
-    require(!isWhitelisted(_listingHash));
-    require(!appWasMade(_listingHash));
+    require(!isWhitelisted(_listingHash), 'listingHash is not whitelisted');
+    require(!appWasMade(_listingHash), '');
     require(_amount >= parameterizer.get("minDeposit"));
 
     // Sets owner
@@ -37,13 +37,8 @@ contract TILRegistry is Registry, Ownable {
     listing.unstakedDeposit = _amount;
 
     // Transfers tokens from user to TILRegistry contract
-    require(token.transferFrom(listing.owner, this, _amount));
+    require(token.transferFrom(msg.sender, this, _amount));
 
     emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);
-  }
-
-  function transferOwnership(bytes32 _listingHash, address _newOwner) external {
-    require(listings[_listingHash].owner == msg.sender, 'only the owner can transfer');
-    listings[_listingHash].owner = _newOwner;
   }
 }

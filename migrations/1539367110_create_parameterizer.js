@@ -9,7 +9,6 @@ module.exports = function(deployer, networkName) {
   deployer.then(async () => {
     const parameterizerFactory = await ParameterizerFactory.deployed()
     const workToken = await WorkToken.deployed()
-    console.log('WE DEPLOYED WITH ', workToken.address)
     await parameterizerFactory.newParameterizerBYOToken(workToken.address, [
       // minimum deposit for listing to be whitelisted
       web3.toWei('100', 'ether'),

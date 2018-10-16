@@ -40,20 +40,13 @@ module.exports = {
    */
 
   networks: {
-    // development: {
-    //   host: "127.0.0.1",     // Localhost (default: none)
-    //   port: 8545,            // Standard Ethereum port (default: none)
-    //   network_id: "1234",       // Any network (default: none)
-    //   gas: 8000000,
-    //   gasPrice: 2 * 1000000000
-    // },
-    // test: {
-    //   host: "127.0.0.1",     // Localhost (default: none)
-    //   port: 8545,            // Standard Ethereum port (default: none)
-    //   network_id: "333",       // Any network (default: none)
-    //   gas: 8000000,
-    //   gasPrice: 2 * 1000000000
-    // }
+    development: {
+      host: "127.0.0.1",     // Localhost (default: none)
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: "1234",       // Any network (default: none)
+      gas: 8000000,
+      gasPrice: 2 * 1000000000
+    }
   },
 
   // Set default mocha options here, use special reporters etc.

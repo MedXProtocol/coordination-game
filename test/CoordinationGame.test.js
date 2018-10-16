@@ -58,7 +58,6 @@ contract('CoordinationGame', (accounts) => {
   })
 
   beforeEach(async () => {
-    console.log('CRREATED REGISTRY WITH PARAMMMATERIZER ', parameterizer.address)
     assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
