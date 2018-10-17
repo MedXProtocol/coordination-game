@@ -75,9 +75,8 @@ contract CoordinationGame is Ownable {
   */
   function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
     public
-    returns (uint256)
   {
-    // make this optional if we want to lock down 1 application per Eth address
+    // make this configurable if we want to lock down 1 application per Eth address
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
     applicationCount += 1;
@@ -102,8 +101,6 @@ contract CoordinationGame is Ownable {
       _keccakOfRandom,
       _hint
     );
-
-    return applicationCount;
   }
 
   function getApplicantsLastApplicationID() external view returns (uint applicationId) {
@@ -112,13 +109,30 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantRandomlySelectVerifier(uint256 _applicationId) {
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
 
-    address v = work.selectWorker(uint256(blockhash(block.number - 1)));
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    address previousVerifier = verifiers[_applicationId];
+    // why minus 1 ?
+    uint256 randomNum = uint256(blockhash(block.number - 1));
+
+    address v = work.selectWorker(randomNum);
+
+    if (previousVerifier != address(0)) {
+      require(false, 'timout');
+
+      // If we chose this verifier last time let's choose a different one
+      if (v == previousVerifier) {
+        v = work.selectWorker(randomNum - 1);
+      }
+    }
+
+    require(v != previousVerifier, 'new verifier is not the same as the previous one');
+    require(v != address(0), 'verifier is not 0');
+    verifiers[_applicationId] = v;
 
     // transfer tokens from verifier's stake in Work contract to here
+    // TODO: This seems wrong as there is nothing about a verifier address here ... :
     require(
       work.token().allowance(address(work), address(this)) > deposit,
       'we can transfer tokens'
@@ -131,9 +145,6 @@ contract CoordinationGame is Ownable {
       work.token().transferFrom(work, address(this), deposit),
       'token transfer succeeded'
     );
-
-    require(v != address(0), 'verifier is available');
-    verifiers[applicationCount] = v;
 
     emit VerifierSelected(
       _applicationId,

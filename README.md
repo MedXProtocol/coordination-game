@@ -22,11 +22,7 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 ## TODO:
 
-*Reward Payment*
-
-- The Applicant needs to pay the reward in DAI (Application Fee) to the CoordinationGame contract as well as the Deposit (in Tokens?) for the application
-
-- Reward payment from Applicant to Verifier (DAI payout) (deferred until production)
+Technically any user (verifier, admin, etc) could choose a random verifier for an applicant if they missed that step.
 
 *Timeouts*
 
@@ -39,6 +35,10 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 *Payouts*
 
 - Need to pay the Verifier when the game is won or the vote rejects
+
+- The Applicant needs to pay the reward in DAI (Application Fee) to the CoordinationGame contract as well as the Deposit (in Tokens?) for the application
+
+- Reward payment from Applicant to Verifier (DAI payout) (deferred until production)
 
 *Parameterizer Variables*
 

@@ -10,6 +10,7 @@ const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
 const createTILRegistry = require('../migrations/support/createTILRegistry')
+const increaseTime = require('./helpers/increaseTime')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
