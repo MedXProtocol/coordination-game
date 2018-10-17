@@ -17,6 +17,8 @@ contract CoordinationGame is Ownable {
   uint256 public applicationCount;
   uint private secondsInDay;
 
+  uint256 public constant verifierTimeout = 120;
+
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
@@ -113,7 +115,7 @@ contract CoordinationGame is Ownable {
   }
 
   function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
-    uint256 verifierTimeout = tilRegistry.tilParameterizer().get("verifierTimeout");
+    // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
     require(verifierTimeout != 0, 'verifierTimeout equals 0');
 
     return (
@@ -124,7 +126,7 @@ contract CoordinationGame is Ownable {
   function applicantRandomlySelectVerifier(uint256 _applicationId) external {
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
 
-    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
     address previousVerifier = verifiers[_applicationId];
     // why minus 1 ?
     uint256 randomNum = uint256(blockhash(block.number - 1));
@@ -206,7 +208,7 @@ contract CoordinationGame is Ownable {
     bytes32 _secret,
     uint256 _randomNumber
   ) public {
-    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
 
     // uint256 id = applicantsApplicationIndices[msg.sender];
@@ -239,7 +241,7 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantLost(uint256 _applicationId) internal {
-    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
 
     losses[msg.sender] += 1;
 

@@ -17,7 +17,7 @@ contract('CoordinationGame', (accounts) => {
   let coordinationGame,
     workToken,
     work,
-    tilParameterizer,
+    parameterizer,
     tilRegistry,
     secondsInADay
 
@@ -44,22 +44,14 @@ contract('CoordinationGame', (accounts) => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     stake = await work.requiredStake()
-    const tilParameterizerAddress = (await tdr.findLastByContractName(
+    const parameterizerAddress = (await tdr.findLastByContractName(
       web3.version.network,
-      'TILParameterizer'
+      'Parameterizer'
     )).address
-    tilParameterizer = await TILParameterizer.at(tilParameterizerAddress)
+    parameterizer = await Parameterizer.at(parameterizerAddress)
 
 
-    const verifierTimeout = await tilParameterizer.get('verifierTimeout')
-    debug(`verifierTimeout ${verifierTimeout.toString()}...`)
-
-    const minDeposit = await tilParameterizer.get('minDeposit')
-    debug(`minDeposit ${minDeposit.toString()}...`)
-
-
-
-    assert.equal((await tilParameterizer.token()), workToken.address, 'tilParameterizer token matches work token')
+    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
     debug(`Minting Stake to Verifier ${stake.toString()}...`)
     await workToken.mint(verifier, stake)
@@ -78,12 +70,12 @@ contract('CoordinationGame', (accounts) => {
   })
 
   beforeEach(async () => {
-    assert.equal((await tilParameterizer.token()), workToken.address, 'tilParameterizer token matches work token')
+    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
     const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
-      tilParameterizer.address,
+      parameterizer.address,
       work.address,
       'TILRegistry'
     )
@@ -99,7 +91,7 @@ contract('CoordinationGame', (accounts) => {
     // Approve the coordinationGame contract of spending tokens on behalf of the work
     await work.approve(coordinationGameAddress)
 
-    const deposit = await tilParameterizer.get('minDeposit')
+    const deposit = await parameterizer.get('minDeposit')
     debug(`Minting Deposit to Applicant ${deposit.toString()}...`)
     await workToken.mint(applicant, deposit)
 
