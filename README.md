@@ -22,7 +22,7 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 ## TODO:
 
-Technically any user (verifier, admin, etc) could choose a random verifier for an applicant if they missed that step.
+DISCUSS: Technically any user (verifier, admin, etc) could choose a random verifier for an applicant if they missed that step.
 
 *Timeouts*
 
@@ -50,10 +50,15 @@ Technically any user (verifier, admin, etc) could choose a random verifier for a
 
 - Reward payment from Applicant to Verifier (DAI payout) (deferred until production)
 
+*Whistleblower Logic*
+
+fill in
+
 *Parameterizer Variables*
 
 - Need to determine all of the parameterizer variables
-  (Whistleblower fee, verifier deposit size, commit period, reveal period)
+  TODO: Whistleblower fee, verifier deposit amount, application deposit amount
+  DONE: commit period, reveal period
 
 *Building a Dapp*
 
