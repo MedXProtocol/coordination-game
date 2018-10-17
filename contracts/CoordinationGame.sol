@@ -15,6 +15,7 @@ contract CoordinationGame is Ownable {
   TILRegistry tilRegistry;
 
   uint256 public applicationCount;
+  uint private secondsInDay;
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => address) public applicants;
@@ -24,6 +25,8 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => address) public verifiers;
   mapping (uint256 => bytes32) public verifierSecrets;
   mapping (uint256 => bytes32) public applicantSecrets;
+  mapping (uint256 => uint256) public verifierSelectedAt;
+
   mapping (address => uint256) wins;
   mapping (address => uint256) losses;
 
@@ -62,6 +65,7 @@ contract CoordinationGame is Ownable {
          to add applicants to
   */
   function init(Work _work, TILRegistry _tilRegistry) public {
+    secondsInDay = 86400;
     work = _work;
     tilRegistry = _tilRegistry;
   }
@@ -108,10 +112,19 @@ contract CoordinationGame is Ownable {
     return applicantsApplicationIndices[msg.sender][index];
   }
 
-  function applicantRandomlySelectVerifier(uint256 _applicationId) {
+  function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
+    uint256 verifierTimeout = tilRegistry.tilParameterizer().get("verifierTimeout");
+    require(verifierTimeout != 0, 'verifierTimeout equals 0');
+
+    return (
+      block.timestamp - verifierSelectedAt[_applicationId]
+    ) > verifierTimeout;
+  }
+
+  function applicantRandomlySelectVerifier(uint256 _applicationId) external {
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
 
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
     address previousVerifier = verifiers[_applicationId];
     // why minus 1 ?
     uint256 randomNum = uint256(blockhash(block.number - 1));
@@ -119,17 +132,23 @@ contract CoordinationGame is Ownable {
     address v = work.selectWorker(randomNum);
 
     if (previousVerifier != address(0)) {
-      require(false, 'timout');
+      require(
+        verifierActionExpired(_applicationId),
+        'verifier had their chance to submit their secret'
+      );
 
       // If we chose this verifier last time let's choose a different one
       if (v == previousVerifier) {
         v = work.selectWorker(randomNum - 1);
       }
+
+      require(v != previousVerifier, 'new verifier is not the same as the previous one');
+      // TODO: reverse previousVerifier's stake
     }
 
-    require(v != previousVerifier, 'new verifier is not the same as the previous one');
     require(v != address(0), 'verifier is not 0');
     verifiers[_applicationId] = v;
+    verifierSelectedAt[_applicationId] = block.timestamp;
 
     // transfer tokens from verifier's stake in Work contract to here
     // TODO: This seems wrong as there is nothing about a verifier address here ... :
@@ -187,7 +206,7 @@ contract CoordinationGame is Ownable {
     bytes32 _secret,
     uint256 _randomNumber
   ) public {
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
 
     // uint256 id = applicantsApplicationIndices[msg.sender];
@@ -220,7 +239,7 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantLost(uint256 _applicationId) internal {
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    uint256 deposit = tilRegistry.tilParameterizer().get("minDeposit");
 
     losses[msg.sender] += 1;
 
@@ -232,5 +251,13 @@ contract CoordinationGame is Ownable {
     tilRegistry.challenge(bytes32(_applicationId), "");
 
     emit ApplicantLost(_applicationId);
+  }
+
+  function secondsInADay() public view returns (uint) {
+    return secondsInDay;
+  }
+
+  function setSecondsInADay(uint _secondsInDay) public onlyOwner {
+    secondsInDay = _secondsInDay;
   }
 }

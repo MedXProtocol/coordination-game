@@ -21,7 +21,7 @@ contract Work is Ownable {
     // require(token.allowance(msg.sender, address(this)) >= requiredStake, 'allowance is sufficient');
   }
 
-  function approve(address _spender) onlyOwner {
+  function approve(address _spender) onlyOwner external {
     uint256 maxInt = 0;
     maxInt -= 1;
     require(token.approve(_spender, maxInt), 'the spender is allowed unlimited tokens');

@@ -53,7 +53,7 @@ contract TILRegistry is Registry, Ownable {
   @dev                Returns true if apply was called for this listingHash
   @param _listingHash The listingHash whose status is to be examined
   */
-  function appWasMade(bytes32 _listingHash) view public returns (bool exists) {
+  function appWasMade(bytes32 _listingHash) public view returns (bool exists) {
       return listings[_listingHash].owner != address(0);
   }
 
@@ -61,7 +61,7 @@ contract TILRegistry is Registry, Ownable {
   @dev                Determines whether the given listingHash be whitelisted.
   @param _listingHash The listingHash whose status is to be examined
   */
-  function canBeWhitelisted(bytes32 _listingHash) view public returns (bool) {
+  function canBeWhitelisted(bytes32 _listingHash) public view returns (bool) {
       uint challengeID = listings[_listingHash].challengeID;
 
       // Ensures that the application was made,

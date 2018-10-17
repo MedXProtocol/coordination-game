@@ -44,7 +44,11 @@ module.exports = function(deployer, networkName) {
       30,
 
       // type of majority out of 100 necessary for proposal success in parameterizer
-      30
+      30,
+
+      // length of time in seconds an applicant has to wait for the verifier to
+      // submit a secret before choosing a new verifier
+      120
     ]).then(transactionReceipt => {
       const transactionHash = transactionReceipt.tx
       const receipt = transactionReceipt.receipt
