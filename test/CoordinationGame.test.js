@@ -19,6 +19,7 @@ contract('CoordinationGame', (accounts) => {
     work,
     parameterizer,
     tilRegistry,
+    applicationId,
     secondsInADay
 
   const applicant = accounts[0]
@@ -100,18 +101,33 @@ contract('CoordinationGame', (accounts) => {
 
   })
 
-  describe('start()', () => {
-    it('should allow a user to start', async () => {
-      await coordinationGame.start(
-        secretRandomHash,
-        randomHash,
-        hint,
-        {
-          from: applicant
-        }
-      )
+  async function applicantRandomlySelectsAVerifier() {
+    await coordinationGame.applicantRandomlySelectVerifier(
+      applicationId,
+      {
+        from: applicant
+      }
+    )
+  }
 
-      const applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+  async function newApplicantStartsGame() {
+    await coordinationGame.start(
+      secretRandomHash,
+      randomHash,
+      hint,
+      {
+        from: applicant
+      }
+    )
+  }
+
+
+
+  describe('start()', () => {
+    it('should allow a user to start the game', async () => {
+      await newApplicantStartsGame()
+
+      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
 
       const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(applicationId)
       const storedRandomHash = await coordinationGame.randomHashes(applicationId)
@@ -123,26 +139,13 @@ contract('CoordinationGame', (accounts) => {
     })
   })
 
-  describe('applicantRandomlySelectVerifier()', () => {
-    let applicationId
 
+  describe('applicantRandomlySelectVerifier()', () => {
     beforeEach(async () => {
-      await coordinationGame.start(
-        secretRandomHash,
-        randomHash,
-        hint,
-        {
-          from: applicant
-        }
-      )
+      await newApplicantStartsGame()
       applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
 
-      await coordinationGame.applicantRandomlySelectVerifier(
-        applicationId,
-        {
-          from: applicant
-        }
-      )
+      await applicantRandomlySelectsAVerifier()
     })
 
     it('should allow applicant to randomly select a verifier', async () => {
@@ -154,22 +157,11 @@ contract('CoordinationGame', (accounts) => {
       const firstVerifier = await coordinationGame.verifiers(applicationId)
 
       await expectThrow(async () => {
-        await coordinationGame.applicantRandomlySelectVerifier(
-          applicationId,
-          {
-            from: applicant
-          }
-        )
+        await applicantRandomlySelectsAVerifier()
       })
 
       await increaseTime(secondsInADay * 3)
-
-      await coordinationGame.applicantRandomlySelectVerifier(
-        applicationId,
-        {
-          from: applicant
-        }
-      )
+      await applicantRandomlySelectsAVerifier()
 
       const newVerifier = await coordinationGame.verifiers(applicationId)
       assert([verifier, verifier2].includes(newVerifier), 'new verifier matches')
@@ -178,25 +170,15 @@ contract('CoordinationGame', (accounts) => {
   })
 
   describe('verifierSubmitSecret()', () => {
+    beforeEach(async () => {
+      await newApplicantStartsGame()
+
+      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+
+      await applicantRandomlySelectsAVerifier()
+    })
+
     it('should allow the verifier to submit a secret', async () => {
-      await coordinationGame.start(
-        secretRandomHash,
-        randomHash,
-        hint,
-        {
-          from: applicant
-        }
-      )
-
-      const applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
-
-      await coordinationGame.applicantRandomlySelectVerifier(
-        applicationId,
-        {
-          from: applicant
-        }
-      )
-
       const randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
 
       debug(`verifierSubmitSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
@@ -208,21 +190,26 @@ contract('CoordinationGame', (accounts) => {
       const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
       assert.equal(secret, storedVerifierSecret)
     })
+
+    it('should not allow the verifier to submit if too much time has passed', async () => {
+      const randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
+
+      await increaseTime(secondsInADay * 3)
+
+      await expectThrow(async () => {
+        await coordinationGame.verifierSubmitSecret(applicationId, secret, {
+          from: randomlySelectedVerifier
+        })
+      })
+    })
   })
 
   describe('applicantRevealSecret()', () => {
-    let applicationId,
-      randomlySelectedVerifier
+    let randomlySelectedVerifier
 
     beforeEach(async () => {
-      await coordinationGame.start(
-        secretRandomHash,
-        randomHash,
-        hint,
-        {
-          from: applicant
-        }
-      )
+      await newApplicantStartsGame()
+
       debug(`applicantRevealSecret() won getApplicantsLastApplicationID(${applicant})...`)
       applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
 

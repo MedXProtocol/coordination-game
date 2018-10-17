@@ -46,7 +46,7 @@ contract CoordinationGame is Ownable {
     address indexed verifier
   );
 
-  event VerificationSubmitted(
+  event VerifierSecretSubmitted(
     uint256 indexed applicationId,
     address verifier,
     bytes32 secret
@@ -107,20 +107,6 @@ contract CoordinationGame is Ownable {
       _keccakOfRandom,
       _hint
     );
-  }
-
-  function getApplicantsLastApplicationID() external view returns (uint applicationId) {
-    uint index = applicantsApplicationIndices[msg.sender].length - 1;
-    return applicantsApplicationIndices[msg.sender][index];
-  }
-
-  function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
-    // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
-    require(verifierTimeout != 0, 'verifierTimeout equals 0');
-
-    return (
-      block.timestamp - verifierSelectedAt[_applicationId]
-    ) > verifierTimeout;
   }
 
   function applicantRandomlySelectVerifier(uint256 _applicationId) external {
@@ -185,17 +171,17 @@ contract CoordinationGame is Ownable {
     require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
 
+    // DISCUSS: do we actually want to do this? We could let them move
+    // the application forward at anytime, but also allow the applicant
+    // to reject this verifier and choose a new one after the expiry date
+    require(
+      !verifierActionExpired(_applicationId),
+      'verifier can still submit their secret'
+    );
+
     verifierSecrets[_applicationId] = _secret;
 
-    emit VerificationSubmitted(_applicationId, msg.sender, _secret);
-  }
-
-  /**
-  @notice Converts an application id into a listing hash key
-  @param _applicationId the application id
-  */
-  function getListingHash(uint256 _applicationId) public view returns (bytes32) {
-    return bytes32(_applicationId);
+    emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
   /**
@@ -210,9 +196,6 @@ contract CoordinationGame is Ownable {
   ) public {
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
-
-    // uint256 id = applicantsApplicationIndices[msg.sender];
-    // require(_applicationId != uint256(0), 'sender has an application');
 
     require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
 
@@ -262,4 +245,36 @@ contract CoordinationGame is Ownable {
   function setSecondsInADay(uint _secondsInDay) public onlyOwner {
     secondsInDay = _secondsInDay;
   }
+
+  /**
+  @notice Converts an application id into a listing hash key
+  @param _applicationId the application id
+  */
+  function getListingHash(uint256 _applicationId) public view returns (bytes32) {
+    return bytes32(_applicationId);
+  }
+
+  function getApplicantsLastApplicationID() external view returns (uint applicationId) {
+    uint index = applicantsApplicationIndices[msg.sender].length - 1;
+    return applicantsApplicationIndices[msg.sender][index];
+  }
+
+  function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
+    // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
+    require(verifierTimeout != 0, 'verifierTimeout equals 0');
+
+    return (
+      block.timestamp - verifierSelectedAt[_applicationId]
+    ) > verifierTimeout;
+  }
+
+  // function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
+  //   // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
+  //   require(verifierTimeout != 0, 'verifierTimeout equals 0');
+  //
+  //   return (
+  //     block.timestamp - verifierSelectedAt[_applicationId]
+  //   ) > verifierTimeout;
+  // }
+
 }

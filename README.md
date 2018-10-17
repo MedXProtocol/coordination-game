@@ -30,7 +30,17 @@ Technically any user (verifier, admin, etc) could choose a random verifier for a
 
 - If the Verifier doesn't commit their answer (secret) within the timeframe (then they get punished?) and a new Verifier is chosen
 
+* verifier should not be allowed to respond after expiry date (DONE)
+* applicant should be allowed to choose a new random verifier (DONE)
+* verifier can get their deposit back
+* original verifier gets punished?
+
 - If the Applicant doesn't reveal within the timeframe, (their deposit goes to the Verifier?) and their application is rejected
+
+* applicant should not be allowed to respond after expiry date
+* verifier should be allowed to force reject the application
+* verifier gets their deposit back (and a reward?)
+* applicant gets punished?
 
 *Payouts*
 
