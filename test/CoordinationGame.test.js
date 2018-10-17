@@ -68,11 +68,13 @@ contract('CoordinationGame', (accounts) => {
       'TILRegistry'
     )
 
-    const tilRegistryInstance = TILRegistry.at(addresses.tilRegistryAddress)
-    assert.equal((await tilRegistryInstance.token()), workToken.address, 'token addresses no match')
+    tilRegistry = TILRegistry.at(addresses.tilRegistryAddress)
+    assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
 
-    const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
+    const coordinationGameAddress = await tilRegistry.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
+
+    await work.approve(coordinationGameAddress)
 
     const deposit = await parameterizer.get('minDeposit')
     debug(`Minting Deposit to Applicant ${deposit.toString()}...`)
@@ -129,23 +131,69 @@ contract('CoordinationGame', (accounts) => {
   })
 
   describe('applicantRevealSecret()', () => {
-    it('should allow the applicant to reveal their secret', async () => {
-      await coordinationGame.start(
-        secretRandomHash,
-        randomHash,
-        hint,
-        {
-          from: applicant
-        }
-      )
-      debug(`applicantRevealSecret() applicationIndices(${applicant})...`)
-      const index = await coordinationGame.applicationIndices(applicant)
-      debug(`applicantRevealSecret() verifierSubmitSecret(${index}, ${secret})...`)
-      await coordinationGame.verifierSubmitSecret(index, secret, { from: verifier })
-      debug(`applicantRevealSecret() applicantRevealSecret(${secret}, ${random})...`)
-      await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
-      const storedSecret = await coordinationGame.applicantSecrets(index)
-      assert.equal(storedSecret, secret)
+    describe('when secret does match and game is won', () => {
+      it('should add applicant to registry (and pay out verifier)', async () => {
+        await coordinationGame.start(
+          secretRandomHash,
+          randomHash,
+          hint,
+          {
+            from: applicant
+          }
+        )
+        debug(`applicantRevealSecret() applicationIndices(${applicant})...`)
+        const applicationId = await coordinationGame.applicationIndices(applicant)
+
+        debug(`applicantRevealSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
+        await coordinationGame.verifierSubmitSecret(applicationId, secret, { from: verifier })
+
+        debug(`applicantRevealSecret() applicantRevealSecret(${secret}, ${random})...`)
+        await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
+
+        debug(`applicantRevealSecret() applicantSecrets(${applicationId})...`)
+        const storedSecret = await coordinationGame.applicantSecrets(applicationId)
+        assert.equal(storedSecret, secret)
+
+        debug(`applicantRevealSecret() getListingHash(${applicationId})...`)
+        const listingHash = await coordinationGame.getListingHash(applicationId)
+
+        debug(`applicantRevealSecret() listings(${listingHash})...`)
+        const listing = await tilRegistry.listings(listingHash)
+
+        assert.equal(listing[4].toString(), '0', 'application is not challenged')
+        assert.equal(listing[1], true, 'application is whitelisted')
+      })
+    })
+
+    describe('when secret does not match and game is lost', () => {
+      it('should make a challenge and go to vote', async () => {
+        const differentSecret = '0x56'
+        await coordinationGame.start(
+          secretRandomHash,
+          randomHash,
+          hint,
+          {
+            from: applicant
+          }
+        )
+        debug(`applicantRevealSecret() failed applicationIndices(${applicant})...`)
+        const applicationId = await coordinationGame.applicationIndices(applicant)
+
+        debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
+        await coordinationGame.verifierSubmitSecret(applicationId, differentSecret, { from: verifier })
+
+        debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
+        await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
+
+        debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
+        const listingHash = await coordinationGame.getListingHash(applicationId)
+
+        debug(`applicantRevealSecret() failed listings(${listingHash})...`)
+        const listing = await tilRegistry.listings(listingHash)
+
+        assert.notEqual(listing[4].toString(), '0', 'application is challenged')
+        assert.notEqual(listing[1], true, 'application is not whitelisted')
+      })
     })
   })
 })

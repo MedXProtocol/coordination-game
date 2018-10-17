@@ -77,13 +77,21 @@ contract CoordinationGame is Ownable {
     randomHashes[applicationCount] = _keccakOfRandom;
     hints[applicationCount] = _hint;
 
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+
+    // MOVE TO SUBSEQUENT TX
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
+
+    // transfer tokens from verifier's stake in Work contract to here
+    require(work.token().allowance(address(work), address(this)) > deposit, 'we can transfer tokens');
+    require(work.token().balanceOf(address(work)) > deposit, 'the work contract has enough tokens');
+    require(work.token().transferFrom(work, address(this), deposit), 'token transfer succeeded');
 
     require(v != address(0), 'verifier is available');
     verifiers[applicationCount] = v;
+    // END MOVE TO SUBSEQUENT TX
 
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    tilRegistry.token().transferFrom(msg.sender, address(this), deposit);
+    require(tilRegistry.token().transferFrom(msg.sender, address(this), deposit), '2nd token transfer succeeded');
 
     emit NewApplication(applicationCount, msg.sender, v, _keccakOfSecretAndRandom, _keccakOfRandom, _hint);
   }
@@ -102,6 +110,14 @@ contract CoordinationGame is Ownable {
     verifierSecrets[_applicationId] = _secret;
 
     emit VerificationSubmitted(_applicationId, msg.sender, _secret);
+  }
+
+  /**
+  @notice Converts an application id into a listing hash key
+  @param _applicationId the application id
+  */
+  function getListingHash(uint256 _applicationId) public view returns (bytes32) {
+    return bytes32(_applicationId);
   }
 
   /**
@@ -135,12 +151,15 @@ contract CoordinationGame is Ownable {
   function applicantWon(uint256 _applicantId) internal {
     address applicant = applicants[_applicantId];
     wins[applicant] += 1;
+    tilRegistry.updateStatus(bytes32(_applicantId));
   }
 
   function applicantLost(uint256 _applicantId) internal {
     address applicant = applicants[_applicantId];
     losses[applicant] += 1;
-
-    // tilRegistry.token().approve();
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    require(tilRegistry.token().balanceOf(address(this)) >= deposit, 'we have enough deposit');
+    tilRegistry.token().approve(address(tilRegistry), deposit);
+    tilRegistry.challenge(bytes32(_applicantId), "");
   }
 }

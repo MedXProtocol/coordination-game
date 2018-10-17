@@ -14,7 +14,7 @@ module.exports = function(deployer, networkName) {
       web3.toWei('100', 'ether'),
 
       // minimum deposit to propose a reparameterization
-      web3.toWei('1000', 'ether'),
+      web3.toWei('10000000000', 'ether'),
 
       // period over which applicants wait to be whitelisted
       0,

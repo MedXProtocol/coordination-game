@@ -48,4 +48,33 @@ contract TILRegistry is Registry, Ownable {
 
     emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);
   }
+
+  /**
+  @dev                Returns true if apply was called for this listingHash
+  @param _listingHash The listingHash whose status is to be examined
+  */
+  function appWasMade(bytes32 _listingHash) view public returns (bool exists) {
+      return listings[_listingHash].owner != address(0);
+  }
+
+  /**
+  @dev                Determines whether the given listingHash be whitelisted.
+  @param _listingHash The listingHash whose status is to be examined
+  */
+  function canBeWhitelisted(bytes32 _listingHash) view public returns (bool) {
+      uint challengeID = listings[_listingHash].challengeID;
+
+      // Ensures that the application was made,
+      // the application period has ended,
+      // the listingHash can be whitelisted,
+      // and either: the challengeID == 0, or the challenge has been resolved.
+      if (
+          appWasMade(_listingHash) &&
+          listings[_listingHash].applicationExpiry <= now &&
+          !isWhitelisted(_listingHash) &&
+          (challengeID == 0 || challenges[challengeID].resolved == true)
+      ) { return true; }
+
+      return false;
+  }
 }
