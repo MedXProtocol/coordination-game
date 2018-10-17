@@ -37,8 +37,8 @@ Technically any user (verifier, admin, etc) could choose a random verifier for a
 
 - If the Applicant doesn't reveal within the timeframe, (their deposit goes to the Verifier?) and their application is rejected
 
-* applicant should not be allowed to respond after expiry date
-* verifier should be allowed to force reject the application
+* applicant should not be allowed to respond after expiry date (DONE)
+* verifier should be allowed to force reject the application & challenge (DONE)
 * verifier gets their deposit back (and a reward?)
 * applicant gets punished?
 

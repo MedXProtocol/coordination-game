@@ -17,7 +17,8 @@ contract CoordinationGame is Ownable {
   uint256 public applicationCount;
   uint private secondsInDay;
 
-  uint256 public constant verifierTimeout = 120;
+  uint256 public constant verifierTimeout = 80;
+  uint256 public constant applicantRevealTimeout = 40;
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => address) public applicants;
@@ -27,7 +28,10 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => address) public verifiers;
   mapping (uint256 => bytes32) public verifierSecrets;
   mapping (uint256 => bytes32) public applicantSecrets;
+
   mapping (uint256 => uint256) public verifierSelectedAt;
+  mapping (uint256 => uint256) public verifierSubmittedAt;
+  mapping (uint256 => uint256) public verifierChallengedAt;
 
   mapping (address => uint256) wins;
   mapping (address => uint256) losses;
@@ -50,6 +54,11 @@ contract CoordinationGame is Ownable {
     uint256 indexed applicationId,
     address verifier,
     bytes32 secret
+  );
+
+  event VerifierChallenged(
+    uint256 indexed applicationId,
+    address verifier
   );
 
   event ApplicantWon(
@@ -180,6 +189,7 @@ contract CoordinationGame is Ownable {
     );
 
     verifierSecrets[_applicationId] = _secret;
+    verifierSubmittedAt[_applicationId] = block.timestamp;
 
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
@@ -194,9 +204,8 @@ contract CoordinationGame is Ownable {
     bytes32 _secret,
     uint256 _randomNumber
   ) public {
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
     require(applicants[_applicationId] == msg.sender, 'sender owns this application');
-
+    require(!applicantRevealExpired(_applicationId), 'applicant can still reveal their secret');
     require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
 
     bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
@@ -206,14 +215,33 @@ contract CoordinationGame is Ownable {
 
     applicantSecrets[_applicationId] = _secret;
 
-    tilRegistry.token().approve(address(tilRegistry), deposit);
-    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), deposit, "");
+    applyToRegistry(_applicationId);
 
     if (_secret != verifierSecrets[_applicationId]) {
       applicantLost(_applicationId);
     } else {
       applicantWon(_applicationId);
     }
+  }
+
+  /**
+  @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
+  @param _applicationId The application that the verifier is challenging
+  */
+  function verifierChallenge(uint256 _applicationId) public {
+    require(msg.sender == verifiers[_applicationId], 'sender is verifier');
+
+    require(
+      applicantRevealExpired(_applicationId),
+      'applicant reveal period has expired'
+    );
+
+    verifierChallengedAt[_applicationId] = block.timestamp;
+
+    applyToRegistry(_applicationId);
+    autoChallenge(_applicationId);
+
+    emit VerifierChallenged(_applicationId, msg.sender);
   }
 
   function applicantWon(uint256 _applicationId) internal {
@@ -224,16 +252,9 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantLost(uint256 _applicationId) internal {
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-
     losses[msg.sender] += 1;
 
-    require(
-      tilRegistry.token().balanceOf(address(this)) >= deposit,
-      'we have enough deposit'
-    );
-    tilRegistry.token().approve(address(tilRegistry), deposit);
-    tilRegistry.challenge(bytes32(_applicationId), "");
+    autoChallenge(_applicationId);
 
     emit ApplicantLost(_applicationId);
   }
@@ -268,13 +289,32 @@ contract CoordinationGame is Ownable {
     ) > verifierTimeout;
   }
 
-  // function verifierActionExpired(uint256 _applicationId) internal view returns (bool) {
-  //   // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
-  //   require(verifierTimeout != 0, 'verifierTimeout equals 0');
-  //
-  //   return (
-  //     block.timestamp - verifierSelectedAt[_applicationId]
-  //   ) > verifierTimeout;
-  // }
+  function applicantRevealExpired(uint256 _applicationId) internal view returns (bool) {
+    // uint256 applicantRevealTimeout = tilRegistry.parameterizer().get("applicantRevealTimeout");
+    require(applicantRevealTimeout != 0, 'applicantRevealTimeout equals 0');
+
+    return (
+      block.timestamp - verifierSubmittedAt[_applicationId]
+    ) > applicantRevealTimeout;
+  }
+
+  function applyToRegistry(uint256 _applicationId) internal {
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+
+    tilRegistry.token().approve(address(tilRegistry), deposit);
+    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), deposit, "");
+  }
+
+  function autoChallenge(uint256 _applicationId) internal {
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+
+    require(
+      tilRegistry.token().balanceOf(address(this)) >= deposit,
+      'we have enough deposit'
+    );
+    tilRegistry.token().approve(address(tilRegistry), deposit);
+
+    tilRegistry.challenge(bytes32(_applicationId), "");
+  }
 
 }

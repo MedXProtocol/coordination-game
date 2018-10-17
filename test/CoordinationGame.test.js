@@ -121,6 +121,20 @@ contract('CoordinationGame', (accounts) => {
     )
   }
 
+  async function applicantRevealsTheirSecret() {
+    await coordinationGame.applicantRevealSecret(
+      applicationId,
+      secret,
+      random.toString(),
+      {
+        from: applicant
+      }
+    )
+  }
+
+  async function verifierChallenges(selectedVerifier) {
+    await coordinationGame.verifierChallenge(applicationId, { from: selectedVerifier })
+  }
 
 
   describe('start()', () => {
@@ -231,12 +245,7 @@ contract('CoordinationGame', (accounts) => {
         })
 
         debug(`applicantRevealSecret() won applicantRevealSecret(${secret}, ${random})...`)
-        await coordinationGame.applicantRevealSecret(
-          applicationId,
-          secret,
-          random.toString(),
-          { from: applicant }
-        )
+        await applicantRevealsTheirSecret()
 
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
         const storedSecret = await coordinationGame.applicantSecrets(applicationId)
@@ -263,12 +272,44 @@ contract('CoordinationGame', (accounts) => {
         })
 
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
-        await coordinationGame.applicantRevealSecret(
-          applicationId,
-          secret,
-          random.toString(),
-          { from: applicant }
-        )
+        await applicantRevealsTheirSecret()
+
+        debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
+        const listingHash = await coordinationGame.getListingHash(applicationId)
+
+        debug(`applicantRevealSecret() failed listings(${listingHash})...`)
+        const listing = await tilRegistry.listings(listingHash)
+
+        assert.notEqual(listing[4].toString(), '0', 'application is challenged')
+        assert.notEqual(listing[1], true, 'application is not whitelisted')
+      })
+    })
+
+    describe('when the timeframe for the applicant to reveal has passed', () => {
+      it('should throw', async () => {
+        await increaseTime(secondsInADay * 3)
+
+        await expectThrow(async () => {
+          await applicantRevealsTheirSecret()
+        })
+      })
+
+      it('should allow the verifier to challenge', async () => {
+        const selectedVerifier = await coordinationGame.verifiers(applicationId)
+
+        debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
+        await coordinationGame.verifierSubmitSecret(applicationId, secret, {
+          from: selectedVerifier
+        })
+
+        await expectThrow(async () => {
+          await verifierChallenges(selectedVerifier)
+        })
+
+        await increaseTime(secondsInADay * 3)
+
+        await verifierChallenges(selectedVerifier)
+
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
