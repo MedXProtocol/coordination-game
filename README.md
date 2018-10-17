@@ -24,13 +24,17 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 *Reward Payment*
 
-- The Applicant needs to pay the reward in DAI (Application Fee) to the CoordinationGame contract as well as the Deposit (in Tokens?) for the application.
+- The Applicant needs to pay the reward in DAI (Application Fee) to the CoordinationGame contract as well as the Deposit (in Tokens?) for the application
+
+- Reward payment from Applicant to Verifier (DAI payout) (deferred until production)
 
 *Timeouts*
 
-- If the Verifier doesn't commit their answer (secret) within the timeframe (then they get punished?) and a new Verifier is chosen.
+- If the Applicant doesn't kick off the second transaction for the random number based on the next block hash to choose a Verifier within timeframe (applicant loses deposit and application is void?)
 
-- If the Applicant doesn't reveal within the timeframe, (their deposit goes to the Verifier?) and their application is rejected.
+- If the Verifier doesn't commit their answer (secret) within the timeframe (then they get punished?) and a new Verifier is chosen
+
+- If the Applicant doesn't reveal within the timeframe, (their deposit goes to the Verifier?) and their application is rejected
 
 *Payouts*
 
@@ -39,10 +43,13 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 *Parameterizer Variables*
 
 - Need to determine all of the parameterizer variables
+  (Whistleblower fee, verifier deposit size, commit period, reveal period)
 
 *Building a Dapp*
 
-- Make a dapp front-end!
+- Make a dapp front-end! (will be an example dapp for SG)
+  Price feed to purchase Tokens with Ether using current SAI price feed
+
 
 ## Exploits and Collusions
 

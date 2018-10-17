@@ -13,9 +13,10 @@ import "./TILRegistry.sol";
 contract CoordinationGame is Ownable {
   Work work;
   TILRegistry tilRegistry;
+
   uint256 public applicationCount;
 
-  mapping (address => uint256) public applicationIndices;
+  mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
@@ -29,10 +30,15 @@ contract CoordinationGame is Ownable {
   event NewApplication(
     uint256 indexed applicationId,
     address indexed applicant,
-    address indexed verifier,
     bytes32 secretAndRandomHash,
     bytes32 randomHash,
     bytes hint
+  );
+
+  event VerifierSelected(
+    uint256 indexed applicationId,
+    address indexed applicant,
+    address indexed verifier
   );
 
   event VerificationSubmitted(
@@ -52,6 +58,8 @@ contract CoordinationGame is Ownable {
   /**
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
+  @param _tilRegistry the Trustless Incentivized List Registry (TCR) contract
+         to add applicants to
   */
   function init(Work _work, TILRegistry _tilRegistry) public {
     work = _work;
@@ -67,11 +75,13 @@ contract CoordinationGame is Ownable {
   */
   function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
     public
+    returns (uint256)
   {
-    require(applicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
+    // make this optional if we want to lock down 1 application per Eth address
+    // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
     applicationCount += 1;
-    applicationIndices[msg.sender] = applicationCount;
+    applicantsApplicationIndices[msg.sender].push(applicationCount);
     applicants[applicationCount] = msg.sender;
     secretAndRandomHashes[applicationCount] = _keccakOfSecretAndRandom;
     randomHashes[applicationCount] = _keccakOfRandom;
@@ -79,21 +89,57 @@ contract CoordinationGame is Ownable {
 
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
 
-    // MOVE TO SUBSEQUENT TX
+    // Transfer a desposit of work tokens from the Applicant to this contract
+    require(
+      tilRegistry.token().transferFrom(msg.sender, address(this), deposit),
+      '2nd token transfer succeeded'
+    );
+
+    emit NewApplication(
+      applicationCount,
+      msg.sender,
+      _keccakOfSecretAndRandom,
+      _keccakOfRandom,
+      _hint
+    );
+
+    return applicationCount;
+  }
+
+  function getApplicantsLastApplicationID() external view returns (uint applicationId) {
+    uint index = applicantsApplicationIndices[msg.sender].length - 1;
+    return applicantsApplicationIndices[msg.sender][index];
+  }
+
+  function applicantRandomlySelectVerifier(uint256 _applicationId) {
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+
+    require(applicants[_applicationId] == msg.sender, 'sender owns this application');
+
     address v = work.selectWorker(uint256(blockhash(block.number - 1)));
 
     // transfer tokens from verifier's stake in Work contract to here
-    require(work.token().allowance(address(work), address(this)) > deposit, 'we can transfer tokens');
-    require(work.token().balanceOf(address(work)) > deposit, 'the work contract has enough tokens');
-    require(work.token().transferFrom(work, address(this), deposit), 'token transfer succeeded');
+    require(
+      work.token().allowance(address(work), address(this)) > deposit,
+      'we can transfer tokens'
+    );
+    require(
+      work.token().balanceOf(address(work)) > deposit,
+      'the work contract has enough tokens'
+    );
+    require(
+      work.token().transferFrom(work, address(this), deposit),
+      'token transfer succeeded'
+    );
 
     require(v != address(0), 'verifier is available');
     verifiers[applicationCount] = v;
-    // END MOVE TO SUBSEQUENT TX
 
-    require(tilRegistry.token().transferFrom(msg.sender, address(this), deposit), '2nd token transfer succeeded');
-
-    emit NewApplication(applicationCount, msg.sender, v, _keccakOfSecretAndRandom, _keccakOfRandom, _hint);
+    emit VerifierSelected(
+      _applicationId,
+      msg.sender,
+      v
+    );
   }
 
   /**
@@ -125,41 +171,55 @@ contract CoordinationGame is Ownable {
   @param _secret The applicant's secret
   @param _randomNumber The random number the applicant chose to obscure the secret
   */
-  function applicantRevealSecret(bytes32 _secret, uint256 _randomNumber) public {
-    uint256 id = applicationIndices[msg.sender];
-    require(id != uint256(0), 'sender has an application');
-    require(verifierSecrets[id] != bytes32(0), 'verify has submitted their secret');
+  function applicantRevealSecret(
+    uint256 _applicationId,
+    bytes32 _secret,
+    uint256 _randomNumber
+  ) public {
+    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    require(applicants[_applicationId] == msg.sender, 'sender owns this application');
+
+    // uint256 id = applicantsApplicationIndices[msg.sender];
+    // require(_applicationId != uint256(0), 'sender has an application');
+
+    require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
+
     bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
     bytes32 rHash = keccak256(abi.encodePacked(_randomNumber));
-    require(srHash == secretAndRandomHashes[id], 'secret and random hash matches');
-    require(rHash == randomHashes[id], 'random hash matches');
-    applicantSecrets[id] = _secret;
+    require(srHash == secretAndRandomHashes[_applicationId], 'secret and random hash matches');
+    require(rHash == randomHashes[_applicationId], 'random hash matches');
 
-    uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
+    applicantSecrets[_applicationId] = _secret;
+
     tilRegistry.token().approve(address(tilRegistry), deposit);
-    tilRegistry.apply(applicants[id], bytes32(id), deposit, "");
+    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), deposit, "");
 
-    if (_secret != verifierSecrets[id]) {
-      emit ApplicantLost(id);
-      applicantLost(id);
+    if (_secret != verifierSecrets[_applicationId]) {
+      applicantLost(_applicationId);
     } else {
-      emit ApplicantWon(id);
-      applicantWon(id);
+      applicantWon(_applicationId);
     }
   }
 
-  function applicantWon(uint256 _applicantId) internal {
-    address applicant = applicants[_applicantId];
-    wins[applicant] += 1;
-    tilRegistry.updateStatus(bytes32(_applicantId));
+  function applicantWon(uint256 _applicationId) internal {
+    wins[msg.sender] += 1;
+    tilRegistry.updateStatus(bytes32(_applicationId));
+
+    emit ApplicantWon(_applicationId);
   }
 
-  function applicantLost(uint256 _applicantId) internal {
-    address applicant = applicants[_applicantId];
-    losses[applicant] += 1;
+  function applicantLost(uint256 _applicationId) internal {
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
-    require(tilRegistry.token().balanceOf(address(this)) >= deposit, 'we have enough deposit');
+
+    losses[msg.sender] += 1;
+
+    require(
+      tilRegistry.token().balanceOf(address(this)) >= deposit,
+      'we have enough deposit'
+    );
     tilRegistry.token().approve(address(tilRegistry), deposit);
-    tilRegistry.challenge(bytes32(_applicantId), "");
+    tilRegistry.challenge(bytes32(_applicationId), "");
+
+    emit ApplicantLost(_applicationId);
   }
 }

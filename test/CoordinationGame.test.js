@@ -96,15 +96,37 @@ contract('CoordinationGame', (accounts) => {
         }
       )
 
-      const index = await coordinationGame.applicationIndices(applicant)
-      const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(index)
-      const storedRandomHash = await coordinationGame.randomHashes(index)
-      const storedHint = await coordinationGame.hints(index)
-      const selectedVerifier = await coordinationGame.verifiers(index)
+      const applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+
+      const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(applicationId)
+      const storedRandomHash = await coordinationGame.randomHashes(applicationId)
+      const storedHint = await coordinationGame.hints(applicationId)
 
       assert.equal(storedRandomHash, randomHash, 'random hash matches')
       assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
       assert.equal(storedHint, hint, 'hint matches')
+    })
+  })
+
+  describe('applicantRandomlySelectVerifier()', () => {
+    it('should allow applicant to randomly select a verifier', async () => {
+      await coordinationGame.start(
+        secretRandomHash,
+        randomHash,
+        hint,
+        {
+          from: applicant
+        }
+      )
+      const applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+
+      await coordinationGame.applicantRandomlySelectVerifier(
+        applicationId,
+        {
+          from: applicant
+        }
+      )
+      const selectedVerifier = await coordinationGame.verifiers(applicationId)
       assert.equal(selectedVerifier, verifier, 'verifier matches')
     })
   })
@@ -119,45 +141,69 @@ contract('CoordinationGame', (accounts) => {
           from: applicant
         }
       )
-      debug('verifierSubmitSecret() applied')
-      const index = await coordinationGame.applicationIndices(applicant)
-      debug('verifierSubmitSecret() applicationIndices')
-      debug(`verifierSubmitSecret() verifierSubmitSecret(${index}, ${secret})...`)
-      await coordinationGame.verifierSubmitSecret(index, secret, { from: verifier })
+
+      const applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+
+      await coordinationGame.applicantRandomlySelectVerifier(
+        applicationId,
+        {
+          from: applicant
+        }
+      )
+
+      debug(`verifierSubmitSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
+      await coordinationGame.verifierSubmitSecret(applicationId, secret, { from: verifier })
+
       debug('verifierSubmitSecret() verifierSubmitSecret')
-      const storedVerifierSecret = await coordinationGame.verifierSecrets(index)
+      const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
       assert.equal(secret, storedVerifierSecret)
     })
   })
 
   describe('applicantRevealSecret()', () => {
+    let applicationId
+
+    beforeEach(async () => {
+      await coordinationGame.start(
+        secretRandomHash,
+        randomHash,
+        hint,
+        {
+          from: applicant
+        }
+      )
+      debug(`applicantRevealSecret() won getApplicantsLastApplicationID(${applicant})...`)
+      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+
+      await coordinationGame.applicantRandomlySelectVerifier(
+        applicationId,
+        {
+          from: applicant
+        }
+      )
+    })
+
     describe('when secret does match and game is won', () => {
       it('should add applicant to registry (and pay out verifier)', async () => {
-        await coordinationGame.start(
-          secretRandomHash,
-          randomHash,
-          hint,
-          {
-            from: applicant
-          }
-        )
-        debug(`applicantRevealSecret() applicationIndices(${applicant})...`)
-        const applicationId = await coordinationGame.applicationIndices(applicant)
-
-        debug(`applicantRevealSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
+        debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
         await coordinationGame.verifierSubmitSecret(applicationId, secret, { from: verifier })
 
-        debug(`applicantRevealSecret() applicantRevealSecret(${secret}, ${random})...`)
-        await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
+        debug(`applicantRevealSecret() won applicantRevealSecret(${secret}, ${random})...`)
+        await coordinationGame.applicantRevealSecret(
+          applicationId,
+          secret,
+          random.toString(),
+          { from: applicant }
+        )
 
-        debug(`applicantRevealSecret() applicantSecrets(${applicationId})...`)
+        debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
         const storedSecret = await coordinationGame.applicantSecrets(applicationId)
         assert.equal(storedSecret, secret)
 
-        debug(`applicantRevealSecret() getListingHash(${applicationId})...`)
+        debug(`applicantRevealSecret() won getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
 
-        debug(`applicantRevealSecret() listings(${listingHash})...`)
+        debug(`applicantRevealSecret() won listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
         assert.equal(listing[4].toString(), '0', 'application is not challenged')
@@ -168,22 +214,17 @@ contract('CoordinationGame', (accounts) => {
     describe('when secret does not match and game is lost', () => {
       it('should make a challenge and go to vote', async () => {
         const differentSecret = '0x56'
-        await coordinationGame.start(
-          secretRandomHash,
-          randomHash,
-          hint,
-          {
-            from: applicant
-          }
-        )
-        debug(`applicantRevealSecret() failed applicationIndices(${applicant})...`)
-        const applicationId = await coordinationGame.applicationIndices(applicant)
 
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
         await coordinationGame.verifierSubmitSecret(applicationId, differentSecret, { from: verifier })
 
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
-        await coordinationGame.applicantRevealSecret(secret, random.toString(), { from: applicant })
+        await coordinationGame.applicantRevealSecret(
+          applicationId,
+          secret,
+          random.toString(),
+          { from: applicant }
+        )
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
