@@ -125,6 +125,7 @@ contract('CoordinationGame', (accounts) => {
         from: applicant
       }
     )
+    applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
   }
 
   async function applicantRevealsTheirSecret() {
@@ -147,8 +148,6 @@ contract('CoordinationGame', (accounts) => {
     it('should allow a user to start the game', async () => {
       await newApplicantStartsGame()
 
-      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
-
       const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(applicationId)
       const storedRandomHash = await coordinationGame.randomHashes(applicationId)
       const storedHint = await coordinationGame.hints(applicationId)
@@ -163,8 +162,6 @@ contract('CoordinationGame', (accounts) => {
   describe('applicantRandomlySelectVerifier()', () => {
     beforeEach(async () => {
       await newApplicantStartsGame()
-      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
-
       await applicantRandomlySelectsAVerifier()
     })
 
@@ -192,9 +189,6 @@ contract('CoordinationGame', (accounts) => {
   describe('verifierSubmitSecret()', () => {
     beforeEach(async () => {
       await newApplicantStartsGame()
-
-      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
-
       await applicantRandomlySelectsAVerifier()
     })
 
@@ -229,12 +223,8 @@ contract('CoordinationGame', (accounts) => {
 
     beforeEach(async () => {
       await newApplicantStartsGame()
-
       debug(`applicantRevealSecret() won getApplicantsLastApplicationID(${applicant})...`)
-      applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
-
       await applicantRandomlySelectsAVerifier()
-
       randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
     })
 
