@@ -27,8 +27,7 @@ h1,
 h2,
 h3 {
   font-family: 'Comfortaa', sans-serif;
-  // font-family: 'Heebo', sans-serif;
-  // font-weight: 700;
+  font-weight: 700;
 }
 
 p {
@@ -37,6 +36,8 @@ p {
 
 .navbar {
   background: transparent;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 10px;
 }
 
 .navbar-item {
@@ -101,4 +102,10 @@ header {
   color: inherit;
   box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2), 0 0 100px 0 rgba(10, 10, 20, 0.1);
   padding: 16px 16px 16px 60px;
+}
+
+.tag:not(body) {
+  color: inherit;
+  background-color: transparent;
+  font-size: inherit;
 }

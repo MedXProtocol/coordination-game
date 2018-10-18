@@ -88,12 +88,14 @@
 
 .nav--circle:before {
   border-radius: 100%;
+  border: 1px solid white;
   content: "";
-  height: 1rem;
-  width: 1rem;
+  height: 0.625rem;
+  width: 0.625rem;
   margin-right: 3px;
-  top: -1px;
-  position: relative;
+  top: 20px;
+  left: 2px;
+  position: absolute;
   z-index: 1;
   display: inline-block;
 }
@@ -166,6 +168,6 @@
 }
 
 .color-localhost:before {
-  background-color: #59b3ae;
-  color: #59b3ae;
+  background-color: #454545;
+  color: #454545;
 }

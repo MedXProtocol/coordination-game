@@ -31,6 +31,12 @@ const App = class extends Component {
             </div>
           </div>
 
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+
           <footer className="has-text-centered">
             <h3>
               What is this?
