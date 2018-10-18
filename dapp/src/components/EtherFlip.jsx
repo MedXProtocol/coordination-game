@@ -4,10 +4,10 @@ import React, {
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-  cacheCall,
-  cacheCallValue,
-  withSaga,
-  contractByName
+  // cacheCall,
+  // cacheCallValue,
+  // withSaga,
+  // contractByName
 } from 'saga-genesis'
 import { etherWeiToUsdWei } from '~/utils/etherWeiToUsdWei'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
