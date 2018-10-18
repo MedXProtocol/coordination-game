@@ -258,13 +258,22 @@ contract('CoordinationGame', (accounts) => {
       await applicantRandomlySelectsAVerifier()
     })
 
-    it('should allow the verifier to submit a secret', async () => {
-      debug(`verifierSubmitSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
-      await verifierSubmitSecret()
+    context('when called successfully', () => {
+      beforeEach(async () => {
+        await verifierSubmitSecret()
+      })
 
-      debug('verifierSubmitSecret() verifierSubmitSecret')
-      const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
-      assert.equal(secret, storedVerifierSecret)
+      it('should set the verifier secret', async () => {
+        debug('verifierSubmitSecret() verifierSubmitSecret')
+        const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
+        assert.equal(secret, storedVerifierSecret)
+      })
+
+      it('should not be called again', async () => {
+        await expectThrow(async () => {
+          await verifierSubmitSecret()
+        })
+      })
     })
 
     it('should not allow the verifier to submit if too much time has passed', async () => {
@@ -283,12 +292,18 @@ contract('CoordinationGame', (accounts) => {
       await applicantRandomlySelectsAVerifier()
     })
 
-    describe('when secret does match and game is won', () => {
-      it('should add applicant to registry (and pay out verifier)', async () => {
-        debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
-        await verifierSubmitSecret()
+    it('should not be called before the verifier has submitted', async () => {
+      await expectThrow(async () => {
+        await applicantRevealsTheirSecret()
+      })
+    })
 
-        debug(`applicantRevealSecret() won applicantRevealSecret(${secret}, ${random})...`)
+    context('when the verifier has submitted a matching secret', async () => {
+      beforeEach(async () => {
+        await verifierSubmitSecret()
+      })
+
+      it('should add applicant to registry (and pay out verifier)', async () => {
         await applicantRevealsTheirSecret()
 
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
@@ -306,7 +321,7 @@ contract('CoordinationGame', (accounts) => {
       })
     })
 
-    describe('when secret does not match and game is lost', () => {
+    context('when the verifier has submitted different secret', async () => {
       it('should make a challenge and go to vote', async () => {
         const differentSecret = '0x56'
 

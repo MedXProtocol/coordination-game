@@ -53,6 +53,11 @@ contract CoordinationGame is Ownable {
     address indexed verifier
   );
 
+  event VerifierSubmissionTimedOut(
+    uint256 indexed applicationId,
+    address indexed verifier
+  );
+
   event VerifierSecretSubmitted(
     uint256 indexed applicationId,
     address verifier,
@@ -154,6 +159,8 @@ contract CoordinationGame is Ownable {
         work.token().transfer(applicants[_applicationId], applicantDeposits[_applicationId]),
         'transferred old verifiers deposit to applicant'
       );
+
+      VerifierSubmissionTimedOut(_applicationId, previousVerifier);
 
       // If we chose this verifier last time let's choose a different one
       if (selectedVerifier == previousVerifier) {
