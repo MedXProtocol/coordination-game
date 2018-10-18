@@ -10,14 +10,12 @@ export const Header = class _Header extends Component {
           <div className="navbar-brand">
             <div className="navbar-item">
               <h1>
-                TIL (Trustless Incentivized List) Coordination Game Demo
+                Coordination Game
               </h1>
             </div>
-
-            <NetworkCheck />
           </div>
 
-
+          <NetworkCheck />
         </div>
       </nav>
     )

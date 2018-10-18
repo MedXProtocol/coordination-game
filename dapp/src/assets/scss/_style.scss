@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   background: #0e0b16;
   /* background: #a239ca; */
@@ -25,31 +26,26 @@ body {
 h1,
 h2,
 h3 {
-  font-family: 'Heebo', sans-serif;
-  font-weight: 700;
+  font-family: 'Comfortaa', sans-serif;
+  // font-family: 'Heebo', sans-serif;
+  // font-weight: 700;
 }
 
 p {
   font-family: 'Heebo', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
 }
 
-.app {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 10px;
-  grid-auto-rows: 200px;
-  grid-template-areas:
-    ". a a ."
-    ". a a ."
-    ". b b .";
+.navbar {
+  background: transparent;
+}
+
+.navbar-item {
+  color: white;
 }
 
 .main {
   align-self: center;
   border-radius: 3px;
-  grid-area: a;
   justify-self: center;
   margin-top: 300px;
   min-height: 600px;
@@ -105,8 +101,4 @@ header {
   color: inherit;
   box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2), 0 0 100px 0 rgba(10, 10, 20, 0.1);
   padding: 16px 16px 16px 60px;
-}
-
-footer {
-  grid-area: b;
 }

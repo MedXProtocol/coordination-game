@@ -1,5 +1,4 @@
 import {
-  all,
   fork,
   takeEvery,
   setContext
@@ -17,5 +16,5 @@ export default function* () {
 }
 
 function* catchSagaGenesisErrorSaga(error) {
-  console.log(error)
+  yield console.log(error)
 }

@@ -31,14 +31,15 @@ const App = class extends Component {
             </div>
           </div>
 
+          <footer className="has-text-centered">
+            <h3>
+              What is this?
+            </h3>
+            <p>
+              (Trustless Incentivized List)
+            </p>
+          </footer>
         </section>
-
-
-        <footer>
-          <p>
-            What is this?
-          </p>
-        </footer>
       </React.Fragment>
     )
   }

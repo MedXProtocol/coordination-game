@@ -15,7 +15,7 @@ import { Ether } from './Ether'
 
 function mapStateToProps(state) {
   return {
-    usdWeiPerEther: 12300000000000
+    usdWeiPerEther: 123000000000000000000
   }
   // const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   // return {
