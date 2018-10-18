@@ -12,10 +12,10 @@ const App = class extends Component {
               <Header />
 
               <div className="entries">
-                <input className="new-hint" placeholder="What's the hint?" value="" />
+                <input className="new-hint" placeholder="What's the hint?" />
                 <br />
                 <br />
-                <input className="new-secret" placeholder="What is the answer?" value="" />
+                <input className="new-secret" placeholder="What is the answer?" />
 
                 <ul>
                   <li>

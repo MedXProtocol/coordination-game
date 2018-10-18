@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { NetworkCheck } from './NetworkCheck'
+import { NetworkCheck } from '~/components/NetworkCheck'
 
 export const Header = class _Header extends Component {
 
