@@ -28,19 +28,27 @@ DISCUSS: Technically any user (verifier, admin, etc) could choose a random verif
 
 - If the Applicant doesn't kick off the second transaction for the random number based on the next block hash to choose a Verifier within timeframe (applicant loses deposit and application is void?)
 
+
+email notifications
 - If the Verifier doesn't commit their answer (secret) within the timeframe (then they get punished?) and a new Verifier is chosen
 
 * verifier should not be allowed to respond after expiry date (DONE)
 * applicant should be allowed to choose a new random verifier (DONE)
-* verifier can get their deposit back
 * original verifier gets punished?
 
+
+
+email notifications
 - If the Applicant doesn't reveal within the timeframe, (their deposit goes to the Verifier?) and their application is rejected
 
 * applicant should not be allowed to respond after expiry date (DONE)
 * verifier should be allowed to force reject the application & challenge (DONE)
+   no challenge
 * verifier gets their deposit back (and a reward?)
-* applicant gets punished?
+* applicant gets punished
+  (part of applicant deposit to stake into TIL, part to verifier. Lose the verifier portion, but receive permanent staking back)
+
+  remove challenge part
 
 *Payouts*
 
