@@ -32,6 +32,8 @@ contract CoordinationGame is Ownable {
   /// Stores the block number whose hash is to be used for randomness
   mapping (uint256 => uint256) public randomBlockNumbers;
 
+  mapping (uint256 => bool) public contractKilled;
+
   mapping (uint256 => uint256) public verifierSelectedAt;
   mapping (uint256 => uint256) public verifierSubmittedAt;
   mapping (uint256 => uint256) public verifierChallengedAt;
@@ -53,11 +55,13 @@ contract CoordinationGame is Ownable {
     address indexed verifier
   );
 
+  /// Emitted when a Verifier is replaced by another after timing out.
   event VerifierSubmissionTimedOut(
     uint256 indexed applicationId,
     address indexed verifier
   );
 
+  /// Emitted when a verifier submits their secret
   event VerifierSecretSubmitted(
     uint256 indexed applicationId,
     address verifier,
@@ -105,7 +109,7 @@ contract CoordinationGame is Ownable {
 
   /**
   @notice Creates an application on behalf of the message sender, this kicks off
-          the game for the applicant
+          the game for the applicant.
   @param _keccakOfSecretAndRandom The hash of the secret and salt
   @param _keccakOfRandom The hash of the salt
   @param _hint The hint for the verifier to determine the secret
@@ -260,11 +264,19 @@ contract CoordinationGame is Ownable {
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
     );
-
     verifierChallengedAt[_applicationId] = block.timestamp;
 
-    applyToRegistry(_applicationId);
-    autoChallenge(_applicationId);
+    /// Transfer the verifier's deposit back to them
+    tilRegistry.token().transfer(
+      address(work),
+      applicantDeposits[_applicationId]
+    );
+
+    /// Transfer applicant's deposit back to them
+    tilRegistry.token().transfer(
+      applicants[_applicationId],
+      applicantDeposits[_applicationId]
+    );
 
     emit VerifierChallenged(_applicationId, msg.sender);
   }

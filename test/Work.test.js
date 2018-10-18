@@ -6,7 +6,7 @@ const BN = require('bn.js')
 const debug = require('debug')('Work.test.js')
 
 contract('Work', (accounts) => {
-  let [staker, staker2] = accounts
+  let [staker, staker2, jobManager] = accounts
 
   let token
   let work
@@ -20,7 +20,8 @@ contract('Work', (accounts) => {
     await token.mint(staker, web3.toWei('1000', 'ether'))
     await token.mint(staker2, web3.toWei('1000', 'ether'))
 
-    work = await Work.new(token.address, requiredStake)
+    work = await Work.new(token.address, requiredStake, web3.toWei('10', 'ether'))
+    await work.setJobManager(jobManager)
     await token.approve(work.address, requiredStake, { from: staker })
     await token.approve(work.address, requiredStake, { from: staker2 })
     debug(`token.approve(${work.address}, ${requiredStake.toString()}) from ${staker}`)
@@ -42,7 +43,7 @@ contract('Work', (accounts) => {
       debug(`depositStake(): work.depositStake()`)
       assert.equal(await token.balanceOf(work.address), requiredStake)
       debug(`depositStake(): token.balanceOf(${work.address})`)
-      assert.equal(await work.stakerAddresses(staker), true)
+      assert.equal(await work.isStaker(staker), true)
     })
   })
 
@@ -55,7 +56,7 @@ contract('Work', (accounts) => {
   describe('withdrawStake()', () => {
     it('should allow a staked user to withdraw their tokens', async () => {
       await work.withdrawStake({ from: staker })
-      assert.equal(await work.stakerAddresses(staker), false)
+      assert.equal(await work.isStaker(staker), false)
       assert.equal(await token.balanceOf(work.address), '0')
       assert.equal((await token.balanceOf(staker)).toString(), initialStakerBalance.toString())
     })
@@ -63,14 +64,23 @@ contract('Work', (accounts) => {
     context('when multiple stakers', () => {
       it('should cleanly shorten when last element', async () => {
         await token.approve(work.address, requiredStake, { from: staker })
+        debug(`balance1: ${(await token.balanceOf(work.address)).toString()}`)
+        debug(`balance staker: ${(await work.stakerAmounts(staker)).toString()}`)
+        debug(`balance staker2: ${(await work.stakerAmounts(staker2)).toString()}`)
         await work.depositStake({ from: staker })
-        debug(`work.depositStake() from ${staker}`)
+        debug(`balance2: ${(await token.balanceOf(work.address)).toString()}`)
+        debug(`balance staker: ${(await work.stakerAmounts(staker)).toString()}`)
+        debug(`balance staker2: ${(await work.stakerAmounts(staker2)).toString()}`)
         await work.depositStake({ from: staker2 })
-        debug(`work.depositStake() from ${staker2}`)
+        debug(`balance3: ${(await token.balanceOf(work.address)).toString()}`)
+        debug(`balance staker: ${(await work.stakerAmounts(staker)).toString()}`)
+        debug(`balance staker2: ${(await work.stakerAmounts(staker2)).toString()}`)
         await work.withdrawStake({ from: staker })
-        debug(`work.withdrawStake() from ${staker}`)
+        debug(`balance4: ${(await token.balanceOf(work.address)).toString()}`)
+        debug(`balance staker: ${(await work.stakerAmounts(staker)).toString()}`)
+        debug(`balance staker2: ${(await work.stakerAmounts(staker2)).toString()}`)
         assert.equal((await token.balanceOf(staker)).toString(), initialStakerBalance.toString())
-        assert.equal(await work.stakerAddresses(staker), false)
+        assert.equal(await work.isStaker(staker), false)
 
         await token.approve(work.address, requiredStake, { from: staker })
         await work.depositStake({ from: staker })
@@ -79,7 +89,7 @@ contract('Work', (accounts) => {
           (await token.balanceOf(work.address)).toString(),
           new BN(requiredStake).mul(new BN(2)).toString()
         )
-        assert.equal(await work.stakerAddresses(staker), true)
+        assert.equal(await work.isStaker(staker), true)
       })
     })
   })

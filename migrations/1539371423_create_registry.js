@@ -25,7 +25,7 @@ module.exports = function(deployer, networkName) {
     const tilRegistryInstance = await TILRegistry.at(addresses.tilRegistryAddress)
     const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
 
-    await work.approve(coordinationGameAddress)
+    await work.setJobManager(coordinationGameAddress)
 
     if (!tdr.isDryRunNetworkName(networkName)) {
       await tdr.append(deployer.network_id, {
