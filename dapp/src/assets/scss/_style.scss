@@ -4,7 +4,7 @@
 
 html,
 body {
-  background: #0e0b16;
+  background: $background-color;
   /* background: #a239ca; */
   /* background: #4717f6; */
   color: #e7dfdd;
@@ -44,16 +44,6 @@ h3 {
 
 p {
   font-family: 'Heebo', sans-serif;
-}
-
-.navbar {
-  background: transparent;
-  font-family: 'Comfortaa', sans-serif;
-  font-size: 10px;
-}
-
-.navbar-item {
-  color: white;
 }
 
 .main {
@@ -123,27 +113,39 @@ header {
 }
 
 
-
-
 .text-input {
   background-color: transparent;
   border: 0;
   border-bottom: 0.1em solid;
   border-radius: 0;
-  color: white;
+  color: rgba(255, 255, 255, 0.3);
   font-size: 3rem;
   line-height: 1.1;
-  // margin: 0 1rem;
+  max-width: 10rem;
   text-align: center;
   outline: 0;
   padding: 0 0.5rem;
+
+  transition: all 0.1s ease-in-out;
 }
+
+.text-input:focus,
+.text-input:active,
+.text-input:hover {
+  color: white;
+}
+
+.text-input.hint {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 0.05em solid;
+}
+
 
 ::placeholder {
   color: #777;
 }
 
-.text-plus {
+.text-operator {
   display: inline-block;
   font-size: 2rem;
   margin: 0 1rem;
@@ -169,4 +171,18 @@ header {
 .table td,
 .table th {
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+.table tr.is-selected td,
+.table tr.is-selected th {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.hint-and-secret {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.section {
+  padding: 8rem 0;
 }

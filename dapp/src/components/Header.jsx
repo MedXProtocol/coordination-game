@@ -6,7 +6,7 @@ export const Header = class _Header extends Component {
   render () {
     return (
       <nav id="navbar" className="navbar is-fixed-top">
-        <div className="container">
+        <div className="container is-fluid">
           <div className="navbar-brand">
             <div className="navbar-item">
               <h1>
