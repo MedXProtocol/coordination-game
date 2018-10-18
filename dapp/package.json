@@ -69,7 +69,6 @@
     "redux": "^4.0.1",
     "redux-saga": "^0.16.2",
     "resolve": "1.8.1",
-    "saga-genesis": "MedXProtocol/saga-genesis#master",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.0",
     "terser-webpack-plugin": "1.1.0",
