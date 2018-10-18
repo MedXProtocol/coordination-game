@@ -19,8 +19,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+strong {
+  color: white;
+}
+
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+a {
+  color: #0fa8e6;
+}
+
+a:hover {
+  color: #0fc8ff;
 }
 
 h1,
@@ -108,4 +120,53 @@ header {
   color: inherit;
   background-color: transparent;
   font-size: inherit;
+}
+
+
+
+
+.text-input {
+  background-color: transparent;
+  border: 0;
+  border-bottom: 0.1em solid;
+  border-radius: 0;
+  color: white;
+  font-size: 3rem;
+  line-height: 1.1;
+  // margin: 0 1rem;
+  text-align: center;
+  outline: 0;
+  padding: 0 0.5rem;
+}
+
+::placeholder {
+  color: #777;
+}
+
+.text-plus {
+  display: inline-block;
+  font-size: 2rem;
+  margin: 0 1rem;
+}
+
+.entries {
+  margin-top: 5rem;
+}
+
+.table {
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  margin: 2rem auto;
+}
+
+.table thead td,
+.table thead th,
+.table td,
+.table th {
+  color: white;
+}
+
+.table td,
+.table th {
+  border-color: rgba(255, 255, 255, 0.05);
 }

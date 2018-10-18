@@ -12,29 +12,70 @@ const App = class extends Component {
               <div className='column is-one-half-desktop'>
                 <Header />
 
-                <div className="entries">
-                <br />
-                <br />
-                  <input className="new-hint" placeholder="What's the hint?" />
+                <div className="hint-and-secret">
                   <br />
                   <br />
-                  <input className="new-secret" placeholder="What is the answer?" />
+                  <input
+                    className="new-hint text-input"
+                    type="number"
+                    min="1"
+                    max="10000"
+                    placeholder="345"
+                    maxchars="5"
+                    pattern="[0-9]*"
+                  />
+                  <span className="text-plus">+</span>
+                  <input
+                    className="new-hint text-input"
+                    type="number"
+                    min="1"
+                    max="10000"
+                    placeholder="223"
+                    maxchars="5"
+                    pattern="[0-9]*"
+                  />
 
-                  <ul>
-                    <li>
+                  <br />
+                  <br />
+                  <input
+                    className="new-secret text-input"
+                    placeholder="What is the answer?"
+                    type="number"
+                    min="1"
+                    max="10000"
+                    placeholder="4500"
+                    maxchars="5"
+                    pattern="[0-9]*"
+                  />
+                </div>
 
-                    </li>
-                  </ul>
+                <div className="entries has-text-centered">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Application #</th>
+                        <th>Hint</th>
+                        <th>Secret</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="is-selected">
+                        <th>1</th>
+                        <th>200 + 200</th>
+                        <th>400</th>
+                      </tr>
+                      <tr>
+                        <th>1</th>
+                        <th>300 + 2</th>
+                        <th>5693</th>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
               </div>
             </div>
           </div>
-
-          <br />
-          <br />
-          <br />
-          <br />
           <br />
 
           <footer className="has-text-centered">
