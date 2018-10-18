@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import { reducers } from 'saga-genesis'
+import { reducers as sagaGenesis } from 'saga-genesis'
 
 export default combineReducers({
-  reducers
+  sagaGenesis
 })

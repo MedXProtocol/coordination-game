@@ -5,34 +5,41 @@ import { Header } from './Header'
 const App = class extends Component {
   render() {
     return (
-      <section className='section'>
-        <div className='container'>
-          <div className='columns'>
-            <div className='column is-one-half-desktop'>
-              <Header />
+      <React.Fragment>
+        <section className='section'>
+          <div className='container'>
+            <div className='columns'>
+              <div className='column is-one-half-desktop'>
+                <Header />
 
-              <div className="entries">
-                <input className="new-hint" placeholder="What's the hint?" />
+                <div className="entries">
                 <br />
                 <br />
-                <input className="new-secret" placeholder="What is the answer?" />
+                  <input className="new-hint" placeholder="What's the hint?" />
+                  <br />
+                  <br />
+                  <input className="new-secret" placeholder="What is the answer?" />
 
-                <ul>
-                  <li>
+                  <ul>
+                    <li>
 
-                  </li>
-                </ul>
+                    </li>
+                  </ul>
+                </div>
+
               </div>
-
-              <footer>
-                <p>
-                  What is this?
-                </p>
-              </footer>
             </div>
           </div>
-        </div>
-      </section>
+
+        </section>
+
+
+        <footer>
+          <p>
+            What is this?
+          </p>
+        </footer>
+      </React.Fragment>
     )
   }
 }
