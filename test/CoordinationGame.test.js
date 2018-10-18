@@ -12,11 +12,14 @@ const tdr = require('truffle-deploy-registry')
 const createTILRegistry = require('../migrations/support/createTILRegistry')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
+const mineBlock = require('./helpers/mineBlock')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
       workToken,
       work,
+      workStake,
+      minDeposit,
       parameterizer,
       tilRegistry,
       applicationId,
@@ -45,28 +48,18 @@ contract('CoordinationGame', (accounts) => {
   before(async () => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
-    stake = await work.requiredStake()
+    workStake = await work.requiredStake()
     const parameterizerAddress = (await tdr.findLastByContractName(
       web3.version.network,
       'Parameterizer'
     )).address
     parameterizer = await Parameterizer.at(parameterizerAddress)
+    minDeposit = await parameterizer.get('minDeposit')
 
     assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
-    debug(`Minting Stake to Verifier ${stake.toString()}...`)
-    await workToken.mint(verifier, stake)
-
-    debug(`Approving stake ${stake.toString()} to ${work.address} for Verifier...`)
-    await workToken.approve(work.address, stake, { from: verifier })
-    await work.depositStake({ from: verifier })
-
-    debug(`Minting Stake to Verifier2 ${stake.toString()}...`)
-    await workToken.mint(verifier2, stake)
-
-    debug(`Approving stake ${stake.toString()} to ${work.address} for Verifier2...`)
-    await workToken.approve(work.address, stake, { from: verifier2 })
-    await work.depositStake({ from: verifier2 })
+    await registerWorker(verifier)
+    await registerWorker(verifier2)
   })
 
   beforeEach(async () => {
@@ -98,16 +91,25 @@ contract('CoordinationGame', (accounts) => {
     // Approve the coordinationGame contract of spending tokens on behalf of the work
     await work.approve(coordinationGameAddress)
 
-    const deposit = await parameterizer.get('minDeposit')
-    debug(`Minting Deposit to Applicant ${deposit.toString()}...`)
-    await workToken.mint(applicant, deposit)
+    debug(`Minting Deposit to Applicant ${minDeposit.toString()}...`)
+    await workToken.mint(applicant, minDeposit)
 
-    debug(`Approving CoordinationGame to spend ${deposit.toString()} for applicant...`)
-    await workToken.approve(coordinationGameAddress, deposit, { from: applicant })
+    debug(`Approving CoordinationGame to spend ${minDeposit.toString()} for applicant...`)
+    await workToken.approve(coordinationGameAddress, minDeposit, { from: applicant })
 
   })
 
+  async function registerWorker(address) {
+    debug(`Minting Stake to ${address}...`)
+    await workToken.mint(address, workStake)
+
+    debug(`Approving workStake ${workStake.toString()} to ${work.address} for ${address}...`)
+    await workToken.approve(work.address, workStake, { from: address })
+    await work.depositStake({ from: address })
+  }
+
   async function applicantRandomlySelectsAVerifier() {
+    await mineBlock()
     await coordinationGame.applicantRandomlySelectVerifier(
       applicationId,
       {
@@ -129,6 +131,7 @@ contract('CoordinationGame', (accounts) => {
   }
 
   async function applicantRevealsTheirSecret() {
+    debug(`applicantRevealsTheirSecret`)
     await coordinationGame.applicantRevealSecret(
       applicationId,
       secret,
@@ -139,7 +142,17 @@ contract('CoordinationGame', (accounts) => {
     )
   }
 
+  async function verifierSubmitSecret(_secret) {
+    if (!_secret) { _secret = secret }
+    debug(`verifierSubmitSecret`)
+    let selectedVerifier = await coordinationGame.verifiers(applicationId)
+    await coordinationGame.verifierSubmitSecret(applicationId, _secret, {
+      from: selectedVerifier
+    })
+  }
+
   async function verifierChallenges(selectedVerifier) {
+    debug(`verifierChallenges`)
     await coordinationGame.verifierChallenge(applicationId, { from: selectedVerifier })
   }
 
@@ -160,29 +173,82 @@ contract('CoordinationGame', (accounts) => {
 
 
   describe('applicantRandomlySelectVerifier()', () => {
-    beforeEach(async () => {
-      await newApplicantStartsGame()
-      await applicantRandomlySelectsAVerifier()
-    })
-
-    it('should allow applicant to randomly select a verifier', async () => {
-      const selectedVerifier = await coordinationGame.verifiers(applicationId)
-      assert([verifier, verifier2].includes(selectedVerifier), '1st verifier matches')
-    })
-
-    it('should not allow a new verifier unless enough time has passed', async () => {
-      const firstVerifier = await coordinationGame.verifiers(applicationId)
-
+    it('should not work before the next block has been mined', async () => {
       await expectThrow(async () => {
+        await coordinationGame.applicantRandomlySelectVerifier(
+          applicationId,
+          {
+            from: applicant
+          }
+        )
+      })
+    })
+
+    context('after being called successfully', () => {
+      let verifierStartingBalance,
+          workBalance
+
+      beforeEach(async () => {
+        verifierStartingBalance = await workToken.balanceOf(verifier)
+        workBalance = await workToken.balanceOf(work.address)
+        await newApplicantStartsGame()
         await applicantRandomlySelectsAVerifier()
       })
 
-      await increaseTime(verifierTimeout)
-      await applicantRandomlySelectsAVerifier()
+      it('should set the verifier', async () => {
+        const selectedVerifier = await coordinationGame.verifiers(applicationId)
+        assert([verifier, verifier2].includes(selectedVerifier), '1st verifier matches')
+      })
 
-      const newVerifier = await coordinationGame.verifiers(applicationId)
-      assert([verifier, verifier2].includes(newVerifier), 'new verifier matches')
-      assert.notEqual(newVerifier, firstVerifier, 'new verifier is not first verifier')
+      it('should not be called again', async () => {
+        await expectThrow(async () => {
+          await applicantRandomlySelectsAVerifier()
+        })
+      })
+
+      context('if the verifier has submitted', () => {
+        beforeEach(async () => {
+          await verifierSubmitSecret()
+        })
+
+        it('should not allow the applicant to select another verifier', async () => {
+          debug(`fault applicantRandomlySelectsAVerifier...`)
+          await expectThrow(async () => {
+            await applicantRandomlySelectsAVerifier()
+          })
+        })
+
+        context('and the verifier submission period has ended', () => {
+          beforeEach(async () => {
+            debug(`increaseTime(${verifierTimeout})...`)
+            await increaseTime(verifierTimeout)
+          })
+
+          it('should not allow the applicant to select another verifier', async () => {
+            debug(`fault applicantRandomlySelectsAVerifier...`)
+            await expectThrow(async () => {
+              await applicantRandomlySelectsAVerifier()
+            })
+          })
+        })
+      })
+
+      context('if the verifier submission period has ended', () => {
+        beforeEach(async () => {
+          debug(`increaseTime(${verifierTimeout})...`)
+          await increaseTime(verifierTimeout)
+        })
+
+        it('should allow the applicant to select another verifier', async () => {
+          const firstVerifier = await coordinationGame.verifiers(applicationId)
+
+          await applicantRandomlySelectsAVerifier()
+
+          const newVerifier = await coordinationGame.verifiers(applicationId)
+          assert([verifier, verifier2].includes(newVerifier), 'new verifier matches')
+          assert.notEqual(newVerifier, firstVerifier, 'new verifier is not first verifier')
+        })
+      })
     })
   })
 
@@ -192,50 +258,52 @@ contract('CoordinationGame', (accounts) => {
       await applicantRandomlySelectsAVerifier()
     })
 
-    it('should allow the verifier to submit a secret', async () => {
-      const randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
-
-      debug(`verifierSubmitSecret() verifierSubmitSecret(${applicationId}, ${secret})...`)
-      await coordinationGame.verifierSubmitSecret(applicationId, secret, {
-        from: randomlySelectedVerifier
+    context('when called successfully', () => {
+      beforeEach(async () => {
+        await verifierSubmitSecret()
       })
 
-      debug('verifierSubmitSecret() verifierSubmitSecret')
-      const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
-      assert.equal(secret, storedVerifierSecret)
+      it('should set the verifier secret', async () => {
+        debug('verifierSubmitSecret() verifierSubmitSecret')
+        const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
+        assert.equal(secret, storedVerifierSecret)
+      })
+
+      it('should not be called again', async () => {
+        await expectThrow(async () => {
+          await verifierSubmitSecret()
+        })
+      })
     })
 
     it('should not allow the verifier to submit if too much time has passed', async () => {
-      const randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
-
       await increaseTime(verifierTimeout)
 
       await expectThrow(async () => {
-        await coordinationGame.verifierSubmitSecret(applicationId, secret, {
-          from: randomlySelectedVerifier
-        })
+        await verifierSubmitSecret()
       })
     })
   })
 
   describe('applicantRevealSecret()', () => {
-    let randomlySelectedVerifier
-
     beforeEach(async () => {
       await newApplicantStartsGame()
       debug(`applicantRevealSecret() won getApplicantsLastApplicationID(${applicant})...`)
       await applicantRandomlySelectsAVerifier()
-      randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
     })
 
-    describe('when secret does match and game is won', () => {
-      it('should add applicant to registry (and pay out verifier)', async () => {
-        debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
-        await coordinationGame.verifierSubmitSecret(applicationId, secret, {
-          from: randomlySelectedVerifier
-        })
+    it('should not be called before the verifier has submitted', async () => {
+      await expectThrow(async () => {
+        await applicantRevealsTheirSecret()
+      })
+    })
 
-        debug(`applicantRevealSecret() won applicantRevealSecret(${secret}, ${random})...`)
+    context('when the verifier has submitted a matching secret', async () => {
+      beforeEach(async () => {
+        await verifierSubmitSecret()
+      })
+
+      it('should add applicant to registry (and pay out verifier)', async () => {
         await applicantRevealsTheirSecret()
 
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
@@ -253,14 +321,12 @@ contract('CoordinationGame', (accounts) => {
       })
     })
 
-    describe('when secret does not match and game is lost', () => {
+    context('when the verifier has submitted different secret', async () => {
       it('should make a challenge and go to vote', async () => {
         const differentSecret = '0x56'
 
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
-        await coordinationGame.verifierSubmitSecret(applicationId, differentSecret, {
-          from: randomlySelectedVerifier
-        })
+        await verifierSubmitSecret(differentSecret)
 
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
         await applicantRevealsTheirSecret()
@@ -289,9 +355,7 @@ contract('CoordinationGame', (accounts) => {
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
 
         debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
-        await coordinationGame.verifierSubmitSecret(applicationId, secret, {
-          from: selectedVerifier
-        })
+        await verifierSubmitSecret()
 
         await expectThrow(async () => {
           await verifierChallenges(selectedVerifier)

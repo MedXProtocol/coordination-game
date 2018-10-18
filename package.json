@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "$(npm bin)/truffle compile && apply-registry build/contracts",
     "migrate": "$(npm bin)/truffle migrate && apply-registry build/contracts",
-    "test": "$(npm bin)/truffle test",
+    "test": "npm run compile && $(npm bin)/truffle test",
     "start": "./scripts/ganache.sh"
   },
   "author": "",

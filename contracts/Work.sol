@@ -10,15 +10,12 @@ contract Work is Ownable {
   mapping (address => bool) public stakerAddresses;
   mapping (address => uint256) private stakerIndices;
   mapping (address => uint256) private stakerAmounts;
-  mapping (address => uint256) private lockedStakeAmounts; // use this
 
   constructor (ERC20 _token, uint256 _requiredStake) public {
     require(_token != address(0), 'token is defined');
     require(_requiredStake > 0, 'stake is greater than zero');
     token = _token;
     requiredStake = _requiredStake;
-
-    // require(token.allowance(msg.sender, address(this)) >= requiredStake, 'allowance is sufficient');
   }
 
   function approve(address _spender) onlyOwner external {
