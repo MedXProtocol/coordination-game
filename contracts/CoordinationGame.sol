@@ -15,7 +15,6 @@ contract CoordinationGame is Ownable {
   TILRegistry tilRegistry;
 
   uint256 public applicationCount;
-  uint private secondsInDay;
 
   uint256 public constant verifierTimeout = 80;
   uint256 public constant applicantRevealTimeout = 40;
@@ -76,7 +75,6 @@ contract CoordinationGame is Ownable {
          to add applicants to
   */
   function init(Work _work, TILRegistry _tilRegistry) public {
-    secondsInDay = 86400;
     work = _work;
     tilRegistry = _tilRegistry;
   }
@@ -257,14 +255,6 @@ contract CoordinationGame is Ownable {
     autoChallenge(_applicationId);
 
     emit ApplicantLost(_applicationId);
-  }
-
-  function secondsInADay() public view returns (uint) {
-    return secondsInDay;
-  }
-
-  function setSecondsInADay(uint _secondsInDay) public onlyOwner {
-    secondsInDay = _secondsInDay;
   }
 
   /**

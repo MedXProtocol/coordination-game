@@ -15,12 +15,13 @@ const increaseTime = require('./helpers/increaseTime')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
-    workToken,
-    work,
-    parameterizer,
-    tilRegistry,
-    applicationId,
-    secondsInADay
+      workToken,
+      work,
+      parameterizer,
+      tilRegistry,
+      applicationId,
+      applicantRevealTimeout,
+      verifierTimeout
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -51,7 +52,6 @@ contract('CoordinationGame', (accounts) => {
     )).address
     parameterizer = await Parameterizer.at(parameterizerAddress)
 
-
     assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
     debug(`Minting Stake to Verifier ${stake.toString()}...`)
@@ -60,7 +60,6 @@ contract('CoordinationGame', (accounts) => {
     debug(`Approving stake ${stake.toString()} to ${work.address} for Verifier...`)
     await workToken.approve(work.address, stake, { from: verifier })
     await work.depositStake({ from: verifier })
-
 
     debug(`Minting Stake to Verifier2 ${stake.toString()}...`)
     await workToken.mint(verifier2, stake)
@@ -87,7 +86,14 @@ contract('CoordinationGame', (accounts) => {
     const coordinationGameAddress = await tilRegistry.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
 
-    secondsInADay = (await coordinationGame.secondsInADay()).toNumber()
+    // Add one to the timeouts so that we can use them to increaseTime and timeout
+    applicantRevealTimeout = await coordinationGame.applicantRevealTimeout()
+    applicantRevealTimeout = new BN(applicantRevealTimeout.toString()).add(new BN(1))
+    debug(`applicantRevealTimeout is ${applicantRevealTimeout.toString()}`)
+
+    verifierTimeout = await coordinationGame.verifierTimeout()
+    verifierTimeout = new BN(verifierTimeout.toString()).add(new BN(1))
+    debug(`verifierTimeout is ${verifierTimeout.toString()}`)
 
     // Approve the coordinationGame contract of spending tokens on behalf of the work
     await work.approve(coordinationGameAddress)
@@ -174,7 +180,7 @@ contract('CoordinationGame', (accounts) => {
         await applicantRandomlySelectsAVerifier()
       })
 
-      await increaseTime(secondsInADay * 3)
+      await increaseTime(verifierTimeout)
       await applicantRandomlySelectsAVerifier()
 
       const newVerifier = await coordinationGame.verifiers(applicationId)
@@ -208,7 +214,7 @@ contract('CoordinationGame', (accounts) => {
     it('should not allow the verifier to submit if too much time has passed', async () => {
       const randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
 
-      await increaseTime(secondsInADay * 3)
+      await increaseTime(verifierTimeout)
 
       await expectThrow(async () => {
         await coordinationGame.verifierSubmitSecret(applicationId, secret, {
@@ -227,12 +233,7 @@ contract('CoordinationGame', (accounts) => {
       debug(`applicantRevealSecret() won getApplicantsLastApplicationID(${applicant})...`)
       applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
 
-      await coordinationGame.applicantRandomlySelectVerifier(
-        applicationId,
-        {
-          from: applicant
-        }
-      )
+      await applicantRandomlySelectsAVerifier()
 
       randomlySelectedVerifier = await coordinationGame.verifiers(applicationId)
     })
@@ -287,7 +288,7 @@ contract('CoordinationGame', (accounts) => {
 
     describe('when the timeframe for the applicant to reveal has passed', () => {
       it('should throw', async () => {
-        await increaseTime(secondsInADay * 3)
+        await increaseTime(applicantRevealTimeout)
 
         await expectThrow(async () => {
           await applicantRevealsTheirSecret()
@@ -306,10 +307,9 @@ contract('CoordinationGame', (accounts) => {
           await verifierChallenges(selectedVerifier)
         })
 
-        await increaseTime(secondsInADay * 3)
+        await increaseTime(applicantRevealTimeout)
 
         await verifierChallenges(selectedVerifier)
-
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
