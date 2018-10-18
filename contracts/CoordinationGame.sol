@@ -68,6 +68,16 @@ contract CoordinationGame is Ownable {
     uint256 indexed applicationId
   );
 
+  modifier onlyApplicant(uint256 _applicationId) {
+    require(applicants[_applicationId] == msg.sender, 'sender must be applicant');
+    _;
+  }
+
+  modifier onlyVerifier(uint256 _applicationId) {
+    require(verifiers[_applicationId] == msg.sender, 'sender must be verifier');
+    _;
+  }
+
   /**
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
@@ -116,9 +126,7 @@ contract CoordinationGame is Ownable {
     );
   }
 
-  function applicantRandomlySelectVerifier(uint256 _applicationId) external {
-    require(applicants[_applicationId] == msg.sender, 'sender owns this application');
-
+  function applicantRandomlySelectVerifier(uint256 _applicationId) external onlyApplicant(_applicationId) {
     uint256 deposit = tilRegistry.parameterizer().get("minDeposit");
     address previousVerifier = verifiers[_applicationId];
     // why minus 1 ?
@@ -172,9 +180,8 @@ contract CoordinationGame is Ownable {
   @param _applicationId The application that the verifier is submitting for
   @param _secret The secret that the verifier is guessing
   */
-  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public {
+  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) {
     require(applicationCount >= _applicationId, 'application has been initialized');
-    require(msg.sender == verifiers[_applicationId], 'sender is verifier');
     require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
 
@@ -201,8 +208,7 @@ contract CoordinationGame is Ownable {
     uint256 _applicationId,
     bytes32 _secret,
     uint256 _randomNumber
-  ) public {
-    require(applicants[_applicationId] == msg.sender, 'sender owns this application');
+  ) public onlyApplicant(_applicationId) {
     require(!applicantRevealExpired(_applicationId), 'applicant can still reveal their secret');
     require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
 
@@ -226,9 +232,7 @@ contract CoordinationGame is Ownable {
   @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
   @param _applicationId The application that the verifier is challenging
   */
-  function verifierChallenge(uint256 _applicationId) public {
-    require(msg.sender == verifiers[_applicationId], 'sender is verifier');
-
+  function verifierChallenge(uint256 _applicationId) public onlyVerifier(_applicationId) {
     require(
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
