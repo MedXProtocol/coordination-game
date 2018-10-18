@@ -3,8 +3,7 @@ import createSagaMiddleware from 'redux-saga'
 import sagas from './sagas'
 import reducers from './reducers'
 import { ContractRegistry, CallCountRegistry } from 'saga-genesis'
-import contractRegistryOptions from './contract-registry-options'
-import { preloadedState } from '~/services/preloadedStateService'
+import { contractRegistryOptions } from './contractRegistryOptions'
 
 const debug = require('debug')('actions')
 
@@ -32,7 +31,6 @@ function logger({ getState }) {
 
 export const store = createStore(
   reducers,
-  preloadedState(),
   composeEnhancers(applyMiddleware(logger, sagaMiddleware))
 )
 
