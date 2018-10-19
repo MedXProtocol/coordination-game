@@ -7,7 +7,8 @@
     "compile": "$(npm bin)/truffle compile && apply-registry build/contracts",
     "migrate": "$(npm bin)/truffle migrate && apply-registry build/contracts",
     "test": "npm run compile && $(npm bin)/truffle test",
-    "start": "./scripts/ganache.sh"
+    "start": "./scripts/ganache.sh",
+    "lambda": "cd lambda && ./lambda-serve.sh"
   },
   "author": "",
   "license": "ISC",
