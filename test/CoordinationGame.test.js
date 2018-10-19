@@ -350,17 +350,22 @@ contract('CoordinationGame', (accounts) => {
 
       it('should allow the verifier to challenge', async () => {
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
+        const verifierStartingBalance = new BN((await work.balances(selectedVerifier)).toString())
+        const applicantStartingBalance = new BN((await workToken.balanceOf(applicant)).toString())
 
         debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
         await verifierSubmitSecret()
-
         await expectThrow(async () => {
           await verifierChallenges(selectedVerifier)
         })
-
         await increaseTime(applicantRevealTimeout)
-
         await verifierChallenges(selectedVerifier)
+
+        const verifierFinishingBalance = new BN((await work.balances(selectedVerifier)).toString())
+        const applicantFinishingBalance = new BN((await workToken.balanceOf(applicant)).toString())
+
+        assert.equal(verifierFinishingBalance.toString(), verifierStartingBalance.toString(), 'verifier deposit was returned')
+        assert.equal(applicantStartingBalance.toString(), applicantFinishingBalance.toString(), 'applicant deposit was returned')
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
@@ -368,8 +373,9 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.notEqual(listing[4].toString(), '0', 'application is challenged')
-        assert.notEqual(listing[1], true, 'application is not whitelisted')
+        /// These assertions essentially make sure there is no listing
+        assert.equal(listing[2].toString(), '0', 'there is no owner')
+        assert.equal(listing[0], '0', 'application has no expiry')
       })
     })
   })

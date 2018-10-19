@@ -32,8 +32,6 @@ contract CoordinationGame is Ownable {
   /// Stores the block number whose hash is to be used for randomness
   mapping (uint256 => uint256) public randomBlockNumbers;
 
-  mapping (uint256 => bool) public contractKilled;
-
   mapping (uint256 => uint256) public verifierSelectedAt;
   mapping (uint256 => uint256) public verifierSubmittedAt;
   mapping (uint256 => uint256) public verifierChallengedAt;
@@ -256,10 +254,8 @@ contract CoordinationGame is Ownable {
     verifierChallengedAt[_applicationId] = block.timestamp;
 
     /// Transfer the verifier's deposit back to them
-    tilRegistry.token().transfer(
-      address(work),
-      applicantDeposits[_applicationId]
-    );
+    work.token().approve(address(work), applicantDeposits[_applicationId]);
+    work.depositJobStake(verifiers[_applicationId]);
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(
@@ -273,6 +269,9 @@ contract CoordinationGame is Ownable {
   function applicantWon(uint256 _applicationId) internal {
     wins[msg.sender] += 1;
     tilRegistry.updateStatus(bytes32(_applicationId));
+
+    tilRegistry.token().approve(address(work), applicantDeposits[_applicationId]);
+    work.depositJobStake(verifiers[_applicationId]);
 
     emit ApplicantWon(_applicationId);
   }

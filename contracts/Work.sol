@@ -58,9 +58,9 @@ contract Work is Ownable {
     return true;
   }
 
-  function depositJobStake(address _worker, uint256 _amount) external onlyJobManager {
+  function depositJobStake(address _worker) external onlyJobManager {
     token.transferFrom(msg.sender, address(this), jobStake);
-    deposit(_worker, _amount);
+    deposit(_worker, jobStake);
   }
 
   function selectWorker(uint256 randomValue) public view returns (address) {
@@ -70,6 +70,10 @@ contract Work is Ownable {
 
   function isStaker(address _staker) public view returns (bool) {
     return stakers.hasAddress(_staker) || suspendedStakers.hasAddress(_staker);
+  }
+
+  function isSuspended(address _staker) public view returns (bool) {
+    return suspendedStakers.hasAddress(_staker);
   }
 
   function deposit(address _worker, uint256 _amount) internal {
