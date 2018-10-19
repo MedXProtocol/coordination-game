@@ -12,13 +12,13 @@ body {
   color: #e7dfdd;
   font-family: 'Heebo', sans-serif;
   line-height: 1.6;
-  margin: 0;
-  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 768px) {
+    font-size: 0.825rem;
+  }
 }
 
 strong {
@@ -47,6 +47,12 @@ h3 {
 p {
   font-family: 'Heebo', sans-serif;
   font-size: 0.75rem;
+}
+
+hr {
+  background-color: #222;
+  margin: 2rem auto;
+  width: 50%;
 }
 
 .main {

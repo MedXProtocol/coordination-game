@@ -11,7 +11,7 @@ export const Header = class _Header extends Component {
             <div className="navbar-item">
               <h1>
                 The Coordination Game
-                &nbsp; <span className="has-text-grey-dark">(Trustless Incentivized List Demo)</span>
+                &nbsp; <span className="has-text-grey">(Trustless Incentivized List Demo)</span>
               </h1>
             </div>
           </div>

@@ -75,13 +75,11 @@ const App = class extends Component {
 
                   <br />
                   <br />
-                  <br />
-                  <br />
                   {this.state.hint !== '' ?
                       (
                         <React.Fragment>
                           <h3>
-                            Provide a secret to submit with the hint.
+                            Provide a secret:
                           </h3>
                           <div className="field">
                             <div className="control">
@@ -91,61 +89,86 @@ const App = class extends Component {
                                 onChange={this.handleSecretChange}
                               />
                             </div>
-                            <p className="help is-dark">
+                            <p className="help has-text-grey">
                               This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
                             </p>
                           </div>
                         </React.Fragment>
                       )
                     : null}
+
+                  {this.state.secret !== '' ?
+                      (
+                        <React.Fragment>
+                          <br />
+                          <button type="submit" className="button is-light is-small">Submit Hint &amp; Secret</button>
+                        </React.Fragment>
+                      )
+                    : null
+                  }
+
                 </div>
 
-                <div className="entries has-text-centered">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>Application #</th>
-                        <th>Hint</th>
-                        <th>Secret</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th>1</th>
-                        <th>200 + 200</th>
-                        <th>400</th>
-                        <th>Verified</th>
-                      </tr>
-                      <tr>
-                        <th>2</th>
-                        <th>300 + 2</th>
-                        <th>5693</th>
-                        <th>Rejected</th>
-                      </tr>
-                      <tr>
-                        <th>3</th>
-                        <th>342 + 182</th>
-                        <th>3</th>
-                        <th>Challenged</th>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <hr />
 
               </div>
             </div>
+
+            <div className='columns'>
+              <div className='column is-half-desktop is-offset-one-quarter'>
+
+              <div className="entries has-text-centered">
+                <table className="table is-fullwidth">
+                  <thead>
+                    <tr>
+                      <th>Application #</th>
+                      <th>Hint</th>
+                      <th>Secret</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>1</th>
+                      <th>200 + 200</th>
+                      <th>400</th>
+                      <th>Verified</th>
+                    </tr>
+                    <tr>
+                      <th>2</th>
+                      <th>300 + 2</th>
+                      <th>5693</th>
+                      <th>Rejected</th>
+                    </tr>
+                    <tr>
+                      <th>3</th>
+                      <th>342 + 182</th>
+                      <th>3</th>
+                      <th>Challenged</th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+          <div className='columns'>
+            <div className='column is-half-desktop is-offset-one-quarter'>
+              <footer className="has-text-centered">
+                <h3>
+                  What is this?
+                </h3>
+                <p className="has-text-grey-light">
+                  Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
+                </p>
+              </footer>
+            </div>
+          </div>
+
           </div>
           <br />
 
-          <footer className="has-text-centered">
-            <h3>
-              What is this?
-            </h3>
-            <p className="has-text-grey">
-              Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
-            </p>
-          </footer>
         </section>
       </React.Fragment>
     )
