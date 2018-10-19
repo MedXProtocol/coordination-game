@@ -13,7 +13,7 @@ contract Work is Ownable {
   IndexedAddressArray.Data suspendedStakers;
   uint256 public requiredStake;
   uint256 public jobStake;
-  mapping (address => uint256) public stakerAmounts;
+  mapping (address => uint256) public balances;
 
   constructor (ERC20 _token, uint256 _requiredStake, uint256 _jobStake) public {
     require(_token != address(0), 'token is defined');
@@ -40,20 +40,22 @@ contract Work is Ownable {
     if (suspendedStakers.hasAddress(msg.sender)) {
       suspendedStakers.removeAddress(msg.sender);
     }
-    uint256 amount = stakerAmounts[msg.sender];
-    delete stakerAmounts[msg.sender];
+    uint256 amount = balances[msg.sender];
+    delete balances[msg.sender];
     token.transfer(msg.sender, amount);
   }
 
-  function withdrawJobStake(address _worker) external onlyJobManager {
-    require(stakerAmounts[_worker] >= jobStake, 'worker has enough stake for job');
-    stakerAmounts[_worker] -= jobStake;
+  function withdrawJobStake(address _worker) external onlyJobManager returns (bool) {
+    require(balances[_worker] >= jobStake, 'worker has enough stake for job');
+    balances[_worker] -= jobStake;
     token.transfer(msg.sender, jobStake);
     /// If the new stake amount is below the job amount, suspend them
-    if (stakerAmounts[_worker] < jobStake) {
+    if (balances[_worker] < jobStake) {
       stakers.removeAddress(_worker);
       suspendedStakers.pushAddress(_worker);
     }
+
+    return true;
   }
 
   function depositJobStake(address _worker, uint256 _amount) external onlyJobManager {
@@ -71,8 +73,8 @@ contract Work is Ownable {
   }
 
   function deposit(address _worker, uint256 _amount) internal {
-    stakerAmounts[_worker] += _amount;
-    if (stakerAmounts[_worker] >= jobStake) {
+    balances[_worker] += _amount;
+    if (balances[_worker] >= jobStake) {
       if (suspendedStakers.hasAddress(_worker)) {
         suspendedStakers.removeAddress(_worker);
       }

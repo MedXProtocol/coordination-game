@@ -128,7 +128,7 @@ contract CoordinationGame is Ownable {
     hints[applicationCount] = _hint;
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationCount] = block.number + 1;
-    applicantDeposits[applicationCount] = tilRegistry.parameterizer().get("minDeposit");
+    applicantDeposits[applicationCount] = minDeposit();
 
     // Transfer a desposit of work tokens from the Applicant to this contract
     require(
@@ -146,6 +146,7 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantRandomlySelectVerifier(uint256 _applicationId) external onlyApplicant(_applicationId) randomBlockWasMined(_applicationId) {
+    require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
 
     address previousVerifier = verifiers[_applicationId];
@@ -181,19 +182,7 @@ contract CoordinationGame is Ownable {
     randomBlockNumbers[_applicationId] = block.number + 1;
 
     // transfer tokens from verifier's stake in Work contract to here
-    // TODO: This seems wrong as there is nothing about a verifier address here ... :
-    require(
-      work.token().allowance(address(work), address(this)) > applicantDeposits[_applicationId],
-      'we can transfer tokens'
-    );
-    require(
-      work.token().balanceOf(address(work)) > applicantDeposits[_applicationId],
-      'the work contract has enough tokens'
-    );
-    require(
-      work.token().transferFrom(work, address(this), applicantDeposits[_applicationId]),
-      'token transfer succeeded'
-    );
+    require(work.withdrawJobStake(selectedVerifier), 'transferred verifier tokens');
 
     emit VerifierSelected(
       _applicationId,
@@ -343,5 +332,9 @@ contract CoordinationGame is Ownable {
 
   function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
     return verifierSecrets[_applicationId] != 0;
+  }
+
+  function minDeposit() internal view returns (uint256) {
+    return tilRegistry.parameterizer().get("minDeposit");
   }
 }

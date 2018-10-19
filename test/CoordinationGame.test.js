@@ -78,6 +78,7 @@ contract('CoordinationGame', (accounts) => {
 
     const coordinationGameAddress = await tilRegistry.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
+    await work.setJobManager(coordinationGameAddress)
 
     // Add one to the timeouts so that we can use them to increaseTime and timeout
     applicantRevealTimeout = await coordinationGame.applicantRevealTimeout()
@@ -88,15 +89,11 @@ contract('CoordinationGame', (accounts) => {
     verifierTimeout = new BN(verifierTimeout.toString()).add(new BN(1))
     debug(`verifierTimeout is ${verifierTimeout.toString()}`)
 
-    // Approve the coordinationGame contract of spending tokens on behalf of the work
-    await work.approve(coordinationGameAddress)
-
     debug(`Minting Deposit to Applicant ${minDeposit.toString()}...`)
     await workToken.mint(applicant, minDeposit)
 
     debug(`Approving CoordinationGame to spend ${minDeposit.toString()} for applicant...`)
     await workToken.approve(coordinationGameAddress, minDeposit, { from: applicant })
-
   })
 
   async function registerWorker(address) {

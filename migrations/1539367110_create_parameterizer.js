@@ -2,6 +2,7 @@ const abi = require('ethereumjs-abi')
 const abiDecoder = require('abi-decoder')
 const ParameterizerFactory = artifacts.require('ParameterizerFactory.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
+const Work = artifacts.require('Work.sol')
 const Parameterizer = artifacts.require('Parameterizer.sol')
 const tdr = require('truffle-deploy-registry')
 
@@ -9,9 +10,10 @@ module.exports = function(deployer, networkName) {
   deployer.then(async () => {
     const parameterizerFactory = await ParameterizerFactory.deployed()
     const workToken = await WorkToken.deployed()
+    const work = await Work.deployed()
     await parameterizerFactory.newParameterizerBYOToken(workToken.address, [
       // minimum deposit for listing to be whitelisted
-      web3.toWei('100', 'ether'),
+      await work.jobStake(),
 
       // minimum deposit to propose a reparameterization
       web3.toWei('10000000000', 'ether'),
