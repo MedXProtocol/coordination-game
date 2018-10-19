@@ -24,6 +24,8 @@ const App = class extends Component {
                 <Header />
 
                 <StartGameFormContainer />
+                <br />
+                <br />
                 <hr />
 
               </div>

@@ -155,13 +155,16 @@ header {
 
 .text-input.hint {
   color: rgba(255, 255, 255, 0.8);
-  border-bottom: 0.05em solid;
+  border-bottom: 0;
+  text-align: left;
 }
 
 .text-operator {
   display: inline-block;
   font-size: 2rem;
   margin: 0 1rem;
+  top: -0.4rem;
+  position: relative;
 }
 
 .entries {
