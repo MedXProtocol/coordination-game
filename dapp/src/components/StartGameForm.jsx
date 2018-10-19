@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import BN from 'bn.js'
+import { Flipper, Flipped } from 'react-flip-toolkit'
 import {
   contractByName,
   withSend,
@@ -54,6 +55,14 @@ export const StartGameFormContainer = connect(mapStateToProps)(
               toastr.success('Application submitted successfully. It will take a few minutes to confirm on the Ethereum network.')
             })
         }
+      }
+
+      formReady = () => {
+        return (
+          this.state.hintRight !== ''
+          && this.state.hintLeft !== ''
+          && this.state.secret !== ''
+        )
       }
 
       handleSubmit = (e) => {
@@ -122,79 +131,77 @@ export const StartGameFormContainer = connect(mapStateToProps)(
         }
 
         return (
-          <form onSubmit={this.handleSubmit}>
-            <div className="hint-and-secret">
-              <h3>
-                Provide a hint for the verifier:
-              </h3>
-              <input
-                name="hintLeft"
-                className="new-hint text-input"
-                placeholder="345"
-                onChange={this.handleHintChange}
-                value={this.state.hintLeft}
-              />
-              <span className="text-operator">+</span>
-              <br className="is-hidden-desktop" />
-              <br className="is-hidden-desktop" />
+          <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.txInFlight}`}>
+            <form onSubmit={this.handleSubmit}>
+              <div className="hint-and-secret">
+                <h3>
+                  Provide a hint for the verifier:
+                </h3>
+                <input
+                  name="hintLeft"
+                  className="new-hint text-input"
+                  placeholder="345"
+                  onChange={this.handleHintChange}
+                  value={this.state.hintLeft}
+                />
+                <span className="text-operator">+</span>
+                <br className="is-hidden-desktop" />
+                <br className="is-hidden-desktop" />
 
-              <input
-                name="hintRight"
-                className="new-hint text-input"
-                placeholder="223"
-                onChange={this.handleHintChange}
-                value={this.state.hintRight}
-              />
-              <span className="text-operator">=</span>
-              <br className="is-hidden-desktop" />
-              <br className="is-hidden-desktop" />
+                <input
+                  name="hintRight"
+                  className="new-hint text-input"
+                  placeholder="223"
+                  onChange={this.handleHintChange}
+                  value={this.state.hintRight}
+                />
+                <span className="text-operator">=</span>
+                <br className="is-hidden-desktop" />
+                <br className="is-hidden-desktop" />
 
-              <input
-                name="hint"
-                className="hint text-input"
-                placeholder=""
-                value={this.state.hint}
-                readOnly={true}
-              />
+                <input
+                  name="hint"
+                  className="hint text-input"
+                  placeholder=""
+                  value={this.state.hint}
+                  readOnly={true}
+                />
 
-              <br />
-              <br />
-              <br />
-              {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
-                  (
-                    <React.Fragment>
-                      <h3>
-                        Provide a secret:
-                      </h3>
-                      <div className="field">
-                        <div className="control">
-                          <input
-                            className="new-secret text-input"
-                            pattern="[0-9]*"
-                            onChange={this.handleSecretChange}
-                          />
-                        </div>
-                        <p className="help has-text-grey">
-                          This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                        </p>
-                      </div>
-                    </React.Fragment>
-                  )
-                : null}
+                <br />
+                <br />
+                {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                    (
+                      <Flipped flipId="coolDiv">
+                        <React.Fragment>
+                          <h3>
+                            Provide a secret:
+                          </h3>
+                          <div className="field">
+                            <div className="control">
+                              <input
+                                className="new-secret text-input"
+                                pattern="[0-9]*"
+                                onChange={this.handleSecretChange}
+                              />
+                            </div>
+                            <p className="help has-text-grey">
+                              This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
+                            </p>
+                          </div>
+                        </React.Fragment>
+                      </Flipped>
+                    )
+                  : null}
 
-              {this.state.hintRight !== '' && this.state.hintLeft && this.state.secret !== '' ?
-                  (
-                    <React.Fragment>
-                      <br />
-                      <br />
-                      <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
-                    </React.Fragment>
-                  )
-                : null
-              }
+                <Flipped flipId="coolDiv">
+                  <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                    <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
+                  </div>
+                </Flipped>
 
-            </div>
-          </form>
+              </div>
+            </form>
+          </Flipper>
         )
       }
     }

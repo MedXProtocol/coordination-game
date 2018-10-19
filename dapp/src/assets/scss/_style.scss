@@ -22,6 +22,14 @@ body {
   }
 }
 
+.is-hidden {
+  display: none;
+}
+
+.is-visible {
+  display: block;
+}
+
 strong {
   color: white;
 }
