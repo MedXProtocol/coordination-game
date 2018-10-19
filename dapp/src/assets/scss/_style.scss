@@ -2,11 +2,13 @@
   box-sizing: border-box;
 }
 
+::placeholder {
+  color: #444;
+}
+
 html,
 body {
   background: $background-color;
-  /* background: #a239ca; */
-  /* background: #4717f6; */
   color: #e7dfdd;
   font-family: 'Heebo', sans-serif;
   line-height: 1.6;
@@ -44,6 +46,7 @@ h3 {
 
 p {
   font-family: 'Heebo', sans-serif;
+  font-size: 0.75rem;
 }
 
 .main {
@@ -141,9 +144,6 @@ header {
 }
 
 
-::placeholder {
-  color: #777;
-}
 
 .text-operator {
   display: inline-block;
@@ -156,9 +156,13 @@ header {
 }
 
 .table {
-  background: rgba(255, 255, 255, 0.1);
+  background: none;
   font-size: 0.75rem;
   margin: 2rem auto;
+}
+
+.table tr {
+  transition: all 0.1s ease-in-out;
 }
 
 .table thead td,
@@ -170,12 +174,26 @@ header {
 
 .table td,
 .table th {
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.0);
+  // border-color: rgba(255, 255, 255, 0.05);
 }
 
 .table tr.is-selected td,
 .table tr.is-selected th {
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 0, 0, 0);
+}
+
+.table tr.is-selected,
+.table tbody tr:hover {
+  background-color: $accent-color-2;
+}
+
+.table thead tr {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.table tbody tr {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .hint-and-secret {

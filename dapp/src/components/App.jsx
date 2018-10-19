@@ -9,7 +9,8 @@ const App = class extends Component {
     this.state = {
       hintLeft: '',
       hintRight: '',
-      hint: ''
+      hint: '',
+      secret: ''
     }
   }
 
@@ -76,14 +77,27 @@ const App = class extends Component {
                   <br />
                   <br />
                   <br />
-                  <h3>
-                    What is the secret (answer) you would like to submit?
-                  </h3>
-                  <input
-                    className="new-secret text-input"
-                    pattern="[0-9]*"
-                    onChange={this.handleSecretChange}
-                  />
+                  {this.state.hint !== '' ?
+                      (
+                        <React.Fragment>
+                          <h3>
+                            Provide a secret to submit with the hint.
+                          </h3>
+                          <div className="field">
+                            <div className="control">
+                              <input
+                                className="new-secret text-input"
+                                pattern="[0-9]*"
+                                onChange={this.handleSecretChange}
+                              />
+                            </div>
+                            <p className="help is-dark">
+                              This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
+                            </p>
+                          </div>
+                        </React.Fragment>
+                      )
+                    : null}
                 </div>
 
                 <div className="entries has-text-centered">
@@ -97,20 +111,20 @@ const App = class extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="is-selected">
+                      <tr>
                         <th>1</th>
                         <th>200 + 200</th>
                         <th>400</th>
                         <th>Verified</th>
                       </tr>
                       <tr>
-                        <th>1</th>
+                        <th>2</th>
                         <th>300 + 2</th>
                         <th>5693</th>
                         <th>Rejected</th>
                       </tr>
                       <tr>
-                        <th>1</th>
+                        <th>3</th>
                         <th>342 + 182</th>
                         <th>3</th>
                         <th>Challenged</th>
@@ -128,8 +142,8 @@ const App = class extends Component {
             <h3>
               What is this?
             </h3>
-            <p>
-              (Trustless Incentivized List)
+            <p className="has-text-grey">
+              Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
             </p>
           </footer>
         </section>
