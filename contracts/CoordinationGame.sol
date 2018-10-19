@@ -53,11 +53,13 @@ contract CoordinationGame is Ownable {
     address indexed verifier
   );
 
+  /// Emitted when a Verifier is replaced by another after timing out.
   event VerifierSubmissionTimedOut(
     uint256 indexed applicationId,
     address indexed verifier
   );
 
+  /// Emitted when a verifier submits their secret
   event VerifierSecretSubmitted(
     uint256 indexed applicationId,
     address verifier,
@@ -105,7 +107,7 @@ contract CoordinationGame is Ownable {
 
   /**
   @notice Creates an application on behalf of the message sender, this kicks off
-          the game for the applicant
+          the game for the applicant.
   @param _keccakOfSecretAndRandom The hash of the secret and salt
   @param _keccakOfRandom The hash of the salt
   @param _hint The hint for the verifier to determine the secret
@@ -124,7 +126,7 @@ contract CoordinationGame is Ownable {
     hints[applicationCount] = _hint;
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationCount] = block.number + 1;
-    applicantDeposits[applicationCount] = tilRegistry.parameterizer().get("minDeposit");
+    applicantDeposits[applicationCount] = minDeposit();
 
     // Transfer a desposit of work tokens from the Applicant to this contract
     require(
@@ -142,6 +144,7 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantRandomlySelectVerifier(uint256 _applicationId) external onlyApplicant(_applicationId) randomBlockWasMined(_applicationId) {
+    require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
 
     address previousVerifier = verifiers[_applicationId];
@@ -177,19 +180,7 @@ contract CoordinationGame is Ownable {
     randomBlockNumbers[_applicationId] = block.number + 1;
 
     // transfer tokens from verifier's stake in Work contract to here
-    // TODO: This seems wrong as there is nothing about a verifier address here ... :
-    require(
-      work.token().allowance(address(work), address(this)) > applicantDeposits[_applicationId],
-      'we can transfer tokens'
-    );
-    require(
-      work.token().balanceOf(address(work)) > applicantDeposits[_applicationId],
-      'the work contract has enough tokens'
-    );
-    require(
-      work.token().transferFrom(work, address(this), applicantDeposits[_applicationId]),
-      'token transfer succeeded'
-    );
+    require(work.withdrawJobStake(selectedVerifier), 'transferred verifier tokens');
 
     emit VerifierSelected(
       _applicationId,
@@ -260,11 +251,17 @@ contract CoordinationGame is Ownable {
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
     );
-
     verifierChallengedAt[_applicationId] = block.timestamp;
 
-    applyToRegistry(_applicationId);
-    autoChallenge(_applicationId);
+    /// Transfer the verifier's deposit back to them
+    work.token().approve(address(work), applicantDeposits[_applicationId]);
+    work.depositJobStake(verifiers[_applicationId]);
+
+    /// Transfer applicant's deposit back to them
+    tilRegistry.token().transfer(
+      applicants[_applicationId],
+      applicantDeposits[_applicationId]
+    );
 
     emit VerifierChallenged(_applicationId, msg.sender);
   }
@@ -272,6 +269,9 @@ contract CoordinationGame is Ownable {
   function applicantWon(uint256 _applicationId) internal {
     wins[msg.sender] += 1;
     tilRegistry.updateStatus(bytes32(_applicationId));
+
+    tilRegistry.token().approve(address(work), applicantDeposits[_applicationId]);
+    work.depositJobStake(verifiers[_applicationId]);
 
     emit ApplicantWon(_applicationId);
   }
@@ -331,5 +331,9 @@ contract CoordinationGame is Ownable {
 
   function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
     return verifierSecrets[_applicationId] != 0;
+  }
+
+  function minDeposit() internal view returns (uint256) {
+    return tilRegistry.parameterizer().get("minDeposit");
   }
 }
