@@ -34,9 +34,11 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
   }
 
   determineModalState(nextProps) {
-    let newModalState = true
+    let newModalState
     if (!this.props.account && nextProps && nextProps.account) {
       newModalState = false
+    } else if (window.web3) {
+      newModalState = true
     }
 
     this.setState({
@@ -58,13 +60,13 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
           />
           <br />
           <br />
-          <h3 className="is-size-3">
+          <h4 className="is-size-4">
             We see you're using MetaMask, nice!
-          </h3>
+          </h4>
 
-          <h5 className="is-size-5">
+          <h6 className="is-size-6">
             To continue click the fox in the top-right corner to log in to your MetaMask account.
-          </h5>
+          </h6>
         </div>
       </Modal>
     )

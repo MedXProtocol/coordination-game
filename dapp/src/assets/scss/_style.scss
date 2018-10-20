@@ -12,7 +12,7 @@ body {
   color: #e7dfdd;
   // font-family: 'Heebo', sans-serif;
   font-family: 'Comfortaa', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -250,6 +250,7 @@ header {
 .modal.is-active {
   opacity: 1;
   transition: opacity 300ms ease-in-out;
+  pointer-events: initial;
 }
 
 .modal-card-head,
@@ -259,8 +260,12 @@ header {
 
 .modal-content {
   background-color: lighten($background-color, 6%);
+  background: linear-gradient(217deg, rgba(20,15,30,1), rgba(30,40,80,.5) 70.71%),
+              linear-gradient(127deg, rgba(6,12,18,1), rgba(10,20,30,.5) 70.71%),
+              linear-gradient(336deg, rgba(20,15,30,1), rgba(20,10,30,.5) 70.71%);
+
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
-  padding: 6rem;
+  padding: 4rem;
 
   @media screen and (max-width: 768px) {
     padding: 3rem 1.5rem;
