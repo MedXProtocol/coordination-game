@@ -87,7 +87,8 @@ export const StartGameFormContainer = connect(mapStateToProps)(
           'start',
           secretRandomHash,
           randomHash,
-          hint
+          hint,
+          { from: this.props.address }
         )()
 
         this.setState({
@@ -193,8 +194,10 @@ export const StartGameFormContainer = connect(mapStateToProps)(
                     )
                   : null}
 
+
                 <Flipped flipId="coolDiv">
                   <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                    <br />
                     <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
                   </div>
                 </Flipped>

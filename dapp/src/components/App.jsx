@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
 import { hot } from 'react-hot-loader'
 import ReduxToastr from 'react-redux-toastr'
-import { Header } from './Header'
-import { StartGameFormContainer } from './StartGameForm'
+import { Header } from '~/components/Header'
+import { StartGameFormContainer } from '~/components/StartGameForm'
+import { GetWallet } from '~/components/GetWallet'
+import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 
 const App = class extends Component {
 
   render() {
     return (
       <React.Fragment>
+        <GetWallet />
+        <LoginToMetaMask />
         <ReduxToastr
           timeOut={7000}
           newestOnTop={true}
@@ -38,6 +42,7 @@ const App = class extends Component {
                 <table className="table is-fullwidth">
                   <thead>
                     <tr>
+                      <th></th>
                       <th>Application #</th>
                       <th>Hint</th>
                       <th>Secret</th>
@@ -46,18 +51,21 @@ const App = class extends Component {
                   </thead>
                   <tbody>
                     <tr>
+                      <th>May 31st, 2018</th>
                       <th>1</th>
                       <th>200 + 200</th>
                       <th>400</th>
                       <th>Verified</th>
                     </tr>
                     <tr>
+                      <th>June 2nd, 2018</th>
                       <th>2</th>
                       <th>300 + 2</th>
                       <th>5693</th>
                       <th>Rejected</th>
                     </tr>
                     <tr>
+                      <th>July 20th, 2018</th>
                       <th>3</th>
                       <th>342 + 182</th>
                       <th>3</th>
