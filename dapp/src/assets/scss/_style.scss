@@ -19,7 +19,7 @@ body {
     sans-serif;
 
   @media (max-width: 768px) {
-    font-size: 0.825rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -260,9 +260,9 @@ header {
 
 .modal-content {
   background-color: lighten($background-color, 6%);
-  background: linear-gradient(217deg, rgba(20,15,30,1), rgba(30,40,80,.5) 70.71%),
-              linear-gradient(127deg, rgba(6,12,18,1), rgba(10,20,30,.5) 70.71%),
-              linear-gradient(336deg, rgba(20,15,30,1), rgba(20,10,30,.5) 70.71%);
+  background: linear-gradient(217deg, rgba(20,15,30,0.8), rgba(30,40,80,0.5) 70%),
+              linear-gradient(127deg, rgba(6,12,18,0.8), rgba(10,20,30,0.5) 70%),
+              linear-gradient(336deg, rgba(20,15,30,0.8), rgba(20,10,30,0.5) 70%);
 
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
   padding: 4rem;
