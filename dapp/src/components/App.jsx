@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import ReduxToastr from 'react-redux-toastr'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
@@ -9,12 +10,34 @@ import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { GetTILW } from '~/components/GetTILW'
 
 const App = class extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      sagasReady: false
+    }
+  }
+
+  componentDidMount() {
+    this.mountedAt = Date.now()
+    this.props.setTimeout(() => {
+      this.setState({
+        sagasReady: true
+      })
+    }, 1000)
+  }
 
   render() {
+    let betaFaucetModal = null,
+      getTilw = null
+    if (this.state.sagasReady) {
+      betaFaucetModal = <BetaFaucetModal  />
+      getTilw = <GetTILW  />
+    }
+
     return (
       <React.Fragment>
-        <GetTILW />
-        <BetaFaucetModal />
+        {getTilw}
+        {betaFaucetModal}
         <GetWallet />
         <LoginToMetaMask />
         <ReduxToastr
@@ -104,4 +127,4 @@ const App = class extends Component {
   }
 }
 
-export const AppContainer = hot(module)(App)
+export const AppContainer = ReactTimeout(hot(module)(App))

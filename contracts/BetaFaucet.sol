@@ -6,7 +6,7 @@ import "./WorkToken.sol";
 contract BetaFaucet is Ownable {
   // Keep track of which Ethereum addresses we've sent Ether and our Work ERC20 token to
   mapping (address => bool) public sentEtherAddresses;
-  mapping (address => bool) public sentWorkAddresses;
+  mapping (address => bool) public sentTILWAddresses;
 
   // Amount of gas we want to account for when doing require() checks
   uint256 public constant gasAmount = 1000000;
@@ -55,12 +55,12 @@ contract BetaFaucet is Ownable {
 
   function sendTILW(address _recipient, uint256 _amount) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
-    require(!sentWorkAddresses[_recipient], "recipient has already received Work");
+    require(!sentTILWAddresses[_recipient], "recipient has already received Work");
     require(_amount > 0, "amount must be positive");
     require(_amount <= 500 ether, "amount must be below the upper limit");
     require(workToken.balanceOf(address(this)) >= _amount, "contract is out of Work!");
 
-    sentWorkAddresses[_recipient] = true;
+    sentTILWAddresses[_recipient] = true;
     emit WorkTokenSent(_recipient, _amount);
 
     workToken.transfer(_recipient, _amount);

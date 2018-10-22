@@ -19,8 +19,8 @@ function mapStateToProps (state) {
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
   const isOwner = address && (cacheCallValue(state, workTokenAddress, 'owner') === address)
-  const betaFaucetAddress = contractByName(state, 'betaFaucetAddress')
-  const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentAddresses', address)
+  const betaFaucetAddress = contractByName(state, 'BetaFaucet')
+  const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentEtherAddresses', address)
 
   const sendEtherTx = externalTransactionFinders.sendEther(state)
   const sendTILWTx = externalTransactionFinders.sendTILW(state)
@@ -28,12 +28,12 @@ function mapStateToProps (state) {
   const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
   const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
 
-  const needsEth = weiToEther(ethBalance) < 0.1 && !hasBeenSentEther
-  const needsTILW = weiToEther(tilwBalance) < 0.1
-
+  const needsEth = (ethBalance !== undefined && weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
+  const needsTILW = (tilwBalance !== undefined && weiToEther(tilwBalance) < 0.1)
 
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&
+    (workTokenAddress !== undefined && betaFaucetAddress !== undefined) &&
     (hasBeenSentEther === undefined || ethBalance === undefined) &&
     (needsEth || needsTILW || manuallyOpened)
 
@@ -60,7 +60,8 @@ function* saga({ workTokenAddress, betaFaucetAddress, address }) {
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'owner'),
-    cacheCall(betaFaucetAddress, 'sentAddresses', address)
+    cacheCall(betaFaucetAddress, 'sentEtherAddresses', address),
+    cacheCall(betaFaucetAddress, 'sentTILWAddresses', address)
   ])
 }
 

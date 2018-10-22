@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
-import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { axiosInstance } from '~/../config/axiosConfig'
+import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { EtherFlip } from '~/components/EtherFlip'
 
@@ -116,35 +118,37 @@ export const EthFaucetAPI = ReactTimeout(
 
       return (
         <div>
+          <FontAwesomeIcon icon={faEthereum} width="100" />
           <h5 className="is-size-5">
-            kjdhf
+            Current Balance:
+            &nbsp; <EtherFlip wei={this.props.ethBalance} />
           </h5>
-          <strong>Current Balance:</strong>
-          <h2 className="header--no-top-margin">
-            <EtherFlip wei={this.props.ethBalance} />
-          </h2>
           <p className="small text-center">
             <span className="eth-address text-gray">For address:&nbsp;
               <EthAddress address={this.props.address} />
             </span>
           </p>
           <hr />
-          <p>
-            You're low on ether, which is necessary to use OpenCare.
-            <br />Not to worry! We can have some sent to your account:
+          <p className="is-size-6">
+            You're low on ether. Not to worry! We can have some sent to your account:
           </p>
+          <br />
           <p>
             <a
               disabled={isSending}
               href={this.faucetLambdaURI}
               onClick={this.handleSendEther}
-              className="btn btn-lg btn-primary"
+              className="button is-light"
             >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
           </p>
           {isSending || responseMessage || errorMessage ? responseWell : ''}
+          <br />
+          <br />
           <p>
-            <br />
-            <button onClick={this.props.handleMoveToNextStep}>skip this for now</button>
+            <button
+              onClick={this.props.handleMoveToNextStep}
+              className="button is-light is-text"
+            >skip this for now</button>
           </p>
         </div>
       )
