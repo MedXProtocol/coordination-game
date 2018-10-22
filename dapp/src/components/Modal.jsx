@@ -9,7 +9,7 @@ export const Modal = ({ children, closeModal, modalState }) => {
       <div className="modal-background" onClick={closeModal} />
       <CustomScroll>
         <div className="modal-content">
-            {children}
+          {children}
         </div>
       </CustomScroll>
     </div>

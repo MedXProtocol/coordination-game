@@ -125,10 +125,14 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         this.props.dispatchSagaGenesisTransaction(id, txType, txHash, call)
       }
 
-      closeModal = () => {
-        this.setState({
-          step: null
-        }, this.props.hideModal)
+      closeModal = (e) => {
+        e.preventDefault()
+
+        if (this.state.step === -1) {
+          this.setState({
+            step: null
+          }, this.props.hideModal)
+        }
       }
 
       handleMoveToNextStep = (e) => {
@@ -145,8 +149,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           tilwBalance,
           address
         } = this.props
-
-        if (!this.props.showBetaFaucetModal) { return null }
 
         if (step === 1) {
           content = <EthFaucetAPI
