@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 // import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
 import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from 'saga-genesis'
-import { Modal } from 'react-bootstrap'
-import get from 'lodash.get'
+import { get } from 'lodash'
+import { Modal } from '~/components/Modal'
 import { TILWFaucetAPI } from '~/components/betaFaucet/TILWFaucetAPI'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { weiToEther } from '~/utils/weiToEther'
@@ -28,13 +28,13 @@ function mapStateToProps (state) {
   const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
   const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
 
-  const fieldsAreUndefined = hasBeenSentEther === undefined || ethBalance === undefined
   const needsEth = weiToEther(ethBalance) < 0.1 && !hasBeenSentEther
   const needsTILW = weiToEther(tilwBalance) < 0.1
 
+
   const showBetaFaucetModal =
-    !fieldsAreUndefined &&
     !betaFaucetModalDismissed &&
+    (hasBeenSentEther === undefined || ethBalance === undefined) &&
     (needsEth || needsTILW || manuallyOpened)
 
   return {
@@ -139,8 +139,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       render() {
         let content
 
-        let totalSteps = 2
-
         const { step } = this.state
         const {
           ethBalance,
@@ -166,10 +164,8 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else {
           content = (
-            <div className="col-xs-12 text-center">
-              <br />
-              <br />
-              <h2 className="header--no-top-margin">
+            <div>
+              <h2>
                 You're all set!
               </h2>
               <p>
@@ -177,36 +173,24 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
               </p>
               <hr />
               <p>
-                <a onClick={this.closeModal} className="btn btn-primary">Close this</a>
+                <button
+                  onClick={this.closeModal}
+                  className="button is-light is-text">
+                  Close this
+                </button>
               </p>
             </div>
-          )
-        }
-
-        let stepText
-
-        if (step > 0) {
-          stepText = (
-            <React.Fragment>
-              &nbsp;<small>(Step {step} of {totalSteps})</small>
-            </React.Fragment>
           )
         }
 
         return (
           <Modal
             closeModal={this.closeModal}
-            showBetaFaucetModal={this.props.showBetaFaucetModal}
+            modalState={this.props.showBetaFaucetModal}
             title="Example modal title"
           >
             <div className='has-text-centered'>
-              <h5 className="is-size-5">
-                To use this demo you will need to use an Ethereum wallet
-              </h5>
-
-              <div className="row">
-                {content}
-              </div>
+              {content}
             </div>
           </Modal>
         );

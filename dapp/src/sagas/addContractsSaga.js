@@ -3,6 +3,7 @@ import {
 } from 'saga-genesis'
 import { all } from 'redux-saga/effects'
 
+import betaFaucetConfig from '#/BetaFaucet.json'
 import coordinationGameConfig from '#/CoordinationGame.json'
 import tilRegistryConfig from '#/TILRegistry.json'
 import parameterizerConfig from '#/Parameterizer.json'
@@ -24,6 +25,7 @@ export const addTruffleArtifactAddresses = function* (contractJson) {
 }
 
 export const addContractsSaga = function* () {
+  yield addTruffleArtifactAddresses(betaFaucetConfig)
   yield addTruffleArtifactAddresses(coordinationGameConfig)
   yield addTruffleArtifactAddresses(tilRegistryConfig)
   yield addTruffleArtifactAddresses(parameterizerConfig)

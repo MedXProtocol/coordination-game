@@ -240,11 +240,27 @@ header {
   color: white;
 }
 
+.button.is-light.is-text {
+  background-color: transparent;
+  color: #ccc;
+  font-weight: normal;
+}
+
 .modal {
   display: flex;
   opacity: 0;
   transition: opacity 300ms ease-in-out;
   pointer-events: none;
+}
+
+.modal-content {
+  overflow: initial;
+}
+
+.modal hr {
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 2rem auto;
+  width: 50%;
 }
 
 .modal.is-active {
@@ -285,4 +301,8 @@ header {
     max-height: calc(100vh - 20px);
     width: 1020px;
   }
+}
+
+section {
+  min-height: 100%;
 }

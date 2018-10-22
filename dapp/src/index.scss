@@ -23,9 +23,11 @@ $brand-danger: $red;
 $screen-sm: 768px;
 $screen-lg: 1200px;
 
+@import 'react-custom-scroll/src/main/cs.scss';
 @import 'react-redux-toastr/src/styles/index.scss';
 @import './assets/scss/toastr-animations';
 @import './assets/scss/toastr-overrides';
 
+@import './assets/scss/_loading-lines.scss';
 @import './assets/scss/_navbar.scss';
 @import './assets/scss/_style.scss';

@@ -6,12 +6,14 @@ import { Header } from '~/components/Header'
 import { StartGameFormContainer } from '~/components/StartGameForm'
 import { GetWallet } from '~/components/GetWallet'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
+import { GetTILW } from '~/components/GetTILW'
 
 const App = class extends Component {
 
   render() {
     return (
       <React.Fragment>
+        <GetTILW />
         <BetaFaucetModal />
         <GetWallet />
         <LoginToMetaMask />
