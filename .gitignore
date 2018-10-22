@@ -8,3 +8,4 @@ networks/*
 !networks/3.json
 !networks/4.json
 .DS_Store
+yarn-error.log

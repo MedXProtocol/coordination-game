@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { hot } from 'react-hot-loader'
 import ReduxToastr from 'react-redux-toastr'
+import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { Header } from '~/components/Header'
 import { StartGameFormContainer } from '~/components/StartGameForm'
 import { GetWallet } from '~/components/GetWallet'
@@ -11,6 +12,7 @@ const App = class extends Component {
   render() {
     return (
       <React.Fragment>
+        <BetaFaucetModal />
         <GetWallet />
         <LoginToMetaMask />
         <ReduxToastr
