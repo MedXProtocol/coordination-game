@@ -128,7 +128,7 @@ export const TILWFaucetAPI = ReactTimeout(
           </p>
           <br />
           <p className="is-size-6">
-            You're low on TILW which is necessary for staking a deposit to play the Coordination Game. We can mint you some:
+            You're low on TILW which is necessary for staking a deposit to play the Coordination Game. We can send some to you now:
           </p>
           <br />
           <p>

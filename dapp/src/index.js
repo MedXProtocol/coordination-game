@@ -5,7 +5,6 @@ import { Provider } from 'react-redux'
 import { AppContainer } from '~/components/App';
 import { store } from '~/store'
 
-
 import 'bulma/css/bulma.css';
 import './index.scss'
 

@@ -28,13 +28,13 @@ function mapStateToProps (state) {
   const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
   const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
 
-  const needsEth = (ethBalance !== undefined && weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
-  const needsTILW = (tilwBalance !== undefined && weiToEther(tilwBalance) < 0.1)
+  const needsEth = (weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
+  const needsTILW = (weiToEther(tilwBalance) < 0.1)
 
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&
     (workTokenAddress !== undefined && betaFaucetAddress !== undefined) &&
-    (hasBeenSentEther === undefined || ethBalance === undefined) &&
+    // (hasBeenSentEther === undefined || ethBalance === undefined) &&
     (needsEth || needsTILW || manuallyOpened)
 
   return {
@@ -108,7 +108,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           step = 2
         }
 
-        if (step === 2 && (!props.needsTILW || props.tilwWasMinted)) {
+        if (step === 2 && (!props.needsTILW)) {
           step = 3
         }
 

@@ -76,7 +76,7 @@ export const EtherFlip = connect(mapStateToProps)(
 
         return (
           <span className='ether-flip flip-link' {...extraProps}>
-            <span className='ether-flip--first-value'>{firstValue}</span>&nbsp;
+            <span className='ether-flip--first-value'>{firstValue}</span>&nbsp;&nbsp;&nbsp;
             <span className='ether-flip--second-value'>{secondValue}</span>
           </span>
         )

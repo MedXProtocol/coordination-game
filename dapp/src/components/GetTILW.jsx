@@ -26,9 +26,16 @@ function* getTILWSaga({ workTokenAddress, address }) {
   ])
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowBetaFaucetModal: () => {
+      dispatch({ type: 'SHOW_BETA_FAUCET_MODAL', manuallyOpened: true })
+    }
+  }
+}
 
 export const GetTILW = withSaga(getTILWSaga)(
-  connect(mapStateToProps)(
+  connect(mapStateToProps, mapDispatchToProps)(
     class _GetTILW extends Component {
 
       render() {
@@ -39,7 +46,9 @@ export const GetTILW = withSaga(getTILWSaga)(
           this.props.tilwBalance !== undefined &&
           this.props.tilwBalance < 25
         ) {
-          getTilw = <img alt="get-tilw-coin-img" src={GetTILWCoinImg} width="100" />
+          getTilw = <button onClick={this.props.dispatchShowBetaFaucetModal}>
+            <img alt="get-tilw-coin-img" src={GetTILWCoinImg} width="100" />
+          </button>
         } else {
           getTilw = null
         }

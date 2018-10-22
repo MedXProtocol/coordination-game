@@ -5,7 +5,7 @@ import metaMaskFoxAndWordmarkImg from '~/assets/img/metamask-fox-and-wordmark.sv
 
 function mapStateToProps(state, ownProps) {
   return {
-    account: state.sagaGenesis.accounts[0]
+    address: state.sagaGenesis.accounts[0]
   }
 }
 
@@ -35,7 +35,10 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
 
   determineModalState(nextProps) {
     let newModalState
-    if (!this.props.account && nextProps && nextProps.account) {
+    // console.log(!this.props.address)
+    // console.log(nextProps)
+    // console.log(nextProps.address)
+    if (!this.props.address && nextProps && nextProps.address) {
       newModalState = false
     } else if (window.web3) {
       newModalState = true

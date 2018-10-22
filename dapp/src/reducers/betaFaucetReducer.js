@@ -1,6 +1,8 @@
 export const betaFaucet = function (state, { type, manuallyOpened }) {
   if (typeof state === 'undefined') {
-    state = {}
+    state = {
+      manuallyOpened: false
+    }
   }
 
   switch(type) {
