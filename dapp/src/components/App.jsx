@@ -148,25 +148,24 @@ const App = connect(mapStateToProps)(
 
             <div className='columns'>
               <div className='column is-half-tablet is-offset-one-quarter'>
-                <footer className="has-text-centered">
+                <div className="has-text-centered">
                   <h3>
                     What is this?
                   </h3>
                   <p className="has-text-grey-light">
                     Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
                   </p>
-                </footer>
+                </div>
               </div>
             </div>
 
             <br />
           </section>
 
-          <footer className="footer has-text-centered">
-            <section className='section'>
-              <div className='container is-fluid'>
-                <div className='columns'>
-                  <div className='column is-half-desktop'>
+          <section className='section'>
+            <footer className="footer has-text-centered">
+              <div className='columns'>
+                <div className='column is-half-tablet is-offset-one-quarter'>
                     <p className="text-footer">
                       &copy; 2018 MedX Protocol - All Rights Reserved
                     </p>
@@ -175,9 +174,8 @@ const App = connect(mapStateToProps)(
                     {debugLink}
                   </div>
                 </div>
-              </div>
-            </section>
-          </footer>
+            </footer>
+          </section>
         </React.Fragment>
       )
     }
