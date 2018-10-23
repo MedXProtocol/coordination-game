@@ -1,0 +1,57 @@
+[
+  {
+    "contractName": "AttributeStore",
+    "address": "0x95049830dafa462e046a2ae2310ff50f999a4d23",
+    "transactionHash": "0xede7ad920e82b4861556e8ad08100c464eae365b4784fa9614e3b5cdf0d25bb6"
+  },
+  {
+    "contractName": "DLL",
+    "address": "0xcd7a980dc9f41b81b4b206d3a6bcaa282638348c",
+    "transactionHash": "0x31f441eb7f27422bf145d7229f17e2f774ccf0144c76f7c3359ca9797919bded"
+  },
+  {
+    "contractName": "PLCRFactory",
+    "address": "0x9a8c1324c1629bb2f34f7e076dd4a6cc18ab62ed",
+    "transactionHash": "0x76230b5363a8bfb38ed1780caf71ba49bcf106e27f1acc7a7bf98b809609cf54"
+  },
+  {
+    "contractName": "ParameterizerFactory",
+    "address": "0x2963f9940bbff17147449616c8d8c398be65b2fb",
+    "transactionHash": "0x92d0d7144ed6a893e0c27e667a436739a97625a5bcf911a5abb86c099283118b"
+  },
+  {
+    "contractName": "ParameterizerFactory",
+    "address": "0x4a5b8ce7ebbac248f907fdca155702d47f793427",
+    "transactionHash": "0x50023dea8a6855fcbcde644b1cd9eefa2d607eea518c75fcbc0d9ab34a31dea0"
+  },
+  {
+    "contractName": "WorkToken",
+    "address": "0xe810073d990b3c51c11fddf84e5fd4c3b05ee3cd",
+    "transactionHash": "0x02524692386e4eac728934ef59b2b6550b28b92857aca6c504c1963acdcbf91b"
+  },
+  {
+    "contractName": "Work",
+    "address": "0xa3885338466bfa443e774b16e7c2978edcfd78b0",
+    "transactionHash": "0x6fa1dfcffb57559c427f2309bdf10b3759f4b19214f350632b7596b4bf3f0248"
+  },
+  {
+    "contractName": "Parameterizer",
+    "address": "0xdbf0a9da61700ad3571bdebdfbf8c793837ec7be",
+    "transactionHash": "0x09a46006ef569d95cbcd4cc6b952bca6dfe2317a2c711bc38f73974e81498934"
+  },
+  {
+    "contractName": "CoordinationGameFactory",
+    "address": "0x0ac90c697c91ec8af0760217f81fad3258ea482a",
+    "transactionHash": "0x5c71825b7090992d60bb81497f849617ed8b2145972ff68a99db06cfbff01a05"
+  },
+  {
+    "contractName": "CoordinationGameFactory",
+    "address": "0x2a049cd243c12363bdb638e0115111f48cb4c8bd",
+    "transactionHash": "0x200de9633206466fb1786c1417a592b5815a05a693c25017b4a6a1be4f8e603e"
+  },
+  {
+    "contractName": "CoordinationGameFactory",
+    "address": "0xc2cea1b197b0f27aa9ff3992a8b3193862505a5e",
+    "transactionHash": "0x711eacd4f33d0632a9cebf2d155c183bae9635c880f909e8b0ef1e461722c233"
+  }
+]
