@@ -1,15 +1,21 @@
 import React, { Component } from 'react'
+import { withRouter, Route, Switch } from 'react-router-dom'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { connect } from 'react-redux'
 import ReduxToastr from 'react-redux-toastr'
 import { get } from 'lodash'
+import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
-import { Header } from '~/components/Header'
-import { StartGameFormContainer } from '~/components/StartGameForm'
-import { GetWallet } from '~/components/GetWallet'
+import { DebugLog } from '~/components/DebugLog'
+import { FourOhFour } from '~/components/FourOhFour'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { GetTILW } from '~/components/GetTILW'
+import { GetWallet } from '~/components/GetWallet'
+import { Header } from '~/components/Header'
+import { Home } from '~/components/Home'
+import { Web3Route } from '~/components/Web3Route'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -84,6 +90,26 @@ const App = connect(mapStateToProps)(
         header = <Header />
       }
 
+      if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+        if (this.state.debugging) {
+          var debugLog =
+            <div>
+              <hr />
+              <DebugLog />
+            </div>
+        }
+
+        var debugLink =
+          <div>
+            {/*<a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>*/}
+            <button
+              onClick={() => this.setState({ debugging: !this.state.debugging })}
+              className='button button-primary'
+            >Toggle Log</button>
+            {debugLog}
+          </div>
+      }
+
       return (
         <React.Fragment>
           {getTilw}
@@ -98,60 +124,26 @@ const App = connect(mapStateToProps)(
             transitionIn="bounceIn"
             transitionOut="bounceOut"
           />
+
+          {header}
+
           <section className='section'>
             <div className='container is-fluid'>
               <div className='columns'>
                 <div className='column is-one-half-desktop'>
-                  {header}
 
-                  <StartGameFormContainer />
+                  <Switch>
+                    <Route path={routes.HOME} component={Home} />
+
+                    <Web3Route path={routes.APPLY} component={ApplicantApplyContainer} />
+                    {/*<Web3Route path={routes.STAKE} component={VerifierStake} />*/}
+
+                    <Route path={routes.HOME} component={FourOhFour} />
+                  </Switch>
                   <br />
                   <br />
                   <hr />
-
                 </div>
-              </div>
-
-              <div className='columns'>
-                <div className='column is-half-desktop is-offset-one-quarter'>
-
-                <div className="entries has-text-centered">
-                  <table className="table is-fullwidth">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th>Application #</th>
-                        <th>Hint</th>
-                        <th>Secret</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th>May 31st, 2018</th>
-                        <th>1</th>
-                        <th>200 + 200</th>
-                        <th>400</th>
-                        <th>Verified</th>
-                      </tr>
-                      <tr>
-                        <th>June 2nd, 2018</th>
-                        <th>2</th>
-                        <th>300 + 2</th>
-                        <th>5693</th>
-                        <th>Rejected</th>
-                      </tr>
-                      <tr>
-                        <th>July 20th, 2018</th>
-                        <th>3</th>
-                        <th>342 + 182</th>
-                        <th>3</th>
-                        <th>Challenged</th>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
               </div>
             </div>
 
@@ -168,14 +160,29 @@ const App = connect(mapStateToProps)(
               </div>
             </div>
 
-            </div>
             <br />
-
           </section>
+
+          <footer className="footer has-text-centered">
+            <section className='section'>
+              <div className='container is-fluid'>
+                <div className='columns'>
+                  <div className='column is-one-half-desktop'>
+                    <p className="text-footer">
+                      &copy; 2018 MedX Protocol - All Rights Reserved
+                    </p>
+                    <br />
+                    <br />
+                    {debugLink}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </footer>
         </React.Fragment>
       )
     }
   }
 )
 
-export const AppContainer = ReactTimeout(hot(module)(App))
+export const AppContainer = withRouter(ReactTimeout(hot(module)(App)))

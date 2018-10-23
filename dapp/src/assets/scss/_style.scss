@@ -144,6 +144,7 @@ header {
   color: rgba(255, 255, 255, 0.3);
   font-size: 3rem;
   line-height: 1.1;
+  margin-bottom: 2rem;
   max-width: 10rem;
   text-align: center;
   outline: 0;
@@ -310,4 +311,8 @@ section {
 .svg-inline--fa.fa-w-10.fa-ethereum {
   height: 5rem;
   width: 2.5rem;
+}
+
+.footer {
+  background-color: inherit;
 }

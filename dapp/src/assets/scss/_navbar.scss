@@ -1,16 +1,43 @@
 .navbar {
-  background: $background-color;
+  background-color: $background-color;
   border: 0;
+  flex-wrap: wrap;
   margin-bottom: 0;
   font-family: 'Comfortaa', sans-serif;
   font-size: .75rem;
   z-index: 3;
 }
 
+.navbar > .container {
+  min-height: 1.75rem;
+}
+
+.navbar {
+  @media screen and (min-width: 1088px) {
+    min-height: 1.75rem;
+  }
+}
+
+.navbar.is-fixed-top.navbar--row-one {
+  background-color: lighten($background-color, 4%);
+}
+
+.navbar.is-fixed-top.navbar--row-two {
+  background-color: lighten($background-color, 3%);
+}
+
+.navbar.is-fixed-top.navbar--row-two {
+  top: 60px;
+}
+
 .navbar-item {
   color: white;
 }
 
+.navbar-item,
+.navbar-link {
+  padding: 0.25rem 0.75rem;
+}
 
 .nav--circle:before {
   border-radius: 100%;

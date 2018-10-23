@@ -23,9 +23,9 @@ function mapStateToProps(state) {
   }
 }
 
-export const StartGameFormContainer = connect(mapStateToProps)(
+export const ApplicantApplyContainer = connect(mapStateToProps)(
   withSend(
-    class _StartGameForm extends Component {
+    class _ApplicantApplyContainer extends Component {
 
       constructor(props) {
         super(props)
@@ -44,6 +44,7 @@ export const StartGameFormContainer = connect(mapStateToProps)(
             props.transactions[this.state.coordinationGameStartTransactionId]
           )
             .onError((error) => {
+              console.log(error)
               toastr.transactionError(error)
               this.setState({ coordinationGameStartHandler: null })
             })
@@ -69,6 +70,8 @@ export const StartGameFormContainer = connect(mapStateToProps)(
         e.preventDefault()
 
         const { send, coordinationGameInstance } = this.props
+        const padLeft = getWeb3().utils.padLeft
+        const toHex = getWeb3().utils.toHex
 
         const random = new BN(Math.ceil(Math.random(1) * 1000000))
 
@@ -80,15 +83,16 @@ export const StartGameFormContainer = connect(mapStateToProps)(
           ['uint256'],
           [random]
         ).toString('hex')
-        const hint = getWeb3().utils.toHex(this.state.hint)
+
+        const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
+        const hint = padLeft(toHex(hintString), 32)
 
         const coordinationGameStartTransactionId = send(
           coordinationGameInstance,
           'start',
           secretRandomHash,
           randomHash,
-          hint,
-          { from: this.props.address }
+          hint
         )()
 
         this.setState({

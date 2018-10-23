@@ -2,3 +2,12 @@
 # or just `source .envrc`
 
 export HDWALLET_MNEMONIC="rescue tree music reform symbol caught adult sand sentence belt tooth later"
+
+export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
+
+export LAMBDA_CONFIG_CORS_ORIGIN="*"
+export LAMBDA_CONFIG_PRIVKEY="<YOUR PRIVATE KEY WITH 0x IN FRONT>"
+export LAMBDA_CONFIG_PROVIDER_URL=http://localhost:8545
+export LAMBDA_CONFIG_NETWORK_ID=1234
+
+export REACT_APP_ENABLE_FIREBUG_DEBUGGER=true

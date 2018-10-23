@@ -52,7 +52,7 @@ export const EthFaucetAPI = ReactTimeout(
             this.setState({
               isSending: false
             })
-          }, 7000)
+          }, 1000)
         }
       } catch (error) {
         this.setState({
@@ -63,7 +63,7 @@ export const EthFaucetAPI = ReactTimeout(
           this.setState({
             isSending: false
           })
-        }, 7000)
+        }, 1000)
       }
     }
 
