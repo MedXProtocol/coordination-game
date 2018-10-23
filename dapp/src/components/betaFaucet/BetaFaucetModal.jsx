@@ -3,7 +3,14 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 // import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
-import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from 'saga-genesis'
+import {
+  cacheCall,
+  cacheCallValue,
+  cacheCallValueBigNumber,
+  contractByName,
+  nextId,
+  withSaga
+} from 'saga-genesis'
 import { get } from 'lodash'
 import { Modal } from '~/components/Modal'
 import { TILWFaucetApi } from '~/components/betaFaucet/TILWFaucetApi'
@@ -14,7 +21,7 @@ function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValue(state, workTokenAddress, 'balanceOf', address)
+  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')

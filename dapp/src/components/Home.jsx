@@ -8,11 +8,7 @@ export const Home = class _Home extends Component {
       <React.Fragment>
         <PageTitle title='home' />
 
-        <div className='columns'>
-          <div className='column is-half-desktop is-offset-one-quarter'>
-            <TILTable />
-          </div>
-        </div>
+        <TILTable />
       </React.Fragment>
     )
   }

@@ -11,21 +11,17 @@ export const FourOhFour = class _FourOhFour extends Component {
       <div>
         <PageTitle title='fourOhFour' />
 
-        <div className='columns'>
-          <div className='column is-half-desktop is-offset-one-quarter'>
-            <h5 className="is-size-5 text-center">
-              404
-            </h5>
+        <h5 className="is-size-5 text-center">
+          404
+        </h5>
 
-            <p>
-              The page you are looking for does not exist.
-            </p>
-            <br />
-            <p>
-              <Link className="button button-light" to={path}>Go Back</Link>
-            </p>
-          </div>
-        </div>
+        <p>
+          The page you are looking for does not exist.
+        </p>
+        <br />
+        <p>
+          <Link className="button button-light" to={path}>Go Back</Link>
+        </p>
       </div>
     )
   }

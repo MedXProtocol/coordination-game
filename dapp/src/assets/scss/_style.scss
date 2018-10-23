@@ -144,6 +144,7 @@ header {
   color: rgba(255, 255, 255, 0.3);
   font-size: 3rem;
   line-height: 1.1;
+  // margin-top: 0.5rem;
   margin-bottom: 2rem;
   max-width: 10rem;
   text-align: center;
@@ -223,14 +224,14 @@ header {
 }
 
 .section {
-  padding: 8rem 0;
+  padding: 6rem 1.5rem;
 }
 
 .button {
-  border: 0;
+  border: 1px solid transparent;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
-  padding-top: calc(0.5rem - 1px);
+  // padding-top: calc(0.5rem - 1px);
 }
 
 .button.is-light:hover,
@@ -238,7 +239,7 @@ header {
 .button.is-light.is-focused,
 .button.is-light:active {
   background-color: $accent-color-2;
-  border: 0;
+  border: 1px solid lighten($accent-color-2, 10%);
   color: white;
 }
 
@@ -266,6 +267,16 @@ header {
   transform: translate3d(0, 0, 0);
   perspective: 1000px;
   z-index: 500;
+}
+
+.button.button--amount-to-stake {
+  margin: 0;
+}
+
+.button.is-small {
+  height: 1.25rem;
+  padding: 0 10px;
+  min-width: 2.5rem;
 }
 
 @keyframes shake {
@@ -366,4 +377,16 @@ section {
 
 .has-text-transparent-white {
   color: rgba(255, 255, 255, 0.4);
+}
+
+.columns--is-button-container .column {
+  padding-right: 0;
+}
+
+.heading {
+  font-size: 0.75rem;
+}
+
+.title {
+  color: white;
 }

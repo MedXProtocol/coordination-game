@@ -2,7 +2,12 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { cacheCall, withSaga, cacheCallValue, contractByName } from 'saga-genesis'
+import {
+  cacheCall,
+  cacheCallValueBigNumber,
+  contractByName,
+  withSaga
+} from 'saga-genesis'
 import GetTILWCoinImg from '~/assets/img/get-tilw-coin.png'
 import GetTILWCoinImg2x from '~/assets/img/get-tilw-coin@2x.png'
 
@@ -10,7 +15,7 @@ function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValue(state, workTokenAddress, 'balanceOf', address)
+  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   return {
     address,

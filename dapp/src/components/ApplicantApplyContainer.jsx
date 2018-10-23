@@ -5,8 +5,8 @@ import BN from 'bn.js'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import {
   contractByName,
-  withSend,
-  TransactionStateHandler
+  TransactionStateHandler,
+  withSend
 } from 'saga-genesis'
 import { toastr } from '~/toastr'
 import { getWeb3 } from '~/utils/getWeb3'
@@ -14,12 +14,12 @@ import { getWeb3 } from '~/utils/getWeb3'
 function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const coordinationGameInstance = contractByName(state, 'CoordinationGame')
+  const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   return {
     transactions,
     address,
-    coordinationGameInstance
+    coordinationGameAddress
   }
 }
 
@@ -69,7 +69,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
       handleSubmit = (e) => {
         e.preventDefault()
 
-        const { send, coordinationGameInstance } = this.props
+        const { send, coordinationGameAddress } = this.props
         const padLeft = getWeb3().utils.padLeft
         const toHex = getWeb3().utils.toHex
 
@@ -88,7 +88,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         const hint = padLeft(toHex(hintString), 32)
 
         const coordinationGameStartTransactionId = send(
-          coordinationGameInstance,
+          coordinationGameAddress,
           'start',
           secretRandomHash,
           randomHash,

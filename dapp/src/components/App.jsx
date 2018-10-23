@@ -14,7 +14,7 @@ import { GetTILW } from '~/components/GetTILW'
 import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
-import { Web3Route } from '~/components/Web3Route'
+// import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake'
 import * as routes from '~/../config/routes'
 
@@ -43,7 +43,7 @@ const App = connect(mapStateToProps)(
         this.setState({
           sagasReady: true
         })
-      }, 1000)
+      }, 600)
 
 
       window.addEventListener("beforeunload", this.unload)
@@ -131,18 +131,14 @@ const App = connect(mapStateToProps)(
           <section className='section'>
             <div className='container is-fluid'>
               <div className='columns'>
-                <div className='column is-one-half-desktop'>
-
+                <div className='column is-8 is-offset-2'>
                   <Switch>
                     <Route path={routes.APPLY} component={ApplicantApplyContainer} />
                     <Route path={routes.STAKE} component={VerifierStake} />
 
                     <Route path={routes.HOME} component={Home} />
 
-
-
                     <Route component={FourOhFour} />
-                    {/*<Route path={routes.HOME} component={FourOhFour} />*/}
                   </Switch>
                   <br />
                   <br />
@@ -152,7 +148,7 @@ const App = connect(mapStateToProps)(
             </div>
 
             <div className='columns'>
-              <div className='column is-half-desktop is-offset-one-quarter'>
+              <div className='column is-half-tablet is-offset-one-quarter'>
                 <footer className="has-text-centered">
                   <h3>
                     What is this?
@@ -171,7 +167,7 @@ const App = connect(mapStateToProps)(
             <section className='section'>
               <div className='container is-fluid'>
                 <div className='columns'>
-                  <div className='column is-one-half-desktop'>
+                  <div className='column is-half-desktop'>
                     <p className="text-footer">
                       &copy; 2018 MedX Protocol - All Rights Reserved
                     </p>
