@@ -118,8 +118,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           step = -1
         }
 
-        console.log('settings' + step)
-
         return step
       }
 
@@ -144,8 +142,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         e.preventDefault()
         e.persist()
 
-        console.log('moving to' + (this.state.step + 1))
-
         this.setState({
           step: this.nextStep(this.state.step + 1, this.props)
         }, () => {
@@ -157,7 +153,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         let content
 
         const { step } = this.state
-        console.log(step)
 
         const {
           ethBalance,

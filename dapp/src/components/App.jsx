@@ -15,6 +15,7 @@ import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 import { Web3Route } from '~/components/Web3Route'
+import { VerifierStake } from '~/components/VerifierStake'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps (state) {
@@ -136,7 +137,7 @@ const App = connect(mapStateToProps)(
                     <Route path={routes.HOME} component={Home} />
 
                     <Web3Route path={routes.APPLY} component={ApplicantApplyContainer} />
-                    {/*<Web3Route path={routes.STAKE} component={VerifierStake} />*/}
+                    <Web3Route path={routes.STAKE} component={VerifierStake} />
 
                     <Route path={routes.HOME} component={FourOhFour} />
                   </Switch>

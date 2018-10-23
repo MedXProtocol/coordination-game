@@ -1,0 +1,100 @@
+$fast: .1s;
+$quick: .25s;
+$medium: .5s;
+$mid-slow: .75s;
+$slow: 1s;
+$slower: 1.25s;
+$very-slow: 1.5s;
+$pretty-slow: 2s;
+$super-slow: 2s;
+
+.fade-out {
+  opacity: 1;
+  transition: all $quick linear;
+
+  &.anim-fade-out {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+
+  &.anim-fade-in {
+    opacity: 1;
+  }
+
+  &.fast {
+    transition: all $fast ease-in-out;
+  }
+  &.quick {
+    transition: all $quick ease-in-out;
+  }
+  &.medium {
+    transition: all $medium ease-in-out;
+  }
+  &.mid-slow {
+    transition: all $mid-slow ease-in-out;
+  }
+  &.slow {
+    transition: all $slow ease-in-out;
+  }
+  &.slower {
+    transition: all $slower ease-in-out;
+  }
+  &.very-slow {
+    transition: all $very-slow ease-in-out;
+  }
+  &.pretty-slow {
+    transition: all $pretty-slow ease-in-out;
+  }
+  &.super-slow {
+    transition: all $super-slow ease-in-out;
+  }
+}
+
+.slide-down {
+  position:relative;
+  opacity: 0;
+  bottom:1em;
+
+  &.mid-slow {
+    transition: all $mid-slow ease-in-out;
+  }
+  &.slow {
+    transition: all $slow ease-in-out;
+  }
+  &.slower {
+    transition: all $slower ease-in-out;
+  }
+  &.very-slow {
+    transition: all $very-slow ease-in-out;
+  }
+  &.pretty-slow {
+    transition: all $pretty-slow ease-in-out;
+  }
+  &.super-slow {
+    transition: all $super-slow ease-in-out;
+  }
+
+  &.anim-slide-down {
+    position:relative;
+    opacity: 1;
+    bottom:0em;
+  }
+}
+
+/* content fade in animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in-start {
+  animation: fadeIn 0.4s forwards;
+}

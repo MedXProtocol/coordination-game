@@ -53,7 +53,7 @@ export const GetTILW = withSaga(getTILWSaga)(
           >
             <img
               src={GetTILWCoinImg}
-              alt="Get More TILW Token image"
+              alt="Get More TILW Token"
               width="100"
               srcSet={`${GetTILWCoinImg} 1x, ${GetTILWCoinImg2x} 2x`}
             />
