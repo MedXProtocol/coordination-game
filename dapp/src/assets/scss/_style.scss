@@ -390,3 +390,17 @@ section {
 .title {
   color: white;
 }
+
+.level-item {
+  min-width: 200px;
+
+  @media (max-width: 1024px) {
+    min-width: 120px;
+  }
+}
+
+.column.is-narrow {
+  @media screen and (max-width: 769px) {
+    display: inline-block;
+  }
+}

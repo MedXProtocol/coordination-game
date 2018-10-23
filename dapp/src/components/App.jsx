@@ -45,7 +45,6 @@ const App = connect(mapStateToProps)(
         })
       }, 600)
 
-
       window.addEventListener("beforeunload", this.unload)
       window.addEventListener("focus", this.refocus)
       this.onAccountChangeSignOut(this.props)

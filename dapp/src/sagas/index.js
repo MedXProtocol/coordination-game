@@ -14,26 +14,8 @@ export default function* () {
   yield takeEvery('SAGA_GENESIS_CAUGHT_ERROR', catchSagaGenesisErrorSaga)
   // yield put('SAGA_GENESIS_READY')
   yield sagas()
-  // yield talkin()
 }
 
 function* catchSagaGenesisErrorSaga(error) {
   yield console.log(error)
 }
-
-
-// function* prepareSaga({ saga, props, key }) {
-//   yield console.log('in here!', saga, props, key)
-//   // const action = `RUN_SAGA_${key}`
-//   // const task = yield takeLatest(action, runSaga)
-//   // yield runSaga({ saga, props, key })
-//   // yield take(`END_SAGA_${key}`)
-//   // yield deregisterKey(key)
-//   // yield cancel(task)
-// }
-//
-// function* talkin() {
-//   // yield takeEvery('TRANSACTION_CONFIRMED', invalidateTransaction)
-//   // yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
-//   yield takeEvery('PREPARE_SAGA', prepareSaga)
-// }
