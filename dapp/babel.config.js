@@ -12,6 +12,9 @@ module.exports = function(api) {
 
   const plugins = [
     [
+      "inline-react-svg"
+    ],
+    [
       "@babel/transform-runtime"
     ],
     [

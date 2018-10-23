@@ -66,8 +66,9 @@ export const GetWallet = class _GetWallet extends Component {
             href={link}
             target="_blank"
             rel="noopener noreferrer"
-            title="Get Coinbase Wallet">
-            <img src={GetCoinbaseWalletImg} alt="Get Coinbase Wallet Button" width="200" />
+            title="Get Coinbase Wallet"
+          >
+            <GetCoinbaseWalletImg />
           </a>
           <br />
           <br />

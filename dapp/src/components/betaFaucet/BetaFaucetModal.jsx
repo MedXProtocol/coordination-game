@@ -6,7 +6,7 @@ import { externalTransactionFinders } from '~/finders/externalTransactionFinders
 import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from 'saga-genesis'
 import { get } from 'lodash'
 import { Modal } from '~/components/Modal'
-import { TILWFaucetAPI } from '~/components/betaFaucet/TILWFaucetAPI'
+import { TILWFaucetApi } from '~/components/betaFaucet/TILWFaucetApi'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { weiToEther } from '~/utils/weiToEther'
 
@@ -96,7 +96,9 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       init(props) {
-        this.setState({ step: this.nextStep(this.state.step, props) })
+        this.setState({
+          step: this.nextStep(this.state.step, props)
+        })
       }
 
       nextStep = (step, props) => {
@@ -109,12 +111,14 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         if (step === 2 && (!props.needsTILW)) {
-          step = 3
-        }
-
-        if (step > 2) {
           step = -1
         }
+
+        if (step === 3) {
+          step = -1
+        }
+
+        console.log('settings' + step)
 
         return step
       }
@@ -129,7 +133,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       closeModal = (e) => {
         e.preventDefault()
 
-        if (this.state.step === -1) {
+        if (this.state.step === -1 || this.state.step === 3) {
           this.setState({
             step: null
           }, this.props.hideModal)
@@ -138,13 +142,23 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
       handleMoveToNextStep = (e) => {
         e.preventDefault()
-        this.setState({ step: this.nextStep(this.state.step + 1, this.props) })
+        e.persist()
+
+        console.log('moving to' + (this.state.step + 1))
+
+        this.setState({
+          step: this.nextStep(this.state.step + 1, this.props)
+        }, () => {
+          this.closeModal(e)
+        })
       }
 
       render() {
         let content
 
         const { step } = this.state
+        console.log(step)
+
         const {
           ethBalance,
           tilwBalance,
@@ -157,39 +171,24 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             address={address}
             ethBalance={ethBalance}
             addExternalTransaction={this.addExternalTransaction}
-            handleMoveToNextStep={this.handleMoveToNextStep} />
+            handleMoveToNextStep={this.handleMoveToNextStep}
+          />
         } else if (step === 2) {
-          content = <TILWFaucetAPI
+          content = <TILWFaucetApi
             key='tilwFaucet'
             address={address}
             tilwBalance={tilwBalance}
             addExternalTransaction={this.addExternalTransaction}
-            handleMoveToNextStep={this.handleMoveToNextStep} />
-        } else {
-          content = (
-            <div>
-              <h2>
-                You're all set!
-              </h2>
-              <p>
-                There is nothing more to do.
-              </p>
-              <hr />
-              <p>
-                <button
-                  onClick={this.closeModal}
-                  className="button is-light is-text">
-                  Close this
-                </button>
-              </p>
-            </div>
-          )
+            handleMoveToNextStep={this.handleMoveToNextStep}
+          />
         }
+
+        const modalState = (step === 1 || step === 2) && this.props.showBetaFaucetModal
 
         return (
           <Modal
             closeModal={this.closeModal}
-            modalState={this.props.showBetaFaucetModal}
+            modalState={modalState}
             title="Example modal title"
           >
             <div className='has-text-centered'>

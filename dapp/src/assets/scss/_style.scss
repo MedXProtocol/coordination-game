@@ -247,6 +247,52 @@ header {
   font-weight: normal;
 }
 
+.button.button--getTilw {
+  background: none;
+  bottom: 20px;
+  height: 100px;
+  position: fixed;
+  right: 20px;
+  width: 100px;
+}
+
+.button.button--getTilw {
+  animation-name: shake;
+  animation-duration: 6s;
+  animation-timing-function: cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  animation-iteration-count: infinite;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  perspective: 1000px;
+  z-index: 500;
+}
+
+@keyframes shake {
+  2%, 18% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  4%, 15% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  6%, 10%, 13% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  8%, 12% {
+    transform: translate3d(4px, 0, 0);
+  }
+
+  20% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .modal {
   display: flex;
   opacity: 0;

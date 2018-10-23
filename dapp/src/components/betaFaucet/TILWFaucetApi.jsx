@@ -7,8 +7,8 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { TILW } from '~/components/TILW'
 import TILWCoinImg from '~/assets/img/tilw-coin.svg'
 
-export const TILWFaucetAPI = ReactTimeout(
-  class _TILWFaucetAPI extends Component {
+export const TILWFaucetApi = ReactTimeout(
+  class _TILWFaucetApi extends Component {
 
     faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendTILW`
 
@@ -117,7 +117,7 @@ export const TILWFaucetAPI = ReactTimeout(
 
       return (
         <div>
-          <img alt="tilw-coin-img" src={TILWCoinImg} width="100" />
+          <TILWCoinImg width="100" height="100" />
           <h5 className="is-size-5">
             Current Balance: <TILW wei={this.props.tilwBalance} />
           </h5>
@@ -154,7 +154,7 @@ export const TILWFaucetAPI = ReactTimeout(
   }
 )
 
-TILWFaucetAPI.propTypes = {
+TILWFaucetApi.propTypes = {
   tilwBalance: PropTypes.string,
   address: PropTypes.string
 }

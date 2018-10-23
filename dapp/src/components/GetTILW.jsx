@@ -3,7 +3,8 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { cacheCall, withSaga, cacheCallValue, contractByName } from 'saga-genesis'
-import GetTILWCoinImg from '~/assets/img/get-tilw-coin.svg'
+import GetTILWCoinImg from '~/assets/img/get-tilw-coin.png'
+import GetTILWCoinImg2x from '~/assets/img/get-tilw-coin@2x.png'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -46,8 +47,16 @@ export const GetTILW = withSaga(getTILWSaga)(
           this.props.tilwBalance !== undefined &&
           this.props.tilwBalance < 25
         ) {
-          getTilw = <button onClick={this.props.dispatchShowBetaFaucetModal}>
-            <img alt="get-tilw-coin-img" src={GetTILWCoinImg} width="100" />
+          getTilw = <button
+            onClick={this.props.dispatchShowBetaFaucetModal}
+            className="button button--getTilw"
+          >
+            <img
+              src={GetTILWCoinImg}
+              alt="Get More TILW Token image"
+              width="100"
+              srcSet={`${GetTILWCoinImg} 1x, ${GetTILWCoinImg2x} 2x`}
+            />
           </button>
         } else {
           getTilw = null

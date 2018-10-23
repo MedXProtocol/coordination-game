@@ -1,7 +1,7 @@
+import { hot } from 'react-hot-loader'
 import React, { Component } from 'react'
 import { withRouter, Route, Switch } from 'react-router-dom'
 import ReactTimeout from 'react-timeout'
-import { hot } from 'react-hot-loader'
 import { connect } from 'react-redux'
 import ReduxToastr from 'react-redux-toastr'
 import { get } from 'lodash'

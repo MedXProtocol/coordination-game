@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { NetworkCheck } from '~/components/NetworkCheck'
-import { withRouter, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import * as routes from '~/../config/routes'
 
 export const Header = class _Header extends Component {
@@ -29,7 +29,17 @@ export const Header = class _Header extends Component {
               <div className="navbar-end">
                 <div className="navbar-item">
                   <Link to={routes.HOME} className="navbar-item">
-                    Home
+                    Registry
+                  </Link>
+                </div>
+                <div className="navbar-item">
+                  <Link to={routes.APPLY} className="navbar-item">
+                    Apply
+                  </Link>
+                </div>
+                <div className="navbar-item">
+                  <Link to={routes.STAKE} className="navbar-item">
+                    Stake
                   </Link>
                 </div>
               </div>

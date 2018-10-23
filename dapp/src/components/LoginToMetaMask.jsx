@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Modal } from '~/components/Modal'
-import metaMaskFoxAndWordmarkImg from '~/assets/img/metamask-fox-and-wordmark.svg'
+import MetaMaskFoxAndWordmarkImg from '~/assets/img/metamask-fox-and-wordmark.svg'
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -35,10 +35,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
 
   determineModalState(nextProps) {
     let newModalState
-    // console.log(!this.props.address)
-    // console.log(nextProps)
-    // console.log(nextProps.address)
-    if (!this.props.address && nextProps && nextProps.address) {
+    if (this.props.address || nextProps.address) {
       newModalState = false
     } else if (window.web3) {
       newModalState = true
@@ -57,11 +54,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
         title="Example modal title"
       >
         <div className='has-text-centered'>
-          <img
-            width='120'
-            src={metaMaskFoxAndWordmarkImg} alt="MetaMask logo"
-          />
-          <br />
+          <MetaMaskFoxAndWordmarkImg width="150" />
           <br />
           <h4 className="is-size-4">
             We see you're using MetaMask, nice!
