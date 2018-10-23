@@ -3,7 +3,6 @@ import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
 import { NetworkCheck } from '~/components/NetworkCheck'
 import { Link } from 'react-router-dom'
-import { Flipper, Flipped } from 'react-flip-toolkit'
 import * as routes from '~/../config/routes'
 
 export const Header = ReactTimeout(

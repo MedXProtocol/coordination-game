@@ -230,6 +230,7 @@ header {
   border: 0;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
+  padding-top: calc(0.5rem - 1px);
 }
 
 .button.is-light:hover,

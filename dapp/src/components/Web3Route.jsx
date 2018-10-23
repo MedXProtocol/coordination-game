@@ -22,26 +22,28 @@ export const Web3Route = connect(mapStateToProps)(
     }
 
     redirect () {
-      let redirect
-      if (!this.props.web3Initialized || !this.props.address) {
-        redirect = routes.HOME
-      }
-      return redirect
+      // let redirect
+      // if (!this.props.web3Initialized || !this.props.address) {
+      //   redirect = routes.HOME
+      // }
+      // return redirect
     }
 
     render () {
-      const redirect = this.redirect()
-      if (redirect) {
-        var component = <Redirect to={redirect} />
-      } else {
+      let component
+      // const redirect = this.redirect()
+      // if (redirect) {
+        // var component = <Redirect to={redirect} />
+      // } else {
         const otherProps = {
           ...this.props,
           component: undefined
         }
+        console.log(otherProps)
         component = (
           <Route {...otherProps} render={props => this.renderComponent(props)} />
         )
-      }
+      // }
       return component
     }
   }

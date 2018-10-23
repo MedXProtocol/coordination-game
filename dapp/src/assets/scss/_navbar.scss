@@ -1,3 +1,5 @@
+$navbar-height: 50px;
+
 .navbar {
   background-color: $background-color;
   border: 0;
@@ -5,32 +7,33 @@
   font-family: 'Comfortaa', sans-serif;
   font-size: .75rem;
   margin-bottom: 0;
+  padding: 0;
   z-index: 3;
 }
 
 .navbar-brand,
 .navbar-tabs,
 .navbar > .container {
-  min-height: 2.25rem;
+  min-height: $navbar-height;
 }
 
 .navbar {
   @media screen and (min-width: 1088px) {
-    min-height: 2.25rem;
+    min-height: $navbar-height;
   }
 }
 
 .navbar.is-fixed-top.navbar--row-one {
-  background: linear-gradient(183deg, lighten($background-color, 8%), lighten($background-color, 13%) 70%);
+  background: linear-gradient(183deg, lighten($background-color, 10%), lighten($background-color, 15%) 100%);
 }
 
 .navbar.is-fixed-top.navbar--row-two {
-  background: linear-gradient(177deg, lighten($background-color, 9%), lighten($background-color, 6%) 70%);
+  background: linear-gradient(177deg, lighten($background-color, 8%), lighten($background-color, 2%) 100%);
   border-bottom: 4px solid black;
 }
 
 .navbar.is-fixed-top.navbar--row-two {
-  top: 2.25rem;
+  top: $navbar-height;
 }
 
 .navbar-item {
@@ -41,7 +44,8 @@
 
 .navbar-item,
 .navbar-link {
-  padding: 0.325rem 0.75rem 0.25rem;
+  line-height: 54px;
+  padding: 0 0.75rem 0;
 }
 
 a.navbar-item:hover,

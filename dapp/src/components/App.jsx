@@ -134,12 +134,15 @@ const App = connect(mapStateToProps)(
                 <div className='column is-one-half-desktop'>
 
                   <Switch>
+                    <Route path={routes.APPLY} component={ApplicantApplyContainer} />
+                    <Route path={routes.STAKE} component={VerifierStake} />
+
                     <Route path={routes.HOME} component={Home} />
 
-                    <Web3Route path={routes.APPLY} component={ApplicantApplyContainer} />
-                    <Web3Route path={routes.STAKE} component={VerifierStake} />
 
-                    <Route path={routes.HOME} component={FourOhFour} />
+
+                    <Route component={FourOhFour} />
+                    {/*<Route path={routes.HOME} component={FourOhFour} />*/}
                   </Switch>
                   <br />
                   <br />
