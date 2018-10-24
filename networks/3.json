@@ -63,5 +63,10 @@
     "contractName": "BetaFaucet",
     "address": "0x8079f1e186bfb7043464cfcb9f5b900369872109",
     "transactionHash": "0x13d4fc98f9daa3ff5b3087ab9694bc6896a8341aacc56e470454f6c1ae1f6208"
+  },
+  {
+    "contractName": "Work",
+    "address": "0x0ab5b6f9653c47e61125d2dc7b62797d89d7266d",
+    "transactionHash": "0x8b4013fa13a3f68b4944e37fdc868dc920ecdcd5114a639a71b9f25a9dd5cd81"
   }
 ]
