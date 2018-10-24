@@ -16,11 +16,6 @@
   },
   {
     "contractName": "ParameterizerFactory",
-    "address": "0x2963f9940bbff17147449616c8d8c398be65b2fb",
-    "transactionHash": "0x92d0d7144ed6a893e0c27e667a436739a97625a5bcf911a5abb86c099283118b"
-  },
-  {
-    "contractName": "ParameterizerFactory",
     "address": "0x4a5b8ce7ebbac248f907fdca155702d47f793427",
     "transactionHash": "0x50023dea8a6855fcbcde644b1cd9eefa2d607eea518c75fcbc0d9ab34a31dea0"
   },
@@ -41,17 +36,32 @@
   },
   {
     "contractName": "CoordinationGameFactory",
-    "address": "0x0ac90c697c91ec8af0760217f81fad3258ea482a",
-    "transactionHash": "0x5c71825b7090992d60bb81497f849617ed8b2145972ff68a99db06cfbff01a05"
+    "address": "0x6aac712cbb1755b3916f4e8c998de1e1df1d2b2c",
+    "transactionHash": "0x4a052ee957689a918e27c2c152d39f66f102b01c1b4b1a9821b72860ef9a39e5"
   },
   {
     "contractName": "CoordinationGameFactory",
-    "address": "0x2a049cd243c12363bdb638e0115111f48cb4c8bd",
-    "transactionHash": "0x200de9633206466fb1786c1417a592b5815a05a693c25017b4a6a1be4f8e603e"
+    "address": "0xc56dd1cc030a1db9d15e04f92d946000f046948a",
+    "transactionHash": "0x06ab4c8dcf962759d34b069bd7b852310807de90d92b1c81405bdf8e1ec35823"
   },
   {
-    "contractName": "CoordinationGameFactory",
-    "address": "0xc2cea1b197b0f27aa9ff3992a8b3193862505a5e",
-    "transactionHash": "0x711eacd4f33d0632a9cebf2d155c183bae9635c880f909e8b0ef1e461722c233"
+    "contractName": "TILRegistryFactory",
+    "address": "0x3979ac54cbb7445f4bbf21493dae897d1d94afd8",
+    "transactionHash": "0x2559d7b8cbe08ff8108e254140a50de6e7d813060b5e7b0cc90de2f59c835cd6"
+  },
+  {
+    "contractName": "TILRegistry",
+    "address": "0x7894d37ec8b98653c05e9888a10eccb37f7b8f69",
+    "transactionHash": "0xaa85ab5c4d13baba19fb2979c2ac60d1f87ee8d2bc8a915d39e62c6ec619f4c9"
+  },
+  {
+    "contractName": "CoordinationGame",
+    "address": "0x665a3f26c2926d07e65e0543cda583755675da9a",
+    "transactionHash": "0xaa85ab5c4d13baba19fb2979c2ac60d1f87ee8d2bc8a915d39e62c6ec619f4c9"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x8079f1e186bfb7043464cfcb9f5b900369872109",
+    "transactionHash": "0x13d4fc98f9daa3ff5b3087ab9694bc6896a8341aacc56e470454f6c1ae1f6208"
   }
 ]
