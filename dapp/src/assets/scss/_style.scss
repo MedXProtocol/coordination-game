@@ -23,6 +23,15 @@ body {
   }
 }
 
+a {
+  color: lighten($accent-color-1, 10%);
+}
+
+a:hover,
+a:focus {
+  color: lighten($accent-color-1, 20%);
+}
+
 .is-hidden {
   display: none;
 }
@@ -37,14 +46,6 @@ strong {
 
 :focus:not(:focus-visible) {
   outline: none;
-}
-
-a {
-  color: #0fa8e6;
-}
-
-a:hover {
-  color: #0fc8ff;
 }
 
 h1,
@@ -174,13 +175,13 @@ header {
 }
 
 .entries {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
 }
 
 .table {
   background: none;
   font-size: 0.75rem;
-  margin: 2rem auto;
+  margin: 2rem auto 0.25rem;
 }
 
 .table tr {
@@ -435,6 +436,11 @@ section {
   text-transform: none;
 }
 
+.is-size-1,
+.is-size-2,
+.is-size-3,
+.is-size-4,
+.is-size-5,
 .is-size-6 {
   margin-bottom: 0.5rem;
 }

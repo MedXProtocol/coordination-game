@@ -11,11 +11,9 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { toastr } from '~/toastr'
 import { PageTitle } from '~/components/PageTitle'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import { etherToWei } from '~/utils/etherToWei'
-import { getWeb3 } from '~/utils/getWeb3'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {

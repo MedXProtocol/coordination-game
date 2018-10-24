@@ -140,8 +140,6 @@ const App = connect(mapStateToProps)(
                     <Route component={FourOhFour} />
                   </Switch>
                   <br />
-                  <br />
-                  <hr />
                 </div>
               </div>
             </div>
