@@ -42,6 +42,9 @@ export const EthFaucetAPI = ReactTimeout(
             txHash: response.data.txHash
           })
           this.props.addExternalTransaction('sendEther', response.data.txHash)
+          this.props.setTimeout(() => {
+            this.props.handleMoveToNextStep()
+          }, 2000)
         } else {
           this.setState({
             responseMessage: '',

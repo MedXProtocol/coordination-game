@@ -99,7 +99,9 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       componentWillReceiveProps(nextProps) {
-        this.init(nextProps)
+        // I removed this because the incredible speed of transitions
+        //        was jarring
+        // this.init(nextProps)
       }
 
       init(props) {
@@ -136,7 +138,9 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       closeModal = (e) => {
-        e.preventDefault()
+        if (e) {
+          e.preventDefault()
+        }
 
         if (this.state.step === -1 || this.state.step === 3) {
           this.setState({
@@ -146,8 +150,10 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       handleMoveToNextStep = (e) => {
-        e.preventDefault()
-        e.persist()
+        if (e) {
+          e.preventDefault()
+          e.persist()
+        }
 
         this.setState({
           step: this.nextStep(this.state.step + 1, this.props)

@@ -7,4 +7,5 @@ ganache-cli \
   -e 1000 \
   -a 10 \
   -u 0 \
+  -b 15 \
   -m "$HDWALLET_MNEMONIC"

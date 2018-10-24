@@ -41,6 +41,9 @@ export const TILWFaucetApi = ReactTimeout(
             txHash: response.data.txHash
           })
           this.props.addExternalTransaction('sendTILW', response.data.txHash)
+          this.props.setTimeout(() => {
+            this.props.handleMoveToNextStep()
+          }, 2000)
         } else {
           this.setState({
             responseMessage: '',
@@ -51,7 +54,7 @@ export const TILWFaucetApi = ReactTimeout(
             this.setState({
               isSending: false
             })
-          }, 7000)
+          }, 1000)
         }
       } catch (error) {
         this.setState({
@@ -62,7 +65,7 @@ export const TILWFaucetApi = ReactTimeout(
           this.setState({
             isSending: false
           })
-        }, 7000)
+        }, 1000)
       }
     }
 
@@ -106,13 +109,13 @@ export const TILWFaucetApi = ReactTimeout(
       }
 
       const responseWell = (
-        <div className="well beta-faucet--well">
+        <React.Fragment>
           <br />
           <LoadingLines visible={isSending} /> &nbsp;
           <br />
           {successParagraph}
           {errorParagraph}
-        </div>
+        </React.Fragment>
       )
 
       return (

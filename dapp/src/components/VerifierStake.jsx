@@ -81,6 +81,8 @@ export const VerifierStake = connect(mapStateToProps)(
             workAddress,
             this.state.amountToStake
           )()
+          // also need to approve coordinationGameAddress !
+          // wt.approve(coordinationGameAddress, minDeposit, { from: applicant })
 
           this.setState({
             workTokenStartHandler: new TransactionStateHandler(),
