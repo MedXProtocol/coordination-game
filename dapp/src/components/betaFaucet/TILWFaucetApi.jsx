@@ -155,6 +155,6 @@ export const TILWFaucetApi = ReactTimeout(
 )
 
 TILWFaucetApi.propTypes = {
-  tilwBalance: PropTypes.string,
+  tilwBalance: PropTypes.object,
   address: PropTypes.string
 }

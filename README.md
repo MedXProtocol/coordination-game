@@ -4,6 +4,23 @@ $ npm i && truffle install
 
 These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
 
+## Config Cheatsheet (fill in the vars with your deployed contract addresses)
+
+WorkToken.at('').then(i => wt = i)
+         // betaFaucet address
+wt.mint('', 50000000000000000000000)
+
+wt.mint('0x061f4af068d28a2ead064c91388d4b25598d6d35', 50000000000000000000000)
+wt.mint('0x8a23c3556fa6a8fd38c86597acfd0151ac62861c', 50000000000000000000000)
+wt.mint('0x5de6eb9f504dc50d33357b61364660db064b623d', 50000000000000000000000)
+wt.mint('0x376de69d2a7130a7d41d052129e8b25335fc1c6e', 50000000000000000000000)
+wt.mint('0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97', 50000000000000000000000)
+
+Work.at('').then(i => w = i)
+                // conract owner address
+w.setJobManager('0x061f4af068d28a2ead064c91388d4b25598d6d35')
+
+
 ## Usage
 
 1. The Applicant creates a secret, a hint, and generates a random number.  The hash of the secret + random number is stored on-chain.  The hash of the random number is also stored on-chain. The hint is stored on-chain. They pay an Application Fee (Reward) in DAI, and a Deposit (in Tokens?).
