@@ -12,13 +12,16 @@ contract('Work', (accounts) => {
   let token
   let work
   let initialStakerBalance
-  const jobStake = web3.toWei('10', 'ether')
+
   const requiredStake = web3.toWei('20', 'ether')
+  const jobStake = web3.toWei('10', 'ether')
+  const stakeLimit = web3.toWei('1000', 'ether')
+
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   beforeEach(async () => {
     token = await WorkToken.deployed()
-    work = await Work.new(token.address, requiredStake, jobStake)
+    work = await Work.new(token.address, requiredStake, jobStake, stakeLimit)
     await work.setJobManager(jobManager)
 
     await token.mint(jobManager, jobManagerBalance)

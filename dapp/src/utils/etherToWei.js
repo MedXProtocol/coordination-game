@@ -1,4 +1,4 @@
-import getWeb3 from '~/get-web3'
+import { getWeb3 } from '~/utils/getWeb3'
 
 export function etherToWei(amount) {
   const web3 = getWeb3()

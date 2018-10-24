@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
+import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import {
   cacheCall,
   cacheCallValueBigNumber,
@@ -13,7 +14,9 @@ import {
 import { toastr } from '~/toastr'
 import { PageTitle } from '~/components/PageTitle'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
+import { etherToWei } from '~/utils/etherToWei'
 import { getWeb3 } from '~/utils/getWeb3'
+import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -24,13 +27,18 @@ function mapStateToProps(state) {
 
   const allowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, workAddress)
   const staked = cacheCallValueBigNumber(state, workAddress, 'balances', address)
+
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
+  const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
+  const stakeLimit = cacheCallValueBigNumber(state, workAddress, 'stakeLimit')
 
   return {
     address,
     allowance,
+    jobStake,
     requiredStake,
     staked,
+    stakeLimit,
     transactions,
     tilwBalance,
     workAddress,
@@ -45,7 +53,9 @@ function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, workAddress),
     cacheCall(workAddress, 'balances', address),
-    cacheCall(workAddress, 'requiredStake')
+    cacheCall(workAddress, 'jobStake'),
+    cacheCall(workAddress, 'requiredStake'),
+    cacheCall(workAddress, 'stakeLimit')
   ])
 }
 
@@ -57,16 +67,18 @@ export const VerifierStake = connect(mapStateToProps)(
         constructor(props) {
           super(props)
           this.state = {
-            amountToStake: 0,
+            amountToApprove: 0,
             txInFlight: false
           }
         }
 
         setAmountToStake = (percentage) => {
-          const calculatedAmount = this.props.tilwBalance * (percentage / 100)
+          const calculatedAmount = (
+            weiToEther(this.props.tilwBalance) * (percentage / 100)
+          )
 
           this.setState({
-            amountToStake: calculatedAmount
+            amountToApprove: calculatedAmount
           })
         }
 
@@ -79,12 +91,14 @@ export const VerifierStake = connect(mapStateToProps)(
             workTokenAddress,
             'approve',
             workAddress,
-            this.state.amountToStake
+            etherToWei(this.state.amountToApprove)
           )()
+
           // also need to approve coordinationGameAddress !
           // wt.approve(coordinationGameAddress, minDeposit, { from: applicant })
 
           this.setState({
+            amountToApprove: 0,
             workTokenStartHandler: new TransactionStateHandler(),
             workTokenApproveTxId
           })
@@ -107,6 +121,8 @@ export const VerifierStake = connect(mapStateToProps)(
         }
 
         handleTextInputChange = (e) => {
+          console.log(e.target.name)
+          console.log(e.target.value)
           this.setState({
             [e.target.name]: e.target.value
           })
@@ -117,44 +133,93 @@ export const VerifierStake = connect(mapStateToProps)(
             <div>
               <PageTitle title='stake' />
 
-              <nav className="level">
-                <p className="level-item has-text-centered">
-                  <span className="title">
-                    TILW
-                  </span>
-                </p>
-              </nav>
-              <nav className="level">
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">Balance</p>
-                    <p className="title">{displayWeiToEther(this.props.tilwBalance)}</p>
+              <div className="level--container">
+                <nav className="level">
+                  <p className="level-item has-text-centered">
+                    <span className="title">
+                      TILW
+                    </span>
+                  </p>
+                </nav>
+                <nav className="level">
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Balance
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.tilwBalance)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">Approved</p>
-                    <p className="title">{displayWeiToEther(this.props.allowance)}</p>
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Approved
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.allowance)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">Staked</p>
-                    <p className="title">{displayWeiToEther(this.props.staked)}</p>
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Staked <InfoQuestionMark
+                          name="stake-limit"
+                          place="left"
+                          tooltipText={`The current stake limit is: ${displayWeiToEther(this.props.stakeLimit)}`}
+                        />
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.staked)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </nav>
-              <hr />
+                </nav>
+
+                <nav className="level level--footer">
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Required Stake:
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.requiredStake)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Job Stake Amount:
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.jobStake)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">
+                        Stake limit:
+                      </p>
+                      <p className="title">
+                        {displayWeiToEther(this.props.stakeLimit)}
+                      </p>
+                    </div>
+                  </div>
+                </nav>
+              </div>
 
               <br />
-
 
               <div className="columns">
                 <div className="column">
                   <form onSubmit={this.handleSubmitApproval}>
-                    <h5 className="is-size-5">
+                    <h6 className="is-size-6">
                       Amount to Approve:
-                    </h5>
+                    </h6>
                     <div className="columns columns--is-button-container">
                       <div className="column is-narrow">
                         <button
@@ -214,11 +279,11 @@ export const VerifierStake = connect(mapStateToProps)(
                     </div>
 
                     <input
-                      name="amountToStake"
+                      name="amountToApprove"
                       className="text-input"
                       placeholder="100"
                       onChange={this.handleTextInputChange}
-                      value={displayWeiToEther(this.state.amountToStake)}
+                      value={this.state.amountToApprove}
                     />
                     <br />
 
@@ -229,9 +294,9 @@ export const VerifierStake = connect(mapStateToProps)(
                 </div>
                 <div className="column">
                   <form onSubmit={this.handleSubmitStake}>
-                    <h5 className="is-size-5">
+                    <h6 className="is-size-6">
                       Stake:
-                    </h5>
+                    </h6>
 
                     <p>
                       Current stake amount is: {displayWeiToEther(this.props.requiredStake)}

@@ -391,6 +391,12 @@ section {
   color: white;
 }
 
+.column.is-narrow {
+  @media screen and (max-width: 769px) {
+    display: inline-block;
+  }
+}
+
 .level-item {
   min-width: 200px;
 
@@ -399,8 +405,36 @@ section {
   }
 }
 
-.column.is-narrow {
-  @media screen and (max-width: 769px) {
-    display: inline-block;
-  }
+.level--container {
+  background-color: lighten($background-color, 5%);
+  border: 3px solid lighten($background-color, 2%);
+  padding: 1rem 0;
+}
+
+.level--footer {
+  border-top: 1px solid lighten($background-color, 20%);
+  padding-top: 0.5rem;
+}
+
+.level--footer .heading {
+  display: inline-block;
+  font-size: 0.625rem;
+}
+
+.level--footer .title {
+  display: inline-block;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+
+.info-question-mark {
+  cursor: pointer;
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.is-size-6 {
+  margin-bottom: 0.5rem;
 }
