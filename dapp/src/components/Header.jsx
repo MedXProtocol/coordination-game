@@ -46,8 +46,10 @@ export const Header = ReactTimeout(
               <div className="navbar-brand">
                 <div className="navbar-item">
                   <h1>
-                    The Coordination Game
-                    &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                    <Link to={routes.HOME}>
+                      The Coordination Game
+                      &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                      </Link>
                   </h1>
                 </div>
               </div>

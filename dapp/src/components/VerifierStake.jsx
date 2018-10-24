@@ -214,96 +214,113 @@ export const VerifierStake = connect(mapStateToProps)(
 
               <div className="columns">
                 <div className="column">
-                  <form onSubmit={this.handleSubmitApproval}>
-                    <h6 className="is-size-6">
-                      Amount to Approve:
-                    </h6>
-                    <div className="columns columns--is-button-container">
-                      <div className="column is-narrow">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            this.setAmountToStake(0)
-                          }}
-                          className="button is-light is-small button--amount-to-stake"
-                        >
-                          0%
-                        </button>
-                      </div>
-                      <div className="column is-narrow">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            this.setAmountToStake(25)
-                          }}
-                          className="button is-light is-small button--amount-to-stake"
-                        >
-                          25%
-                        </button>
-                      </div>
-                      <div className="column is-narrow">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            this.setAmountToStake(50)
-                          }}
-                          className="button is-light is-small button--amount-to-stake"
-                        >
-                          50%
-                        </button>
-                      </div>
-                      <div className="column is-narrow">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            this.setAmountToStake(75)
-                          }}
-                          className="button is-light is-small button--amount-to-stake"
-                        >
-                          75%
-                        </button>
-                      </div>
-                      <div className="column is-narrow">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            this.setAmountToStake(100)
-                          }}
-                          className="button is-light is-small button--amount-to-stake"
-                        >
-                          MAX
-                        </button>
-                      </div>
-                    </div>
+                  <h6 className="is-size-6">
+                    Amount to Approve:
+                  </h6>
+                  {
+                    weiToEther(this.props.tilwBalance) < 1 ? (
+                      <p>
+                        You need TILW before you can approve and stake.
+                      </p>
+                    ) : (
+                      <form onSubmit={this.handleSubmitApproval}>
+                        <div className="columns columns--is-button-container">
+                          <div className="column is-narrow">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                this.setAmountToStake(0)
+                              }}
+                              className="button is-light is-small button--amount-to-stake"
+                            >
+                              0%
+                            </button>
+                          </div>
+                          <div className="column is-narrow">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                this.setAmountToStake(25)
+                              }}
+                              className="button is-light is-small button--amount-to-stake"
+                            >
+                              25%
+                              </button>
+                            </div>
+                            <div className="column is-narrow">
+                              <button
+                                onClick={(e) => {
+                                e.preventDefault()
+                                this.setAmountToStake(50)
+                              }}
+                              className="button is-light is-small button--amount-to-stake"
+                            >
+                              50%
+                            </button>
+                          </div>
+                          <div className="column is-narrow">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                this.setAmountToStake(75)
+                              }}
+                              className="button is-light is-small button--amount-to-stake"
+                            >
+                              75%
+                            </button>
+                          </div>
+                          <div className="column is-narrow">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                this.setAmountToStake(100)
+                              }}
+                              className="button is-light is-small button--amount-to-stake"
+                            >
+                              MAX
+                            </button>
+                          </div>
+                        </div>
 
-                    <input
-                      name="amountToApprove"
-                      className="text-input"
-                      placeholder="100"
-                      onChange={this.handleTextInputChange}
-                      value={this.state.amountToApprove}
-                    />
-                    <br />
+                        <input
+                          name="amountToApprove"
+                          className="text-input"
+                          placeholder="100"
+                          onChange={this.handleTextInputChange}
+                          value={this.state.amountToApprove}
+                        />
+                        <br />
 
-                    <button type="submit" className="button is-light">
-                      Approve
-                    </button>
-                  </form>
+                        <button type="submit" className="button is-light">
+                          Approve
+                        </button>
+                      </form>
+                    )
+                  }
                 </div>
                 <div className="column">
+                  <h6 className="is-size-6">
+                    Stake:
+                  </h6>
                   <form onSubmit={this.handleSubmitStake}>
-                    <h6 className="is-size-6">
-                      Stake:
-                    </h6>
+                    {
+                      weiToEther(this.props.tilwBalance) < 1 ? (
+                        <p>
+                          You need TILW before you can approve and stake.
+                        </p>
+                      ) : (
+                        <React.Fragment>
+                          <p>
+                            Current stake amount is: {displayWeiToEther(this.props.requiredStake)}
+                          </p>
+                          <br />
 
-                    <p>
-                      Current stake amount is: {displayWeiToEther(this.props.requiredStake)}
-                    </p>
-                    <br />
-
-                    <button type="submit" className="button is-light">
-                      Stake {displayWeiToEther(this.props.requiredStake)}
-                    </button>
+                          <button type="submit" className="button is-light">
+                            Stake {displayWeiToEther(this.props.requiredStake)}
+                          </button>
+                        </React.Fragment>
+                      )
+                    }
                   </form>
                 </div>
               </div>

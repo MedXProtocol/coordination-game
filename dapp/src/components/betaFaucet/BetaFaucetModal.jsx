@@ -24,6 +24,7 @@ function mapStateToProps (state) {
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
+  const step = get(state, 'betaFaucet.step')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
   const isOwner = address && (cacheCallValue(state, workTokenAddress, 'owner') === address)
   const betaFaucetAddress = contractByName(state, 'BetaFaucet')
@@ -47,6 +48,7 @@ function mapStateToProps (state) {
   return {
     address,
     betaFaucetAddress,
+    step,
     showBetaFaucetModal,
     needsEth,
     needsTILW,
@@ -82,6 +84,9 @@ function mapDispatchToProps(dispatch) {
     },
     dispatchSagaGenesisTransaction: (transactionId, txType, txHash, call) => {
       dispatch({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
+    },
+    dispatchSetBetaFaucetModalStep: (step) => {
+      dispatch({ type: 'SET_BETA_FAUCET_MODAL_STEP', step })
     }
   }
 }
@@ -89,13 +94,10 @@ function mapDispatchToProps(dispatch) {
 export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _BetaFaucetModal extends Component {
-      constructor(props) {
-        super(props)
-        this.state = {}
-      }
 
       componentDidMount() {
-        this.init(this.props)
+
+        // this.init(this.props)
       }
 
       componentWillReceiveProps(nextProps) {
@@ -105,9 +107,9 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       init(props) {
-        this.setState({
-          step: this.nextStep(this.state.step, props)
-        })
+        // this.setState({
+        //   step: this.nextStep(this.state.step, props)
+        // })
       }
 
       nextStep = (step, props) => {
@@ -142,10 +144,8 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           e.preventDefault()
         }
 
-        if (this.state.step === -1 || this.state.step === 3) {
-          this.setState({
-            step: null
-          }, this.props.hideModal)
+        if (this.props.step === -1 || this.props.step === 3) {
+          this.props.hideModal()
         }
       }
 
@@ -155,22 +155,19 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           e.persist()
         }
 
-        this.setState({
-          step: this.nextStep(this.state.step + 1, this.props)
-        }, () => {
-          this.closeModal(e)
-        })
+        this.props.dispatchSetBetaFaucetModalStep(
+          this.nextStep(this.props.step + 1, this.props)
+        )
       }
 
       render() {
         let content
 
-        const { step } = this.state
-
         const {
           ethBalance,
           tilwBalance,
-          address
+          address,
+          step
         } = this.props
 
         if (step === 1) {

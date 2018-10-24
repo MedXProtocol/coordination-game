@@ -56,6 +56,10 @@ a.navbar-item.is-active,
   color: white;
 }
 
+.navbar-brand a {
+  color: inherit;
+}
+
 .nav--circle:before {
   border-radius: 100%;
   border: 0.05rem solid white;
