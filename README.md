@@ -31,6 +31,20 @@ var address = '0x8a23c3556fa6a8fd38c86597acfd0151ac62861c'
 wt.approve(w.address, 1000000000000000000000, { from: address })
 w.depositStake({ from: address })
 
+var address = '0x5de6eb9f504dc50d33357b61364660db064b623d'
+wt.approve(w.address, 1000000000000000000000, { from: address })
+w.depositStake({ from: address })
+
+var address = '0x376de69d2a7130a7d41d052129e8b25335fc1c6e'
+wt.approve(w.address, 1000000000000000000000, { from: address })
+w.depositStake({ from: address })
+
+var address = '0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97'
+wt.approve(w.address, 1000000000000000000000, { from: address })
+w.depositStake({ from: address })
+
+
+
 // Don't forget to manually send the betaFaucetAddress some ether !
 
 ## Usage

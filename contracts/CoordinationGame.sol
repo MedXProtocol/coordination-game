@@ -194,6 +194,9 @@ contract CoordinationGame is Ownable {
       require(selectedVerifier != previousVerifier, 'new verifier is not the same as the previous one');
     }
 
+    require(selectedVerifier != msg.sender, 'verifier is not the applicant');
+
+
     require(selectedVerifier != address(0), 'verifier is not 0');
     verifiers[_applicationId] = selectedVerifier;
     verifierSelectedAt[_applicationId] = block.timestamp;

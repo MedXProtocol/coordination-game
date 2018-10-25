@@ -20,6 +20,7 @@ import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
+import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
 import { etherToWei } from '~/utils/etherToWei'
@@ -305,6 +306,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         render() {
           return (
             <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.applicationCount}`}>
+              <PageTitle title='apply' />
               <ScrollToTop />
 
               <h1>
