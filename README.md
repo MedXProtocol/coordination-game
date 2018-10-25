@@ -23,6 +23,14 @@ wt.mint('0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97', 50000000000000000000000)
 Work.at(workAddress).then(i => w = i)
 w.setJobManager(coordinationGameAddress)
 
+var address = '0x061f4af068d28a2ead064c91388d4b25598d6d35'
+wt.approve(w.address, 1000000000000000000000, { from: address })
+w.depositStake({ from: address })
+
+var address = '0x8a23c3556fa6a8fd38c86597acfd0151ac62861c'
+wt.approve(w.address, 1000000000000000000000, { from: address })
+w.depositStake({ from: address })
+
 // Don't forget to manually send the betaFaucetAddress some ether !
 
 ## Usage

@@ -154,7 +154,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         registerCoordinationGameSelectVerifierHandler = (nextProps) => {
           if (this.state.coordinationGameSelectVerifierHandler) {
             this.state.coordinationGameSelectVerifierHandler.handle(
-              nextProps.transactions[this.state.coordinationGameStartTxId]
+              nextProps.transactions[this.state.coordinationGameSelectVerifierTxId]
             )
               .onError((error) => {
                 console.log(error)
@@ -325,7 +325,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                     {
                       weiToEther(this.props.tilwBalance) < 1 ? (
                         <p>
-                          You need TILW before you can approve:
+                          You need TILW before you can apply
                           <br /><br /><GetTILWLink />
                         </p>
                       ) : (
@@ -446,6 +446,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                   <button
                                     type="submit"
                                     className="button is-outlined is-primary"
+                                    disabled={this.state.coordinationGameStartHandler}
                                   >
                                     Submit Hint &amp; Secret
                                   </button>
@@ -494,13 +495,21 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                       {
                         this.step3Completed()
                         ? (
-                          null
+                          <div className='columns'>
+                            <div className='column is-8'>
+                              <p>
+                                Your application has been sent for review. The
+                                reviewer will attempt to verify the accuracy of your application,
+                                after which you will need to come back and reveal your secret.
+                              </p>
+                            </div>
+                          </div>
                         ) : (
                           <form onSubmit={this.handleSubmitSelectVerifier}>
                             <div className='columns'>
                               <div className='column is-8'>
                                 <p>
-                                  Your application requires you to choose a verifier at random. This uses the next block's blockhash for unique randomness.
+                                  Your application requires you to choose a verifier at random. This uses the next block's hash for unique randomness.
                                 </p>
                               </div>
                             </div>
