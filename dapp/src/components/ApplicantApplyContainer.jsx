@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import {
   cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   cacheCallValueBigNumber,
   contractByName,
@@ -25,6 +26,7 @@ import { etherToWei } from '~/utils/etherToWei'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
+  let verifier
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -43,6 +45,13 @@ function mapStateToProps(state) {
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
   console.log('applicantsApplicationCount', applicantsApplicationCount)
 
+  const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  console.log('applicantsLastApplicationId', applicantsLastApplicationId)
+
+  if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
+    verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
+  }
+
   return {
     applicantsApplicationCount,
     applicationStakeAmount,
@@ -51,8 +60,10 @@ function mapStateToProps(state) {
     coordinationGameAddress,
     coordinationGameAllowance,
     // minDeposit,
+    applicantsLastApplicationId,
     tilwBalance,
     transactions,
+    verifier,
     workTokenAddress
   }
 }
@@ -64,7 +75,8 @@ function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, addres
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount')
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
+    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID')
   ])
 }
 
@@ -96,6 +108,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           this.registerWorkTokenApproveHandlers(nextProps)
           this.registerCoordinationGameStartHandler(nextProps)
+          this.registerCoordinationGameSelectVerifierHandler(nextProps)
         }
 
         registerWorkTokenApproveHandlers = (nextProps) => {
@@ -121,7 +134,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         registerCoordinationGameStartHandler = (nextProps) => {
           if (this.state.coordinationGameStartHandler) {
             this.state.coordinationGameStartHandler.handle(
-              nextProps.transactions[this.state.coordinationGameStartTransactionId]
+              nextProps.transactions[this.state.coordinationGameStartTxId]
             )
               .onError((error) => {
                 console.log(error)
@@ -138,6 +151,26 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           }
         }
 
+        registerCoordinationGameSelectVerifierHandler = (nextProps) => {
+          if (this.state.coordinationGameSelectVerifierHandler) {
+            this.state.coordinationGameSelectVerifierHandler.handle(
+              nextProps.transactions[this.state.coordinationGameStartTxId]
+            )
+              .onError((error) => {
+                console.log(error)
+                this.setState({ coordinationGameSelectVerifierHandler: null })
+                toastr.transactionError(error)
+              })
+              .onConfirmed(() => {
+                this.setState({ coordinationGameSelectVerifierHandler: null })
+                toastr.success('Verification request confirmed.')
+              })
+              .onTxHash(() => {
+                toastr.success('Verification request sent successfully - it will take a few minutes to confirm on the Ethereum network.')
+              })
+          }
+        }
+
         step1Completed = () => {
           const { coordinationGameAllowance, applicationStakeAmount } = this.props
           return (
@@ -148,6 +181,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         step2Completed = () => {
           return this.state.applicationCreated
+        }
+
+        step3Completed = () => {
+          console.log('step3Completed', this.state.verifier !== undefined)
+          return this.state.verifier !== undefined
         }
 
         formReady = () => {
@@ -200,7 +238,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           console.log(secretRandomHash, randomHash, hint)
 
 
-          const coordinationGameStartTransactionId = send(
+          const coordinationGameStartTxId = send(
             coordinationGameAddress,
             'start',
             secretRandomHash,
@@ -210,7 +248,26 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           this.setState({
             coordinationGameStartHandler: new TransactionStateHandler(),
-            coordinationGameStartTransactionId
+            coordinationGameStartTxId
+          })
+        }
+
+        handleSubmitSelectVerifier = (e) => {
+          e.preventDefault()
+
+          const { send, coordinationGameAddress } = this.props
+
+          const coordinationGameSelectVerifierTxId = send(
+            coordinationGameAddress,
+            'applicantRandomlySelectVerifier',
+            this.props.applicantsLastApplicationId
+          )()
+          console.log('Making call to coordinationGameAddress#applicantRandomlySelectVerifier with app Id', this.props.applicantsLastApplicationId)
+          console.log('txid is: ', coordinationGameSelectVerifierTxId)
+
+          this.setState({
+            coordinationGameSelectVerifierHandler: new TransactionStateHandler(),
+            coordinationGameSelectVerifierTxId
           })
         }
 
@@ -246,7 +303,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               </h1>
 
               <h6 className="is-size-6">
-                <span className="multistep-form--step-number">1.</span> Approve TILW
+                <span className="multistep-form--step-number">1.</span>
+                Approve TILW
                 {
                   this.step1Completed()
                   ? (
@@ -305,7 +363,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                   ? (
                     <React.Fragment>
                       <h6 className="is-size-6">
-                        <span className="multistep-form--step-number">2.</span> Create a Hint and Secret for the Verifier to check
+                        <span className="multistep-form--step-number">2.</span>
+                        Create a Hint and Secret for the Verifier to check
                         {
                           this.step2Completed()
                           ? (
@@ -390,11 +449,74 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                   >
                                     Submit Hint &amp; Secret
                                   </button>
+
+                                  <LoadingLines
+                                    visible={this.state.coordinationGameStartHandler}
+                                  />
                                 </div>
                               </Flipped>
 
                             </form>
                           </div>
+                        )
+                      }
+
+                    </React.Fragment>
+                  ) : (
+                    null
+                  )
+                }
+              </div>
+
+
+
+              <div className="multistep-form--step-container">
+                {
+                  this.step2Completed()
+                  ? (
+                    <React.Fragment>
+                      <h6 className="is-size-6">
+                        <span className="multistep-form--step-number">3.</span>
+                        Request Verification
+                        {
+                          this.step3Completed()
+                          ? (
+                            <React.Fragment>
+                              &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                            </React.Fragment>
+                          ) : (
+                            null
+                          )
+                        }
+                      </h6>
+
+
+                      {
+                        this.step3Completed()
+                        ? (
+                          null
+                        ) : (
+                          <form onSubmit={this.handleSubmitSelectVerifier}>
+                            <div className='columns'>
+                              <div className='column is-8'>
+                                <p>
+                                  Your application requires you to choose a verifier at random. This uses the next block's blockhash for unique randomness.
+                                </p>
+                              </div>
+                            </div>
+
+                            <button
+                              type="submit"
+                              className="button is-outlined is-primary"
+                              disabled={this.state.coordinationGameSelectVerifierHandler}
+                            >
+                              Request Verification
+                            </button>
+
+                            <LoadingLines
+                              visible={this.state.coordinationGameSelectVerifierHandler}
+                            />
+                          </form>
                         )
                       }
 

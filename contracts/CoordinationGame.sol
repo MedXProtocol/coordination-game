@@ -159,7 +159,11 @@ contract CoordinationGame is Ownable {
     );
   }
 
-  function applicantRandomlySelectVerifier(uint256 _applicationId) external onlyApplicant(_applicationId) randomBlockWasMined(_applicationId) {
+  function applicantRandomlySelectVerifier(uint256 _applicationId)
+    external
+    onlyApplicant(_applicationId)
+    randomBlockWasMined(_applicationId)
+  {
     // change from minDeposit to jobStake
     require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
@@ -314,13 +318,12 @@ contract CoordinationGame is Ownable {
   }
 
   function getApplicantsLastApplicationID() external view returns (uint applicationId) {
-    require(
-      applicantsApplicationIndices[msg.sender].length > 0,
-      'msg.sender has no applications'
-    );
-
-    uint index = applicantsApplicationIndices[msg.sender].length - 1;
-    return applicantsApplicationIndices[msg.sender][index];
+    if (applicantsApplicationIndices[msg.sender].length > 0) {
+      uint index = applicantsApplicationIndices[msg.sender].length - 1;
+      return applicantsApplicationIndices[msg.sender][index];
+    } else {
+      return 0;
+    }
   }
 
   function verifierSubmissionTimedOut(uint256 _applicationId) internal view returns (bool) {
