@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
 import { NetworkCheck } from '~/components/NetworkCheck'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import * as routes from '~/../config/routes'
 
 export const Header = ReactTimeout(
@@ -45,12 +45,10 @@ export const Header = ReactTimeout(
             <div className="container is-fluid">
               <div className="navbar-brand">
                 <div className="navbar-item">
-                  <h1>
-                    <Link to={routes.HOME}>
-                      The Coordination Game
-                      &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
-                      </Link>
-                  </h1>
+                  <Link to={routes.HOME}>
+                    The Coordination Game
+                    &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                  </Link>
                 </div>
               </div>
 
@@ -71,19 +69,32 @@ export const Header = ReactTimeout(
               <div className="navbar-menu">
                 <div className="navbar-end">
                   <div className="navbar-item">
-                    <Link to={routes.HOME} className="navbar-item">
+                    <NavLink
+                      exact={true}
+                      activeClassName="is-active"
+                      to={routes.HOME}
+                      className="navbar-item"
+                    >
                       Registry
-                    </Link>
+                    </NavLink>
                   </div>
                   <div className="navbar-item">
-                    <Link to={routes.APPLY} className="navbar-item">
+                    <NavLink
+                      activeClassName="is-active"
+                      to={routes.APPLY}
+                      className="navbar-item"
+                    >
                       Apply
-                    </Link>
+                    </NavLink>
                   </div>
                   <div className="navbar-item">
-                    <Link to={routes.STAKE} className="navbar-item">
+                    <NavLink
+                      activeClassName="is-active"
+                      to={routes.STAKE}
+                      className="navbar-item"
+                    >
                       Stake
-                    </Link>
+                    </NavLink>
                   </div>
                 </div>
               </div>

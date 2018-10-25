@@ -34,10 +34,12 @@ function mapStateToProps(state) {
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const approveTx = transactionFinders.approve(state)
-  console.log(approveTx)
+  // console.log(approveTx)
 
+  const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
 
   return {
+    applicationStakeAmount,
     approveTx,
     address,
     coordinationGameAddress,
@@ -54,7 +56,8 @@ function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, addres
 
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
-    cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress)
+    cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
+    cacheCall(coordinationGameAddress, 'applicationStakeAmount')
   ])
 }
 
@@ -77,7 +80,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         componentWillReceiveProps (props) {
           if (this.state.workTokenApproveHandler) {
             this.state.workTokenApproveHandler.handle(
-              props.transactions[this.state.coordinationGameStartTransactionId]
+              props.transactions[this.state.workTokenApproveTxId]
             )
               .onError((error) => {
                 console.log(error)
@@ -216,17 +219,29 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.txInFlight}`}>
               <ScrollToTop />
 
-              {weiToEther(this.props.coordinationGameAllowance) === this.props.applicationStake}
+              <h1>
+                Apply to be on the TIL
+              </h1>
+
+              <h6 className="is-size-6">
+                1. Approve TILW
+                {
+                  (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+                  ? (
+                    <React.Fragment>
+                      &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                    </React.Fragment>
+                  ) : (
+                    null
+                  )
+                }
+              </h6>
+
+              {(weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
                 ? (
-                  <h6 className="is-size-6">
-                    1. Approve TILW
-                    &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
-                  </h6>
+                  null
                 ) : (
                   <React.Fragment>
-                    <h6 className="is-size-6">
-                      1. Approve TILW
-                    </h6>
                     {
                       weiToEther(this.props.tilwBalance) < 1 ? (
                         <p>
@@ -235,6 +250,13 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                         </p>
                       ) : (
                         <form onSubmit={this.handleSubmitApproval}>
+                          <div className='columns'>
+                            <div className='column is-8'>
+                              <p>
+                                The TIL contract needs your permission to stake <strong>{weiToEther(this.props.applicationStakeAmount)} TILW</strong> to apply. If your application is successful, half of this amount will be returned to you.
+                              </p>
+                            </div>
+                          </div>
 
                           <button
                             type="submit"
@@ -252,9 +274,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
               </div>
 
-              fill in var instead of magic number '20':
               {
-                weiToEther(this.props.coordinationGameAllowance) === this.props.applicationStake} ? (
+                (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+                ? (
                   <form onSubmit={this.handleSubmit}>
                     <div className="multistep-form--step-container">
                       <h6 className="is-size-6">
@@ -314,13 +336,19 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               </React.Fragment>
                             </Flipped>
                           )
-                        : null}
+                        : null
+                      }
 
 
                       <Flipped flipId="coolDiv">
                         <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
                           <br />
-                          <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
+                          <button
+                            type="submit"
+                            className="button is-outlined is-primary"
+                          >
+                            Submit Hint &amp; Secret
+                          </button>
                         </div>
                       </Flipped>
 
