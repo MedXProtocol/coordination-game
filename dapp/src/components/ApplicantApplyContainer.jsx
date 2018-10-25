@@ -68,7 +68,12 @@ function mapStateToProps(state) {
   }
 }
 
-function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, address }) {
+function* applicantApplySaga({
+  workTokenAddress,
+  coordinationGameAddress,
+  address,
+  applicantsLastApplicationId
+}) {
   if (!workTokenAddress || !coordinationGameAddress || !address) { return null }
 
   yield all([
@@ -76,8 +81,12 @@ function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, addres
     cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID')
+    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
   ])
+
+  if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
+    yield cacheCall(coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
+  }
 }
 
 export const ApplicantApplyContainer = connect(mapStateToProps)(
