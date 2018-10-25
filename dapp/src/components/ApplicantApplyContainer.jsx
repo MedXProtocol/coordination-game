@@ -216,7 +216,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.txInFlight}`}>
               <ScrollToTop />
 
-              {weiToEther(this.props.coordinationGameAllowance) === '20'
+              {weiToEther(this.props.coordinationGameAllowance) === this.props.applicationStake}
                 ? (
                   <h6 className="is-size-6">
                     1. Approve TILW
@@ -254,7 +254,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
               fill in var instead of magic number '20':
               {
-                weiToEther(this.props.coordinationGameAllowance) === '20' ? (
+                weiToEther(this.props.coordinationGameAllowance) === this.props.applicationStake} ? (
                   <form onSubmit={this.handleSubmit}>
                     <div className="multistep-form--step-container">
                       <h6 className="is-size-6">

@@ -13,7 +13,12 @@ contract TILRegistryFactory {
     coordinationGameFactory = _coordinationGameFactory;
   }
 
-  function createTILRegistry(Parameterizer _parameterizer, Work _work, string _name)
+  function createTILRegistry(
+    Parameterizer _parameterizer,
+    Work _work,
+    string _name,
+    uint256 _applicationStakeAmount
+  )
     external
     returns (address)
   {
@@ -28,7 +33,8 @@ contract TILRegistryFactory {
 
     address coordinationGameAddress = coordinationGameFactory.createCoordinationGame(
       _work,
-      tilRegistry
+      tilRegistry,
+      _applicationStakeAmount
     );
     tilRegistry.setCoordinationGame(coordinationGameAddress);
 

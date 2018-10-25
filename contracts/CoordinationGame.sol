@@ -14,11 +14,11 @@ contract CoordinationGame is Ownable {
   Work work;
   TILRegistry tilRegistry;
 
+  uint256 public applicationStakeAmount;
   uint256 public applicationCount;
 
   uint256 public constant verifierTimeout = 80;
   uint256 public constant applicantRevealTimeout = 40;
-  // const applicationStake = web3.toWei('20', 'ether') // to apply to the tcr/til (10 and 10)
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => uint256) public applicantDeposits;
@@ -100,10 +100,25 @@ contract CoordinationGame is Ownable {
   @param _work the Work contract to select verifiers
   @param _tilRegistry the Trustless Incentivized List Registry (TCR) contract
          to add applicants to
+  @param _applicationStakeAmount how much an applicant has to stake when applying
   */
-  function init(Work _work, TILRegistry _tilRegistry) public {
+  function init(
+    Work _work,
+    TILRegistry _tilRegistry,
+    uint256 _applicationStakeAmount
+  ) public {
     work = _work;
     tilRegistry = _tilRegistry;
+    applicationStakeAmount = _applicationStakeAmount;
+  }
+
+  function setApplicationStakeAmount(uint256 _applicationStakeAmount)
+    public
+    onlyOwner
+  {
+    require(_applicationStakeAmount > 0, 'applicationStakeAmount is greater then zero');
+
+    applicationStakeAmount = _applicationStakeAmount;
   }
 
   /**

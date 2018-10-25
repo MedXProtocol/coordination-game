@@ -65,12 +65,15 @@ contract('CoordinationGame', (accounts) => {
   beforeEach(async () => {
     assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
+    const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply
+
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
     const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
       parameterizer.address,
       work.address,
-      'TILRegistry'
+      'TILRegistry',
+      applicationStakeAmount
     )
 
     tilRegistry = TILRegistry.at(addresses.tilRegistryAddress)

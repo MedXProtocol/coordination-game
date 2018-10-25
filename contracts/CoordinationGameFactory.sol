@@ -9,13 +9,14 @@ contract CoordinationGameFactory {
 
   function createCoordinationGame(
     Work _work,
-    TILRegistry _tilRegistry
+    TILRegistry _tilRegistry,
+    uint256 _applicationStakeAmount
   )
     external
     returns (address)
   {
     CoordinationGame coordinationGame = new CoordinationGame();
-    coordinationGame.init(_work, _tilRegistry);
+    coordinationGame.init(_work, _tilRegistry, _applicationStakeAmount);
 
     emit CoordinationGameCreated(msg.sender, address(coordinationGame));
 

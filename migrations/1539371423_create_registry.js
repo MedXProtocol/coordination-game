@@ -20,7 +20,8 @@ module.exports = function(deployer, networkName) {
       tilRegistryFactory,
       parameterizer.address,
       work.address,
-      name
+      name,
+      web3.toWei('20', 'ether') // the cost to apply
     )
     const tilRegistryInstance = await TILRegistry.at(addresses.tilRegistryAddress)
     const coordinationGameAddress = await tilRegistryInstance.coordinationGame()

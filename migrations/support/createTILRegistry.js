@@ -1,9 +1,20 @@
 const abiDecoder = require('abi-decoder')
 
-module.exports = async function (tilRegistryFactory, parameterizerAddress, workAddress, name) {
+module.exports = async function (
+  tilRegistryFactory,
+  parameterizerAddress,
+  workAddress,
+  name,
+  applicationStakeAmount
+) {
   let tilRegistryAddress, coordinationGameAddress, transactionHash
 
-  await tilRegistryFactory.createTILRegistry(parameterizerAddress, workAddress, name).then(async (transactionReceipt) => {
+  await tilRegistryFactory.createTILRegistry(
+    parameterizerAddress,
+    workAddress,
+    name,
+    applicationStakeAmount
+  ).then(async (transactionReceipt) => {
     const { tx, receipt } = transactionReceipt
     transactionHash = tx
     abiDecoder.addABI(tilRegistryFactory.abi)
