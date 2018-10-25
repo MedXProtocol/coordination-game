@@ -40,8 +40,8 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const GetTILW = withSaga(getTILWSaga)(
-  connect(mapStateToProps, mapDispatchToProps)(
+export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(getTILWSaga)(
     class _GetTILW extends Component {
 
       render() {

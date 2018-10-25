@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import BN from 'bn.js'
 import { Flipper, Flipped } from 'react-flip-toolkit'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import {
   cacheCall,
   cacheCallValueBigNumber,
@@ -12,29 +15,47 @@ import {
   withSend
 } from 'saga-genesis'
 import { toastr } from '~/toastr'
+import { transactionFinders } from '~/finders/transactionFinders'
+import { GetTILWLink } from '~/components/GetTILWLink'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
+import { etherToWei } from '~/utils/etherToWei'
+import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const workTokenAddress = contractByName(state, 'WorkToken')
 
-  const minDeposit = cacheCallValueBigNumber(state, coordinationGameAddress, 'minDeposit')
-  console.log(minDeposit)
+  // const minDeposit = cacheCallValueBigNumber(state, coordinationGameAddress, 'minDeposit')
+  // console.log(minDeposit)
+  const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
+  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+
+  const approveTx = transactionFinders.approve(state)
+  console.log(approveTx)
+
 
   return {
-    transactions,
+    approveTx,
     address,
-    minDeposit,
-    coordinationGameAddress
+    coordinationGameAddress,
+    coordinationGameAllowance,
+    // minDeposit,
+    tilwBalance,
+    transactions,
+    workTokenAddress
   }
 }
 
-function* applicantApplySaga({ coordinationGameAddress }) {
-  if (!coordinationGameAddress) { return null }
+function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, address }) {
+  if (!workTokenAddress || !coordinationGameAddress || !address) { return null }
 
-  yield cacheCall(coordinationGameAddress, 'minDeposit')
+  yield all([
+    cacheCall(workTokenAddress, 'balanceOf', address),
+    cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress)
+  ])
 }
 
 export const ApplicantApplyContainer = connect(mapStateToProps)(
@@ -54,6 +75,24 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         componentWillReceiveProps (props) {
+          if (this.state.workTokenApproveHandler) {
+            this.state.workTokenApproveHandler.handle(
+              props.transactions[this.state.coordinationGameStartTransactionId]
+            )
+              .onError((error) => {
+                console.log(error)
+                toastr.transactionError(error)
+                this.setState({ workTokenApproveHandler: null })
+              })
+              .onConfirmed(() => {
+                this.setState({ workTokenApproveHandler: null })
+              })
+              .onTxHash(() => {
+                // this.setState({ txInFlight: true })
+                toastr.success('Approval for contract to spend TILW tokens sent! It will take a few minutes to confirm on the Ethereum network.')
+              })
+          }
+
           if (this.state.coordinationGameStartHandler) {
             this.state.coordinationGameStartHandler.handle(
               props.transactions[this.state.coordinationGameStartTransactionId]
@@ -81,6 +120,24 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           )
         }
 
+        handleSubmitApproval = (e) => {
+          e.preventDefault()
+
+          const { send, coordinationGameAddress, workTokenAddress } = this.props
+
+          const workTokenApproveTxId = send(
+            workTokenAddress,
+            'approve',
+            coordinationGameAddress,
+            etherToWei(20)
+          )()
+
+          this.setState({
+            workTokenApproveHandler: new TransactionStateHandler(),
+            workTokenApproveTxId
+          })
+        }
+
         handleSubmit = (e) => {
           e.preventDefault()
 
@@ -103,6 +160,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           const hint = padLeft(toHex(hintString), 32)
 
           console.log(secretRandomHash, randomHash, hint)
+
 
           const coordinationGameStartTransactionId = send(
             coordinationGameAddress,
@@ -141,9 +199,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         render() {
+          console.log(this.state.workTokenApproveHandler)
+
           if (this.state.txInFlight) {
             return (
-              <div className="hint-and-secret">
+              <div className="multistep-form--step-container">
                 <h3>
                   Application submitted.
                 </h3>
@@ -155,77 +215,122 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           return (
             <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.txInFlight}`}>
               <ScrollToTop />
-              <form onSubmit={this.handleSubmit}>
-                <div className="hint-and-secret">
-                  <h3>
-                    Provide a hint for the verifier:
-                  </h3>
-                  <input
-                    name="hintLeft"
-                    className="new-hint text-input"
-                    placeholder="345"
-                    onChange={this.handleHintChange}
-                    value={this.state.hintLeft}
-                  />
-                  <span className="text-operator">+</span>
-                  <br className="is-hidden-desktop" />
-                  <br className="is-hidden-desktop" />
 
-                  <input
-                    name="hintRight"
-                    className="new-hint text-input"
-                    placeholder="223"
-                    onChange={this.handleHintChange}
-                    value={this.state.hintRight}
-                  />
-                  <span className="text-operator">=</span>
-                  <br className="is-hidden-desktop" />
-                  <br className="is-hidden-desktop" />
+              {weiToEther(this.props.coordinationGameAllowance) === '20'
+                ? (
+                  <h6 className="is-size-6">
+                    1. Approve TILW
+                    &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                  </h6>
+                ) : (
+                  <React.Fragment>
+                    <h6 className="is-size-6">
+                      1. Approve TILW
+                    </h6>
+                    {
+                      weiToEther(this.props.tilwBalance) < 1 ? (
+                        <p>
+                          You need TILW before you can approve:
+                          <br /><br /><GetTILWLink />
+                        </p>
+                      ) : (
+                        <form onSubmit={this.handleSubmitApproval}>
 
-                  <input
-                    name="hint"
-                    className="hint text-input"
-                    placeholder=""
-                    value={this.state.hint}
-                    readOnly={true}
-                  />
+                          <button
+                            type="submit"
+                            className="button is-outlined is-primary"
+                          >
+                            Approve
+                          </button>
+                        </form>
 
-                  <br />
-                  <br />
-                  {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
-                      (
-                        <Flipped flipId="coolDiv">
-                          <React.Fragment>
-                            <h3>
-                              Provide a secret:
-                            </h3>
-                            <div className="field">
-                              <div className="control">
-                                <input
-                                  className="new-secret text-input"
-                                  pattern="[0-9]*"
-                                  onChange={this.handleSecretChange}
-                                />
-                              </div>
-                              <p className="help has-text-grey">
-                                This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                              </p>
-                            </div>
-                          </React.Fragment>
-                        </Flipped>
                       )
-                    : null}
+                    }
+                  </React.Fragment>
+                )}
+              <div className="multistep-form--step-container">
 
+              </div>
 
-                  <Flipped flipId="coolDiv">
-                    <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+              fill in var instead of magic number '20':
+              {
+                weiToEther(this.props.coordinationGameAllowance) === '20' ? (
+                  <form onSubmit={this.handleSubmit}>
+                    <div className="multistep-form--step-container">
+                      <h6 className="is-size-6">
+                        2. Provide a hint for the verifier:
+                      </h6>
+                      <input
+                        name="hintLeft"
+                        className="text-input text-input--large"
+                        placeholder="345"
+                        onChange={this.handleHintChange}
+                        value={this.state.hintLeft}
+                      />
+                      <span className="text-operator">+</span>
+                      <br className="is-hidden-desktop" />
+                      <br className="is-hidden-desktop" />
+
+                      <input
+                        name="hintRight"
+                        className="text-input text-input--large"
+                        placeholder="223"
+                        onChange={this.handleHintChange}
+                        value={this.state.hintRight}
+                      />
+                      <span className="text-operator">=</span>
+                      <br className="is-hidden-desktop" />
+                      <br className="is-hidden-desktop" />
+
+                      <input
+                        name="hint"
+                        className="readonly text-input text-input--large"
+                        placeholder=""
+                        value={this.state.hint}
+                        readOnly={true}
+                      />
+
                       <br />
-                      <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
-                    </div>
-                  </Flipped>
+                      <br />
+                      {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                          (
+                            <Flipped flipId="coolDiv">
+                              <React.Fragment>
+                                <h3>
+                                  Provide a secret:
+                                </h3>
+                                <div className="field">
+                                  <div className="control">
+                                    <input
+                                      className="text-input text-input--large"
+                                      pattern="[0-9]*"
+                                      onChange={this.handleSecretChange}
+                                    />
+                                  </div>
+                                  <p className="help has-text-grey">
+                                    This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
+                                  </p>
+                                </div>
+                              </React.Fragment>
+                            </Flipped>
+                          )
+                        : null}
 
-                </div>
-              </form>
+
+                      <Flipped flipId="coolDiv">
+                        <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                          <br />
+                          <button type="submit" className="button is-light">Submit Hint &amp; Secret</button>
+                        </div>
+                      </Flipped>
+
+                    </div>
+                  </form>
+                ) : (
+                  null
+                )
+              }
+
             </Flipper>
           )
         }

@@ -143,16 +143,22 @@ header {
   border-bottom: 0.1em solid;
   border-radius: 0;
   color: rgba(255, 255, 255, 0.3);
-  font-size: 3rem;
+  font-size: 1.5rem;
   line-height: 1.1;
   // margin-top: 0.5rem;
   margin-bottom: 2rem;
-  max-width: 10rem;
-  text-align: center;
+  max-width: 7rem;
   outline: 0;
-  padding: 0 0.5rem;
+  padding: 0.5rem 1rem;
 
   transition: all 0.1s ease-in-out;
+}
+
+.text-input--large {
+  font-size: 3rem;
+  max-width: 10rem;
+  padding: 0 0.5rem;
+  text-align: center;
 }
 
 .text-input:focus,
@@ -161,7 +167,8 @@ header {
   color: white;
 }
 
-.text-input.hint {
+.text-input.readonly {
+  background-color: rgba(255, 255, 255, 0.025);
   color: rgba(255, 255, 255, 0.8);
   border-bottom: 0;
 }
@@ -219,8 +226,8 @@ header {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.hint-and-secret {
-  margin: 0 auto;
+.multistep-form--step-container {
+  margin: 0 auto 2rem;
   width: 80%;
 }
 
@@ -242,6 +249,18 @@ header {
   background-color: $accent-color-2;
   border: 1px solid lighten($accent-color-2, 10%);
   color: white;
+}
+
+.button.is-primary.is-outlined {
+  border-color: lighten(#00d1b2, 5%);
+  color: lighten(#00d1b2, 5%);
+}
+
+.button.is-primary.is-outlined:hover,
+.button.is-primary.is-outlined:active,
+.button.is-primary.is-outlined:focus {
+  box-shadow: 0 0 3px 0 lighten(#00d1b2, 5%);
+  background-color: transparent;
 }
 
 .button.is-light.is-text {

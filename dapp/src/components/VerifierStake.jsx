@@ -71,7 +71,7 @@ export const VerifierStake = connect(mapStateToProps)(
           }
         }
 
-        setAmountToStake = (percentage) => {
+        setAmountToApprove = (percentage) => {
           const calculatedAmount = (
             weiToEther(this.props.tilwBalance) * (percentage / 100)
           )
@@ -93,12 +93,9 @@ export const VerifierStake = connect(mapStateToProps)(
             etherToWei(this.state.amountToApprove)
           )()
 
-          // also need to approve coordinationGameAddress !
-          // wt.approve(coordinationGameAddress, minDeposit, { from: applicant })
-
           this.setState({
             amountToApprove: 0,
-            workTokenStartHandler: new TransactionStateHandler(),
+            workTokenApproveHandler: new TransactionStateHandler(),
             workTokenApproveTxId
           })
         }
@@ -231,7 +228,7 @@ export const VerifierStake = connect(mapStateToProps)(
                             <button
                               onClick={(e) => {
                                 e.preventDefault()
-                                this.setAmountToStake(0)
+                                this.setAmountToApprove(0)
                               }}
                               className="button is-light is-small button--amount-to-stake"
                             >
@@ -242,7 +239,7 @@ export const VerifierStake = connect(mapStateToProps)(
                             <button
                               onClick={(e) => {
                                 e.preventDefault()
-                                this.setAmountToStake(25)
+                                this.setAmountToApprove(25)
                               }}
                               className="button is-light is-small button--amount-to-stake"
                             >
@@ -253,7 +250,7 @@ export const VerifierStake = connect(mapStateToProps)(
                               <button
                                 onClick={(e) => {
                                 e.preventDefault()
-                                this.setAmountToStake(50)
+                                this.setAmountToApprove(50)
                               }}
                               className="button is-light is-small button--amount-to-stake"
                             >
@@ -264,7 +261,7 @@ export const VerifierStake = connect(mapStateToProps)(
                             <button
                               onClick={(e) => {
                                 e.preventDefault()
-                                this.setAmountToStake(75)
+                                this.setAmountToApprove(75)
                               }}
                               className="button is-light is-small button--amount-to-stake"
                             >
@@ -275,7 +272,7 @@ export const VerifierStake = connect(mapStateToProps)(
                             <button
                               onClick={(e) => {
                                 e.preventDefault()
-                                this.setAmountToStake(100)
+                                this.setAmountToApprove(100)
                               }}
                               className="button is-light is-small button--amount-to-stake"
                             >
