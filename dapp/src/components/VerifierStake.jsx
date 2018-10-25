@@ -12,6 +12,7 @@ import {
   withSend
 } from 'saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import { etherToWei } from '~/utils/etherToWei'
 import { weiToEther } from '~/utils/weiToEther'
@@ -129,6 +130,7 @@ export const VerifierStake = connect(mapStateToProps)(
         render() {
           return (
             <div>
+              <ScrollToTop />
               <PageTitle title='stake' />
 
               <div className="level--container">

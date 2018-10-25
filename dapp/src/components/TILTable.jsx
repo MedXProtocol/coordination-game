@@ -33,7 +33,7 @@ function mapStateToProps(state) {
   }
 }
 
-function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
+function* tilTableSaga({ address, workTokenAddress, workAddress }) {
   if (!address || !workTokenAddress || !workAddress) { return }
 
   yield all([
@@ -43,7 +43,7 @@ function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
 }
 
 export const TILTable = connect(mapStateToProps)(
-  withSaga(verifierStakeSaga)(
+  withSaga(tilTableSaga)(
     class _TILTable extends Component {
 
       render() {

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { PageTitle } from '~/components/PageTitle'
 import { ApplicantsTable } from '~/components/ApplicantsTable'
 import { TILTable } from '~/components/TILTable'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import * as routes from '~/../config/routes'
 
 export const Home = class _Home extends Component {
@@ -10,6 +11,8 @@ export const Home = class _Home extends Component {
     return (
       <React.Fragment>
         <PageTitle title='home' />
+
+        <ScrollToTop />
 
         <div className="is-clearfix">
           <h6 className="is-size-6 is-pulled-left">

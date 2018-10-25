@@ -18,6 +18,7 @@ contract CoordinationGame is Ownable {
 
   uint256 public constant verifierTimeout = 80;
   uint256 public constant applicantRevealTimeout = 40;
+  // const applicationStake = web3.toWei('20', 'ether') // to apply to the tcr/til (10 and 10)
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (uint256 => uint256) public applicantDeposits;
@@ -128,7 +129,7 @@ contract CoordinationGame is Ownable {
     randomBlockNumbers[applicationCount] = block.number + 1;
     applicantDeposits[applicationCount] = minDeposit();
 
-    // Transfer a desposit of work tokens from the Applicant to this contract
+    // Transfer a deposit of work tokens from the Applicant to this contract
     require(
       tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationCount]),
       '2nd token transfer succeeded'
@@ -144,6 +145,7 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantRandomlySelectVerifier(uint256 _applicationId) external onlyApplicant(_applicationId) randomBlockWasMined(_applicationId) {
+    // change from minDeposit to jobStake
     require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
 
@@ -292,6 +294,7 @@ contract CoordinationGame is Ownable {
     return bytes32(_applicationId);
   }
 
+  // TODO: add a require to ensure there is a value in applicantsApplicationIndices, etc
   function getApplicantsLastApplicationID() external view returns (uint applicationId) {
     uint index = applicantsApplicationIndices[msg.sender].length - 1;
     return applicantsApplicationIndices[msg.sender][index];
@@ -333,7 +336,8 @@ contract CoordinationGame is Ownable {
     return verifierSecrets[_applicationId] != 0;
   }
 
-  function minDeposit() internal view returns (uint256) {
+  // the 3rd-party TCR Registry contract uses this var:
+  function minDeposit() public view returns (uint256) {
     return tilRegistry.parameterizer().get("minDeposit");
   }
 }
