@@ -269,95 +269,105 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                       )
                     }
                   </React.Fragment>
-                )}
-              <div className="multistep-form--step-container">
-
-              </div>
-
-              {
-                (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
-                ? (
-                  <form onSubmit={this.handleSubmit}>
-                    <div className="multistep-form--step-container">
-                      <h6 className="is-size-6">
-                        2. Provide a hint for the verifier:
-                      </h6>
-                      <input
-                        name="hintLeft"
-                        className="text-input text-input--large"
-                        placeholder="345"
-                        onChange={this.handleHintChange}
-                        value={this.state.hintLeft}
-                      />
-                      <span className="text-operator">+</span>
-                      <br className="is-hidden-desktop" />
-                      <br className="is-hidden-desktop" />
-
-                      <input
-                        name="hintRight"
-                        className="text-input text-input--large"
-                        placeholder="223"
-                        onChange={this.handleHintChange}
-                        value={this.state.hintRight}
-                      />
-                      <span className="text-operator">=</span>
-                      <br className="is-hidden-desktop" />
-                      <br className="is-hidden-desktop" />
-
-                      <input
-                        name="hint"
-                        className="readonly text-input text-input--large"
-                        placeholder=""
-                        value={this.state.hint}
-                        readOnly={true}
-                      />
-
-                      <br />
-                      <br />
-                      {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
-                          (
-                            <Flipped flipId="coolDiv">
-                              <React.Fragment>
-                                <h3>
-                                  Provide a secret:
-                                </h3>
-                                <div className="field">
-                                  <div className="control">
-                                    <input
-                                      className="text-input text-input--large"
-                                      pattern="[0-9]*"
-                                      onChange={this.handleSecretChange}
-                                    />
-                                  </div>
-                                  <p className="help has-text-grey">
-                                    This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                                  </p>
-                                </div>
-                              </React.Fragment>
-                            </Flipped>
-                          )
-                        : null
-                      }
-
-
-                      <Flipped flipId="coolDiv">
-                        <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
-                          <br />
-                          <button
-                            type="submit"
-                            className="button is-outlined is-primary"
-                          >
-                            Submit Hint &amp; Secret
-                          </button>
-                        </div>
-                      </Flipped>
-
-                    </div>
-                  </form>
-                ) : (
-                  null
                 )
               }
+
+              <div className="multistep-form--step-container">
+                {
+                  (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+                  ? (
+                    <React.Fragment>
+                      <h6 className="is-size-6">
+                        2. Create a Hint and Secret for the Verifier to check
+                        {
+                          (false)
+                          ? (
+                            <React.Fragment>
+                              &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                            </React.Fragment>
+                          ) : (
+                            null
+                          )
+                        }
+                      </h6>
+                      <div className="multistep-form--step-child">
+                        <form onSubmit={this.handleSubmit}>
+                          <h6 className="is-size-6">
+                            a. Provide a hint for the verifier:
+                          </h6>
+                          <input
+                            name="hintLeft"
+                            className="text-input text-input--large"
+                            placeholder="345"
+                            onChange={this.handleHintChange}
+                            value={this.state.hintLeft}
+                          />
+                          <span className="text-operator">+</span>
+
+                          <input
+                            name="hintRight"
+                            className="text-input text-input--large"
+                            placeholder="223"
+                            onChange={this.handleHintChange}
+                            value={this.state.hintRight}
+                          />
+                          <span className="text-operator">=</span>
+
+                          <input
+                            name="hint"
+                            className="readonly text-input text-input--large"
+                            placeholder=""
+                            value={this.state.hint}
+                            readOnly={true}
+                          />
+
+                          <br />
+                          {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                              (
+                                <Flipped flipId="coolDiv">
+                                  <React.Fragment>
+                                    <h6 className="is-size-6">
+                                      b. Provide a secret:
+                                    </h6>
+                                    <div className="field">
+                                      <div className="control">
+                                        <input
+                                          className="text-input text-input--large is-marginless"
+                                          pattern="[0-9]*"
+                                          onChange={this.handleSecretChange}
+                                        />
+                                      </div>
+                                      <p className="help has-text-grey">
+                                        This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
+                                      </p>
+                                    </div>
+                                  </React.Fragment>
+                                </Flipped>
+                              )
+                            : null
+                          }
+
+
+                          <Flipped flipId="coolDiv">
+                            <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                              <br />
+                              <button
+                                type="submit"
+                                className="button is-outlined is-primary"
+                              >
+                                Submit Hint &amp; Secret
+                              </button>
+                            </div>
+                          </Flipped>
+
+                        </form>
+                      </div>
+                    </React.Fragment>
+                  ) : (
+                    null
+                  )
+                }
+              </div>
 
             </Flipper>
           )
