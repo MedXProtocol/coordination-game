@@ -8,8 +8,8 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 var betaFaucetAddress = ''
 var coordinationGameAddress = ''
-var workTokenAddress = ''
 var workAddress = ''
+var workTokenAddress = ''
 
 WorkToken.at(workTokenAddress).then(i => wt = i)
 wt.mint(betaFaucetAddress, 50000000000000000000000)

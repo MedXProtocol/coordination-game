@@ -3,9 +3,11 @@
  */
 .loader {
   display: inline-block;
+  height: 1rem;
   margin-left: 20px;
   margin-right: 20px;
-  margin-top: -5px;
+  margin-top: 8px;
+  width: 1rem;
 }
 
 @keyframes line-scale {

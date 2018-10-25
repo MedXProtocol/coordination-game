@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import {
   cacheCall,
+  cacheCallValueInt,
   cacheCallValueBigNumber,
   contractByName,
   TransactionStateHandler,
@@ -17,6 +18,7 @@ import {
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
 import { GetTILWLink } from '~/components/GetTILWLink'
+import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
 import { etherToWei } from '~/utils/etherToWei'
@@ -38,7 +40,11 @@ function mapStateToProps(state) {
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
 
+  const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
+  console.log('applicantsApplicationCount', applicantsApplicationCount)
+
   return {
+    applicantsApplicationCount,
     applicationStakeAmount,
     approveTx,
     address,
@@ -57,7 +63,8 @@ function* applicantApplySaga({ workTokenAddress, coordinationGameAddress, addres
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
-    cacheCall(coordinationGameAddress, 'applicationStakeAmount')
+    cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount')
   ])
 }
 
@@ -73,46 +80,74 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             hintRight: '',
             hint: '',
             secret: '',
-            txInFlight: false
+            applicationCreated: false
           }
         }
 
-        componentWillReceiveProps (props) {
-          if (this.state.workTokenApproveHandler) {
-            this.state.workTokenApproveHandler.handle(
-              props.transactions[this.state.workTokenApproveTxId]
-            )
-              .onError((error) => {
-                console.log(error)
-                toastr.transactionError(error)
-                this.setState({ workTokenApproveHandler: null })
-              })
-              .onConfirmed(() => {
-                this.setState({ workTokenApproveHandler: null })
-              })
-              .onTxHash(() => {
-                // this.setState({ txInFlight: true })
-                toastr.success('Approval for contract to spend TILW tokens sent! It will take a few minutes to confirm on the Ethereum network.')
-              })
+        componentWillReceiveProps (nextProps) {
+          if (
+            this.props.applicantsApplicationCount !== undefined &&
+            this.props.applicantsApplicationCount !== nextProps.applicantsApplicationCount
+          ) {
+            this.setState({
+              applicationCreated: true
+            })
           }
 
-          if (this.state.coordinationGameStartHandler) {
-            this.state.coordinationGameStartHandler.handle(
-              props.transactions[this.state.coordinationGameStartTransactionId]
+          this.registerWorkTokenApproveHandlers(nextProps)
+          this.registerCoordinationGameStartHandler(nextProps)
+        }
+
+        registerWorkTokenApproveHandlers = (nextProps) => {
+          if (this.state.workTokenApproveHandler) {
+            this.state.workTokenApproveHandler.handle(
+              nextProps.transactions[this.state.workTokenApproveTxId]
             )
               .onError((error) => {
                 console.log(error)
+                this.setState({ workTokenApproveHandler: null })
                 toastr.transactionError(error)
+              })
+              .onConfirmed(() => {
+                this.setState({ workTokenApproveHandler: null })
+                toastr.success('Approval for contract to spend TILW tokens confirmed.')
+              })
+              .onTxHash(() => {
+                toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
+              })
+          }
+        }
+
+        registerCoordinationGameStartHandler = (nextProps) => {
+          if (this.state.coordinationGameStartHandler) {
+            this.state.coordinationGameStartHandler.handle(
+              nextProps.transactions[this.state.coordinationGameStartTransactionId]
+            )
+              .onError((error) => {
+                console.log(error)
                 this.setState({ coordinationGameStartHandler: null })
+                toastr.transactionError(error)
               })
               .onConfirmed(() => {
                 this.setState({ coordinationGameStartHandler: null })
+                toastr.success('Application submission confirmed.')
               })
               .onTxHash(() => {
-                this.setState({ txInFlight: true })
-                toastr.success('Application submitted successfully. It will take a few minutes to confirm on the Ethereum network.')
+                toastr.success('Application submitted successfully - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
+        }
+
+        step1Completed = () => {
+          const { coordinationGameAllowance, applicationStakeAmount } = this.props
+          return (
+            this.step2Completed() ||
+            weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount)
+          )
+        }
+
+        step2Completed = () => {
+          return this.state.applicationCreated
         }
 
         formReady = () => {
@@ -202,21 +237,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         render() {
-          console.log(this.state.workTokenApproveHandler)
-
-          if (this.state.txInFlight) {
-            return (
-              <div className="multistep-form--step-container">
-                <h3>
-                  Application submitted.
-                </h3>
-                Loading Spinner.
-              </div>
-            )
-          }
-
           return (
-            <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.txInFlight}`}>
+            <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.applicationCount}`}>
               <ScrollToTop />
 
               <h1>
@@ -224,9 +246,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               </h1>
 
               <h6 className="is-size-6">
-                1. Approve TILW
+                <span className="multistep-form--step-number">1.</span> Approve TILW
                 {
-                  (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+                  this.step1Completed()
                   ? (
                     <React.Fragment>
                       &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
@@ -237,7 +259,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 }
               </h6>
 
-              {(weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+              {this.step1Completed()
                 ? (
                   null
                 ) : (
@@ -261,9 +283,14 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                           <button
                             type="submit"
                             className="button is-outlined is-primary"
+                            disabled={this.state.workTokenApproveHandler}
                           >
                             Approve
                           </button>
+
+                          <LoadingLines
+                            visible={this.state.workTokenApproveHandler}
+                          />
                         </form>
 
                       )
@@ -274,13 +301,13 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
               <div className="multistep-form--step-container">
                 {
-                  (weiToEther(this.props.coordinationGameAllowance) === weiToEther(this.props.applicationStakeAmount))
+                  this.step1Completed()
                   ? (
                     <React.Fragment>
                       <h6 className="is-size-6">
-                        2. Create a Hint and Secret for the Verifier to check
+                        <span className="multistep-form--step-number">2.</span> Create a Hint and Secret for the Verifier to check
                         {
-                          (false)
+                          this.step2Completed()
                           ? (
                             <React.Fragment>
                               &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
@@ -290,78 +317,87 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                           )
                         }
                       </h6>
-                      <div className="multistep-form--step-child">
-                        <form onSubmit={this.handleSubmit}>
-                          <h6 className="is-size-6">
-                            a. Provide a hint for the verifier:
-                          </h6>
-                          <input
-                            name="hintLeft"
-                            className="text-input text-input--large"
-                            placeholder="345"
-                            onChange={this.handleHintChange}
-                            value={this.state.hintLeft}
-                          />
-                          <span className="text-operator">+</span>
-
-                          <input
-                            name="hintRight"
-                            className="text-input text-input--large"
-                            placeholder="223"
-                            onChange={this.handleHintChange}
-                            value={this.state.hintRight}
-                          />
-                          <span className="text-operator">=</span>
-
-                          <input
-                            name="hint"
-                            className="readonly text-input text-input--large"
-                            placeholder=""
-                            value={this.state.hint}
-                            readOnly={true}
-                          />
-
-                          <br />
-                          {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
-                              (
-                                <Flipped flipId="coolDiv">
-                                  <React.Fragment>
-                                    <h6 className="is-size-6">
-                                      b. Provide a secret:
-                                    </h6>
-                                    <div className="field">
-                                      <div className="control">
-                                        <input
-                                          className="text-input text-input--large is-marginless"
-                                          pattern="[0-9]*"
-                                          onChange={this.handleSecretChange}
-                                        />
-                                      </div>
-                                      <p className="help has-text-grey">
-                                        This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                                      </p>
-                                    </div>
-                                  </React.Fragment>
-                                </Flipped>
-                              )
-                            : null
-                          }
 
 
-                          <Flipped flipId="coolDiv">
-                            <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                      {
+                        this.step2Completed()
+                        ? (
+                          null
+                        ) : (
+                          <div className="multistep-form--step-child">
+                            <form onSubmit={this.handleSubmit}>
+                              <h6 className="is-size-6">
+                                a. Provide a hint for the verifier:
+                              </h6>
+                              <input
+                                name="hintLeft"
+                                className="text-input text-input--large"
+                                placeholder="345"
+                                onChange={this.handleHintChange}
+                                value={this.state.hintLeft}
+                              />
+                              <span className="text-operator">+</span>
+
+                              <input
+                                name="hintRight"
+                                className="text-input text-input--large"
+                                placeholder="223"
+                                onChange={this.handleHintChange}
+                                value={this.state.hintRight}
+                              />
+                              <span className="text-operator">=</span>
+
+                              <input
+                                name="hint"
+                                className="readonly text-input text-input--large"
+                                placeholder=""
+                                value={this.state.hint}
+                                readOnly={true}
+                              />
+
                               <br />
-                              <button
-                                type="submit"
-                                className="button is-outlined is-primary"
-                              >
-                                Submit Hint &amp; Secret
-                              </button>
-                            </div>
-                          </Flipped>
+                              {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                                  (
+                                    <Flipped flipId="coolDiv">
+                                      <React.Fragment>
+                                        <h6 className="is-size-6">
+                                          b. Provide a secret:
+                                        </h6>
+                                        <div className="field">
+                                          <div className="control">
+                                            <input
+                                              className="text-input text-input--large is-marginless"
+                                              pattern="[0-9]*"
+                                              onChange={this.handleSecretChange}
+                                            />
+                                          </div>
+                                          <p className="help has-text-grey">
+                                            This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
+                                          </p>
+                                        </div>
+                                      </React.Fragment>
+                                    </Flipped>
+                                  )
+                                : null
+                              }
 
-                        </form>
-                      </div>
+                              <Flipped flipId="coolDiv">
+                                <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                                  <br />
+                                  <button
+                                    type="submit"
+                                    className="button is-outlined is-primary"
+                                  >
+                                    Submit Hint &amp; Secret
+                                  </button>
+                                </div>
+                              </Flipped>
+
+                            </form>
+                          </div>
+                        )
+                      }
+
                     </React.Fragment>
                   ) : (
                     null

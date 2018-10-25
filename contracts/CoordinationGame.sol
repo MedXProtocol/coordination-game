@@ -309,8 +309,16 @@ contract CoordinationGame is Ownable {
     return bytes32(_applicationId);
   }
 
-  // TODO: add a require to ensure there is a value in applicantsApplicationIndices, etc
+  function getApplicantsApplicationCount() external view returns (uint applicantsApplicationCount) {
+    return applicantsApplicationIndices[msg.sender].length;
+  }
+
   function getApplicantsLastApplicationID() external view returns (uint applicationId) {
+    require(
+      applicantsApplicationIndices[msg.sender].length > 0,
+      'msg.sender has no applications'
+    );
+
     uint index = applicantsApplicationIndices[msg.sender].length - 1;
     return applicantsApplicationIndices[msg.sender][index];
   }

@@ -7,7 +7,7 @@ module.exports = async function (
   name,
   applicationStakeAmount
 ) {
-  let tilRegistryAddress, coordinationGameAddress, transactionHash
+  let tilRegistryAddress, transactionHash
 
   await tilRegistryFactory.createTILRegistry(
     parameterizerAddress,
