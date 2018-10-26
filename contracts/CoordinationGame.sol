@@ -135,23 +135,24 @@ contract CoordinationGame is Ownable {
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
     applicationCount += 1;
-    applicantsApplicationIndices[msg.sender].push(applicationCount);
-    applicants[applicationCount] = msg.sender;
-    secretAndRandomHashes[applicationCount] = _keccakOfSecretAndRandom;
-    randomHashes[applicationCount] = _keccakOfRandom;
-    hints[applicationCount] = _hint;
+    uint256 applicationId = applicationCount;
+    applicantsApplicationIndices[msg.sender].push(applicationId);
+    applicants[applicationId] = msg.sender;
+    secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
+    randomHashes[applicationId] = _keccakOfRandom;
+    hints[applicationId] = _hint;
     /// Make sure the next block is used for randomness
-    randomBlockNumbers[applicationCount] = block.number + 1;
-    applicantDeposits[applicationCount] = minDeposit();
+    randomBlockNumbers[applicationId] = block.number + 1;
+    applicantDeposits[applicationId] = minDeposit();
 
     // Transfer a deposit of work tokens from the Applicant to this contract
     require(
-      tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationCount]),
+      tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationId]),
       '2nd token transfer succeeded'
     );
 
     emit NewApplication(
-      applicationCount,
+      applicationId,
       msg.sender,
       _keccakOfSecretAndRandom,
       _keccakOfRandom,

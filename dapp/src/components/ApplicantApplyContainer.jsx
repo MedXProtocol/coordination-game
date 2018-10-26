@@ -18,6 +18,7 @@ import {
 } from 'saga-genesis'
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
+import { ApplicationsTable } from '~/components/ApplicationsTable'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
@@ -544,6 +545,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                   )
                 }
               </div>
+
+              <ApplicationsTable />
 
             </Flipper>
           )
