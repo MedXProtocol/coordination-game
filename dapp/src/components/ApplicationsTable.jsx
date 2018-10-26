@@ -27,8 +27,8 @@ function mapStateToProps(state) {
   // console.log('applicationCount', applicationCount)
 
   if (applicationCount && applicationCount !== 0) {
-    // index at 1 doesn't make sense:
 
+    // The -1 logic here is weird, range is exclusive not inclusive:
     applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {
       const applicationId = cacheCallValueInt(
         state,

@@ -23,13 +23,17 @@ import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { storageAvailable } from '~/services/storageAvailable'
 import { getWeb3 } from '~/utils/getWeb3'
+import { isBlank } from '~/utils/isBlank'
 import { etherToWei } from '~/utils/etherToWei'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
   let verifier
   const transactions = get(state, 'sagaGenesis.transactions')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const workTokenAddress = contractByName(state, 'WorkToken')
@@ -50,17 +54,28 @@ function mapStateToProps(state) {
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
+
+    // const applicationId = cacheCallValueInt(
+    //   state,
+    //   coordinationGameAddress,
+    //   "applicantsApplicationIndices",
+    //   address,
+    //   index
+    // )
+    //
+    // this.props.applicantsApplicationCount !== nextProps.applicantsApplicationCount
   }
 
   return {
     applicantsApplicationCount,
+    applicantsLastApplicationId,
     applicationStakeAmount,
     approveTx,
     address,
     coordinationGameAddress,
     coordinationGameAllowance,
     // minDeposit,
-    applicantsLastApplicationId,
+    networkId,
     tilwBalance,
     transactions,
     verifier,
@@ -107,17 +122,34 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         componentWillReceiveProps (nextProps) {
           if (
-            this.props.applicantsApplicationCount !== undefined &&
-            this.props.applicantsApplicationCount !== nextProps.applicantsApplicationCount
+            this.props.applicantsLastApplicationId !== undefined &&
+            this.props.applicantsLastApplicationId !== nextProps.applicantsLastApplicationId
           ) {
             this.setState({
               applicationCreated: true
             })
+            this.storeApplicationDetailsInLocalStorage(nextProps)
           }
 
           this.registerWorkTokenApproveHandlers(nextProps)
           this.registerCoordinationGameStartHandler(nextProps)
           this.registerCoordinationGameSelectVerifierHandler(nextProps)
+        }
+
+        storeApplicationDetailsInLocalStorage = (nextProps) => {
+          if (storageAvailable('localStorage')) {
+            const key = `application-${nextProps.networkId}-${nextProps.applicantsLastApplicationId}`
+            const applicationObject = {
+              applicationId: nextProps.applicantsLastApplicationId,
+              random: this.state.random,
+              hint: this.state.hint,
+              secret: this.state.hint
+            }
+            localStorage.setItem(key, JSON.stringify(applicationObject))
+            console.log(key, "storing secret, random, hint and applicationId", applicationObject)
+          } else {
+            console.warn('Unable to destroy account, no access to localStorage')
+          }
         }
 
         registerWorkTokenApproveHandlers = (nextProps) => {
@@ -193,8 +225,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         step3Completed = () => {
-          console.log('step3Completed', this.state.verifier !== undefined)
-          return this.state.verifier !== undefined
+          // console.log('step3Completed', !isBlank(this.props.verifier))
+          return !isBlank(this.props.verifier)
         }
 
         formReady = () => {
@@ -230,6 +262,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           const padLeft = getWeb3().utils.padLeft
           const toHex = getWeb3().utils.toHex
 
+          // needs to be BN ?
+          // scrap leading 0's in hintLeft, hintRight, hint, secret!
+          // somehow make 100% sure we're not choosing a verifier that is the applicant!
           const random = new BN(Math.ceil(Math.random(1) * 1000000))
 
           const secretRandomHash = getWeb3().utils.sha3(
@@ -244,9 +279,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
           const hint = padLeft(toHex(hintString), 32)
 
-          console.log(secretRandomHash, randomHash, hint)
-
-
           const coordinationGameStartTxId = send(
             coordinationGameAddress,
             'start',
@@ -257,7 +289,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           this.setState({
             coordinationGameStartHandler: new TransactionStateHandler(),
-            coordinationGameStartTxId
+            coordinationGameStartTxId,
+            random
           })
         }
 
