@@ -508,3 +508,20 @@ section {
   font-weight: 700;
   text-transform: none;
 }
+
+.blank-state {
+  display: grid;
+  grid-template-columns: none;
+  grid-gap: 0;
+  grid-auto-rows: 80px;
+  grid-template-areas:
+    ". a a ."
+    ". a a .";
+}
+
+.blank-state--inner {
+  align-self: center;
+  grid-area: a;
+  justify-self: center;
+  margin-top: -10px;
+}

@@ -33,6 +33,9 @@ contract CoordinationGame is Ownable {
   /// Stores the block number whose hash is to be used for randomness
   mapping (uint256 => uint256) public randomBlockNumbers;
 
+  mapping (uint256 => uint256) public createdAt;
+  mapping (uint256 => uint256) public updatedAt;
+
   mapping (uint256 => uint256) public verifierSelectedAt;
   mapping (uint256 => uint256) public verifierSubmittedAt;
   mapping (uint256 => uint256) public verifierChallengedAt;
@@ -145,6 +148,9 @@ contract CoordinationGame is Ownable {
     randomBlockNumbers[applicationId] = block.number + 1;
     applicantDeposits[applicationId] = minDeposit();
 
+    createdAt[applicationId] = block.timestamp;
+    updatedAt[applicationId] = block.timestamp;
+
     // Transfer a deposit of work tokens from the Applicant to this contract
     require(
       tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationId]),
@@ -204,6 +210,8 @@ contract CoordinationGame is Ownable {
     /// Update random block to be the next one
     randomBlockNumbers[_applicationId] = block.number + 1;
 
+    updatedAt[_applicationId] = block.timestamp;
+
     // transfer tokens from verifier's stake in Work contract to here
     require(work.withdrawJobStake(selectedVerifier), 'transferred verifier tokens');
 
@@ -235,6 +243,8 @@ contract CoordinationGame is Ownable {
     verifierSecrets[_applicationId] = _secret;
     verifierSubmittedAt[_applicationId] = block.timestamp;
 
+    updatedAt[_applicationId] = block.timestamp;
+
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
@@ -259,6 +269,8 @@ contract CoordinationGame is Ownable {
     applicantSecrets[_applicationId] = _secret;
 
     applyToRegistry(_applicationId);
+
+    updatedAt[_applicationId] = block.timestamp;
 
     if (_secret != verifierSecrets[_applicationId]) {
       applicantLost(_applicationId);
@@ -287,6 +299,8 @@ contract CoordinationGame is Ownable {
       applicants[_applicationId],
       applicantDeposits[_applicationId]
     );
+
+    updatedAt[_applicationId] = block.timestamp;
 
     emit VerifierChallenged(_applicationId, msg.sender);
   }

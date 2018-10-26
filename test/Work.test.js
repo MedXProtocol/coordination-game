@@ -22,6 +22,8 @@ contract('Work', (accounts) => {
   beforeEach(async () => {
     token = await WorkToken.deployed()
     work = await Work.new(token.address, requiredStake, jobStake, stakeLimit)
+
+    // this is typically supposed to be the coordinationGameAddress:
     await work.setJobManager(jobManager)
 
     await token.mint(jobManager, jobManagerBalance)

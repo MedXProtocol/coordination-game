@@ -1,6 +1,5 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
@@ -11,22 +10,24 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   contractByName,
-  addContract,
   cacheCall
 } from 'saga-genesis'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
 
-import { EthAddress } from '~/components/EthAddress'
-import { LoadingLines } from '~/components/LoadingLines'
-// import { HippoTimestamp } from '~/components/HippoTimestamp'
-import { defined } from '~/utils/defined'
+// import { EthAddress } from '~/components/EthAddress'
+// import { LoadingLines } from '~/components/LoadingLines'
+import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+// import { defined } from '~/utils/defined'
+import { isBlank } from '~/utils/isBlank'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationRowObject, applicationId, objIndex }) {
   let status, createdAt, updatedAt, secondsInADay
-  let applicationIsStale = false
+  secondsInADay = 40
+
+  // let applicationIsStale = false
   if (applicationRowObject === undefined) { applicationRowObject = {} }
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -38,12 +39,11 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
 
   if (applicationId) {
     // status = cacheCallValueInt(state, applicationId, 'status')
-    // createdAt = cacheCallValueInt(state, ApplicationScheduleManager, 'createdAt', applicationId)
-    // updatedAt = cacheCallValueInt(state, ApplicationScheduleManager, 'updatedAt', applicationId)
+    createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+    updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
     // secondsInADay = cacheCallValueInt(state, ApplicationScheduleManager, 'secondsInADay')
 
     const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
-    console.log('verifier', verifier)
 
     if (!objIndex) {
       objIndex = applicationId
@@ -53,10 +53,10 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
     // if (status && objIndex) {
       applicationRowObject = {
         applicationId,
-        verifier
+        verifier,
         // status,
-        // createdAt,
-        // updatedAt,
+        createdAt,
+        updatedAt
         // objIndex,
       }
     // }
@@ -108,11 +108,11 @@ function* applicationRowSaga({ coordinationGameAddress, applicationId }) {
   // if (!ApplicationScheduleManager || !coordinationGameAddress || !applicationId) { return }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'verifiers', applicationId)
+    cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     // cacheCall(applicationId, 'status'),
     // cacheCall(ApplicationScheduleManager, 'secondsInADay'),
-    // cacheCall(ApplicationScheduleManager, 'createdAt', applicationId),
-    // cacheCall(ApplicationScheduleManager, 'updatedAt', applicationId)
+    cacheCall(coordinationGameAddress, 'createdAt', applicationId),
+    cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
   ])
 }
 
@@ -226,7 +226,13 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
         let remove, label
         let style = { zIndex: 950 }
 
-        let { applicationId, objIndex, verifier } = applicationRowObject
+        let {
+          applicationId,
+          objIndex,
+          createdAt,
+          updatedAt,
+          verifier
+        } = applicationRowObject
 
         // let { applicationId, objIndex, error, transactionId, createdAt, updatedAt } = applicationRowObject
         //
@@ -235,11 +241,12 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
         //   || (applicationRowObject.status === applicationStatus('Pending'))
         // )
         //
-        // const createdAtDisplay = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
+        const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
+        const loadingOrCreatedAtTimestamp = createdAtDisplay
         // const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
         //
-        // const createdAtTooltip = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
-        // const updatedAtTooltip = <HippoTimestamp timeInUtcSecondsSinceEpoch={updatedAt} />
+        const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
+        const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
         //
         // if (objIndex) {
         //   style = { zIndex: 901 + objIndex }
@@ -292,19 +299,17 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
             { 'list--item__pending': pendingTransaction }
           */)}>
             <span className="list--item__application-date text-center">
-              {/*
-                <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-                    ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-                    Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-                  <ReactTooltip
-                    html={true}
-                    effect='solid'
-                    place={'top'}
-                    wrapper='span'
-                  />
-                  {loadingOrCreatedAtTimestamp}
-                </span>
-              */}
+              <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+                  ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+                  Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+                <ReactTooltip
+                  html={true}
+                  effect='solid'
+                  place={'top'}
+                  wrapper='span'
+                />
+                {loadingOrCreatedAtTimestamp}
+              </span>
             </span>
 
             <span className="list--item__status text-center">
@@ -312,7 +317,10 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
             </span>
 
             <span className="list--item__eth-address text text-left">
-              {verifier}
+              {isBlank(verifier)
+                ? "Req'd"
+                : 'Assigned'
+              }
             </span>
 
             <span className="list--item__view text-center">

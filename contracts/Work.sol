@@ -7,7 +7,7 @@ import './IndexedAddressArray.sol';
 contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
 
-  address jobManager;
+  address public jobManager;
   ERC20 public token;
   IndexedAddressArray.Data stakers;
   IndexedAddressArray.Data suspendedStakers;
@@ -22,12 +22,14 @@ contract Work is Ownable {
     uint256 _jobStake,
     uint256 _stakeLimit
   ) public {
-    require(_token != address(0), 'token is defined');
+    require(_token != address(0), '_token is defined');
+
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
     require(_stakeLimit > 0, '_stakeLimit is greater than zero');
 
     token = _token;
+
     requiredStake = _requiredStake;
     jobStake = _jobStake;
     stakeLimit = _stakeLimit;

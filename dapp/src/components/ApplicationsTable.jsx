@@ -134,7 +134,7 @@ export const ApplicationsTable = connect(mapStateToProps)(
             noApplications = (
               <div className="blank-state">
                 <div className="blank-state--inner text-center text-gray">
-                  <span>You have not applied yet.</span>
+                  <span className="is-size-6">You have not applied yet.</span>
                 </div>
               </div>
             )
@@ -145,7 +145,7 @@ export const ApplicationsTable = connect(mapStateToProps)(
           }
 
           return (
-            <div>
+            <div className="list--container">
               {loadingLines}
               {noApplications}
 

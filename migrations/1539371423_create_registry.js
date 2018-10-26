@@ -26,6 +26,11 @@ module.exports = function(deployer, networkName) {
     const tilRegistryInstance = await TILRegistry.at(addresses.tilRegistryAddress)
     const coordinationGameAddress = await tilRegistryInstance.coordinationGame()
 
+    console.log('')
+    console.log('Setting jobManager in Work contract to: ' + coordinationGameAddress)
+    console.log('Work contract owner is: ' + await work.owner())
+    console.log('')
+
     await work.setJobManager(coordinationGameAddress)
 
     if (!tdr.isDryRunNetworkName(networkName)) {

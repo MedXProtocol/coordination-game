@@ -33,6 +33,7 @@
     "classnames": "^2.2.6",
     "copy-webpack-plugin": "^4.5.4",
     "css-loader": "1.0.0",
+    "date-fns": "^1.29.0",
     "debug": "^4.1.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",

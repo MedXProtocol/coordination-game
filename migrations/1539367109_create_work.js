@@ -10,7 +10,9 @@ module.exports = function(deployer, networkName) {
     const stakeLimit = web3.toWei('1000', 'ether') // the most 1 eth address can stake
 
     await WorkToken.deployed()
-    return deployer.deploy(Work,
+
+    return deployer.deploy(
+      Work,
       WorkToken.address,
       requiredStake,
       jobStake,

@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { PageTitle } from '~/components/PageTitle'
+import { ApplicationsTable } from '~/components/ApplicationsTable'
 import { ApplicantsTable } from '~/components/ApplicantsTable'
-import { TILTable } from '~/components/TILTable'
+import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { TILTable } from '~/components/TILTable'
 import * as routes from '~/../config/routes'
 
 export const Home = class _Home extends Component {
@@ -15,12 +16,18 @@ export const Home = class _Home extends Component {
         <ScrollToTop />
 
         <div className="is-clearfix">
+          <h6 className="is-size-6">
+            Your Applications:
+          </h6>
+        </div>
+        <ApplicationsTable />
+
+        <hr />
+
+        <div className="is-clearfix">
           <h6 className="is-size-6 is-pulled-left">
             Current Applicants:
           </h6>
-          {/*}<Link to={routes.APPLY} className="is-pulled-right is-size-7">
-            Apply to the Registry
-          </Link>*/}
           <ApplicantsTable />
           <Link to={routes.APPLY} className="is-pulled-right is-size-7">
             Apply to the Registry
