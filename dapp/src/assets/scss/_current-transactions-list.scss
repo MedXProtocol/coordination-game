@@ -1,0 +1,95 @@
+.navbar--txs {
+  background-color: transparent;
+}
+
+.navbar-link:not(.is-arrowless)::after {
+  border-color: rgba(255, 255, 255, 0.4);
+  margin-top: -0.375rem;
+}
+
+.navbar-item.has-dropdown:hover .navbar-link,
+.navbar-item.has-dropdown.is-active .navbar-link {
+  background-color: rgba(255, 150, 255, 0.2);
+}
+
+.navbar .svg-inline--fa.fa-w-10.fa-ethereum {
+  color: white;
+  height: 1rem;
+  margin-top: -5px;
+  width: 0.5rem;
+}
+
+.nav-list {
+  bottom: 0;
+  height: 300px;
+  background-color: #fff;
+  padding: 0 20px;
+  position: relative;
+  width: 260px;
+  overflow: auto;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    width: 100%
+  }
+}
+
+#transactions .caret {
+  display: none;
+}
+
+.nav-list--group {
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+
+.nav-list--item:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.nav-list--item:first-child {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.nav-list--item {
+  position: relative;
+  display: block;
+  padding: 10px 5px;
+  margin-bottom: -1px;
+  background-color: #fff;
+}
+
+.nav-list--tx-wrapper {
+  display: grid;
+  grid-template-areas:
+    "a b"
+    "a b";
+  max-width: 210px;
+}
+
+.nav-list--tx-wrapper__child {
+  grid-area: a;
+  align-self: center;
+  justify-self: center;
+}
+
+.nav-list--tx-name {
+  display: inline-block;
+  grid-area: b;
+  margin-left: 10px;
+  width: 170px;
+}
+
+.navbar-dropdown .blank-state {
+  font-size: 0.75rem;
+}
+
+.navbar-dropdown {
+  line-height: 1.5;
+  height: 400px;
+  padding: 20px;
+  width: 250px;
+}

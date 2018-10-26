@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
+import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import { NetworkInfo } from '~/components/NetworkInfo'
 import { Link, NavLink } from 'react-router-dom'
 import * as routes from '~/../config/routes'
@@ -51,6 +52,8 @@ export const Header = ReactTimeout(
                   </Link>
                 </div>
               </div>
+
+              <CurrentTransactionsList />
 
               <NetworkInfo />
             </div>
