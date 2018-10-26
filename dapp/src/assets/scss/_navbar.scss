@@ -92,8 +92,10 @@ a.navbar-item.is-active,
 }
 
 .color-ropsten:before {
-  background-color: #ea3474;
-  color: #ea3474;
+  // background-color: #ea3474; // metamask colours
+  // color: #ea3474; // metamask colours
+  background-color: $accent-color-3; // metamask colours
+  color: $accent-color-3; // metamask colours
 }
 
 .color-rinkeby:before {
