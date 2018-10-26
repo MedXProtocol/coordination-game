@@ -36,6 +36,10 @@ contract BetaFaucet is Ownable {
     workToken = _workToken;
   }
 
+  function setWorkToken(WorkToken _workToken) external onlyOwner {
+    workToken = _workToken;
+  }
+
   function withdrawEther() external onlyOwner {
     owner.transfer(address(this).balance.sub(gasAmount));
   }
@@ -57,7 +61,7 @@ contract BetaFaucet is Ownable {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentTILWAddresses[_recipient], "recipient has already received TILW");
     require(_amount > 0, "amount must be positive");
-    require(_amount <= 500 ether, "amount must be below the upper limit");
+    require(_amount <= 1000 ether, "amount must be below the upper limit");
     require(workToken.balanceOf(address(this)) >= _amount, "contract is out of TILW!");
 
     sentTILWAddresses[_recipient] = true;

@@ -92,7 +92,7 @@ export class FaucetClient {
     const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendTILW')
     // Eth.toWei() with 'ether' as second argument simply returns a number
     // in this case, it would be 500 TILW
-    var data = abi.encodeMethod(method, [ethAddress, Eth.toWei('500', 'ether')])
+    var data = abi.encodeMethod(method, [ethAddress, Eth.toWei('1000', 'ether')])
     const tx = this.buildTransaction(data)
 
     console.info('sendTILW tx: ', tx)

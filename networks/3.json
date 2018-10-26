@@ -108,5 +108,10 @@
     "contractName": "BetaFaucet",
     "address": "0x39a531bdb9f04d5e189600e3a023b4d7a8ed0cae",
     "transactionHash": "0xf82a939c66c17903e3d5915423af6164efd5c5aa1f37de7c20a648163d450226"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x75ef396b1788f3d9e25ffec5258a594033dc3595",
+    "transactionHash": "0x3ac47e795e2759dfc47e121380b6181990e2d80011c9d4d3bc24354961848318"
   }
 ]
