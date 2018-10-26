@@ -32,32 +32,32 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-function* networkCheckSaga ({ address, workTokenAddress }) {
+function* networkInfoSaga ({ address, workTokenAddress }) {
   if (!address || !workTokenAddress) { return }
 
   yield cacheCall(workTokenAddress, 'balanceOf', address)
 }
 
-export const NetworkCheck = withSaga(networkCheckSaga)(
+export const NetworkInfo = withSaga(networkInfoSaga)(
   connect(mapStateToProps)(
     function({ address, ethBalance, networkName, tilwBalance }) {
       return (
         <div className="navbar-menu">
           <div className="navbar-end">
-            <div className="navbar-item">
+            <div className="navbar-item has-text-transparent-white">
               <span>
                 <span className={classnames(`nav--circle`, `color-${networkName.toLowerCase()}` )} />
                 &nbsp;
                 {networkName}
               </span>
             </div>
-            <div className="navbar-item">
+            <div className="navbar-item has-text-transparent-white">
               {displayWeiToEther(tilwBalance)} TILW
             </div>
-            <div className="navbar-item">
+            <div className="navbar-item has-text-transparent-white">
               <EtherFlip wei={ethBalance} />
             </div>
-            <div className="navbar-item">
+            <div className="navbar-item has-text-transparent-white">
               <EthAddress address={address} />
             </div>
           </div>

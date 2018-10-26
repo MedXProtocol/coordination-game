@@ -42,7 +42,6 @@ function mapStateToProps (state) {
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&
     (workTokenAddress !== undefined && betaFaucetAddress !== undefined) &&
-    // (hasBeenSentEther === undefined || ethBalance === undefined) &&
     (needsEth || needsTILW || manuallyOpened)
 
   return {
@@ -76,7 +75,7 @@ function* saga({ workTokenAddress, betaFaucetAddress, address }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    hideModal: () => {
+    dispatchHideModal: () => {
       dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
     },
     dispatchAddExternalTransaction: (transactionId, txType, txHash, call) => {
@@ -95,21 +94,11 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _BetaFaucetModal extends Component {
 
-      componentDidMount() {
-
-        // this.init(this.props)
-      }
-
       componentWillReceiveProps(nextProps) {
-        // I removed this because the incredible speed of transitions
-        //        was jarring
-        // this.init(nextProps)
-      }
-
-      init(props) {
-        // this.setState({
-        //   step: this.nextStep(this.state.step, props)
-        // })
+        if (!nextProps.needsEth && nextProps.step === 1) {
+          const nextStepNum = this.nextStep(nextProps.step + 1, nextProps)
+          this.props.dispatchSetBetaFaucetModalStep(nextStepNum)
+        }
       }
 
       nextStep = (step, props) => {
@@ -143,10 +132,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         if (e) {
           e.preventDefault()
         }
-
-        if (this.props.step === -1 || this.props.step === 3) {
-          this.props.hideModal()
-        }
+        this.props.dispatchHideModal()
       }
 
       handleMoveToNextStep = (e) => {
@@ -155,9 +141,12 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           e.persist()
         }
 
-        this.props.dispatchSetBetaFaucetModalStep(
-          this.nextStep(this.props.step + 1, this.props)
-        )
+        const nextStepNum = this.nextStep(this.props.step + 1, this.props)
+        this.props.dispatchSetBetaFaucetModalStep(nextStepNum)
+
+        if (nextStepNum === -1 || nextStepNum === 3) {
+          this.closeModal(e)
+        }
       }
 
       render() {
@@ -188,12 +177,10 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           />
         }
 
-        const modalState = (step === 1 || step === 2) && this.props.showBetaFaucetModal
-
         return (
           <Modal
             closeModal={this.closeModal}
-            modalState={modalState}
+            modalState={this.props.showBetaFaucetModal}
             title="Example modal title"
           >
             <div className='has-text-centered'>

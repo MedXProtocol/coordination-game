@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
-import { NetworkCheck } from '~/components/NetworkCheck'
+import { NetworkInfo } from '~/components/NetworkInfo'
 import { Link, NavLink } from 'react-router-dom'
 import * as routes from '~/../config/routes'
 
@@ -52,7 +52,7 @@ export const Header = ReactTimeout(
                 </div>
               </div>
 
-              <NetworkCheck />
+              <NetworkInfo />
             </div>
           </nav>
 

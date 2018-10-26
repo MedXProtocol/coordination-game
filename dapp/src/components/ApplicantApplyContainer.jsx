@@ -34,20 +34,18 @@ function mapStateToProps(state) {
   const workTokenAddress = contractByName(state, 'WorkToken')
 
   // const minDeposit = cacheCallValueBigNumber(state, coordinationGameAddress, 'minDeposit')
-  // console.log(minDeposit)
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const approveTx = transactionFinders.approve(state)
-  // console.log(approveTx)
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
 
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
-  console.log('applicantsApplicationCount', applicantsApplicationCount)
+  // console.log('applicantsApplicationCount', applicantsApplicationCount)
 
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
-  console.log('applicantsLastApplicationId', applicantsLastApplicationId)
+  // console.log('applicantsLastApplicationId', applicantsLastApplicationId)
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)

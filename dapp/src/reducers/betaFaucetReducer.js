@@ -1,6 +1,7 @@
 export const betaFaucet = function (state, { type, manuallyOpened, step }) {
   if (typeof state === 'undefined') {
     state = {
+      betaFaucetModalDismissed: false,
       manuallyOpened: false,
       step: 1
     }
@@ -23,7 +24,6 @@ export const betaFaucet = function (state, { type, manuallyOpened, step }) {
       break
 
     case 'SHOW_BETA_FAUCET_MODAL':
-      console.log('SHOW_BETA_FAUCET_MODAL')
       state = {
         ...state,
         step: 1,

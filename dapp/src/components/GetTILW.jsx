@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 import { get } from 'lodash'
 import {
   cacheCall,
@@ -17,8 +18,11 @@ function mapStateToProps (state) {
   const workTokenAddress = contractByName(state, 'WorkToken')
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
+  const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
+
   return {
     address,
+    betaFaucetModalDismissed,
     workTokenAddress,
     tilwBalance
   }
@@ -50,11 +54,12 @@ export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
         if (
           this.props.workTokenAddress &&
           this.props.tilwBalance !== undefined &&
-          this.props.tilwBalance < 25
+          this.props.tilwBalance < 25 &&
+          this.props.betaFaucetModalDismissed
         ) {
           getTilw = <button
             onClick={this.props.dispatchShowBetaFaucetModal}
-            className="button button--getTilw"
+            className={classnames('button', 'button--getTilw')}
           >
             <img
               src={GetTILWCoinImg}
