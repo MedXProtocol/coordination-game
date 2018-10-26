@@ -2,10 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get, range } from 'lodash'
-import BN from 'bn.js'
-import { Flipper, Flipped } from 'react-flip-toolkit'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import {
   cacheCall,
   cacheCallValue,
@@ -16,19 +12,12 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { toastr } from '~/toastr'
-import { transactionFinders } from '~/finders/transactionFinders'
-import { GetTILWLink } from '~/components/GetTILWLink'
+import { ApplicationRow } from '~/components/ApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
-import { PageTitle } from '~/components/PageTitle'
-import { ScrollToTop } from '~/components/ScrollToTop'
-import { getWeb3 } from '~/utils/getWeb3'
-import { etherToWei } from '~/utils/etherToWei'
-import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
   let applicationIds = []
-  let verifier, applicantsApplicationIndices
+  let applicantsApplicationIndices
 
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -40,12 +29,8 @@ function mapStateToProps(state) {
   if (applicationCount && applicationCount !== 0) {
     // index at 1 doesn't make sense:
 
-    // verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationCount)
-    // applicantsApplicationIndices = cacheCall(state, coordinationGameAddress, 'applicantsApplicationIndices', address, 1)
-    // console.log('verifier', verifier)
-
     applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {
-      const applicationId = cacheCallValue(
+      const applicationId = cacheCallValueInt(
         state,
         coordinationGameAddress,
         "applicantsApplicationIndices",
@@ -55,14 +40,6 @@ function mapStateToProps(state) {
 
       if (applicationId) {
         accumulator.push(applicationId)
-
-        const verifier = cacheCallValue(
-          state,
-          coordinationGameAddress,
-          "verifiers",
-          applicationId
-        )
-        console.log(verifier)
       }
 
       return accumulator
@@ -90,9 +67,8 @@ function* applicationsTableSaga({
   ])
 
   if (applicationCount && applicationCount !== 0) {
-
     const indices = range(applicationCount)
-    console.log(indices)
+    // console.log(indices)
     yield all(
       indices.map(function*(index) {
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
@@ -110,10 +86,72 @@ export const ApplicationsTable = connect(mapStateToProps)(
     withSend(
       class _ApplicationsTable extends Component {
 
+        renderApplicationRows(applicationIds) {
+        // renderApplicationRows(applicationIds, transactions, applicationCount) {
+          let applicationRows = applicationIds.map((applicationId, index) => {
+            return (
+              <ApplicationRow
+                applicationId={applicationId}
+                key={`application-row-${index}`}
+              />
+            )
+          })
+
+          // let objIndex = applicationCount + 1
+          // transactions.forEach(transaction => {
+          //   const applicationRowObject = addPendingTx(transaction, objIndex)
+          //
+          //   if (applicationRowObject) {
+          //     applicationRows.push(
+          //       <ApplicationRow
+          //         applicationRowObject={applicationRowObject}
+          //         objIndex={objIndex}
+          //         key={`new-application-row-${objIndex}`}
+          //       />
+          //     )
+          //
+          //     objIndex++
+          //   }
+          // })
+
+          return applicationRows.reverse()
+        }
+
         render() {
+          let noApplications, loadingLines, applicationRows
+          const { applicationIds, applicationCount } = this.props
+          const loading = this.props.applicationCount === undefined
+
+          if (loading) {
+            loadingLines = (
+              <div className="blank-state">
+                <div className="blank-state--inner text-center text-gray">
+                  <LoadingLines visible={true} />
+                </div>
+              </div>
+            )
+          } else if (!applicationIds.length) {
+            noApplications = (
+              <div className="blank-state">
+                <div className="blank-state--inner text-center text-gray">
+                  <span>You have not applied yet.</span>
+                </div>
+              </div>
+            )
+          } else {
+            applicationRows = (
+              this.renderApplicationRows(applicationIds)
+            )
+          }
+
           return (
             <div>
-              ApplicationsTable
+              {loadingLines}
+              {noApplications}
+
+              <div className="list">
+                {applicationRows}
+              </div>
             </div>
           )
         }

@@ -1,0 +1,25 @@
+// Colors
+$orange:       hsl(14,  100%, 53%) !default
+$yellow:       hsl(48,  100%, 67%) !default
+$green:        hsl(141, 71%,  48%) !default
+$turquoise:    hsl(171, 100%, 41%) !default
+$cyan:         hsl(204, 86%,  53%) !default
+$blue:         hsl(217, 71%,  53%) !default
+$purple:       hsl(271, 100%, 71%) !default
+$red:          hsl(348, 100%, 61%) !default
+
+$background-color: #0e0b16;
+$background-color--lighter: lighten(#0e0b16, 10%);
+$accent-color-1: #a239ca;
+$accent-color-2: #470776;
+$accent-color-3: lighten(#00d1b2, 5%);
+
+$brand-primary: $accent-color-2;
+$brand-link: $blue;
+$brand-info: $cyan;
+$brand-success: $green;
+$brand-warning: $yellow;
+$brand-danger: $red;
+
+$screen-sm: 768px;
+$screen-lg: 1200px;

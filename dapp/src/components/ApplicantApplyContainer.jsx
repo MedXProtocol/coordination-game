@@ -546,6 +546,13 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 }
               </div>
 
+              <hr />
+
+              <div className="is-clearfix">
+                <h6 className="is-size-6">
+                  Your Applications:
+                </h6>
+              </div>
               <ApplicationsTable />
 
             </Flipper>
