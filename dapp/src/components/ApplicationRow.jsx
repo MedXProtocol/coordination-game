@@ -12,29 +12,23 @@ import {
   contractByName,
   cacheCall
 } from 'saga-genesis'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
-
-// import { EthAddress } from '~/components/EthAddress'
-// import { LoadingLines } from '~/components/LoadingLines'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-// import { defined } from '~/utils/defined'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { isBlank } from '~/utils/isBlank'
+import { getWeb3 } from '~/utils/getWeb3'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationRowObject, applicationId, objIndex }) {
-  let status, createdAt, updatedAt, secondsInADay
+  let status, createdAt, updatedAt, secondsInADay, hint
   secondsInADay = 40
 
-  // let applicationIsStale = false
   if (applicationRowObject === undefined) { applicationRowObject = {} }
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  // const ApplicationScheduleManager = contractByName(state, 'ApplicationScheduleManager')
 
-  // const transactions = Object.values(state.sagaGenesis.transactions)
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (applicationId) {
@@ -44,11 +38,17 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
     // secondsInADay = cacheCallValueInt(state, ApplicationScheduleManager, 'secondsInADay')
 
     const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
+    hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+    // console.log(hint)
+    if (hint) {
+      hint = getWeb3().utils.hexToAscii(hint)
+    }
+
+    const secret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
 
     if (!objIndex) {
       objIndex = applicationId
     }
-
 
     // if (status && objIndex) {
       applicationRowObject = {
@@ -56,7 +56,9 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
         verifier,
         // status,
         createdAt,
-        updatedAt
+        updatedAt,
+        hint,
+        secret
         // objIndex,
       }
     // }
@@ -109,6 +111,8 @@ function* applicationRowSaga({ coordinationGameAddress, applicationId }) {
 
   yield all([
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
+    cacheCall(coordinationGameAddress, 'hints', applicationId),
+    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     // cacheCall(applicationId, 'status'),
     // cacheCall(ApplicationScheduleManager, 'secondsInADay'),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
@@ -231,7 +235,9 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
           objIndex,
           createdAt,
           updatedAt,
-          verifier
+          verifier,
+          hint,
+          secret
         } = applicationRowObject
 
         // let { applicationId, objIndex, error, transactionId, createdAt, updatedAt } = applicationRowObject
@@ -241,7 +247,7 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
         //   || (applicationRowObject.status === applicationStatus('Pending'))
         // )
         //
-        const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
+        const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
         const loadingOrCreatedAtTimestamp = createdAtDisplay
         // const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
         //
@@ -298,7 +304,7 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
             /*,
             { 'list--item__pending': pendingTransaction }
           */)}>
-            <span className="list--item__application-date text-center">
+            <span className="list--item__date text-center">
               <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
@@ -313,18 +319,31 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
             </span>
 
             <span className="list--item__status text-center">
-              {label}
+              Application #{label}
+            </span>
+
+            <span className="list--item__status text-center">
+              Hint: {hint}
             </span>
 
             <span className="list--item__eth-address text text-left">
-              {isBlank(verifier)
-                ? "Req'd"
-                : 'Assigned'
-              }
+              {/*{action} {remove}*/}
             </span>
 
             <span className="list--item__view text-center">
-              {/*{action} {remove}*/}
+              {isBlank(verifier)
+                ? (
+                    <Web3ActionButton
+                      contractAddress={this.props.coordinationGameAddress}
+                      method='applicantRandomlySelectVerifier'
+                      args={applicationId}
+                      buttonText='Request Verification'
+                      confirmationMessage='Verification request confirmed.'
+                      txHashMessage='Verification request sent successfully -
+                        it will take a few minutes to confirm on the Ethereum network.'/>
+                  )
+                : 'Assigned'
+              }
             </span>
           </div>
         )

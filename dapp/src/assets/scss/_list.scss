@@ -21,13 +21,14 @@
   border-radius: 5px;
   // border: 3px solid #eff4f8;
   box-sizing: border-box;
-  font-size: 1rem;
-  height: 70px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  height: 60px;
   list-style-type: none;
-  line-height: 66px;
-  padding: 0;
+  line-height: 34px;
+  padding: 10px 0;
   position: relative;
-  margin: 0 0 24px;
+  margin: 0;
   opacity: 1;
   text-decoration: none;
   width: 100%;
@@ -82,6 +83,7 @@
   color: $brand-info;
   font-weight: 700;
   transition: color 200ms ease-in;
+  min-width: 25%;
   width: 160px;
 
   @media (max-width: 768px) {
@@ -92,13 +94,14 @@
     width: 40%;
   }
 }
+
 .list--item__date > span {
   line-height: 22px;
   margin: auto;
 }
 
 .list--item__status {
-  min-width: 20%;
+  min-width: 5%;
 
   @media (max-width: 768px) {
     width: 50%;
@@ -114,7 +117,6 @@
 }
 
 .list--item__eth-address {
-  line-height: 22px;
   width: 106px;
 
   @media (max-width: 768px) {
@@ -137,7 +139,8 @@
   float: right;
   font-weight: 700;
   transition: color 200ms ease-in;
-  width: 110px;
+  width: 210px;
+  text-align: center;
 
   @media (max-width: 768px) {
     color: $brand-info;
@@ -177,7 +180,7 @@
 
 .list--item button {
   height: 28px;
-  margin: -37px auto;
+  margin: 0 auto;
   padding-top: 5px;
 
   @media (max-width: 768px) {
