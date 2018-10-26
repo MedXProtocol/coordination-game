@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
+import { EtherscanLink } from '~/components/EtherscanLink'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { txErrorToCode } from '~/services/txErrorToCode'
 
@@ -68,10 +70,10 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
         )
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
-          const key   = tx[0]
+          const key = tx[0]
           const { call, options, error, confirmed, gasUsed, address } = tx[1]
-          let name = call.method
-          let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
+          const name = call.method
+          const txHash = call.hash
 
           if (error) {
             if (gasUsed)
@@ -126,7 +128,10 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                   this.getClassName(error, confirmed)
                 )} />
                 <span className="nav-list--tx-name nav-list--tx-wrapper__child">
-                  {name}
+                  {name}&nbsp;
+                  <EtherscanLink txHash={txHash}>
+                    <FontAwesomeIcon icon={faExternalLinkAlt} />
+                  </EtherscanLink>
                 </span>
               </div>
               {confirmed}
