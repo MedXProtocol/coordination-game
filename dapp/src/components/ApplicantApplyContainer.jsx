@@ -116,8 +116,31 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             hintRight: '',
             hint: '',
             secret: '',
-            applicationCreated: false
+            applicationCreated: false,
+            stepManual: 0
           }
+        }
+
+        // everything stepManual is for testing animations and can safely be removed
+        // for other devs who might not know keyCodes
+        LEFT_KEY = 37
+        RIGHT_KEY = 39
+
+        _handleKeyDown = (event) => {
+            switch( event.keyCode ) {
+                case this.RIGHT_KEY:
+                    this.setState({ stepManual: Math.min(this.state.stepManual + 1, 3) })
+                    break;
+                case this.LEFT_KEY:
+                    this.setState({ stepManual: Math.max(this.state.stepManual - 1, 0) })
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        componentWillMount(){
+            document.addEventListener("keydown", this._handleKeyDown.bind(this));
         }
 
         componentWillReceiveProps (nextProps) {
@@ -214,6 +237,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         step1Completed = () => {
           const { coordinationGameAllowance, applicationStakeAmount } = this.props
+          return this.state.stepManual > 0
           return (
             this.step2Completed() ||
             weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount)
@@ -221,10 +245,12 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         step2Completed = () => {
+          return this.state.stepManual > 1
           return this.state.applicationCreated
         }
 
         step3Completed = () => {
+          return this.state.stepManual > 2
           // console.log('step3Completed', !isBlank(this.props.verifier))
           return !isBlank(this.props.verifier)
         }
