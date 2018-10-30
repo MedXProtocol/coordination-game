@@ -80,7 +80,6 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
           ...applicationRowObject,
           random: applicationObject.random
         }
-        console.log(applicationRowObject)
       }
 
       // console.log(key, "getting secret, random, hint and applicationId", applicationObject)
@@ -130,7 +129,7 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
 }
 
 function* applicationRowSaga({ coordinationGameAddress, applicationId }) {
-// function* applicationRowSaga({ coordinationGameAddress, ApplicationScheduleManager, applicationId }) {
+  // function* applicationRowSaga({ coordinationGameAddress, ApplicationScheduleManager, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
   // if (!ApplicationScheduleManager || !coordinationGameAddress || !applicationId) { return }
 

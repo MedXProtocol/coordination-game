@@ -27,6 +27,7 @@ import { storageAvailable } from '~/services/storageAvailable'
 import { applicationStorageKey } from '~/utils/applicationStorageKey'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
+import { defined } from '~/utils/defined'
 import { etherToWei } from '~/utils/etherToWei'
 import { weiToEther } from '~/utils/weiToEther'
 
@@ -238,11 +239,13 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         step1Completed = () => {
           const { coordinationGameAllowance, applicationStakeAmount } = this.props
+
+          const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
+          const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
+          console.log(coordinationGameAllowance, applicationStakeAmount)
+
           return (this.state.stepManual > 0) ||
-            (
-              this.step2Completed() ||
-              weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount)
-            )
+            (this.step2Completed() || (valuesDefined && valuesAreEqual))
         }
 
         step2Completed = () => {

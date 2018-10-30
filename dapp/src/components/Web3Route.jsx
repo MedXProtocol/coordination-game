@@ -39,7 +39,6 @@ export const Web3Route = connect(mapStateToProps)(
           ...this.props,
           component: undefined
         }
-        console.log(otherProps)
         component = (
           <Route {...otherProps} render={props => this.renderComponent(props)} />
         )

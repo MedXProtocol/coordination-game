@@ -33,10 +33,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 function* networkInfoSaga ({ address, workTokenAddress }) {
-  console.log('networkInfoSaga')
-
   if (!address || !workTokenAddress) { return }
-  console.log('networkInfoSaga POST')
 
   yield cacheCall(workTokenAddress, 'balanceOf', address)
 }
