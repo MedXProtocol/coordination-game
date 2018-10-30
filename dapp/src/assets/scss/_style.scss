@@ -4,6 +4,15 @@
 
 button {
   background-color: transparent;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 0;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 ::placeholder {
@@ -86,6 +95,10 @@ strong {
 
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+:focus {
+  outline: -webkit-focus-ring-color auto 0;
 }
 
 p {
@@ -549,6 +562,47 @@ section {
   }
 }
 
-button {
-  cursor: pointer;
+.tabs ul {
+  border-bottom-color: lighten($accent-color-3, 30%);
+}
+
+.tabs button {
+  align-items: center;
+  border-bottom-color: lighten($accent-color-3, 30%);
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  line-height: inherit;
+  margin-bottom: -1px;
+  padding: 0.5em 1em;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.tabs button:hover {
+  border-bottom-color: lighten($accent-color-3, 30%);
+  color: lighten($accent-color-3, 30%);
+}
+
+.tabs li.is-active button {
+  border-bottom-color: $accent-color-3;
+  color: $accent-color-3;
+}
+
+.tabs.is-boxed li.is-active button {
+  // background-color: #fff;
+  border-color: $accent-color-3;
+  border-bottom-color: rgb(219, 219, 219);
+  border-bottom-color: transparent !important;
+}
+
+.tabs.is-boxed button {
+  border: 1px solid transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-radius: 4px 4px 0 0;
 }

@@ -612,7 +612,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">
-                  Your Applications:
+                  Your Current Applications:
                 </h6>
               </div>
               <ApplicationsTable />

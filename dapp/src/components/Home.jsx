@@ -15,12 +15,23 @@ export const Home = class _Home extends Component {
 
         <ScrollToTop />
 
-        <div className="is-clearfix">
-          <h6 className="is-size-6">
-            Your Applications:
-          </h6>
+        {/*}<div class="tabs is-toggle is-fullwidth">*/}
+        <div class="tabs is-centered is-boxed">
+          <ul>
+            <li class="is-active">
+              <button>Your Current Applications</button>
+            </li>
+            <li>
+              <button disabled={true}>Challenged Applications</button>
+            </li>
+            <li>
+              <button disabled={true}>Accepted Applications</button>
+            </li>
+          </ul>
         </div>
+
         <ApplicationsTable />
+        {/*
 
         <hr />
 
@@ -39,7 +50,7 @@ export const Home = class _Home extends Component {
         <h6 className="is-size-6 is-pulled-left">
           Registry:
         </h6>
-        <TILTable />
+        <TILTable />*/}
       </React.Fragment>
     )
   }

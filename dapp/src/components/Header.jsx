@@ -78,7 +78,7 @@ export const Header = ReactTimeout(
                       to={routes.HOME}
                       className="navbar-item"
                     >
-                      Registry
+                      View Registry
                     </NavLink>
                   </div>
                   <div className="navbar-item">
@@ -97,6 +97,15 @@ export const Header = ReactTimeout(
                       className="navbar-item"
                     >
                       Stake
+                    </NavLink>
+                  </div>
+                  <div className="navbar-item">
+                    <NavLink
+                      activeClassName="is-active"
+                      to={routes.VERIFY}
+                      className="navbar-item"
+                    >
+                      <span className={classnames(`nav--circle`, 'color-kovan')}>1</span> &nbsp; Verify
                     </NavLink>
                   </div>
                 </div>

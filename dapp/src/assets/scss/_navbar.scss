@@ -13,11 +13,13 @@ $navbar-height: 50px;
 .navbar-brand,
 .navbar-tabs,
 .navbar > .container {
+  max-height: $navbar-height;
   min-height: $navbar-height;
 }
 
 .navbar {
   @media screen and (min-width: 1088px) {
+    max-height: $navbar-height;
     min-height: $navbar-height;
   }
 }
@@ -37,6 +39,11 @@ $navbar-height: 50px;
   top: $navbar-height;
 }
 
+.navbar.is-fixed-top.navbar--row-two .navbar-item,
+.navbar.is-fixed-top.navbar--row-two .navbar-link {
+  padding-top: 0;
+}
+
 .navbar-item {
   color: #aaa;
   font-weight: 700;
@@ -45,8 +52,7 @@ $navbar-height: 50px;
 
 .navbar-item,
 .navbar-link {
-  line-height: 54px;
-  padding: 0 0.75rem 0;
+  padding: 0.25rem 0.75rem 0;
 }
 
 .navbar-item button,
