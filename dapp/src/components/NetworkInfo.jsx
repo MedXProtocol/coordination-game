@@ -33,7 +33,10 @@ function mapStateToProps(state, ownProps) {
 }
 
 function* networkInfoSaga ({ address, workTokenAddress }) {
+  console.log('networkInfoSaga')
+
   if (!address || !workTokenAddress) { return }
+  console.log('networkInfoSaga POST')
 
   yield cacheCall(workTokenAddress, 'balanceOf', address)
 }
@@ -58,7 +61,7 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
               <EtherFlip wei={ethBalance} />
             </div>
             <div className="navbar-item has-text-transparent-white">
-              <EthAddress address={address} />
+              <EthAddress address={address} disallowFull={true} />
             </div>
           </div>
         </div>

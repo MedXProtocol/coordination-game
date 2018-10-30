@@ -12,23 +12,28 @@ import {
   contractByName,
   cacheCall
 } from 'saga-genesis'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
+import { ExportApplicationDetails } from '~/components/ExportApplicationDetails'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { storageAvailable } from '~/services/storageAvailable'
+import { applicationStorageKey } from '~/utils/applicationStorageKey'
 import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationRowObject, applicationId, objIndex }) {
-  let status, createdAt, updatedAt, secondsInADay, hint
-  secondsInADay = 40
+  // let status, secondsInADay
+  let createdAt, updatedAt, hint
+  // const secondsInADay = 40
 
   if (applicationRowObject === undefined) { applicationRowObject = {} }
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  // const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (applicationId) {
@@ -62,6 +67,26 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
         // objIndex,
       }
     // }
+
+    if (storageAvailable('localStorage')) {
+      let applicationObject
+      const key = applicationStorageKey(networkId, applicationId)
+      const applicationJson = localStorage.getItem(key)
+
+      if (applicationJson) {
+        applicationObject = JSON.parse(applicationJson)
+
+        applicationRowObject = {
+          ...applicationRowObject,
+          random: applicationObject.random
+        }
+        console.log(applicationRowObject)
+      }
+
+      // console.log(key, "getting secret, random, hint and applicationId", applicationObject)
+    } else {
+      console.warn('Unable to read from localStorage')
+    }
   }
 
   // applicationRowObject['statusLabel'] = applicationStatusToName(applicationRowObject, context)
@@ -227,17 +252,18 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
           /*applicationIsStale,*/
         } = this.props
 
-        let remove, label
-        let style = { zIndex: 950 }
+        // let remove, label
+        // let style = { zIndex: 950 }
 
         let {
           applicationId,
-          objIndex,
+          // objIndex,
           createdAt,
           updatedAt,
           verifier,
           hint,
-          secret
+          random//,
+          // secret
         } = applicationRowObject
 
         // let { applicationId, objIndex, error, transactionId, createdAt, updatedAt } = applicationRowObject
@@ -296,7 +322,7 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
         //   )
         // }
 
-        label = applicationId
+        const label = applicationId
 
         return (
           <div className={classnames(
@@ -324,6 +350,8 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
 
             <span className="list--item__status text-center">
               Hint: {hint}
+              <br />Random: {random}
+              <ExportApplicationDetails applicationRowObject={applicationRowObject} />
             </span>
 
             <span className="list--item__eth-address text text-left">

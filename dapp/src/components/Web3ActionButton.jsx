@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { all } from 'redux-saga/effects'
 import {
   TransactionStateHandler,
   withSend
@@ -89,7 +88,6 @@ export const Web3ActionButton = connect(mapStateToProps)(
               disabled={!contractAddress || this.state.txHandler}
               type="submit"
               className="button is-outlined is-primary is-small"
-              disabled={this.state.txHandler}
             >
               {buttonText}
             </button>&nbsp;

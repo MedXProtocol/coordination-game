@@ -1,5 +1,9 @@
 .navbar--txs {
   background-color: transparent;
+
+  @media screen and (max-width: 1088px) {
+    display: none;
+  }
 }
 
 .navbar-link:not(.is-arrowless)::after {

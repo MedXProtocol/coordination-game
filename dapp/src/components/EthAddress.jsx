@@ -19,7 +19,7 @@ export const EthAddress = class _EthAddress extends Component {
 
     if (this.props.onlyAddress) {
       return <span title={address} className='address'>{address.substring(0, 10)} ...</span>
-    } else if (this.state.showFull) {
+    } else if (this.state.showFull && !this.props.disallowFull) {
       displayed = <span className='tag address__full'>{address}</span>
     } else {
       displayed = <span onClick={() => this.toggleFull()} className="flip-link">
@@ -37,9 +37,11 @@ export const EthAddress = class _EthAddress extends Component {
 
 EthAddress.propTypes = {
   address: PropTypes.string,
-  showFull: PropTypes.bool
+  showFull: PropTypes.bool,
+  disallowFull: PropTypes.bool
 }
 
 EthAddress.defaultProps = {
+  disallowFull: false,
   showFull: false
 }

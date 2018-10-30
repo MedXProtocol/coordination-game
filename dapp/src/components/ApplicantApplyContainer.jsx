@@ -24,6 +24,7 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { storageAvailable } from '~/services/storageAvailable'
+import { applicationStorageKey } from '~/utils/applicationStorageKey'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { etherToWei } from '~/utils/etherToWei'
@@ -161,17 +162,17 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         storeApplicationDetailsInLocalStorage = (nextProps) => {
           if (storageAvailable('localStorage')) {
-            const key = `application-${nextProps.networkId}-${nextProps.applicantsLastApplicationId}`
+            const key = applicationStorageKey(nextProps.networkId, nextProps.applicantsLastApplicationId)
             const applicationObject = {
               applicationId: nextProps.applicantsLastApplicationId,
               random: this.state.random,
-              hint: this.state.hint,
+              hint: `${this.state.hintLeft} + ${this.state.hintRight}`,
               secret: this.state.hint
             }
             localStorage.setItem(key, JSON.stringify(applicationObject))
             console.log(key, "storing secret, random, hint and applicationId", applicationObject)
           } else {
-            console.warn('Unable to destroy account, no access to localStorage')
+            console.warn('Unable to set application data - no access to localStorage')
           }
         }
 
@@ -237,22 +238,21 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
         step1Completed = () => {
           const { coordinationGameAllowance, applicationStakeAmount } = this.props
-          return this.state.stepManual > 0
-          return (
-            this.step2Completed() ||
-            weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount)
-          )
+          return (this.state.stepManual > 0) ||
+            (
+              this.step2Completed() ||
+              weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount)
+            )
         }
 
         step2Completed = () => {
-          return this.state.stepManual > 1
-          return this.state.applicationCreated
+          return (this.state.stepManual > 1) ||
+            this.state.applicationCreated
         }
 
         step3Completed = () => {
-          return this.state.stepManual > 2
-          // console.log('step3Completed', !isBlank(this.props.verifier))
-          return !isBlank(this.props.verifier)
+          return (this.state.stepManual > 2) ||
+            !isBlank(this.props.verifier)
         }
 
         formReady = () => {

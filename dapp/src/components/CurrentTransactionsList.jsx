@@ -90,14 +90,14 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               var resendButton = (
                 <React.Fragment>
                   {errorMessage ? null : <br />}
-                  <a
+                  <button
                     onClick={(e) => {
                       e.preventDefault()
                       this.props.dispatchSend(key, call, options, address)
                     }}
                   >
                     Retry
-                  </a>
+                  </button>
                 </React.Fragment>
               )
               var removeButton = (
@@ -156,13 +156,13 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       return (
         <nav className="navbar navbar--txs">
           <div className="navbar-item has-dropdown is-hoverable">
-            <a className="navbar-link has-text-transparent-white">
+            <button className="navbar-link has-text-transparent-white">
               <span className={classnames('nav--circle', this.getDropdownClassName())} />
               &nbsp;
                 <FontAwesomeIcon icon={faEthereum} />
                 &nbsp;
                 Tx
-            </a>
+            </button>
 
             <div className="navbar-dropdown">
               <span>

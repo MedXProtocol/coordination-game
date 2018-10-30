@@ -4,11 +4,8 @@ import { all } from 'redux-saga/effects'
 import { get, range } from 'lodash'
 import {
   cacheCall,
-  cacheCallValue,
   cacheCallValueInt,
-  cacheCallValueBigNumber,
   contractByName,
-  TransactionStateHandler,
   withSaga,
   withSend
 } from 'saga-genesis'
@@ -17,17 +14,14 @@ import { LoadingLines } from '~/components/LoadingLines'
 
 function mapStateToProps(state) {
   let applicationIds = []
-  let applicantsApplicationIndices
 
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
-  // console.log('applicationCount', applicationCount)
 
   if (applicationCount && applicationCount !== 0) {
-
     // The -1 logic here is weird, range is exclusive not inclusive:
     applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {
       const applicationId = cacheCallValueInt(
@@ -120,7 +114,7 @@ export const ApplicationsTable = connect(mapStateToProps)(
         render() {
           let noApplications, loadingLines, applicationRows
           const { applicationIds, applicationCount } = this.props
-          const loading = this.props.applicationCount === undefined
+          const loading = applicationCount === undefined
 
           if (loading) {
             loadingLines = (
