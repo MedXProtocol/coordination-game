@@ -129,16 +129,18 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         RIGHT_KEY = 39
 
         _handleKeyDown = (event) => {
-            switch( event.keyCode ) {
-                case this.RIGHT_KEY:
-                    this.setState({ stepManual: Math.min(this.state.stepManual + 1, 3) })
-                    break;
-                case this.LEFT_KEY:
-                    this.setState({ stepManual: Math.max(this.state.stepManual - 1, 0) })
-                    break;
-                default:
-                    break;
-            }
+          if (window.location.hostname !== 'localhost') { return }
+
+          switch( event.keyCode ) {
+            case this.RIGHT_KEY:
+              this.setState({ stepManual: Math.min(this.state.stepManual + 1, 3) })
+              break;
+            case this.LEFT_KEY:
+              this.setState({ stepManual: Math.max(this.state.stepManual - 1, 0) })
+              break;
+            default:
+              break;
+          }
         }
 
         componentWillMount(){
@@ -242,7 +244,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
           const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
-          console.log(coordinationGameAllowance, applicationStakeAmount)
 
           return (this.state.stepManual > 0) ||
             (this.step2Completed() || (valuesDefined && valuesAreEqual))

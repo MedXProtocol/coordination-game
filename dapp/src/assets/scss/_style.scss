@@ -8,7 +8,14 @@ button {
   border-style: solid;
   border-width: 0;
   cursor: pointer;
+  color: lighten($accent-color-1, 10%);
   font-size: inherit;
+  padding: 10px 10px;
+}
+
+button:hover,
+button:focus {
+  color: lighten($accent-color-1, 20%);
 }
 
 button:disabled {
@@ -178,7 +185,6 @@ header {
   background-color: transparent;
   font-size: inherit;
 }
-
 
 .text-input {
   background-color: rgba(255, 255, 255, 0.05);
@@ -605,4 +611,20 @@ section {
   border-bottom-color: transparent;
   border-left-color: transparent;
   border-radius: 4px 4px 0 0;
+}
+
+.text-input--filename {
+  line-height: 1;
+  max-width: initial;
+  font-size: 1rem;
+  width: 320px;
+}
+
+.text-input--filename-control {
+  width: 320px;
+}
+
+.file-download--container {
+  margin-top: 10px;
+  width: 100%;
 }
