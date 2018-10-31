@@ -204,7 +204,7 @@ export const ApplicationsTable = connect(mapStateToProps)(
               <div
                 className={classnames(
                   'is-pulled-right',
-                  { 'is-hidden': this.state.showCsvLink }
+                  { 'is-hidden': this.state.showCsvLink || !this.props.applicationCount || this.props.applicationCount === 0 }
                 )}
               >
                 <button onClick={this.exportAll} className="is-size-7">

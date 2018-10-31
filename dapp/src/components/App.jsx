@@ -16,6 +16,7 @@ import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 // import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake'
+import { Wallet } from '~/components/Wallet'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps (state) {
@@ -134,6 +135,7 @@ const App = connect(mapStateToProps)(
                   <Switch>
                     <Route path={routes.APPLY} component={ApplicantApplyContainer} />
                     <Route path={routes.STAKE} component={VerifierStake} />
+                    <Route path={routes.WALLET} component={Wallet} />
 
                     <Route path={routes.HOME} component={Home} />
 
@@ -143,6 +145,10 @@ const App = connect(mapStateToProps)(
                 </div>
               </div>
             </div>
+
+            <br />
+            <br />
+            <br />
 
             <div className='columns'>
               <div className='column is-half-tablet is-offset-one-quarter'>
@@ -164,14 +170,14 @@ const App = connect(mapStateToProps)(
             <footer className="footer has-text-centered">
               <div className='columns'>
                 <div className='column is-half-tablet is-offset-one-quarter'>
-                    <p className="text-footer">
-                      &copy; 2018 MedX Protocol - All Rights Reserved
-                    </p>
-                    <br />
-                    <br />
-                    {debugLink}
-                  </div>
+                  <p className="text-footer">
+                    &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
+                  </p>
+                  <br />
+                  <br />
+                  {debugLink}
                 </div>
+              </div>
             </footer>
           </section>
         </React.Fragment>

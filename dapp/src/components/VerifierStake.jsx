@@ -66,35 +66,23 @@ export const VerifierStake = connect(mapStateToProps)(
         constructor(props) {
           super(props)
           this.state = {
-            amountToApprove: 0,
             txInFlight: false
           }
-        }
-
-        setAmountToApprove = (percentage) => {
-          const calculatedAmount = (
-            weiToEther(this.props.tilwBalance) * (percentage / 100)
-          )
-
-          this.setState({
-            amountToApprove: calculatedAmount
-          })
         }
 
         handleSubmitApproval = (e) => {
           e.preventDefault()
 
-          const { send, workAddress, workTokenAddress } = this.props
+          const { send, workAddress, workTokenAddress, requiredStake } = this.props
 
           const workTokenApproveTxId = send(
             workTokenAddress,
             'approve',
             workAddress,
-            etherToWei(this.state.amountToApprove)
+            etherToWei(requiredStake)
           )()
 
           this.setState({
-            amountToApprove: 0,
             workTokenApproveHandler: new TransactionStateHandler(),
             workTokenApproveTxId
           })
@@ -128,91 +116,10 @@ export const VerifierStake = connect(mapStateToProps)(
               <ScrollToTop />
               <PageTitle title='stake' />
 
-              <div className="level--container">
-                <nav className="level">
-                  <p className="level-item has-text-centered">
-                    <span className="title">
-                      TILW
-                    </span>
-                  </p>
-                </nav>
-                <nav className="level">
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Balance
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.tilwBalance)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Approved
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.allowance)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Staked <InfoQuestionMark
-                          name="stake-limit"
-                          place="left"
-                          tooltipText={`The current stake limit is: ${displayWeiToEther(this.props.stakeLimit)}`}
-                        />
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.staked)}
-                      </p>
-                    </div>
-                  </div>
-                </nav>
-
-                <nav className="level level--footer">
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Required Stake:
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.requiredStake)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Job Stake Amount:
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.jobStake)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="level-item has-text-centered">
-                    <div>
-                      <p className="heading">
-                        Stake limit:
-                      </p>
-                      <p className="title">
-                        {displayWeiToEther(this.props.stakeLimit)}
-                      </p>
-                    </div>
-                  </div>
-                </nav>
-              </div>
-
-              <br />
-
               <div className="columns">
                 <div className="column">
                   <h6 className="is-size-6">
-                    Amount to Approve:
+                    Approve:
                   </h6>
                   {
                     weiToEther(this.props.tilwBalance) < 1 ? (
@@ -221,75 +128,8 @@ export const VerifierStake = connect(mapStateToProps)(
                       </p>
                     ) : (
                       <form onSubmit={this.handleSubmitApproval}>
-                        <div className="columns columns--is-button-container">
-                          <div className="column is-narrow">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault()
-                                this.setAmountToApprove(0)
-                              }}
-                              className="button is-light is-small button--amount-to-stake"
-                            >
-                              0%
-                            </button>
-                          </div>
-                          <div className="column is-narrow">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault()
-                                this.setAmountToApprove(25)
-                              }}
-                              className="button is-light is-small button--amount-to-stake"
-                            >
-                              25%
-                              </button>
-                            </div>
-                            <div className="column is-narrow">
-                              <button
-                                onClick={(e) => {
-                                e.preventDefault()
-                                this.setAmountToApprove(50)
-                              }}
-                              className="button is-light is-small button--amount-to-stake"
-                            >
-                              50%
-                            </button>
-                          </div>
-                          <div className="column is-narrow">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault()
-                                this.setAmountToApprove(75)
-                              }}
-                              className="button is-light is-small button--amount-to-stake"
-                            >
-                              75%
-                            </button>
-                          </div>
-                          <div className="column is-narrow">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault()
-                                this.setAmountToApprove(100)
-                              }}
-                              className="button is-light is-small button--amount-to-stake"
-                            >
-                              MAX
-                            </button>
-                          </div>
-                        </div>
-
-                        <input
-                          name="amountToApprove"
-                          className="text-input"
-                          placeholder="100"
-                          onChange={this.handleTextInputChange}
-                          value={this.state.amountToApprove}
-                        />
-                        <br />
-
                         <button type="submit" className="button is-light">
-                          Approve
+                          Approve {displayWeiToEther(this.props.requiredStake)}
                         </button>
                       </form>
                     )
@@ -307,11 +147,6 @@ export const VerifierStake = connect(mapStateToProps)(
                         </p>
                       ) : (
                         <React.Fragment>
-                          <p>
-                            Current stake amount is: {displayWeiToEther(this.props.requiredStake)}
-                          </p>
-                          <br />
-
                           <button type="submit" className="button is-light">
                             Stake {displayWeiToEther(this.props.requiredStake)}
                           </button>

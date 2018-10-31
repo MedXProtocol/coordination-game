@@ -108,6 +108,15 @@ export const Header = ReactTimeout(
                       <span className={classnames(`nav--circle`, 'color-kovan')}>1</span> &nbsp; Verify
                     </NavLink>
                   </div>
+                  <div className="navbar-item">
+                    <NavLink
+                      activeClassName="is-active"
+                      to={routes.WALLET}
+                      className="navbar-item"
+                    >
+                      Wallet
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             </div>

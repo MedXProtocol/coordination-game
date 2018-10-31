@@ -503,14 +503,28 @@ section {
 }
 
 .level--container {
-  background-color: lighten($background-color, 5%);
+  background-color: lighten($background-color, 3%);
   border: 3px solid lighten($background-color, 2%);
-  padding: 1rem 0;
+}
+
+.level--header {
+  background-color: lighten($background-color, 5%);
+  border-bottom: 1px solid lighten($background-color, 20%);
+  padding-bottom: 0.5rem;
+  padding-top: 1rem;
+}
+
+.level--body {
+  background-color: lighten($background-color, 10%);
+  padding-bottom: 1rem;
+  padding-top: 1rem;
 }
 
 .level--footer {
+  background-color: lighten($background-color, 5%);
   border-top: 1px solid lighten($background-color, 20%);
-  padding-top: 0.5rem;
+  padding-bottom: 1rem;
+  padding-top: 0.75rem;
 }
 
 .level--footer .heading {
