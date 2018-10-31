@@ -25,6 +25,7 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { storageAvailable } from '~/services/storageAvailable'
 import { applicationStorageKey } from '~/utils/applicationStorageKey'
+import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { defined } from '~/utils/defined'
@@ -276,7 +277,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             workTokenAddress,
             'approve',
             coordinationGameAddress,
-            etherToWei(20)
+            this.props.applicationStakeAmount
           )()
 
           this.setState({
@@ -406,7 +407,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                           <div className='columns'>
                             <div className='column is-8'>
                               <p>
-                                The TIL contract needs your permission to stake <strong>{weiToEther(this.props.applicationStakeAmount)} TILW</strong> to apply. If your application is successful, half of this amount will be returned to you.
+                                The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TILW</strong> to apply. If your application is successful, half of this amount will be returned to you.
                               </p>
                             </div>
                           </div>

@@ -15,7 +15,8 @@ import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 // import { Web3Route } from '~/components/Web3Route'
-import { VerifierStake } from '~/components/VerifierStake'
+import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
+import { Verify } from '~/components/Verify/Verify'
 import { Wallet } from '~/components/Wallet'
 import * as routes from '~/../config/routes'
 
@@ -136,6 +137,7 @@ const App = connect(mapStateToProps)(
                     <Route path={routes.APPLY} component={ApplicantApplyContainer} />
                     <Route path={routes.STAKE} component={VerifierStake} />
                     <Route path={routes.WALLET} component={Wallet} />
+                    <Route path={routes.VERIFY} component={Verify} />
 
                     <Route path={routes.HOME} component={Home} />
 
@@ -162,8 +164,6 @@ const App = connect(mapStateToProps)(
                 </div>
               </div>
             </div>
-
-            <br />
           </section>
 
           <section className='section'>

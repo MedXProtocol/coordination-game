@@ -108,9 +108,10 @@ strong {
   outline: -webkit-focus-ring-color auto 0;
 }
 
+ul,
+ol,
 p {
   font-family: 'Comfortaa', sans-serif;
-  // font-family: 'Heebo', sans-serif;
   font-size: 0.75rem;
 }
 
@@ -584,6 +585,7 @@ section {
 
 .tabs ul {
   border-bottom-color: lighten($accent-color-3, 30%);
+  font-size: 0.875rem;
 }
 
 .tabs button {
@@ -628,9 +630,10 @@ section {
 }
 
 .text-input--filename {
+  border-width: 1px;
   line-height: 1;
   max-width: initial;
-  font-size: 1rem;
+  font-size: 0.75rem;
   width: 320px;
 }
 
@@ -639,6 +642,24 @@ section {
 }
 
 .file-download--container {
-  margin-top: 10px;
+  margin-top: 0;
   width: 100%;
+}
+
+.is-addon {
+  font-size: 0.875rem;
+  padding: 2px 20px;
+}
+
+.text-input--filename-button {
+  border-left: none;
+  border-top: none;
+  border-top-right-radius: 0;
+  height: 42px;
+}
+
+.button.text-input--filename-button.is-primary.is-outlined:hover,
+.button.text-input--filename-button.is-primary.is-outlined:active,
+.button.text-input--filename-button.is-primary.is-outlined:focus {
+  box-shadow: none;
 }

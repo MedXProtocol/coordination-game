@@ -89,6 +89,7 @@ export const Wallet = connect(mapStateToProps)(
               </nav>
 
               <nav className="level level--footer">
+                {/*
                 <div className="level-item has-text-centered">
                   <div>
                     <p className="heading">
@@ -99,6 +100,8 @@ export const Wallet = connect(mapStateToProps)(
                     </p>
                   </div>
                 </div>
+                */}
+
                 <div className="level-item has-text-centered">
                   <div>
                     <p className="heading">

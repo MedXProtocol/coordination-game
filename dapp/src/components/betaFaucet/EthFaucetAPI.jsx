@@ -141,7 +141,7 @@ export const EthFaucetAPI = ReactTimeout(
               disabled={isSending}
               href={this.faucetLambdaURI}
               onClick={this.handleSendEther}
-              className="button is-light"
+              className="button is-primary is-outlined"
             >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
           </p>
           {isSending || responseMessage || errorMessage ? responseWell : ''}

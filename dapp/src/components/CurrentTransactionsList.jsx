@@ -8,6 +8,13 @@ import { EtherscanLink } from '~/components/EtherscanLink'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { txErrorToCode } from '~/services/txErrorToCode'
 
+const txNames = {
+  'approve': 'TILW Approval',
+  'start': 'Application Started',
+  'applicantRandomlySelectVerifier': 'Requesting Verification',
+  'depositStake': 'Depositing TILW Stake'
+}
+
 function mapStateToProps(state) {
   let transactions = Object.entries(state.sagaGenesis.transactions)
   let pendingOrErrorTransactions = transactions.filter(transaction => {
@@ -128,7 +135,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                   this.getClassName(error, confirmed)
                 )} />
                 <span className="nav-list--tx-name nav-list--tx-wrapper__child">
-                  {name}&nbsp;
+                  {txNames[name]}&nbsp;
                   <EtherscanLink txHash={txHash}>
                     <FontAwesomeIcon icon={faExternalLinkAlt} />
                   </EtherscanLink>

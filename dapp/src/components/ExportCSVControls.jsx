@@ -61,7 +61,7 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
                 { label: "Secret", key: "secret" }
               ]}
               filename={this.state.filename}
-              className="button is-outlined is-primary"
+              className="button is-outlined is-primary is-addon text-input--filename-button"
             >
               Download
             </PropDataUpdatedCSVLink>

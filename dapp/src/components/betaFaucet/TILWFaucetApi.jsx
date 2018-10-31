@@ -139,7 +139,7 @@ export const TILWFaucetApi = ReactTimeout(
               disabled={isSending}
               onClick={this.handleMintTILW}
               href={this.faucetLambdaURI}
-              className="button is-light"
+              className="button is-primary is-outlined"
             >{isSending ? 'Sending ...' : 'Mint Me TILW'}</a>
           </p>
           {isSending || responseMessage || errorMessage ? responseWell : ''}

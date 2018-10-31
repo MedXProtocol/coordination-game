@@ -4,6 +4,10 @@
   border-radius: 5px;
 }
 
+.list--container__top-borderless {
+  border-top: 0;
+}
+
 .list {
   background: black;
   list-style-type: none;

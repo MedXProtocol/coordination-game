@@ -192,7 +192,12 @@ export const ApplicationsTable = connect(mapStateToProps)(
 
           return (
             <React.Fragment>
-              <div className="list--container">
+              <div className={classnames(
+                'list--container',
+                {
+                  'list--container__top-borderless': this.props.topBorderless
+                }
+              )}>
                 {loadingLines}
                 {noApplications}
 
