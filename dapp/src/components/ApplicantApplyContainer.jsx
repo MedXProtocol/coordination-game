@@ -22,6 +22,7 @@ import { ApplicationsTable } from '~/components/ApplicationsTable'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
+import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { storageAvailable } from '~/services/storageAvailable'
 import { applicationStorageKey } from '~/utils/applicationStorageKey'
@@ -375,6 +376,21 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               <h1>
                 Apply to be on the TIL
               </h1>
+
+              <Progress
+                labels={['Send Approval', 'Submit Secret', 'Request Verification', 'Await Verification']}
+                progressState={{
+                  step1Active: !this.step1Completed(),
+                  step2Active: this.step1Completed() && !this.step2Completed(),
+                  step3Active: this.step2Completed() && !this.step3Completed(),
+                  step4Active: false,
+
+                  step1Complete: this.step1Completed() || this.step2Completed() || this.step3Completed(),
+                  step2Complete: this.step2Completed() || this.step3Completed(),
+                  step3Complete: this.step3Completed(),
+                  step4Complete: this.step3Completed()
+                }}
+              />
 
               <h6 className="is-size-6">
                 <span className="multistep-form--step-number">1.</span>

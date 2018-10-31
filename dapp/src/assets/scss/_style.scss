@@ -2,26 +2,6 @@
   box-sizing: border-box;
 }
 
-button {
-  background-color: transparent;
-  border-color: transparent;
-  border-style: solid;
-  border-width: 0;
-  cursor: pointer;
-  color: lighten($accent-color-1, 10%);
-  font-size: inherit;
-  padding: 10px 10px;
-}
-
-button:hover,
-button:focus {
-  color: lighten($accent-color-1, 20%);
-}
-
-button:disabled {
-  cursor: not-allowed;
-}
-
 ::placeholder {
   color: #444;
 }
@@ -30,7 +10,6 @@ html,
 body {
   background: $background-color;
   color: #e7dfdd;
-  // font-family: 'Heebo', sans-serif;
   font-family: 'Comfortaa', sans-serif;
   font-size: 1.375rem;
   line-height: 1.6;
@@ -43,13 +22,34 @@ body {
   }
 }
 
-a {
+button {
+  background-color: transparent;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 0;
+  cursor: pointer;
   color: lighten($accent-color-1, 10%);
+  font-size: inherit;
+  padding: 10px 10px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a,
+button {
+  color: lighten($accent-color-1, 15%);
+  font-weight: 700;
 }
 
 a:hover,
-a:focus {
-  color: lighten($accent-color-1, 20%);
+a:focus,
+a:active,
+button:hover,
+button:focus,
+button:active {
+  color: lighten($accent-color-1, 25%);
 }
 
 h1,
@@ -108,6 +108,7 @@ strong {
   outline: -webkit-focus-ring-color auto 0;
 }
 
+button,
 ul,
 ol,
 p {
@@ -116,7 +117,8 @@ p {
 }
 
 hr {
-  background-color: #222;
+  background-color: $dark-gray;
+  height: 3px;
   margin: 2rem auto;
   width: 50%;
 }
@@ -193,6 +195,7 @@ header {
   border-bottom: 0.1em solid;
   border-radius: 0;
   color: rgba(255, 255, 255, 0.3);
+  font-family: 'Comfortaa', sans-serif;
   font-size: 1.5rem;
   line-height: 1.1;
   // margin-top: 0.5rem;
@@ -205,9 +208,9 @@ header {
 }
 
 .text-input--large {
-  font-size: 3rem;
+  font-size: 2rem;
   max-width: 10rem;
-  padding: 0 0.5rem;
+  padding: 0.75rem 0.5rem 0.375rem;
   text-align: center;
 
   @media screen and (max-width: 768px) {
@@ -222,8 +225,8 @@ header {
 }
 
 .text-input.readonly {
-  background-color: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.03);
 }
 
@@ -313,7 +316,6 @@ header {
   border: 1px solid transparent;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
-  // padding-top: calc(0.5rem - 1px);
 }
 
 .button.is-light:hover,

@@ -83,8 +83,8 @@ export const VerifierStakeStep1 = connect(mapStateToProps)(
         if (canApprove() && !approvalComplete()) {
           step1 = (
             <React.Fragment>
-              <div class="columns">
-                <div class="column is-8">
+              <div className="columns">
+                <div className="column is-8">
                   <p>
                     The Trustless Incentivized List contract needs your permission to stake <strong>{displayWeiToEther(requiredStake)} TILW</strong> to become a verifier.
                   </p>

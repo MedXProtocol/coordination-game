@@ -87,8 +87,8 @@ export const VerifierStakeStep2 = connect(mapStateToProps)(
               Stake TILW {stakeCheckmark}
             </h6>
 
-            <div class="columns">
-              <div class="column is-8">
+            <div className="columns">
+              <div className="column is-8">
                 <p>
                   You've successfully approved at least <strong>{displayWeiToEther(requiredStake)} TILW</strong>!
                   You can now stake that amount to become a Verifier.

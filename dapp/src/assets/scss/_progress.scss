@@ -1,0 +1,115 @@
+.progress--container {
+  position: relative;
+  display: flex;
+}
+
+// Background Track
+.progress--track {
+  position: absolute;
+  top: 5px;
+  width: 100%;
+  height: 5px;
+  background-color: $dark-gray;
+  z-index: 1;
+}
+
+// Each Step on the Progress Bar
+.progress--step {
+  font-family: 'Comfortaa', sans-serif;
+  position: relative;
+  width: 100%;
+  font-size: 14px;
+  text-align: center;
+  z-index: 2;
+
+  // Hide the final step's progress bar
+  &:last-child:after {
+    display: none;
+  }
+
+  // Step's circle in default state
+  &:before {
+    content: "\f00c";
+    display: flex;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    width: 16px;
+    height: 16px;
+    background: $gray;
+    border: 1px solid $gray;
+    border-radius: 100%;
+    // color: $dark-gray;
+    color: transparent;
+  }
+
+  // Step's progress bar in default state
+  &:after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 0%;
+    transition: width 1s ease-in;
+    height: 5px;
+    background: $gray;
+    z-index: -1;
+  }
+
+  // Step's active state
+  &.is-active {
+    color: lighten($accent-color-1, 10%);
+
+    &:before {
+      background: $accent-color-1;
+      border: 1px solid $background-color;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  // Step's complete state
+  &.is-complete {
+    color: $accent-color-3;
+
+    // Step's circle in complete state
+    &:before {
+      // font-family: FontAwesome;
+      // font-size: 10px;
+      // color: $dark-gray;
+      color: transparent;
+      background: $accent-color-3;
+      border: 1px solid $background-color;
+    }
+
+    // Step's progress bar in complete state
+    &:after {
+      background: $brand-info;
+      animation: nextStep 1s;
+      animation-fill-mode: forwards;
+    }
+  }
+}
+
+// Animations --------------------------------------
+// Pulse animation for Step's circle in active state
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(162, 57, 202, 0.8);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(162, 57, 202, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(162, 57, 202, 0);
+  }
+}
+
+// Progressing to next step animation for Step's progress bar
+@keyframes nextStep {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.progress--container {
+  margin: 50px 0 50px;
+  // position: relative;
+}
