@@ -16,9 +16,9 @@ export const Home = class _Home extends Component {
         <ScrollToTop />
 
         {/*}<div class="tabs is-toggle is-fullwidth">*/}
-        <div class="tabs is-centered is-boxed">
+        <div className="tabs is-centered is-boxed">
           <ul>
-            <li class="is-active">
+            <li className="is-active">
               <button>Your Current Applications</button>
             </li>
             <li>
