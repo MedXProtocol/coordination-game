@@ -34,9 +34,11 @@ contract TILRegistryFactory {
     address coordinationGameAddress = coordinationGameFactory.createCoordinationGame(
       _work,
       tilRegistry,
+      msg.sender,
       _applicationStakeAmount
     );
     tilRegistry.setCoordinationGame(coordinationGameAddress);
+    tilRegistry.transferOwnership(msg.sender);
 
     return tilRegistry;
   }

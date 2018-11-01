@@ -34,7 +34,6 @@ function mapStateToProps(state) {
 
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
-  const stakeLimit = cacheCallValueBigNumber(state, workAddress, 'stakeLimit')
 
   return {
     address,
@@ -42,7 +41,6 @@ function mapStateToProps(state) {
     jobStake,
     requiredStake,
     staked,
-    stakeLimit,
     transactions,
     tilwBalance,
     workAddress,
@@ -58,8 +56,7 @@ function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
     cacheCall(workTokenAddress, 'allowance', address, workAddress),
     cacheCall(workAddress, 'balances', address),
     cacheCall(workAddress, 'jobStake'),
-    cacheCall(workAddress, 'requiredStake'),
-    cacheCall(workAddress, 'stakeLimit')
+    cacheCall(workAddress, 'requiredStake')
   ])
 }
 

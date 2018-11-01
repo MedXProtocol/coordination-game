@@ -47,8 +47,7 @@ function* walletSaga({ address, workTokenAddress, workAddress }) {
     cacheCall(workTokenAddress, 'allowance', address, workAddress),
     cacheCall(workAddress, 'balances', address),
     cacheCall(workAddress, 'jobStake'),
-    cacheCall(workAddress, 'requiredStake'),
-    cacheCall(workAddress, 'stakeLimit')
+    cacheCall(workAddress, 'requiredStake')
   ])
 }
 

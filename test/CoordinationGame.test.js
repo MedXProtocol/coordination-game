@@ -16,7 +16,7 @@ const mineBlock = require('./helpers/mineBlock')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
-      ownerAddress,
+      coordinationGameOwnerAddress,
       workToken,
       work,
       workStake,
@@ -80,9 +80,15 @@ contract('CoordinationGame', (accounts) => {
     tilRegistry = TILRegistry.at(addresses.tilRegistryAddress)
     assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
 
+    const tilRegistryOwnerAddress = await tilRegistry.owner.call()
+    assert.equal(tilRegistryOwnerAddress, applicant, 'tilRegistry owner is first account')
+
     const coordinationGameAddress = await tilRegistry.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
-    ownerAddress = await coordinationGame.owner.call()
+
+    coordinationGameOwnerAddress = await coordinationGame.owner.call()
+    assert.equal(coordinationGameOwnerAddress, applicant, 'coord game owner is first account')
+
     await work.setJobManager(coordinationGameAddress)
 
     // Add one to the timeouts so that we can use them to increaseTime and timeout
@@ -393,7 +399,7 @@ contract('CoordinationGame', (accounts) => {
 
       // y u no work?
       await coordinationGame.updateSettings(newApplicationStakeAmount, {
-        from: ownerAddress
+        from: coordinationGameOwnerAddress
       })
 
       assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)

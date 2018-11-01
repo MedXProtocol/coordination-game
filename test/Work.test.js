@@ -16,13 +16,12 @@ contract('Work', (accounts) => {
 
   const requiredStake = web3.toWei('20', 'ether')
   const jobStake = web3.toWei('10', 'ether')
-  const stakeLimit = web3.toWei('1000', 'ether')
 
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   beforeEach(async () => {
     token = await WorkToken.deployed()
-    work = await Work.new(token.address, requiredStake, jobStake, stakeLimit)
+    work = await Work.new(token.address, requiredStake, jobStake)
     ownerAddress = await work.owner.call()
 
     // this is typically supposed to be the coordinationGameAddress:
@@ -166,18 +165,21 @@ contract('Work', (accounts) => {
 
   describe('when updating settings', () => {
     const newRequiredStake = web3.toWei('30', 'ether')
+    const newJobStake = web3.toWei('3', 'ether')
 
     it('should work for the contract owner', async () => {
       assert.equal(await work.requiredStake(), requiredStake)
+      assert.equal(await work.jobStake(), jobStake)
 
-      await work.updateSettings(newRequiredStake)
+      await work.updateSettings(newRequiredStake, newJobStake)
 
       assert.equal(await work.requiredStake(), newRequiredStake)
+      assert.equal(await work.jobStake(), newJobStake)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
-        await work.updateSettings(newRequiredStake, {
+        await work.updateSettings(newRequiredStake, newJobStake, {
           from: staker2
         })
       })

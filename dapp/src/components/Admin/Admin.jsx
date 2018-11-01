@@ -64,7 +64,6 @@ export const Admin = connect(mapStateToProps)(
         }
 
         componentWillReceiveProps (nextProps) {
-          console.log(nextProps.transactions)
           this.registerCoordinationGameSettingsHandler(nextProps)
           this.registerWorkSettingsHandler(nextProps)
         }
@@ -75,15 +74,10 @@ export const Admin = connect(mapStateToProps)(
               nextProps.transactions[this.state.coordinationGameSettingsTxId]
             )
               .onError((error) => {
-                console.log(error)
                 this.setState({ coordinationGameSettingsHandler: null })
                 toastr.transactionError(error)
               })
               .onConfirmed(() => {
-                // TODO: Why are we not gettin in here? Seems like
-                //       props.transactions[this.state.coordinationGameSettingsTxId]
-                //       never gets confirmations
-
                 this.setState({ coordinationGameSettingsHandler: null })
                 toastr.success('Coordination Game contract "Update Settings" confirmed.')
               })
@@ -95,12 +89,10 @@ export const Admin = connect(mapStateToProps)(
 
         registerWorkSettingsHandler = (nextProps) => {
           if (this.state.workSettingsHandler) {
-            console.log('inside')
             this.state.workSettingsHandler.handle(
               nextProps.transactions[this.state.workSettingsTxId]
             )
               .onError((error) => {
-                console.log(error)
                 this.setState({ workSettingsHandler: null })
                 toastr.transactionError(error)
               })
@@ -108,7 +100,6 @@ export const Admin = connect(mapStateToProps)(
                 // TODO: Why are we not gettin in here? Seems like
                 //       props.transactions[this.state.workSettingsTxId]
                 //       never gets confirmations
-                console.log('conffff')
                 this.setState({ workSettingsHandler: null })
                 toastr.success('Work contract "Update Settings" confirmed.')
               })

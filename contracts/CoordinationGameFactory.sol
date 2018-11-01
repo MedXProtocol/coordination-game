@@ -10,6 +10,7 @@ contract CoordinationGameFactory {
   function createCoordinationGame(
     Work _work,
     TILRegistry _tilRegistry,
+    address _owner,
     uint256 _applicationStakeAmount
   )
     external
@@ -17,6 +18,7 @@ contract CoordinationGameFactory {
   {
     CoordinationGame coordinationGame = new CoordinationGame();
     coordinationGame.init(_work, _tilRegistry, _applicationStakeAmount);
+    coordinationGame.transferOwnership(_owner);
 
     emit CoordinationGameCreated(msg.sender, address(coordinationGame));
 

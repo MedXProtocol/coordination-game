@@ -18,12 +18,12 @@ contract Work is Ownable {
 
   uint256 public requiredStake;
   uint256 public jobStake;
-  uint256 public stakeLimit;
 
   mapping (address => uint256) public balances;
 
   event SettingsUpdated(
-    uint256 applicationStakeAmount
+    uint256 applicationStakeAmount,
+    uint256 jobStake
   );
 
   modifier hasNotStaked(address _staker) {
@@ -44,24 +44,17 @@ contract Work is Ownable {
   constructor (
     ERC20 _token,
     uint256 _requiredStake,
-    uint256 _jobStake,
-    uint256 _stakeLimit
+    uint256 _jobStake
   ) public {
     require(_token != address(0), '_token is defined');
 
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
-    require(_stakeLimit > 0, '_stakeLimit is greater than zero');
 
     token = _token;
 
     requiredStake = _requiredStake;
     jobStake = _jobStake;
-    stakeLimit = _stakeLimit;
-  }
-
-  function setStakeLimit(uint256 _stakeLimit) onlyOwner {
-    stakeLimit = _stakeLimit;
   }
 
   function setJobManager(address _jobManager) onlyOwner {
@@ -119,7 +112,9 @@ contract Work is Ownable {
 
   function deposit(address _worker, uint256 _amount) internal {
     uint256 newBalance = balances[_worker] + _amount;
-    require(newBalance <= stakeLimit, 'stake is below the limit');
+    
+    // allow them to stake more than any upper bound for now
+    // require(newBalance <= requiredStake, 'stake is below the limit');
 
     balances[_worker] = newBalance;
     if (balances[_worker] >= jobStake) {
@@ -132,9 +127,13 @@ contract Work is Ownable {
     }
   }
 
-  function updateSettings(uint256 _requiredStake) public onlyOwner {
-    requiredStake = _requiredStake;
+  function updateSettings(uint256 _requiredStake, uint256 _jobStake) public onlyOwner {
+    require(_requiredStake > 0, '_requiredStake is greater than zero');
+    require(_jobStake > 0, '_jobStake is greater than zero');
 
-    emit SettingsUpdated(requiredStake);
+    requiredStake = _requiredStake;
+    jobStake = _jobStake;
+
+    emit SettingsUpdated(requiredStake, jobStake);
   }
 }
