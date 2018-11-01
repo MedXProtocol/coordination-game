@@ -10,13 +10,8 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileExport } from '@fortawesome/free-solid-svg-icons'
-import { ApplicationRow } from '~/components/ApplicationRow'
-import { ExportCSVControls } from '~/components/ExportCSVControls'
+import { VerifierApplicationRow } from '~/components/Verifiers/VerifierApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
-import { storageAvailable } from '~/services/storageAvailable'
-import { applicationStorageKey } from '~/utils/applicationStorageKey'
 
 function mapStateToProps(state) {
   let applicationIds = []
@@ -83,47 +78,10 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
     withSend(
       class _VerifierApplicationsTable extends Component {
 
-        constructor(props) {
-          super(props)
-
-          this.state = {
-            showCsvLink: false,
-            csvData: []
-          }
-        }
-
-        csvData = () => {
-          const data = []
-
-          this.props.applicationIds.forEach((applicationId) => {
-            let applicationData = {
-              applicationId,
-              hint: 'unknown',
-              random: 'unknown',
-              secret: 'unknown'
-            }
-
-            if (storageAvailable('localStorage')) {
-              const key = applicationStorageKey(this.props.networkId, applicationId)
-              const applicationJson = localStorage.getItem(key)
-
-              if (applicationJson) {
-                applicationData = JSON.parse(applicationJson)
-              }
-            } else {
-              console.warn('Unable to read from localStorage')
-            }
-
-            data.push(applicationData)
-          })
-
-          return data
-        }
-
         renderApplicationRows(applicationIds) {
           let applicationRows = applicationIds.map((applicationId, index) => {
             return (
-              <ApplicationRow
+              <VerifierApplicationRow
                 applicationId={applicationId}
                 key={`application-row-${index}`}
               />
@@ -131,14 +89,6 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
           })
 
           return applicationRows.reverse()
-        }
-
-        exportAll = (e) => {
-          e.preventDefault()
-
-          this.setState({
-            showCsvLink: true
-          })
         }
 
         render() {
@@ -183,30 +133,6 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
                   {applicationRows}
                 </div>
               </div>
-
-              <div
-                className={classnames(
-                  'is-pulled-right',
-                  { 'is-hidden': this.state.showCsvLink || !this.props.applicationCount || this.props.applicationCount === 0 }
-                )}
-              >
-                <button onClick={this.exportAll} className="is-size-7">
-                  <FontAwesomeIcon
-                    icon={faFileExport}
-                  /> Export a Backup
-                </button>
-              </div>
-
-              <ExportCSVControls
-                showCsvLink={this.state.showCsvLink}
-                csvData={this.csvData()}
-                headers={[
-                  { label: "Application ID#", key: "applicationId" },
-                  { label: "Hint", key: "hint" },
-                  { label: "Random #", key: "random" },
-                  { label: "Secret", key: "secret" }
-                ]}
-              />
             </React.Fragment>
           )
         }

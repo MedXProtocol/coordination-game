@@ -326,6 +326,10 @@ header {
   padding: 6rem 1.5rem 2rem;
 }
 
+.has-text-primary {
+  color: $accent-color-3 !important;
+}
+
 .button {
   border: 1px solid transparent;
   font-weight: bold;
@@ -346,15 +350,20 @@ header {
   color: $accent-color-3;
 }
 
-.has-text-primary {
-  color: $accent-color-3 !important;
-}
-
 .button.is-primary.is-outlined:hover,
 .button.is-primary.is-outlined:active,
 .button.is-primary.is-outlined:focus {
   box-shadow: 0 0 5px 0 lighten(#00d1b2, 5%);
   background-color: transparent;
+  color: white;
+}
+
+.button.is-warning.is-outlined:hover,
+.button.is-warning.is-outlined:active,
+.button.is-warning.is-outlined:focus {
+  box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
+  background-color: transparent;
+  color: white;
 }
 
 .button.is-light.is-text {

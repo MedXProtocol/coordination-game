@@ -49,8 +49,6 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
       hint = getWeb3().utils.hexToAscii(hint)
     }
 
-    const secret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
-
     if (!objIndex) {
       objIndex = applicationId
     }
@@ -62,8 +60,7 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
         // status,
         createdAt,
         updatedAt,
-        hint,
-        secret
+        hint
         // objIndex,
       }
     // }
@@ -81,8 +78,6 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
           random: applicationObject.random
         }
       }
-
-      // console.log(key, "getting secret, random, hint and applicationId", applicationObject)
     } else {
       console.warn('Unable to read from localStorage')
     }
@@ -128,15 +123,14 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
   }
 }
 
-function* applicationRowSaga({ coordinationGameAddress, applicationId }) {
-  // function* applicationRowSaga({ coordinationGameAddress, ApplicationScheduleManager, applicationId }) {
+function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }) {
+  // function* applicantApplicationRowSaga({ coordinationGameAddress, ApplicationScheduleManager, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
   // if (!ApplicationScheduleManager || !coordinationGameAddress || !applicationId) { return }
 
   yield all([
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     cacheCall(coordinationGameAddress, 'hints', applicationId),
-    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     // cacheCall(applicationId, 'status'),
     // cacheCall(ApplicationScheduleManager, 'secondsInADay'),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
@@ -155,9 +149,9 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(applicationRowSaga)(
-    class _ApplicationRow extends Component {
+export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(applicantApplicationRowSaga)(
+    class _ApplicantApplicationRow extends Component {
 
       static propTypes = {
         applicationId: PropTypes.number
@@ -261,8 +255,7 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
           updatedAt,
           verifier,
           hint,
-          random//,
-          // secret
+          random
         } = applicationRowObject
 
         // let { applicationId, objIndex, error, transactionId, createdAt, updatedAt } = applicationRowObject

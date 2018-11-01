@@ -6,10 +6,10 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 ## Config Cheatsheet (fill in the vars with your deployed contract addresses)
 
-var betaFaucetAddress = '0xcfefc772677a887dd33a549614fabd9f803e3f43'
-var coordinationGameAddress = '0x2be29c1a93cc4a134b8469438b479bd5b0904824'
-var workAddress = '0x0aab313f0aca6ade43535d273f79ce01c03f4725'
-var workTokenAddress = '0x31b745d00c303fb792e364cbb5b89ef42515b176'
+var betaFaucetAddress = ''
+var coordinationGameAddress = ''
+var workAddress = ''
+var workTokenAddress = ''
 
 BetaFaucet.at(betaFaucetAddress).then(i => bf = i)
 CoordinationGame.at(coordinationGameAddress).then(i => cg = i)

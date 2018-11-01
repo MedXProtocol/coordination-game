@@ -193,7 +193,7 @@ contract('CoordinationGame', (accounts) => {
 
 
   describe('applicantRandomlySelectVerifier()', () => {
-    xit('should not work before the next block has been mined', async () => {
+    it('should not work before the next block has been mined', async () => {
       await expectThrow(async () => {
         await coordinationGame.applicantRandomlySelectVerifier(
           applicationId,
@@ -225,7 +225,7 @@ contract('CoordinationGame', (accounts) => {
         assert.equal(verifiersApplicationCount.toString(), new BN(1).toString(), "Verifier's Application Count increased")
       })
 
-      xit('should not be called again', async () => {
+      it('should not be called again', async () => {
         await expectThrow(async () => {
           await applicantRandomlySelectsAVerifier()
         })
@@ -236,7 +236,7 @@ contract('CoordinationGame', (accounts) => {
           await verifierSubmitSecret()
         })
 
-        xit('should not allow the applicant to select another verifier', async () => {
+        it('should not allow the applicant to select another verifier', async () => {
           debug(`fault applicantRandomlySelectsAVerifier...`)
           await expectThrow(async () => {
             await applicantRandomlySelectsAVerifier()
@@ -249,7 +249,7 @@ contract('CoordinationGame', (accounts) => {
             await increaseTime(verifierTimeout)
           })
 
-          xit('should not allow the applicant to select another verifier', async () => {
+          it('should not allow the applicant to select another verifier', async () => {
             debug(`fault applicantRandomlySelectsAVerifier...`)
             await expectThrow(async () => {
               await applicantRandomlySelectsAVerifier()
@@ -264,7 +264,7 @@ contract('CoordinationGame', (accounts) => {
           await increaseTime(verifierTimeout)
         })
 
-        xit('should allow the applicant to select another verifier', async () => {
+        it('should allow the applicant to select another verifier', async () => {
           const firstVerifier = await coordinationGame.verifiers(applicationId)
 
           await applicantRandomlySelectsAVerifier()
@@ -288,20 +288,20 @@ contract('CoordinationGame', (accounts) => {
         await verifierSubmitSecret()
       })
 
-      xit('should set the verifier secret', async () => {
+      it('should set the verifier secret', async () => {
         debug('verifierSubmitSecret() verifierSubmitSecret')
         const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
         assert.equal(secret, storedVerifierSecret)
       })
 
-      xit('should not be called again', async () => {
+      it('should not be called again', async () => {
         await expectThrow(async () => {
           await verifierSubmitSecret()
         })
       })
     })
 
-    xit('should not allow the verifier to submit if too much time has passed', async () => {
+    it('should not allow the verifier to submit if too much time has passed', async () => {
       await increaseTime(verifierTimeout)
 
       await expectThrow(async () => {
@@ -317,7 +317,7 @@ contract('CoordinationGame', (accounts) => {
       await applicantRandomlySelectsAVerifier()
     })
 
-    xit('should not be called before the verifier has submitted', async () => {
+    it('should not be called before the verifier has submitted', async () => {
       await expectThrow(async () => {
         await applicantRevealsTheirSecret()
       })
@@ -328,7 +328,7 @@ contract('CoordinationGame', (accounts) => {
         await verifierSubmitSecret()
       })
 
-      xit('should add applicant to registry (and pay out verifier)', async () => {
+      it('should add applicant to registry (and pay out verifier)', async () => {
         await applicantRevealsTheirSecret()
 
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
@@ -347,7 +347,7 @@ contract('CoordinationGame', (accounts) => {
     })
 
     context('when the verifier has submitted different secret', async () => {
-      xit('should make a challenge and go to vote', async () => {
+      it('should make a challenge and go to vote', async () => {
         const differentSecret = '0x56'
 
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
@@ -368,7 +368,7 @@ contract('CoordinationGame', (accounts) => {
     })
 
     describe('when the timeframe for the applicant to reveal has passed', () => {
-      xit('should throw', async () => {
+      it('should throw', async () => {
         await increaseTime(applicantRevealTimeout)
 
         await expectThrow(async () => {
@@ -376,7 +376,7 @@ contract('CoordinationGame', (accounts) => {
         })
       })
 
-      // xit('should allow the verifier to challenge', async () => {
+      // it('should allow the verifier to challenge', async () => {
       //   const selectedVerifier = await coordinationGame.verifiers(applicationId)
       //   const verifierStartingBalance = new BN((await work.balances(selectedVerifier)).toString())
       //   const applicantStartingBalance = new BN((await workToken.balanceOf(applicant)).toString())
@@ -411,7 +411,7 @@ contract('CoordinationGame', (accounts) => {
   describe('when updating settings', () => {
     const newApplicationStakeAmount = web3.toWei('30', 'ether')
 
-    xit('should work for the contract owner', async () => {
+    it('should work for the contract owner', async () => {
       assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
 
       // y u no work?
@@ -422,7 +422,7 @@ contract('CoordinationGame', (accounts) => {
       assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)
     })
 
-    xit('should not work for anyone but the owner', async () => {
+    it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
         await coordinationGame.updateSettings(newApplicationStakeAmount, {
           from: verifier

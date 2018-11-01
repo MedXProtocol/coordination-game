@@ -12,7 +12,7 @@ import {
 } from 'saga-genesis'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileExport } from '@fortawesome/free-solid-svg-icons'
-import { ApplicationRow } from '~/components/ApplicationRow'
+import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
 import { storageAvailable } from '~/services/storageAvailable'
@@ -128,7 +128,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
           // renderApplicationRows(applicationIds, transactions, applicationCount) {
           let applicationRows = applicationIds.map((applicationId, index) => {
             return (
-              <ApplicationRow
+              <ApplicantApplicationRow
                 applicationId={applicationId}
                 key={`application-row-${index}`}
               />
