@@ -63,5 +63,60 @@
     "contractName": "BetaFaucet",
     "address": "0x51119f0dfeed678d1fa7f5e471667bf7a169e35f",
     "transactionHash": "0x8052d26d4a1091a98944f930e64eba8edaeb60714117ead027e567afc0c985ea"
+  },
+  {
+    "contractName": "AttributeStore",
+    "address": "0xd61b217c0d03869d624119337e75ca6e83611a52",
+    "transactionHash": "0xbb4abe002385187432a505ec8538e5ffb4bea9c31271e8bdc3a23be4d9a8f7bb"
+  },
+  {
+    "contractName": "DLL",
+    "address": "0x518d91e5a32a80a132e1d414cb75988da4ea74ec",
+    "transactionHash": "0x36ae90e1815dc2a21073de66c7ba63d0220ec1972a9909ff1a00ca791fd656e5"
+  },
+  {
+    "contractName": "PLCRFactory",
+    "address": "0x91d5c5baacf89f1c1393673092b4c43c02c5ea35",
+    "transactionHash": "0x6c57e652d53d2f38709da1d7240c31afc6def42918522d6907d7ad604ba74340"
+  },
+  {
+    "contractName": "ParameterizerFactory",
+    "address": "0x08a2f0baeae8132ab38515bd7911b92c71bca461",
+    "transactionHash": "0xbc87ebfb7b2efc6fc8826ec5f611375ec7b306c64e57f768923e4516b8717e16"
+  },
+  {
+    "contractName": "WorkToken",
+    "address": "0xe193c061017816531874b1e8b764ab70c0c4c5cc",
+    "transactionHash": "0x924ce9d0b982c7daf9c186ecdaba61027fcdf70ff4e8a6a6ee8a5ee94a50facc"
+  },
+  {
+    "contractName": "Work",
+    "address": "0x6569ce853ceb35df910b34295f0d4243f832d941",
+    "transactionHash": "0x848b25fe491ff268e348b88de20e3d5bda19cbdf43d6ee5d886d54a0f91a3515"
+  },
+  {
+    "contractName": "Parameterizer",
+    "address": "0xde56fad0efce4f77906f35435e1dfbe980e6f922",
+    "transactionHash": "0x198492fc4557a02ddcd756c56bfe398a50861a63ad96ecac32ca8ae8d4d6944c"
+  },
+  {
+    "contractName": "CoordinationGameFactory",
+    "address": "0x9b86dd3217370923d43d16b53504f9284a024cfa",
+    "transactionHash": "0xde298778502dc8d28e18f8fd7b3ad2dbb7c42b6ef6b532e2a6eee4836cfcc0c0"
+  },
+  {
+    "contractName": "TILRegistryFactory",
+    "address": "0x4be2c0b241003e2f61c3135221604484814ed130",
+    "transactionHash": "0x885516847735606c15d4c5d26b8a6b1ed01e50f3c12078cd257c26745d4f10a7"
+  },
+  {
+    "contractName": "TILRegistry",
+    "address": "0x619ffde2a5c96189a7b421ede4553af2df743618",
+    "transactionHash": "0xe2dda80c986cd4ff084f259bd17f1be147ae30cc01e581325ae6015f4a559236"
+  },
+  {
+    "contractName": "CoordinationGame",
+    "address": "0x0ef559b77b458777bc5d2e830df048509e82803c",
+    "transactionHash": "0xe2dda80c986cd4ff084f259bd17f1be147ae30cc01e581325ae6015f4a559236"
   }
 ]
