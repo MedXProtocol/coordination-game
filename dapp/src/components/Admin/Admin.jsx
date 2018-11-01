@@ -27,6 +27,7 @@ function mapStateToProps(state) {
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
 
+  const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
 
   return {
@@ -34,6 +35,7 @@ function mapStateToProps(state) {
     applicationStakeAmount,
     coordinationGameAddress,
     networkId,
+    jobStake,
     requiredStake,
     transactions,
     workAddress
@@ -48,6 +50,7 @@ function* adminSaga({
   if (!coordinationGameAddress || !workAddress || !address) { return null }
 
   yield all([
+    cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake'),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount')
   ])
@@ -138,11 +141,15 @@ export const Admin = connect(mapStateToProps)(
           const newRequiredStake = this.state.requiredStake
             ? etherToWei(this.state.requiredStake)
             : this.props.requiredStake
+          const newJobStake = this.state.jobStake
+            ? etherToWei(this.state.jobStake)
+            : this.props.jobStake
 
           const workSettingsTxId = send(
             workAddress,
             'updateSettings',
-            newRequiredStake
+            newRequiredStake,
+            newJobStake
           )()
 
           this.setState({
@@ -172,9 +179,10 @@ export const Admin = connect(mapStateToProps)(
               </h4>
 
               <form onSubmit={this.handleSubmitCoordinationGameSettings}>
-                <h6 className="is-size-6">
-                  Application Stake Amount
-                </h6>
+                <p className="is-size-7">
+                  <strong>TIL Application Stake Amount</strong>
+                  <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                </p>
                 <input
                   type="text"
                   name="applicationStakeAmount"
@@ -212,19 +220,42 @@ export const Admin = connect(mapStateToProps)(
                   Work Contract
                 </h4>
 
-                <h6 className="is-size-6">
-                  Required Stake
-                </h6>
-                <input
-                  type="text"
-                  name="requiredStake"
-                  className="text-input is-marginless"
-                  onChange={this.handleTextInputChange}
-                  value={this.state.requiredStake || ''}
-                />
-                <span className="help has-text-grey">
-                  Currently: {displayWeiToEther(this.props.requiredStake)}
-                </span>
+                <div className="columns">
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Verification Job Stake Amount</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="jobStake"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.jobStake || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.jobStake)}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Required Stake Amount</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="requiredStake"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.requiredStake || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.requiredStake)}
+                    </span>
+                  </div>
+                </div>
+
 
                 <div className="is-clearfix">
                   <button
