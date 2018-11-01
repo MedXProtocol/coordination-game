@@ -18,7 +18,7 @@ import {
 } from 'saga-genesis'
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
-import { ApplicationsTable } from '~/components/ApplicationsTable'
+import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
@@ -117,7 +117,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           this.state = {
             hintLeft: '',
             hintRight: '',
-            hint: '',
+            hint: '...',
             secret: '',
             applicationCreated: false,
             stepManual: 0
@@ -173,6 +173,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               hint: `${this.state.hintLeft} + ${this.state.hintRight}`,
               secret: this.state.hint
             }
+            console.log('here!', this.state.hint, applicationObject, applicationObject.secret)
             localStorage.setItem(key, JSON.stringify(applicationObject))
             console.log(key, "storing secret, random, hint and applicationId", applicationObject)
           } else {
@@ -495,13 +496,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               />
                               <span className="text-operator">=</span>
 
-                              <input
-                                name="hint"
+                              <span
                                 className="readonly text-input text-input--large"
-                                placeholder=""
-                                value={this.state.hint}
-                                readOnly={true}
-                              />
+                              >
+                                {this.state.hint}
+                              </span>
 
                               <br />
                               {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
@@ -632,7 +631,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                   Your Current Applications:
                 </h6>
               </div>
-              <ApplicationsTable />
+              <ApplicantApplicationsTable />
 
             </Flipper>
           )

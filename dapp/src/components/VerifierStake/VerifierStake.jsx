@@ -141,8 +141,6 @@ export const VerifierStake = connect(mapStateToProps)(
                 }}
               />
 
-              {needsTILWMessage}
-
               {this.stakeComplete()
                 ?
                   (
@@ -172,7 +170,8 @@ export const VerifierStake = connect(mapStateToProps)(
                         approvalComplete={this.approvalComplete}
                         canApprove={this.canApprove}
                       />
-
+                      {needsTILWMessage}
+                      
                       <VerifierStakeStep2
                         {...this.props}
                         stakeComplete={this.stakeComplete}

@@ -57,7 +57,7 @@ function mapStateToProps(state) {
   }
 }
 
-function* applicationsTableSaga({
+function* applicantApplicationsTableSaga({
   coordinationGameAddress,
   address,
   applicationCount
@@ -82,10 +82,10 @@ function* applicationsTableSaga({
   }
 }
 
-export const ApplicationsTable = connect(mapStateToProps)(
-  withSaga(applicationsTableSaga)(
+export const ApplicantApplicationsTable = connect(mapStateToProps)(
+  withSaga(applicantApplicationsTableSaga)(
     withSend(
-      class _ApplicationsTable extends Component {
+      class _ApplicantApplicationsTable extends Component {
 
         constructor(props) {
           super(props)

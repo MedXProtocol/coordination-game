@@ -11,6 +11,7 @@ import "./TILRegistry.sol";
 @notice This contract stores work tokens in a pool which are applicant applicantDeposits
 **/
 contract CoordinationGame is Ownable {
+  using SafeMath for uint256;
   Work work;
   TILRegistry tilRegistry;
 
@@ -22,6 +23,8 @@ contract CoordinationGame is Ownable {
   uint256 public constant applicantRevealTimeout = 40;
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
+  mapping (address => uint256[]) public verifiersApplicationIndices;
+
   mapping (uint256 => uint256) public applicantDeposits;
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
@@ -208,13 +211,14 @@ contract CoordinationGame is Ownable {
 
     require(selectedVerifier != msg.sender, 'verifier is not the applicant');
 
-
     require(selectedVerifier != address(0), 'verifier is not 0');
     verifiers[_applicationId] = selectedVerifier;
     verifierSelectedAt[_applicationId] = block.timestamp;
+
     /// Update random block to be the next one
     randomBlockNumbers[_applicationId] = block.number + 1;
 
+    verifiersApplicationIndices[selectedVerifier].push(_applicationId);
     updatedAt[_applicationId] = block.timestamp;
 
     // transfer tokens from verifier's stake in Work contract to here
@@ -336,14 +340,27 @@ contract CoordinationGame is Ownable {
     return bytes32(_applicationId);
   }
 
-  function getApplicantsApplicationCount() external view returns (uint applicantsApplicationCount) {
+  function getApplicantsApplicationCount() external view returns (uint256 applicantsApplicationCount) {
     return applicantsApplicationIndices[msg.sender].length;
   }
 
-  function getApplicantsLastApplicationID() external view returns (uint applicationId) {
+  function getApplicantsLastApplicationID() external view returns (uint256 applicationId) {
     if (applicantsApplicationIndices[msg.sender].length > 0) {
-      uint index = applicantsApplicationIndices[msg.sender].length - 1;
+      uint256 index = applicantsApplicationIndices[msg.sender].length.sub(1);
       return applicantsApplicationIndices[msg.sender][index];
+    } else {
+      return 0;
+    }
+  }
+
+  function getVerifiersApplicationCount() external view returns (uint256 verifiersApplicationCount) {
+    return verifiersApplicationIndices[msg.sender].length;
+  }
+
+  function getVerifiersLastApplicationID() external view returns (uint256 applicationId) {
+    if (verifiersApplicationIndices[msg.sender].length > 0) {
+      uint256 index = verifiersApplicationIndices[msg.sender].length.sub(1);
+      return verifiersApplicationIndices[msg.sender][index];
     } else {
       return 0;
     }

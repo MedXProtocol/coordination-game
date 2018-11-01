@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { ApplicationsTable } from '~/components/ApplicationsTable'
+import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import * as routes from '~/../config/routes'
@@ -27,7 +27,7 @@ export const Home = class _Home extends Component {
           </ul>
         </div>
 
-        <ApplicationsTable topBorderless={true} />
+        <ApplicantApplicationsTable topBorderless={true} />
 
         <br />
         <br />

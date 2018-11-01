@@ -353,10 +353,6 @@ export const ApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
               <ExportApplicationDetails applicationRowObject={applicationRowObject} />
             </span>
 
-            <span className="list--item__eth-address text text-left">
-              {/*{action} {remove}*/}
-            </span>
-
             <span className="list--item__view text-center">
               {isBlank(verifier)
                 ? (

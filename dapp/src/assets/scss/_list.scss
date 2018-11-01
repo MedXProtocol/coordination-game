@@ -146,7 +146,7 @@
   float: right;
   font-weight: 700;
   transition: color 200ms ease-in;
-  width: 210px;
+  width: 240px;
   text-align: center;
 
   @media (max-width: 768px) {
@@ -174,7 +174,7 @@
 }
 
 .list--item__view .loader {
-  margin: 0 auto;
+  margin: 5px auto 0;
 }
 
 .list--item__pending {
