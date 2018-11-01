@@ -15,6 +15,7 @@ contract CoordinationGame is Ownable {
   TILRegistry tilRegistry;
 
   uint256 public applicationStakeAmount;
+
   uint256 public applicationCount;
 
   uint256 public constant verifierTimeout = 80;
@@ -81,6 +82,10 @@ contract CoordinationGame is Ownable {
 
   event ApplicantLost(
     uint256 indexed applicationId
+  );
+
+  event SettingsUpdated(
+    uint256 applicationStakeAmount
   );
 
   modifier onlyApplicant(uint256 _applicationId) {
@@ -383,5 +388,11 @@ contract CoordinationGame is Ownable {
   // the 3rd-party TCR Registry contract uses this var:
   function minDeposit() public view returns (uint256) {
     return tilRegistry.parameterizer().get("minDeposit");
+  }
+
+  function updateSettings(uint256 _applicationStakeAmount) public onlyOwner {
+    setApplicationStakeAmount(_applicationStakeAmount);
+
+    emit SettingsUpdated(applicationStakeAmount);
   }
 }

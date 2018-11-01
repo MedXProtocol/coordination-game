@@ -12,7 +12,8 @@ const txNames = {
   'approve': 'TILW Approval',
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
-  'depositStake': 'Depositing TILW Stake'
+  'depositStake': 'Depositing TILW Stake',
+  'updateSettings': 'Update Settings'
 }
 
 function mapStateToProps(state) {

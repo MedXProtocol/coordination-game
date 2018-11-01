@@ -9,13 +9,10 @@ import {
   cacheCall,
   cacheCallValueBigNumber,
   contractByName,
-  TransactionStateHandler,
   withSaga,
   withSend
 } from 'saga-genesis'
 import { GetTILWLink } from '~/components/GetTILWLink'
-import { InfoQuestionMark } from '~/components/InfoQuestionMark'
-import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -23,8 +20,6 @@ import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
-import { etherToWei } from '~/utils/etherToWei'
-import { weiToEther } from '~/utils/weiToEther'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {

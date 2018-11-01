@@ -30,7 +30,6 @@ import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { defined } from '~/utils/defined'
-import { etherToWei } from '~/utils/etherToWei'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {

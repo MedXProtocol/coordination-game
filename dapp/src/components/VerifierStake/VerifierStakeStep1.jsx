@@ -7,7 +7,6 @@ import {
   TransactionStateHandler,
   withSend
 } from 'saga-genesis'
-import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 

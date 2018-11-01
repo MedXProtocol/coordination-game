@@ -8,7 +8,6 @@ import {
   withSend
 } from 'saga-genesis'
 import { LoadingLines } from '~/components/LoadingLines'
-import { defined } from '~/utils/defined'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
 function mapStateToProps(state) {

@@ -51,14 +51,20 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
                 {networkName}
               </span>
             </div>
-            <div className="navbar-item has-text-transparent-white">
-              {displayWeiToEther(tilwBalance)} TILW
+            <div className="navbar-item">
+              <span className="navbar-item has-text-transparent-white">
+                {displayWeiToEther(tilwBalance)} TILW
+              </span>
             </div>
-            <div className="navbar-item has-text-transparent-white">
-              <EtherFlip wei={ethBalance} />
+            <div className="navbar-item">
+              <span className="navbar-item has-text-transparent-white">
+                <EtherFlip wei={ethBalance} />
+              </span>
             </div>
-            <div className="navbar-item has-text-transparent-white">
-              <EthAddress address={address} disallowFull={true} />
+            <div className="navbar-item">
+              <span className="navbar-item has-text-transparent-white">
+                <EthAddress address={address} disallowFull={true} />
+              </span>
             </div>
           </div>
         </div>

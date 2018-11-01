@@ -1,14 +1,12 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileExport } from '@fortawesome/free-solid-svg-icons'
-import { CSVLink, CSVDownload } from 'react-csv'
+import { CSVLink } from 'react-csv'
 
 // This is a bugfix for react-csv which can be removed when they fix it upstream:
 class PropDataUpdatedCSVLink extends CSVLink {
-	constructor(props) {
-		super(props)
-	}
+	// constructor(props) {
+	// 	super(props)
+	// }
 
 	componentWillReceiveProps(nextProps) {
 		const { data, headers, separator, uFEFF } = nextProps

@@ -17,6 +17,18 @@ $navbar-height: 50px;
   min-height: $navbar-height;
 }
 
+.navbar > .container .navbar-brand,
+.container > .navbar .navbar-brand {
+  @media screen and (min-width: 1088px) {
+    margin-left: 0;
+  }
+}
+
+.navbar-brand,
+.navbar-tabs {
+
+}
+
 .navbar {
   @media screen and (min-width: 1088px) {
     max-height: $navbar-height;
@@ -39,8 +51,8 @@ $navbar-height: 50px;
   top: $navbar-height;
 }
 
-.navbar.is-fixed-top.navbar--row-two .navbar-item,
-.navbar.is-fixed-top.navbar--row-two .navbar-link {
+.navbar-item .navbar-item,
+.navbar-item .navbar-link {
   padding-top: 0;
 }
 
@@ -52,7 +64,7 @@ $navbar-height: 50px;
 
 .navbar-item,
 .navbar-link {
-  padding: 0.25rem 0.75rem 0;
+  padding: 0.25rem 0.5rem 0;
 }
 
 .navbar-item button,

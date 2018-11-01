@@ -9,9 +9,10 @@ const expectThrow = require('./helpers/expectThrow')
 contract('Work', (accounts) => {
   let [staker, staker2, jobManager] = accounts
 
-  let token
-  let work
-  let initialStakerBalance
+  let token,
+    ownerAddress,
+    work,
+    initialStakerBalance
 
   const requiredStake = web3.toWei('20', 'ether')
   const jobStake = web3.toWei('10', 'ether')
@@ -22,6 +23,7 @@ contract('Work', (accounts) => {
   beforeEach(async () => {
     token = await WorkToken.deployed()
     work = await Work.new(token.address, requiredStake, jobStake, stakeLimit)
+    ownerAddress = await work.owner.call()
 
     // this is typically supposed to be the coordinationGameAddress:
     await work.setJobManager(jobManager)
@@ -161,4 +163,25 @@ contract('Work', (accounts) => {
       })
     })
   })
+
+  describe('when updating settings', () => {
+    const newRequiredStake = web3.toWei('30', 'ether')
+
+    it('should work for the contract owner', async () => {
+      assert.equal(await work.requiredStake(), requiredStake)
+
+      await work.updateSettings(newRequiredStake)
+
+      assert.equal(await work.requiredStake(), newRequiredStake)
+    })
+
+    it('should not work for anyone but the owner', async () => {
+      await expectThrow(async () => {
+        await work.updateSettings(newRequiredStake, {
+          from: staker2
+        })
+      })
+    })
+  })
+
 });

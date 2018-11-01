@@ -26,7 +26,6 @@ function mapStateToProps (state) {
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const step = get(state, 'betaFaucet.step')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
-  const isOwner = address && (cacheCallValue(state, workTokenAddress, 'owner') === address)
   const betaFaucetAddress = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentEtherAddresses', address)
 
@@ -55,7 +54,6 @@ function mapStateToProps (state) {
     workTokenAddress,
     tilwBalance,
     hasBeenSentEther,
-    isOwner,
     etherWasDripped,
     tilwWasMinted,
     manuallyOpened

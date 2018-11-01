@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { ApplicationsTable } from '~/components/ApplicationsTable'
-import { ApplicantsTable } from '~/components/ApplicantsTable'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { TILTable } from '~/components/TILTable'
 import * as routes from '~/../config/routes'
 
 export const Home = class _Home extends Component {

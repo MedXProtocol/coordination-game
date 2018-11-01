@@ -46,7 +46,7 @@ export const Header = ReactTimeout(
             <div className="container is-fluid">
               <div className="navbar-brand">
                 <div className="navbar-item">
-                  <Link to={routes.HOME}>
+                  <Link to={routes.HOME} className="navbar-item">
                     The Coordination Game
                     &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
                   </Link>
@@ -70,6 +70,24 @@ export const Header = ReactTimeout(
           }>
             <div className="container is-fluid">
               <div className="navbar-menu">
+                {
+                  this.props.isOwner ? (
+                    <div className="navbar-start">
+                      <div className="navbar-item">
+                        <NavLink
+                          exact={true}
+                          activeClassName="is-active"
+                          to={routes.ADMIN}
+                          className="navbar-item"
+                        >
+                          Admin
+                        </NavLink>
+                      </div>
+                    </div>
+                  )
+                  : null
+                }
+
                 <div className="navbar-end">
                   <div className="navbar-item">
                     <NavLink

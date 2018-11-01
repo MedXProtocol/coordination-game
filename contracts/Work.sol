@@ -4,17 +4,42 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IndexedAddressArray.sol';
 
+// TODO: This contract needs events!
+
 contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
 
   address public jobManager;
+
   ERC20 public token;
+
   IndexedAddressArray.Data stakers;
   IndexedAddressArray.Data suspendedStakers;
+
   uint256 public requiredStake;
   uint256 public jobStake;
   uint256 public stakeLimit;
+
   mapping (address => uint256) public balances;
+
+  event SettingsUpdated(
+    uint256 applicationStakeAmount
+  );
+
+  modifier hasNotStaked(address _staker) {
+    require(!isStaker(_staker), 'Staker has not staked');
+    _;
+  }
+
+  modifier hasStaked(address _staker) {
+    require(isStaker(_staker), 'Staker has staked');
+    _;
+  }
+
+  modifier onlyJobManager() {
+    require(msg.sender == jobManager, 'sender is job manager');
+    _;
+  }
 
   constructor (
     ERC20 _token,
@@ -107,18 +132,9 @@ contract Work is Ownable {
     }
   }
 
-  modifier hasNotStaked(address _staker) {
-    require(!isStaker(_staker), 'Staker has not staked');
-    _;
-  }
+  function updateSettings(uint256 _requiredStake) public onlyOwner {
+    requiredStake = _requiredStake;
 
-  modifier hasStaked(address _staker) {
-    require(isStaker(_staker), 'Staker has staked');
-    _;
-  }
-
-  modifier onlyJobManager() {
-    require(msg.sender == jobManager, 'sender is job manager');
-    _;
+    emit SettingsUpdated(requiredStake);
   }
 }

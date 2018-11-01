@@ -16,6 +16,7 @@ const mineBlock = require('./helpers/mineBlock')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
+      ownerAddress,
       workToken,
       work,
       workStake,
@@ -33,6 +34,8 @@ contract('CoordinationGame', (accounts) => {
   const secret = '0x85dd39c91a64167ba20732b228251e67caed1462d4bcf036af88dc6856d0fdcc'
   const random = new BN("4312341235")
   const hint = web3.toHex("Totally bogus hint")
+
+  const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -65,8 +68,6 @@ contract('CoordinationGame', (accounts) => {
   beforeEach(async () => {
     assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
-    const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply
-
     tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
     const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
@@ -81,6 +82,7 @@ contract('CoordinationGame', (accounts) => {
 
     const coordinationGameAddress = await tilRegistry.coordinationGame()
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
+    ownerAddress = await coordinationGame.owner.call()
     await work.setJobManager(coordinationGameAddress)
 
     // Add one to the timeouts so that we can use them to increaseTime and timeout
@@ -382,4 +384,28 @@ contract('CoordinationGame', (accounts) => {
       // })
     })
   })
+
+  describe('when updating settings', () => {
+    const newApplicationStakeAmount = web3.toWei('30', 'ether')
+
+    it('should work for the contract owner', async () => {
+      assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
+
+      // y u no work?
+      await coordinationGame.updateSettings(newApplicationStakeAmount, {
+        from: ownerAddress
+      })
+
+      assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)
+    })
+
+    it('should not work for anyone but the owner', async () => {
+      await expectThrow(async () => {
+        await coordinationGame.updateSettings(newApplicationStakeAmount, {
+          from: verifier
+        })
+      })
+    })
+  })
+
 })

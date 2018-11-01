@@ -2,20 +2,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
-import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import {
   cacheCall,
   cacheCallValueBigNumber,
   contractByName,
-  TransactionStateHandler,
-  withSaga,
-  withSend
+  withSaga
 } from 'saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
-import { etherToWei } from '~/utils/etherToWei'
-import { weiToEther } from '~/utils/weiToEther'
 import TILWLogoImg from '~/assets/img/tilw-logo-white.svg'
 
 function mapStateToProps(state) {
