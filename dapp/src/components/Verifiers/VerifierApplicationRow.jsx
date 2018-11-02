@@ -9,48 +9,48 @@ import { formatRoute } from 'react-router-named-routes'
 import { get } from 'lodash'
 import { all } from 'redux-saga/effects'
 import {
-  withSaga,
+  cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   contractByName,
-  cacheCall
+  withSaga
 } from 'saga-genesis'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
-  let createdAt,
-    updatedAt,
-    secondsInADay,
-    verifierTimeoutInDays
-
   let applicationRowObject = {}
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  if (applicationId) {
-    createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-    updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
-    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
+  const secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
+  const applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+  const verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
 
-    applicationRowObject = {
-      applicationId,
-      createdAt,
-      updatedAt
-    }
+  applicationRowObject = {
+    applicationId,
+    createdAt,
+    updatedAt
   }
 
-  applicationRowObject.expiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  console.log('Current time: ', latestBlockTimestamp)
-  console.log('Expires at: ', applicationRowObject.expiresAt)
-  console.log('Expires in: ', (applicationRowObject.expiresAt - latestBlockTimestamp))
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
+  applicationRowObject.applicantRevealExpiresAt    = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  // console.log('Current time: ', latestBlockTimestamp)
+  // console.log('Expires at: ', applicationRowObject.verifierSubmitSecretExpiresAt)
+  // console.log('Expires in: ', (applicationRowObject.verifierSubmitSecretExpiresAt - latestBlockTimestamp))
 
   return {
-    coordinationGameAddress,
     applicationRowObject,
-    address
+    address,
+    coordinationGameAddress,
+    latestBlockTimestamp,
+    verifiersSecret
   }
 }
 
@@ -60,7 +60,9 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
   yield all([
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
+    cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'secondsInADay'),
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
     cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
   ])
 }
@@ -74,16 +76,20 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
       }
 
       render () {
+        let expirationMessage,
+          verifyAction
+
         const {
-          applicationRowObject
+          applicationRowObject,
+          latestBlockTimestamp,
+          verifiersSecret
         } = this.props
 
-        let expired
         let {
+          applicantRevealExpiresAt,
           applicationId,
           createdAt,
-          expiresAt,
-          latestBlockTimestamp,
+          verifierSubmitSecretExpiresAt,
           updatedAt
         } = applicationRowObject
 
@@ -94,14 +100,43 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-        if (latestBlockTimestamp > expiresAt) {
-          expired = true
+        const verifierSubmittedSecret = !isBlank(verifiersSecret)
+
+        if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
+          expirationMessage = <span className="has-text-warning">Cannot Verify, Verification Expiry Passed</span>
+        } else if (!verifierSubmittedSecret) {
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-grey">Verification required before:</span>
+              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
+            </React.Fragment>
+          )
+
+          verifyAction = (
+            <Link
+              to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
+              className="button is-small is-warning is-outlined is-pulled-right"
+            >
+              Verify
+            </Link>
+          )
+        } else if (verifierSubmittedSecret) {
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-grey">Waiting on applicant to reveal secret before:</span>
+              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
+            </React.Fragment>
+          )
         }
 
         return (
           <div className={classnames(
             'list--item',
           )}>
+            <span className="list--item__id text-center">
+              #{applicationId}
+            </span>
+
             <span className="list--item__date text-center">
               <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
@@ -116,42 +151,12 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               </span>
             </span>
 
-            <span className="list--item__status text-center">
-              Application #{applicationId}
-            </span>
-
             <span className='list--item__status text-center'>
-              {
-                expired
-                  ?
-                    (
-                      <span className="has-text-warning">Verification Expired</span>
-                    )
-                  : (
-                    <React.Fragment>
-                      <span className="has-text-grey">Verification required before:</span>
-                      <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={expiresAt} />
-                    </React.Fragment>
-                  )
-              }
+              {expirationMessage}
             </span>
 
             <span className="list--item__view text-right">
-              {
-                expired
-                  ?
-                    (
-                      null
-                    )
-                  : (
-                    <Link
-                      to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
-                      className="button is-small is-warning is-outlined is-pulled-right"
-                    >
-                      Verify
-                    </Link>
-                  )
-              }
+              {verifyAction}
             </span>
           </div>
         )

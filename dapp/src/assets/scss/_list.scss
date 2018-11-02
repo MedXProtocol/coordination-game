@@ -21,16 +21,13 @@
   justify-content: center;
   flex-direction: row;
   flex-wrap: wrap;
-
-  // box-shadow: 1px 1px 1px 0 rgba(200, 205, 210, 0.1);
   border-radius: 5px;
-  // border: 3px solid #eff4f8;
   box-sizing: border-box;
   font-size: 0.75rem;
   font-weight: 700;
-  height: 66px;
+  // height: 70px;
   list-style-type: none;
-  line-height: 20px;
+  line-height: 24px;
   padding: 10px 0;
   position: relative;
   margin: 0;
@@ -41,9 +38,6 @@
   transition: all .15s cubic-bezier(0.4,0.0,0.2,1);
 
   @media (max-width: 768px) {
-    // border-radius: 0;
-    // border: 1px solid white;
-    // border-bottom-color: rgba(200, 205, 210, 0.2);
     box-shadow: none;
     margin: 0 0 3px;
     padding: 0;
@@ -55,22 +49,7 @@
   background-color: darken($accent-color-2, 13%);
 }
 
-// .list--item:hover {
-//   box-shadow: 0 0 10px 4px rgba(60,64,67,0.052),
-//               0 1px 2px 0 rgba(60,64,67,0.202),
-//               0 1px 4px 0 rgba(60,64,67,0.109);
-//   border: 1px solid transparent;
-//   opacity: 1;
-//   text-decoration: none;
-//
-//   @media (max-width: 768px) {
-//     border-bottom-color: rgba(200, 205, 210, 0.2);
-//     box-shadow: none;
-//   }
-// }
-
 .list--item > span {
-  // display: inline-flex;
   display: inline-block;
   flex-wrap: wrap;
   margin: auto;
@@ -83,7 +62,6 @@
   padding: 0;
   text-overflow: ellipsis;
   overflow: hidden;
-  // white-space: nowrap;
   white-space: normal;
 }
 

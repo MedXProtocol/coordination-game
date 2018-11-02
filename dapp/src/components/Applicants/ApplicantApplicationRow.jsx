@@ -5,6 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
+import BN from 'bn.js'
 import {
   withSaga,
   cacheCallValue,
@@ -23,73 +24,69 @@ import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
 import { get } from 'lodash'
 
-function mapStateToProps(state, { applicationRowObject, applicationId, objIndex }) {
-  // let status, secondsInADay
-  let createdAt, updatedAt, hint
-  // const secondsInADay = 40
-
-  if (applicationRowObject === undefined) { applicationRowObject = {} }
+function mapStateToProps(state, { applicationId }) {
+  let applicantRevealTimeoutInDays,
+    applicationRowObject,
+    hint,
+    secondsInADay,
+    verifierTimeoutInDays
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-  // const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  if (applicationId) {
-    // status = cacheCallValueInt(state, applicationId, 'status')
-    createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-    updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-    // secondsInADay = cacheCallValueInt(state, ApplicationScheduleManager, 'secondsInADay')
+  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
 
-    const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
-    hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-    // console.log(hint)
-    if (hint) {
-      hint = getWeb3().utils.hexToAscii(hint)
-    }
+  const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
+  const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
 
-    if (!objIndex) {
-      objIndex = applicationId
-    }
-
-    // if (status && objIndex) {
-      applicationRowObject = {
-        applicationId,
-        verifier,
-        // status,
-        createdAt,
-        updatedAt,
-        hint
-        // objIndex,
-      }
-    // }
-
-    if (storageAvailable('localStorage')) {
-      let applicationObject
-      const key = applicationStorageKey(networkId, applicationId)
-      const applicationJson = localStorage.getItem(key)
-
-      if (applicationJson) {
-        applicationObject = JSON.parse(applicationJson)
-
-        applicationRowObject = {
-          ...applicationRowObject,
-          random: applicationObject.random
-        }
-      }
-    } else {
-      console.warn('Unable to read from localStorage')
-    }
+  hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+  if (hint) {
+    hint = getWeb3().utils.hexToAscii(hint)
   }
 
-  // applicationRowObject['statusLabel'] = applicationStatusToName(applicationRowObject, context)
-  // applicationRowObject['statusClass'] = applicationStatusToClass(applicationRowObject, context)
+  applicationRowObject = {
+    applicationId,
+    createdAt,
+    hint,
+    verifier,
+    verifiersSecret,
+    updatedAt
+  }
 
-  // if (applicationStale(updatedAt, status, context, secondsInADay, latestBlockTimestamp)) {
-  //   applicationIsStale = true
-  // }
+  if (!isBlank(verifier)) {
+    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
+    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+    applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+  }
 
+  if (storageAvailable('localStorage')) {
+    let applicationObject
+    const key = applicationStorageKey(networkId, applicationId)
+    const applicationJson = localStorage.getItem(key)
+
+    if (applicationJson) {
+      applicationObject = JSON.parse(applicationJson)
+      applicationRowObject = {
+        ...applicationRowObject,
+        random: applicationObject.random,
+        secret: applicationObject.secret
+      }
+    }
+  } else {
+    console.warn('Unable to read from localStorage')
+  }
+
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
+  applicationRowObject.applicantRevealExpiresAt      = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  // console.log('Current time: ', latestBlockTimestamp)
+  // console.log('verifierSubmitSecretExpires at: ', applicationRowObject.verifierSubmitSecretExpiresAt)
+  // console.log('verifierSubmitSecretExpires in: ', (applicationRowObject.verifierSubmitSecretExpiresAt - latestBlockTimestamp))
+  // console.log('applicantRevealExpires at: ', applicationRowObject.applicantRevealExpiresAt)
+  // console.log('applicantRevealExpires in: ', (applicationRowObject.applicantRevealExpiresAt - latestBlockTimestamp))
+  //
   // If this applicationRowObject has an ongoing blockchain transaction this will update
   // const reversedTransactions = transactions.reverse().filter(transaction => {
   //   const { call, confirmed, error } = transaction
@@ -115,26 +112,25 @@ function mapStateToProps(state, { applicationRowObject, applicationId, objIndex 
   // }
 
   return {
-    // ApplicationScheduleManager,
-    coordinationGameAddress,
     applicationRowObject,
     address,
-    // applicationIsStale
+    coordinationGameAddress,
+    latestBlockTimestamp
   }
 }
 
 function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }) {
-  // function* applicantApplicationRowSaga({ coordinationGameAddress, ApplicationScheduleManager, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
-  // if (!ApplicationScheduleManager || !coordinationGameAddress || !applicationId) { return }
 
   yield all([
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     cacheCall(coordinationGameAddress, 'hints', applicationId),
-    // cacheCall(applicationId, 'status'),
-    // cacheCall(ApplicationScheduleManager, 'secondsInADay'),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
-    cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
+    cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
+    cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
+    cacheCall(coordinationGameAddress, 'secondsInADay'),
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
   ])
 }
 
@@ -240,88 +236,99 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
       // }
 
       render () {
+        let expirationMessage,
+          hintRandomAndExport
+
         const {
           applicationRowObject,
-          /*applicationIsStale,*/
+          latestBlockTimestamp
         } = this.props
 
-        // let remove, label
-        // let style = { zIndex: 950 }
-
         let {
+          applicantRevealExpiresAt,
           applicationId,
-          // objIndex,
           createdAt,
+          hint,
+          random,
+          secret,
           updatedAt,
           verifier,
-          hint,
-          random
+          verifiersSecret,
+          verifierSubmitSecretExpiresAt
         } = applicationRowObject
 
-        // let { applicationId, objIndex, error, transactionId, createdAt, updatedAt } = applicationRowObject
-        //
+        // let { error, transactionId } = applicationRowObject
+
         // const pendingTransaction = (
         //      !defined(applicationRowObject.status)
         //   || (applicationRowObject.status === applicationStatus('Pending'))
         // )
-        //
+
         const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
         const loadingOrCreatedAtTimestamp = createdAtDisplay
         // const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
-        //
+
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
-        //
-        // if (objIndex) {
-        //   style = { zIndex: 901 + objIndex }
-        // }
-        // const path = this.props.path || routes.PATIENTS_CASES
-        // const ethAddress = applicationId ? <EthAddress address={applicationId} onlyAddress={true} /> : null
-        //
-        // const action = this.applicationRowAction(applicationRowObject, pendingTransaction)
-        //
-        // if (applicationIsStale && context === 'patient') {
-        //   applicationRowObject['statusLabel'] = 'Requires Attention'
-        //   applicationRowObject['statusClass'] = 'warning'
-        // }
-        //
-        // const labelClass = this.applicationRowLabelClass(applicationRowObject)
-        // label = (
-        //   <label className={`label label-${labelClass}`}>
-        //     {this.applicationRowLabel(applicationRowObject, pendingTransaction)}
-        //   </label>
-        // )
-        //
-        // if (
-        //   applicationRowObject.status !== applicationStatus('Pending')
-        //   && applicationRowObject.isFirstDoc
-        //   && applicationIsStale
-        // ) {
-        //   label = <AbandonedApplicationActionsContainer applicationId={applicationId} />
-        // }
-        //
-        // if (error) {
-        //   remove = (
-        //     <button
-        //       className="btn-link text-gray btn__remove-transaction"
-        //       onClick={(e) => {
-        //         e.preventDefault()
-        //         this.props.dispatchRemove(transactionId)
-        //       }}
-        //     >
-        //       {'\u2716'}
-        //     </button>
-        //   )
-        // }
 
-        const label = applicationId
+        const verifierSubmittedSecret = !isBlank(verifiersSecret)
 
+        if (!isBlank(verifier) && !verifierSubmittedSecret) {
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-grey">Waiting on Verifier until:</span>
+              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
+            </React.Fragment>
+          )
+        } else if (verifierSubmittedSecret) {
+          let secretAsHex
+          if (secret) {
+            secretAsHex = getWeb3().utils.sha3(secret.toString())
+          }
+
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-grey">Reveal your secret before:</span>
+              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
+              <br />
+                <Web3ActionButton
+                  contractAddress={this.props.coordinationGameAddress}
+                  method='applicantRevealSecret'
+                  args={[applicationId, secretAsHex, new BN(random)]}
+                  buttonText='Reveal Secret'
+                  confirmationMessage='"Reveal Secret" transaction confirmed.'
+                  txHashMessage='"Reveal Secret" transaction sent successfully -
+                    it will take a few minutes to confirm on the Ethereum network.'/>
+            </React.Fragment>
+          )
+        }
+
+        if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
+          expirationMessage = <span className="has-text-warning">Verifier Failed to Respond</span>
+        } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
+          expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
+        }
+
+        hintRandomAndExport = (
+          <React.Fragment>
+            Hint: {hint}
+            <br />Random: {random}
+            <ExportApplicationDetails applicationRowObject={applicationRowObject} />
+          </React.Fragment>
+        )
+        // uint256 _applicationId,
+        // bytes32 _secret,
+        // uint256 _randomNumber
         return (
           <div className={classnames(
             'list--item',
             /*,
             { 'list--item__pending': pendingTransaction }
           */)}>
+            <span className="list--item__id text-center">
+              #{applicationId}
+            </span>
+
             <span className="list--item__date text-center">
               <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
@@ -337,13 +344,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__status text-center">
-              Application #{label}
-            </span>
-
-            <span className="list--item__status text-center">
-              Hint: {hint}
-              <br />Random: {random}
-              <ExportApplicationDetails applicationRowObject={applicationRowObject} />
+              {hintRandomAndExport}
             </span>
 
             <span className="list--item__view text-center">
@@ -352,13 +353,13 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                     <Web3ActionButton
                       contractAddress={this.props.coordinationGameAddress}
                       method='applicantRandomlySelectVerifier'
-                      args={applicationId}
+                      args={[applicationId]}
                       buttonText='Request Verification'
                       confirmationMessage='Verification request confirmed.'
                       txHashMessage='Verification request sent successfully -
                         it will take a few minutes to confirm on the Ethereum network.'/>
                   )
-                : 'Assigned'
+                : expirationMessage
               }
             </span>
           </div>

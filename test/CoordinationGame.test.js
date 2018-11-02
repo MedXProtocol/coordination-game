@@ -16,17 +16,17 @@ const mineBlock = require('./helpers/mineBlock')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
-      coordinationGameOwnerAddress,
-      workToken,
-      work,
-      workStake,
-      minDeposit,
-      parameterizer,
-      tilRegistry,
-      applicationId,
-      applicantRevealTimeoutInDays,
-      verifierTimeoutInDays,
-      secondsInADay
+    coordinationGameOwnerAddress,
+    workToken,
+    work,
+    workStake,
+    minDeposit,
+    parameterizer,
+    tilRegistry,
+    applicationId,
+    applicantRevealTimeoutInDays,
+    verifierTimeoutInDays,
+    secondsInADay
 
   const applicant = accounts[0]
   const verifier = accounts[1]

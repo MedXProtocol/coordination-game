@@ -24,7 +24,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
       static propTypes = {
         contractAddress: PropTypes.string.isRequired,
         method: PropTypes.string.isRequired,
-        args: PropTypes.number.isRequired,
+        args: PropTypes.array.isRequired,
         buttonText: PropTypes.string.isRequired
       }
 
@@ -63,15 +63,15 @@ export const Web3ActionButton = connect(mapStateToProps)(
         e.preventDefault()
 
         const { send, contractAddress, method, args } = this.props
+        console.log(...args)
 
-        // TODO: convert args into a proper list of args (currently only supports 1 arg)
         const txId = send(
           contractAddress,
           method,
-          args
+          ...args
         )()
-        // console.log(`Making call to ${contractAddress}#${method} with app args`, args)
-        // console.log('txid is: ', txId)
+        console.log(`Making call to ${contractAddress}#${method} with args`, args)
+        console.log('txid is: ', txId)
 
         this.setState({
           txHandler: new TransactionStateHandler(),
