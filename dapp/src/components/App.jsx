@@ -23,6 +23,7 @@ import {
 } from 'saga-genesis'
 // import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
+import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
 import * as routes from '~/../config/routes'
@@ -152,11 +153,12 @@ const App = connect(mapStateToProps)(
                 <div className='columns'>
                   <div className='column is-8 is-offset-2'>
                     <Switch>
-                      <Route path={routes.ADMIN} component={Admin} />
+                      <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
+                      <Route path={routes.VERIFY} component={Verify} />
                       <Route path={routes.APPLY} component={ApplicantApplyContainer} />
                       <Route path={routes.STAKE} component={VerifierStake} />
                       <Route path={routes.WALLET} component={Wallet} />
-                      <Route path={routes.VERIFY} component={Verify} />
+                      <Route path={routes.ADMIN} component={Admin} />
 
                       <Route path={routes.HOME} component={Home} />
 

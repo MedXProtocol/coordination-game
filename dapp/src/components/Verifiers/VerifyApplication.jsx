@@ -1,5 +1,6 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
+import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
@@ -19,6 +20,7 @@ import {
 import { LoadingLines } from '~/components/LoadingLines'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { getWeb3 } from '~/utils/getWeb3'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
   let createdAt, updatedAt, hint
@@ -73,163 +75,165 @@ function mapDispatchToProps (dispatch) {
 export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(verifyApplicationSaga)(
     withSend(
-      class _VerifyApplication extends Component {
+      withRouter(
+        class _VerifyApplication extends Component {
 
-        constructor(props) {
-          super(props)
-          this.state = {
-            secret: ''
+          constructor(props) {
+            super(props)
+            this.state = {
+              secret: ''
+            }
           }
-        }
 
-        static propTypes = {
-          applicationId: PropTypes.number
-        }
-
-        componentWillReceiveProps (nextProps) {
-          this.registerVerifierSubmitSecretHandlers(nextProps)
-        }
-
-        registerVerifierSubmitSecretHandlers = (nextProps) => {
-          if (this.state.verifierSubmitSecretHandler) {
-            this.state.verifierSubmitSecretHandler.handle(
-              nextProps.transactions[this.state.verifierSubmitSecretTxId]
-            )
-              .onError((error) => {
-                console.log(error)
-                this.setState({ verifierSubmitSecretHandler: null })
-                toastr.transactionError(error)
-              })
-              .onConfirmed(() => {
-                this.setState({ verifierSubmitSecretHandler: null })
-                toastr.success(`Verification secret transaction for application #${this.props.applicationId} has been confirmed.`)
-              })
-              .onTxHash(() => {
-                toastr.success('Verification secret sent - it will take a few minutes to confirm on the Ethereum network.')
-                this.props.dispatchHideVerifyApplication()
-              })
+          static propTypes = {
+            applicationId: PropTypes.number
           }
-        }
 
-        handleVerifierSecretSubmit = (e) => {
-          e.preventDefault()
+          componentWillReceiveProps (nextProps) {
+            this.registerVerifierSubmitSecretHandlers(nextProps)
+          }
 
-          const { send, coordinationGameAddress } = this.props
+          registerVerifierSubmitSecretHandlers = (nextProps) => {
+            if (this.state.verifierSubmitSecretHandler) {
+              this.state.verifierSubmitSecretHandler.handle(
+                nextProps.transactions[this.state.verifierSubmitSecretTxId]
+              )
+                .onError((error) => {
+                  console.log(error)
+                  this.setState({ verifierSubmitSecretHandler: null })
+                  toastr.transactionError(error)
+                })
+                .onConfirmed(() => {
+                  this.setState({ verifierSubmitSecretHandler: null })
+                  toastr.success(`Verification secret transaction for application #${this.props.applicationId} has been confirmed.`)
+                })
+                .onTxHash(() => {
+                  toastr.success('Verification secret sent - it will take a few minutes to confirm on the Ethereum network.')
+                  this.props.history.push(routes.VERIFY)
+                })
+            }
+          }
 
-          const secret = getWeb3().utils.sha3(this.state.secret)
+          handleVerifierSecretSubmit = (e) => {
+            e.preventDefault()
 
-          const verifierSubmitSecretTxId = send(
-            coordinationGameAddress,
-            'verifierSubmitSecret',
-            this.props.applicationId,
-            secret
-          )()
-          console.log(verifierSubmitSecretTxId)
+            const { send, coordinationGameAddress } = this.props
 
-          this.setState({
-            verifierSubmitSecretHandler: new TransactionStateHandler(),
-            verifierSubmitSecretTxId
-          })
-        }
+            const secret = getWeb3().utils.sha3(this.state.secret)
 
-        handleCloseClick = (e) => {
-          e.preventDefault()
+            const verifierSubmitSecretTxId = send(
+              coordinationGameAddress,
+              'verifierSubmitSecret',
+              this.props.applicationId,
+              secret
+            )()
+            console.log(verifierSubmitSecretTxId)
 
-          this.props.dispatchHideVerifyApplication()
-        }
+            this.setState({
+              verifierSubmitSecretHandler: new TransactionStateHandler(),
+              verifierSubmitSecretTxId
+            })
+          }
 
-        handleTextInputChange = (e) => {
-          this.setState({
-            [e.target.name]: e.target.value
-          })
-        }
+          handleCloseClick = (e) => {
+            e.preventDefault()
 
-        render () {
-          const { applicationObject } = this.props
+            this.props.history.push(routes.VERIFY)
+          }
 
-          let {
-            applicationId,
-            createdAt,
-            updatedAt,
-            hint
-          } = applicationObject
+          handleTextInputChange = (e) => {
+            this.setState({
+              [e.target.name]: e.target.value
+            })
+          }
 
-          const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
+          render () {
+            const { applicationObject } = this.props
 
-          const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
-          const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
+            let {
+              applicationId,
+              createdAt,
+              updatedAt,
+              hint
+            } = applicationObject
 
-          const loadingOrUpdatedAtTimestamp = updatedAtDisplay
+            const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
 
-          return (
-            <div className={classnames(
-            )}>
-              <div className="has-text-right">
-                <button
-                  className="is-warning is-outlined is-pulled-right delete is-large"
-                  onClick={this.handleCloseClick}
-                >
+            const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
+            const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
-                </button>
-              </div>
+            const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-              <h5 className="is-size-5 has-text-grey">
-                Application #{applicationId}
-              </h5>
+            return (
+              <div className={classnames(
+              )}>
+                <div className="has-text-right">
+                  <button
+                    className="is-warning is-outlined is-pulled-right delete is-large"
+                    onClick={this.handleCloseClick}
+                  >
 
-              <h3 className="is-size-3 has-text-grey-light">
-                Hint: {hint}
-              </h3>
+                  </button>
+                </div>
 
-              <br />
+                <h5 className="is-size-5 has-text-grey">
+                  Application #{applicationId}
+                </h5>
 
-              <form onSubmit={this.handleVerifierSecretSubmit}>
-                <h6 className="is-size-6">
-                  Provide your secret as verification:
-                </h6>
-                <input
-                  type="text"
-                  name="secret"
-                  className="text-input text-input--large"
-                  placeholder=""
-                  onChange={this.handleTextInputChange}
-                  value={this.state.secret}
-                />
+                <h3 className="is-size-3 has-text-grey-light">
+                  Hint: {hint}
+                </h3>
 
                 <br />
 
-                <button
-                  type="submit"
-                  className="button is-outlined is-primary"
-                  disabled={this.state.secret === '' || this.state.verifierSubmitSecretHandler}
-                >
-                  Submit Verification
-                </button>
-
-                <LoadingLines
-                  visible={this.state.verifierSubmitSecretHandler}
-                />
-              </form>
-
-              <hr />
-
-              <h6 className="has-text-centered is-size-6 has-text-grey">
-                <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-                    ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-                    Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-                  <ReactTooltip
-                    html={true}
-                    effect='solid'
-                    place={'top'}
-                    wrapper='span'
+                <form onSubmit={this.handleVerifierSecretSubmit}>
+                  <h6 className="is-size-6">
+                    Provide your secret as verification:
+                  </h6>
+                  <input
+                    type="text"
+                    name="secret"
+                    className="text-input text-input--large"
+                    placeholder=""
+                    onChange={this.handleTextInputChange}
+                    value={this.state.secret}
                   />
-                  {loadingOrUpdatedAtTimestamp}
-                </span>
-              </h6>
-            </div>
-          )
+
+                  <br />
+
+                  <button
+                    type="submit"
+                    className="button is-outlined is-primary"
+                    disabled={this.state.secret === '' || this.state.verifierSubmitSecretHandler}
+                  >
+                    Submit Verification
+                  </button>
+
+                  <LoadingLines
+                    visible={this.state.verifierSubmitSecretHandler}
+                  />
+                </form>
+
+                <hr />
+
+                <h6 className="has-text-centered is-size-6 has-text-grey">
+                  <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+                      ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+                      Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+                    <ReactTooltip
+                      html={true}
+                      effect='solid'
+                      place={'top'}
+                      wrapper='span'
+                    />
+                    {loadingOrUpdatedAtTimestamp}
+                  </span>
+                </h6>
+              </div>
+            )
+          }
         }
-      }
+      )
     )
   )
 )

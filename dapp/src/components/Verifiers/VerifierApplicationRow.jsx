@@ -1,6 +1,8 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { formatRoute } from 'react-router-named-routes'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
@@ -15,6 +17,7 @@ import {
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { getWeb3 } from '~/utils/getWeb3'
 import { get } from 'lodash'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
   let createdAt, updatedAt, hint
@@ -59,26 +62,12 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
   ])
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchShowVerifyApplication: (applicationId) => {
-      dispatch({ type: 'SHOW_VERIFY_APPLICATION', applicationId })
-    }
-  }
-}
-
-export const VerifierApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
+export const VerifierApplicationRow = connect(mapStateToProps)(
   withSaga(verifierApplicationRowSaga)(
     class _VerifierApplicationRow extends Component {
 
       static propTypes = {
         applicationId: PropTypes.number
-      }
-
-      handleVerifyClick = (e) => {
-        e.preventDefault()
-
-        this.props.dispatchShowVerifyApplication(this.props.applicationId)
       }
 
       render () {
@@ -100,8 +89,6 @@ export const VerifierApplicationRow = connect(mapStateToProps, mapDispatchToProp
 
         const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-        const label = applicationId
-
         return (
           <div className={classnames(
             'list--item',
@@ -121,7 +108,7 @@ export const VerifierApplicationRow = connect(mapStateToProps, mapDispatchToProp
             </span>
 
             <span className="list--item__status text-center">
-              Application #{label}
+              Application #{applicationId}
             </span>
 
             <span className="list--item__status text-center">
@@ -129,12 +116,12 @@ export const VerifierApplicationRow = connect(mapStateToProps, mapDispatchToProp
             </span>
 
             <span className="list--item__view text-right">
-              <button
+              <Link
+                to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
                 className="button is-small is-warning is-outlined is-pulled-right"
-                onClick={this.handleVerifyClick}
               >
                 Verify
-              </button>
+              </Link>
             </span>
           </div>
         )
