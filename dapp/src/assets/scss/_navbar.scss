@@ -144,7 +144,7 @@ a.navbar-item.is-active,
   color: #454545;
 }
 
-.is-attention-grabby {
+.is-attention-grabby:not(.is-active) {
   animation: attention-grabby 4s infinite ease-in;
 }
 
