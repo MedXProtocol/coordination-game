@@ -118,5 +118,15 @@
     "contractName": "CoordinationGame",
     "address": "0x0ef559b77b458777bc5d2e830df048509e82803c",
     "transactionHash": "0xe2dda80c986cd4ff084f259bd17f1be147ae30cc01e581325ae6015f4a559236"
+  },
+  {
+    "contractName": "TILRegistry",
+    "address": "0xaa23990c009ca01c72fe31ca5753676500941555",
+    "transactionHash": "0xdfc9ad4c34a9a195023d3238380a46e10a6751ca2bf555524d022efab88f899d"
+  },
+  {
+    "contractName": "CoordinationGame",
+    "address": "0x7323193b832edc76392e9b74fac203a1d6322449",
+    "transactionHash": "0xdfc9ad4c34a9a195023d3238380a46e10a6751ca2bf555524d022efab88f899d"
   }
 ]
