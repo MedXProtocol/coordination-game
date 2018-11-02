@@ -190,6 +190,7 @@ contract CoordinationGame is Ownable {
 
     address previousVerifier = verifiers[_applicationId];
 
+    // TODO: How are we converting the blockhas to a random number?
     uint256 randomNum = uint256(blockhash(randomBlockNumbers[_applicationId]));
     address selectedVerifier = work.selectWorker(randomNum);
 
