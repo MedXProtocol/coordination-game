@@ -183,5 +183,10 @@
     "contractName": "CoordinationGame",
     "address": "0x41b2d58193b7028ab0a256ca87988776c6d5a6d7",
     "transactionHash": "0x44ab7d4df4f42dd46c98102f04f10575f4821275626458c2814b970d8c72ef40"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x6f6ad4da4c5258d970b45f8674d0c5b8d95e7b28",
+    "transactionHash": "0x1c1980cc67ce09540faab3fd3ab8970b1af70e78adf302c351f2bbfde76b2f00"
   }
 ]
