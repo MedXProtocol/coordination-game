@@ -334,6 +334,7 @@ header {
   border: 1px solid transparent;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
+  padding-top: calc(0.5em - 1px);
 }
 
 .button.is-light:hover,
@@ -687,4 +688,45 @@ section {
 .button.text-input--filename-button.is-primary.is-outlined:active,
 .button.text-input--filename-button.is-primary.is-outlined:focus {
   box-shadow: none;
+}
+
+.delete.is-warning:hover,
+.modal-close.is-warning:hover,
+.delete.is-warning:focus,
+.modal-close.is-warning:focus {
+  color: white;
+}
+
+.is-warning.is-outlined,
+.is-warning.is-outlined,
+.is-warning.is-outlined {
+  border: 2px solid $brand-warning;
+}
+
+.delete.is-warning.is-outlined::before,
+.modal-close.is-warning.is-outlined::before,
+.delete.is-warning.is-outlined::after,
+.modal-close.is-warning.is-outlined::after {
+  background-color: $brand-warning;
+}
+
+.is-warning.is-outlined:hover,
+.is-warning.is-outlined:active,
+.is-warning.is-outlined:focus {
+  box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
+  background-color: transparent;
+}
+
+.delete.is-warning.is-outlined:hover::before,
+.modal-close.is-warning.is-outlined:hover::before,
+.delete.is-warning.is-outlined:hover::after,
+.modal-close.is-warning.is-outlined:hover::after {
+  background-color: white;
+}
+
+.delete.is-warning:hover,
+.modal-close.is-warning:hover,
+.delete.is-warning:focus,
+.modal-close.is-warning:focus {
+  color: white;
 }

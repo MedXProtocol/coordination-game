@@ -479,6 +479,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                 a. Provide a hint for the verifier:
                               </h6>
                               <input
+                                type="text"
                                 name="hintLeft"
                                 className="text-input text-input--large"
                                 placeholder="345"
@@ -488,6 +489,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               <span className="text-operator">+</span>
 
                               <input
+                                type="text"
                                 name="hintRight"
                                 className="text-input text-input--large"
                                 placeholder="223"
@@ -513,6 +515,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                         <div className="field">
                                           <div className="control">
                                             <input
+                                              type="text"
                                               className="text-input text-input--large is-marginless"
                                               pattern="[0-9]*"
                                               onChange={this.handleSecretChange}

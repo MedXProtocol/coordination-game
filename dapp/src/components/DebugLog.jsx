@@ -110,10 +110,12 @@ export class DebugLog extends PureComponent {
             <div className='form-group col-sm-6 text-left'>
               <label>Debug Namespace</label>
               <input
+                type="text"
                 value={this.state.namespace}
                 onChange={(event) => this.setState({ namespace: event.target.value })}
                 className="form-control input-sm"
-                placeholder="block-sagas,-actions" />
+                placeholder="block-sagas,-actions"
+              />
             </div>
             <div className='form-group col-sm-6 text-left'>
               <label>Controls</label>

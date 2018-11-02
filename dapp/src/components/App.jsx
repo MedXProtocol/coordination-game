@@ -23,7 +23,7 @@ import {
 } from 'saga-genesis'
 // import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
-import { Verify } from '~/components/Verify/Verify'
+import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
 import * as routes from '~/../config/routes'
 

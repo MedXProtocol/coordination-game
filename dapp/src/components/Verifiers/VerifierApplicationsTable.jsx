@@ -7,8 +7,7 @@ import {
   cacheCall,
   cacheCallValueInt,
   contractByName,
-  withSaga,
-  withSend
+  withSaga
 } from 'saga-genesis'
 import { VerifierApplicationRow } from '~/components/Verifiers/VerifierApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
@@ -75,68 +74,72 @@ function* verifierApplicationsTableSaga({
 
 export const VerifierApplicationsTable = connect(mapStateToProps)(
   withSaga(verifierApplicationsTableSaga)(
-    withSend(
-      class _VerifierApplicationsTable extends Component {
+    class _VerifierApplicationsTable extends Component {
 
-        renderApplicationRows(applicationIds) {
-          let applicationRows = applicationIds.map((applicationId, index) => {
-            return (
-              <VerifierApplicationRow
-                applicationId={applicationId}
-                key={`application-row-${index}`}
-              />
-            )
-          })
-
-          return applicationRows.reverse()
-        }
-
-        render() {
-          let noApplications, loadingLines, applicationRows
-          const { applicationIds, applicationCount } = this.props
-          const loading = applicationCount === undefined
-
-          if (loading) {
-            loadingLines = (
-              <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
-                  <LoadingLines visible={true} />
-                </div>
-              </div>
-            )
-          } else if (!applicationIds.length) {
-            noApplications = (
-              <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
-                  <span className="is-size-6">You currently have no applications to verify.</span>
-                </div>
-              </div>
-            )
-          } else {
-            applicationRows = (
-              this.renderApplicationRows(applicationIds)
-            )
-          }
-
+      renderApplicationRows(applicationIds) {
+        let applicationRows = applicationIds.map((applicationId, index) => {
           return (
-            <React.Fragment>
-              <div className={classnames(
-                'list--container',
-                {
-                  'list--container__top-borderless': this.props.topBorderless
-                }
-              )}>
-                {loadingLines}
-                {noApplications}
+            <VerifierApplicationRow
+              applicationId={applicationId}
+              key={`application-row-${index}`}
+            />
+          )
+        })
 
-                <div className="list">
-                  {applicationRows}
-                </div>
+        return applicationRows.reverse()
+      }
+
+      render() {
+        let noApplications, loadingLines, applicationRows
+        const { applicationIds, applicationCount } = this.props
+        const loading = applicationCount === undefined
+
+        if (loading) {
+          loadingLines = (
+            <div className="blank-state">
+              <div className="blank-state--inner text-center text-gray">
+                <LoadingLines visible={true} />
               </div>
-            </React.Fragment>
+            </div>
+          )
+        } else if (!applicationIds.length) {
+          noApplications = (
+            <div className="blank-state">
+              <div className="blank-state--inner text-center text-gray">
+                <span className="is-size-6">You currently have no applications to verify.</span>
+              </div>
+            </div>
+          )
+        } else {
+          applicationRows = (
+            this.renderApplicationRows(applicationIds)
           )
         }
+
+        return (
+          <React.Fragment>
+            <div className="is-clearfix">
+              <h6 className="is-size-6">
+                Your Applications to Verify:
+              </h6>
+            </div>
+
+            <div className={classnames(
+              'list--container',
+              {
+                'list--container__top-borderless': this.props.topBorderless
+              }
+            )}>
+              {loadingLines}
+              {noApplications}
+
+              <div className="list">
+                {applicationRows}
+              </div>
+            </div>
+          </React.Fragment>
+        )
       }
-    )
+    }
   )
 )

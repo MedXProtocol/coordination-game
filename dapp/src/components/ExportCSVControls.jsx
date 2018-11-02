@@ -42,8 +42,8 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
         <div className="field has-addons is-pulled-right">
           <div className="control text-input--filename-control">
             <input
+							type="text"
               name="filename"
-              type="text"
               onChange={this.handleTextInputChange}
               className="text-input text-input--filename"
               value={this.state.filename}

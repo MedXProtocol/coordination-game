@@ -13,7 +13,8 @@ const txNames = {
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
   'depositStake': 'Depositing TILW Stake',
-  'updateSettings': 'Update Settings'
+  'updateSettings': 'Update Settings',
+  'verifierSubmitSecret': 'Submitting Secret'
 }
 
 function mapStateToProps(state) {
