@@ -22,6 +22,13 @@ function mapStateToProps(state) {
 
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
 
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  console.log(latestBlockTimestamp + ' vs. ' + (Date.now() / 1000))
+  console.log('last block in past', latestBlockTimestamp < (Date.now() / 1000))
+
+
+
+
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
     applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {

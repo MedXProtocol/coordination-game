@@ -24,8 +24,9 @@ contract('CoordinationGame', (accounts) => {
       parameterizer,
       tilRegistry,
       applicationId,
-      applicantRevealTimeout,
-      verifierTimeout
+      applicantRevealTimeoutInDays,
+      verifierTimeoutInDays,
+      secondsInADay
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -91,14 +92,18 @@ contract('CoordinationGame', (accounts) => {
 
     await work.setJobManager(coordinationGameAddress)
 
-    // Add one to the timeouts so that we can use them to increaseTime and timeout
-    applicantRevealTimeout = await coordinationGame.applicantRevealTimeout()
-    applicantRevealTimeout = new BN(applicantRevealTimeout.toString()).add(new BN(1))
-    debug(`applicantRevealTimeout is ${applicantRevealTimeout.toString()}`)
+    secondsInADay = await coordinationGame.secondsInADay()
+    debug(`secondsInADay is ${secondsInADay.toString()}`)
 
-    verifierTimeout = await coordinationGame.verifierTimeout()
-    verifierTimeout = new BN(verifierTimeout.toString()).add(new BN(1))
-    debug(`verifierTimeout is ${verifierTimeout.toString()}`)
+    // Add one to the timeouts so that we can use them to increaseTime and timeout
+    applicantRevealTimeoutInDays = await coordinationGame.applicantRevealTimeoutInDays()
+    applicantRevealTimeoutInDays = new BN(applicantRevealTimeoutInDays.toString()).add(new BN(1))
+    debug(`applicantRevealTimeoutInDays is ${applicantRevealTimeoutInDays.toString()}`)
+
+    // Add one to the timeouts so that we can use them to increaseTime and timeout
+    verifierTimeoutInDays = await coordinationGame.verifierTimeoutInDays()
+    verifierTimeoutInDays = new BN(verifierTimeoutInDays.toString()).add(new BN(1))
+    debug(`verifierTimeoutInDays is ${verifierTimeoutInDays.toString()}`)
 
     debug(`Minting Deposit to Applicant ${minDeposit.toString()}...`)
     await workToken.mint(applicant, minDeposit)
@@ -245,8 +250,8 @@ contract('CoordinationGame', (accounts) => {
 
         context('and the verifier submission period has ended', () => {
           beforeEach(async () => {
-            debug(`increaseTime(${verifierTimeout})...`)
-            await increaseTime(verifierTimeout)
+            debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
+            await increaseTime(verifierTimeoutInDays * secondsInADay)
           })
 
           it('should not allow the applicant to select another verifier', async () => {
@@ -260,8 +265,8 @@ contract('CoordinationGame', (accounts) => {
 
       context('if the verifier submission period has ended', () => {
         beforeEach(async () => {
-          debug(`increaseTime(${verifierTimeout})...`)
-          await increaseTime(verifierTimeout)
+          debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
+          await increaseTime(verifierTimeoutInDays * secondsInADay)
         })
 
         it('should allow the applicant to select another verifier', async () => {
@@ -302,7 +307,8 @@ contract('CoordinationGame', (accounts) => {
     })
 
     it('should not allow the verifier to submit if too much time has passed', async () => {
-      await increaseTime(verifierTimeout)
+      debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
+      await increaseTime(verifierTimeoutInDays * secondsInADay)
 
       await expectThrow(async () => {
         await verifierSubmitSecret()
@@ -369,7 +375,8 @@ contract('CoordinationGame', (accounts) => {
 
     describe('when the timeframe for the applicant to reveal has passed', () => {
       it('should throw', async () => {
-        await increaseTime(applicantRevealTimeout)
+        debug(`increaseTime(${applicantRevealTimeoutInDays * secondsInADay})...`)
+        await increaseTime(applicantRevealTimeoutInDays * secondsInADay)
 
         await expectThrow(async () => {
           await applicantRevealsTheirSecret()
@@ -386,7 +393,7 @@ contract('CoordinationGame', (accounts) => {
       //   await expectThrow(async () => {
       //     await verifierChallenges(selectedVerifier)
       //   })
-      //   await increaseTime(applicantRevealTimeout)
+      //   await increaseTime(applicantRevealTimeoutInDays)
       //   await verifierChallenges(selectedVerifier)
       //
       //   const verifierFinishingBalance = new BN((await work.balances(selectedVerifier)).toString())

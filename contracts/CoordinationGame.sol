@@ -15,12 +15,13 @@ contract CoordinationGame is Ownable {
   Work work;
   TILRegistry tilRegistry;
 
+  uint256 public secondsInADay;
+  uint256 public verifierTimeoutInDays;
+  uint256 public applicantRevealTimeoutInDays;
+
   uint256 public applicationStakeAmount;
 
   uint256 public applicationCount;
-
-  uint256 public constant verifierTimeout = 80;
-  uint256 public constant applicantRevealTimeout = 40;
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (address => uint256[]) public verifiersApplicationIndices;
@@ -121,6 +122,10 @@ contract CoordinationGame is Ownable {
     work = _work;
     tilRegistry = _tilRegistry;
     applicationStakeAmount = _applicationStakeAmount;
+
+    secondsInADay = 86400;
+    verifierTimeoutInDays = 4;
+    applicantRevealTimeoutInDays = 3;
   }
 
   function setApplicationStakeAmount(uint256 _applicationStakeAmount)
@@ -367,21 +372,13 @@ contract CoordinationGame is Ownable {
   }
 
   function verifierSubmissionTimedOut(uint256 _applicationId) internal view returns (bool) {
-    // uint256 verifierTimeout = tilRegistry.parameterizer().get("verifierTimeout");
-    require(verifierTimeout != 0, 'verifierTimeout equals 0');
-
-    return (
-      block.timestamp - verifierSelectedAt[_applicationId]
-    ) > verifierTimeout;
+    return (block.timestamp - verifierSelectedAt[_applicationId])
+      > (verifierTimeoutInDays * secondsInADay);
   }
 
   function applicantRevealExpired(uint256 _applicationId) internal view returns (bool) {
-    // uint256 applicantRevealTimeout = tilRegistry.parameterizer().get("applicantRevealTimeout");
-    require(applicantRevealTimeout != 0, 'applicantRevealTimeout equals 0');
-
-    return (
-      block.timestamp - verifierSubmittedAt[_applicationId]
-    ) > applicantRevealTimeout;
+    return (block.timestamp - verifierSubmittedAt[_applicationId])
+      > (applicantRevealTimeoutInDays * secondsInADay);
   }
 
   function applyToRegistry(uint256 _applicationId) internal {
@@ -412,4 +409,17 @@ contract CoordinationGame is Ownable {
 
     emit SettingsUpdated(applicationStakeAmount);
   }
+
+  function setSecondsInADay(uint256 _secondsInADay) public onlyOwner {
+    secondsInADay = _secondsInADay;
+  }
+
+  function setApplicantRevealTimeoutInDays(uint256 _applicantRevealTimeoutInDays) public onlyOwner {
+    applicantRevealTimeoutInDays = _applicantRevealTimeoutInDays;
+  }
+
+  function setVerifierTimeoutInDays(uint256 _verifierTimeoutInDays) public onlyOwner {
+    verifierTimeoutInDays = _verifierTimeoutInDays;
+  }
+
 }

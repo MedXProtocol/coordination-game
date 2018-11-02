@@ -70,7 +70,8 @@
 // }
 
 .list--item > span {
-  display: inline-flex;
+  // display: inline-flex;
+  display: inline-block;
   flex-wrap: wrap;
   margin: auto;
 }
@@ -108,7 +109,7 @@
 }
 
 .list--item__status {
-  min-width: 20%;
+  min-width: 12%;
 
   @media (max-width: 768px) {
     width: 50%;

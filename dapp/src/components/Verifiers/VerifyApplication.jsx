@@ -22,12 +22,14 @@ import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { getWeb3 } from '~/utils/getWeb3'
 import * as routes from '~/../config/routes'
 
-function mapStateToProps(state, { applicationId }) {
-  let createdAt, updatedAt, hint
+function mapStateToProps(state, { match }) {
+  let createdAt,
+    updatedAt,
+    hint
   let applicationObject = {}
 
+  const applicationId = parseInt(match.params.applicationId, 10)
   const transactions = get(state, 'sagaGenesis.transactions')
-
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   if (applicationId) {
@@ -49,6 +51,7 @@ function mapStateToProps(state, { applicationId }) {
 
   return {
     coordinationGameAddress,
+    applicationId,
     applicationObject,
     transactions
   }
@@ -64,15 +67,7 @@ function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   ])
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchHideVerifyApplication: () => {
-      dispatch({ type: 'HIDE_VERIFY_APPLICATION' })
-    }
-  }
-}
-
-export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
+export const VerifyApplication = connect(mapStateToProps)(
   withSaga(verifyApplicationSaga)(
     withSend(
       withRouter(
@@ -127,7 +122,6 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
               this.props.applicationId,
               secret
             )()
-            console.log(verifierSubmitSecretTxId)
 
             this.setState({
               verifierSubmitSecretHandler: new TransactionStateHandler(),

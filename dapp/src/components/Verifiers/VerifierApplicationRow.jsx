@@ -1,49 +1,51 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { formatRoute } from 'react-router-named-routes'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { formatRoute } from 'react-router-named-routes'
+import { get } from 'lodash'
 import { all } from 'redux-saga/effects'
 import {
   withSaga,
-  cacheCallValue,
   cacheCallValueInt,
   contractByName,
   cacheCall
 } from 'saga-genesis'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { getWeb3 } from '~/utils/getWeb3'
-import { get } from 'lodash'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
-  let createdAt, updatedAt, hint
+  let createdAt,
+    updatedAt,
+    secondsInADay,
+    verifierTimeoutInDays
 
   let applicationRowObject = {}
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (applicationId) {
     createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
     updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-
-    hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-    if (hint) {
-      hint = getWeb3().utils.hexToAscii(hint)
-    }
+    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
+    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
 
     applicationRowObject = {
       applicationId,
       createdAt,
-      updatedAt,
-      hint
+      updatedAt
     }
   }
+
+  applicationRowObject.expiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
+  console.log('Current time: ', latestBlockTimestamp)
+  console.log('Expires at: ', applicationRowObject.expiresAt)
+  console.log('Expires in: ', (applicationRowObject.expiresAt - latestBlockTimestamp))
 
   return {
     coordinationGameAddress,
@@ -56,9 +58,10 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
-    cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
+    cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
+    cacheCall(coordinationGameAddress, 'secondsInADay'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
   ])
 }
 
@@ -75,11 +78,13 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           applicationRowObject
         } = this.props
 
+        let expired
         let {
           applicationId,
           createdAt,
-          updatedAt,
-          hint
+          expiresAt,
+          latestBlockTimestamp,
+          updatedAt
         } = applicationRowObject
 
         const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
@@ -88,6 +93,10 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
         const loadingOrUpdatedAtTimestamp = updatedAtDisplay
+
+        if (latestBlockTimestamp > expiresAt) {
+          expired = true
+        }
 
         return (
           <div className={classnames(
@@ -111,17 +120,38 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               Application #{applicationId}
             </span>
 
-            <span className="list--item__status text-center">
-              Hint: {hint}
+            <span className='list--item__status text-center'>
+              {
+                expired
+                  ?
+                    (
+                      <span className="has-text-warning">Verification Expired</span>
+                    )
+                  : (
+                    <React.Fragment>
+                      <span className="has-text-grey">Verification required before:</span>
+                      <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={expiresAt} />
+                    </React.Fragment>
+                  )
+              }
             </span>
 
             <span className="list--item__view text-right">
-              <Link
-                to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
-                className="button is-small is-warning is-outlined is-pulled-right"
-              >
-                Verify
-              </Link>
+              {
+                expired
+                  ?
+                    (
+                      null
+                    )
+                  : (
+                    <Link
+                      to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
+                      className="button is-small is-warning is-outlined is-pulled-right"
+                    >
+                      Verify
+                    </Link>
+                  )
+              }
             </span>
           </div>
         )
