@@ -15,6 +15,7 @@ import { get } from 'lodash'
 import { Modal } from '~/components/Modal'
 import { TILWFaucetApi } from '~/components/betaFaucet/TILWFaucetApi'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
+import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps (state) {
@@ -40,7 +41,10 @@ function mapStateToProps (state) {
 
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&
-    (workTokenAddress !== undefined && betaFaucetAddress !== undefined) &&
+    (
+      defined(workTokenAddress) && defined(betaFaucetAddress) &&
+      defined(ethBalance) && defined(tilwBalance)
+    ) &&
     (needsEth || needsTILW || manuallyOpened)
 
   return {
