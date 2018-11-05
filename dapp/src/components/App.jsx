@@ -8,6 +8,7 @@ import { get } from 'lodash'
 import { Admin } from '~/components/Admin/Admin'
 import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
+import { BodyClass } from '~/components/BodyClass'
 import { DebugLog } from '~/components/DebugLog'
 import { FourOhFour } from '~/components/FourOhFour'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
@@ -132,76 +133,78 @@ const App = connect(mapStateToProps)(
         }
 
         return (
-          <React.Fragment>
-            {getTilw}
-            {betaFaucetModal}
-            <GetWallet />
-            <LoginToMetaMask />
-            <ReduxToastr
-              timeOut={7000}
-              newestOnTop={true}
-              tapToDismiss={false}
-              position="bottom-left"
-              transitionIn="bounceIn"
-              transitionOut="bounceOut"
-            />
+          <BodyClass>
+            <React.Fragment>
+              {getTilw}
+              {betaFaucetModal}
+              <GetWallet />
+              <LoginToMetaMask />
+              <ReduxToastr
+                timeOut={7000}
+                newestOnTop={true}
+                tapToDismiss={false}
+                position="bottom-left"
+                transitionIn="bounceIn"
+                transitionOut="bounceOut"
+              />
 
-            {header}
+              {header}
 
-            <section className='section'>
-              <div className='container is-fluid'>
-                <div className='columns'>
-                  <div className='column is-8 is-offset-2'>
-                    <Switch>
-                      <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
-                      <Route path={routes.VERIFY} component={Verify} />
-                      <Route path={routes.APPLY} component={ApplicantApplyContainer} />
-                      <Route path={routes.STAKE} component={VerifierStake} />
-                      <Route path={routes.WALLET} component={Wallet} />
-                      <Route path={routes.ADMIN} component={Admin} />
+              <section className='section'>
+                <div className='container is-fluid'>
+                  <div className='columns'>
+                    <div className='column is-8 is-offset-2'>
+                      <Switch>
+                        <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
+                        <Route path={routes.VERIFY} component={Verify} />
+                        <Route path={routes.APPLY} component={ApplicantApplyContainer} />
+                        <Route path={routes.STAKE} component={VerifierStake} />
+                        <Route path={routes.WALLET} component={Wallet} />
+                        <Route path={routes.ADMIN} component={Admin} />
 
-                      <Route path={routes.HOME} component={Home} />
+                        <Route path={routes.HOME} component={Home} />
 
-                      <Route component={FourOhFour} />
-                    </Switch>
-                    <br />
+                        <Route component={FourOhFour} />
+                      </Switch>
+                      <br />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <br />
-              <br />
-              <br />
+                <br />
+                <br />
+                <br />
 
-              <div className='columns'>
-                <div className='column is-half-tablet is-offset-one-quarter'>
-                  <div className="has-text-centered">
-                    <h3>
-                      What is this?
-                    </h3>
-                    <p className="has-text-grey-light">
-                      Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className='section'>
-              <footer className="footer has-text-centered">
                 <div className='columns'>
                   <div className='column is-half-tablet is-offset-one-quarter'>
-                    <p className="text-footer">
-                      &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
-                    </p>
-                    <br />
-                    <br />
-                    {debugLink}
+                    <div className="has-text-centered">
+                      <h3>
+                        What is this?
+                      </h3>
+                      <p className="has-text-grey-light">
+                        Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </footer>
-            </section>
-          </React.Fragment>
+              </section>
+
+              <section className='section'>
+                <footer className="footer has-text-centered">
+                  <div className='columns'>
+                    <div className='column is-half-tablet is-offset-one-quarter'>
+                      <p className="text-footer">
+                        &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
+                      </p>
+                      <br />
+                      <br />
+                      {debugLink}
+                    </div>
+                  </div>
+                </footer>
+              </section>
+            </React.Fragment>
+          </BodyClass>
         )
       }
     }

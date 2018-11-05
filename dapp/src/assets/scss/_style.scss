@@ -161,10 +161,6 @@ header {
   }
 }
 
-.new-todo {
-
-}
-
 .new-todo,
 .edit {
   background: rgba(0, 0, 0, 0);
@@ -377,9 +373,17 @@ header {
   background: none;
   bottom: 20px;
   height: 100px;
+  opacity: 0.8;
   position: fixed;
   right: 20px;
   width: 100px;
+}
+
+.button.button--getTilw:hover,
+.button.button--getTilw:focus,
+.button.button--getTilw:active {
+  border: 0;
+  opacity: 1;
 }
 
 .button.button--getTilw {

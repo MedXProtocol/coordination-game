@@ -129,11 +129,9 @@
   text-align: right;
 
   @media (max-width: 768px) {
-    color: $brand-info;
     width: 80px;
   }
   @media (max-width: 468px) {
-    color: $brand-info;
     width: 40px;
   }
 }
