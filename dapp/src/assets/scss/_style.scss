@@ -12,6 +12,7 @@ body {
   color: #e7dfdd;
   font-size: 1.375rem;
   line-height: 1.6;
+  transition: all 0.5s ease-in-out;
 
   @media (max-width: 768px) {
     font-size: 1.25rem;
@@ -33,6 +34,10 @@ button {
   color: lighten($accent-color-1, 10%);
   font-size: inherit;
   padding: 10px 10px;
+}
+
+button[disabled] {
+  cursor: not-allowed;
 }
 
 button.is-loading {
@@ -99,6 +104,7 @@ h6 {
 
 strong {
   color: white;
+  transition: all 0.5s ease-in-out;
 }
 
 :focus:not(:focus-visible) {

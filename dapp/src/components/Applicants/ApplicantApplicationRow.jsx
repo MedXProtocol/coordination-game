@@ -15,7 +15,6 @@ import {
 } from 'saga-genesis'
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
-import { ExportApplicationDetails } from '~/components/ExportApplicationDetails'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { storageAvailable } from '~/services/storageAvailable'
@@ -313,7 +312,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           <React.Fragment>
             Hint: {hint}
             <br />Random: {random}
-            <ExportApplicationDetails applicationRowObject={applicationRowObject} />
           </React.Fragment>
         )
         // uint256 _applicationId,

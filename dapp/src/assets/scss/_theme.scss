@@ -1,11 +1,22 @@
-$background-color--light: #e4e8f6;
-$accent-color-1--light: #52099a;
-$accent-color-2--light: #f777f7;
-$accent-color-3--light: #10a0d9;
-
+// LIGHT THEME COLOURS
 $text-color--light: #333;
+$background-color--light: #efeff4;
+$accent-color-1--light: #a86da8; // purple
+$accent-color-2--light: #f8aa2f; // orange
+$accent-color-3--light: saturate(#47b9f4, 10%); // light blue
 
-$nav-link-color--light: orange;
+$brand-primary--light: $accent-color-2;
+$brand-link--light: $blue;
+$brand-info--light: $cyan;
+$brand-success--light: $brand-primary--light;
+$brand-warning--light: $yellow;
+$brand-danger--light: $red;
+
+$gray--light: #afc3c4;
+$dark-gray--light: #dedede;
+
+$nav-link-color--light: darken($accent-color-2--light, 40%);
+// END LIGHT THEME COLOURS
 
 html.html-light,
 .html-light body {
@@ -15,7 +26,7 @@ html.html-light,
 
 .html-light {
   ::placeholder {
-    color: #444;
+    color: lighten($accent-color-1--light, 30%);
   }
 
   hr {
@@ -33,6 +44,15 @@ html.html-light,
 
   .has-text-grey-light {
     color: lighten($text-color--light, 20%) !important;
+  }
+
+  .has-text-transparent-white,
+  .has-text-transparent-white .svg-inline--fa.fa-w-10.fa-ethereum,
+  .navbar-link:not(.is-arrowless)::after,
+  .navbar-item.has-dropdown:hover .navbar-link,
+  .navbar-item.has-dropdown.is-active .navbar-link {
+    border-color: rgba(0, 0, 0, 0.3);
+    color: rgba(0, 0, 0, 0.3);
   }
 
   a,
@@ -75,20 +95,23 @@ html.html-light,
   }
 
   .text-input {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-color: white;
+    color: lighten($text-color--light, 25%);
   }
 
   .text-input:focus,
   .text-input:active,
   .text-input:hover {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: lighten($accent-color-3--light, 40%);
     color: $text-color--light;
   }
 
   .text-input.readonly {
     background-color: transparent;
     border-color: transparent;
-    color: rgba(255, 255, 255, 0.2);
+    color: $text-color--light;
   }
 
   .table {
@@ -125,41 +148,73 @@ html.html-light,
     background: rgba(255, 255, 255, 0.1);
   }
 
+  .redux-toastr .toastr {
+    background: darken($background-color--light, 70%);
+  }
+
   .redux-toastr .toastr.rrt-info,
   .redux-toastr .toastr .toastr-status.info {
-    background-color: $brand-info;
+    background-color: $brand-info--light;
   }
 
   .redux-toastr .toastr.rrt-success,
   .redux-toastr .toastr .toastr-status.success {
-    background-color: $brand-success;
+    background-color: $brand-success--light;
   }
 
   .redux-toastr .toastr.rrt-error,
   .redux-toastr .toastr .toastr-status.error {
-    background-color: $brand-danger;
+    background-color: $brand-danger--light;
   }
 
   .redux-toastr .toastr.rrt-warning,
   .redux-toastr .toastr .toastr-status.warning {
-    background-color: $brand-warning;
+    background-color: $brand-warning--light;
   }
 
   .redux-toastr .toastr a {
-    color: $brand-info;
+    color: $brand-info--light;
   }
 
   .list--container {
     background: darken($background-color--light, 2%);
-    border-color: $accent-color-2--light;
+    border-color: lighten($accent-color-1--light, 40%);
+  }
+
+  .list {
+    background: white;
+  }
+
+  .list--item__id,
+  .list--item__status {
+    color: lighten($text-color--light, 40%);
   }
 
   .list--item__date {
-    color: $brand-info;
+    color: $brand-info--light;
   }
 
   .list--item__view {
-    color: lighten($brand-info, 40%);
+    color: darken($accent-color-2--light, 10%);
+  }
+
+  .list--item:hover {
+    background-color: lighten($background-color--light, 3%);
+  }
+
+  .progress--step:before {
+    background-color: white;
+    border: 1px solid white;
+  }
+
+  .progress--step.is-active {
+    color: $accent-color-1--light;
+  }
+
+  .progress--step.is-active:before {
+    animation: pulse--light 2s infinite;
+    background-color: $accent-color-1--light;
+    color: lighten($accent-color-1--light, 10%);
   }
 
   .progress--step.is-complete {
@@ -172,26 +227,21 @@ html.html-light,
   }
 
   .progress--step.is-complete:after {
-    background: $brand-info;
+    background: $brand-info--light;
   }
 
   .progress--track {
-    background-color: $dark-gray;
-  }
-
-  .progress--step:before {
-    background: $gray;
-    border-color: $gray;
+    background-color: lighten($dark-gray--light, 2%);
   }
 
   .has-text-primary {
-    color: $accent-color-3--light !important;
+    color: saturate($accent-color-3--light, 40%) !important;
   }
 
   .button.is-warning.is-outlined:hover,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
+    box-shadow: 0 0 5px 0 lighten($text-color--light, 5%);
     color: $text-color--light;
   }
 
@@ -204,16 +254,16 @@ html.html-light,
   }
 
   .button.is-primary.is-outlined {
-    border-color: $accent-color-3--light;
-    color: $accent-color-3--light;
+    border-color: $accent-color-1--light;
+    color: $accent-color-1--light;
   }
 
   .button.is-primary.is-outlined:hover,
   .button.is-primary.is-outlined:active,
   .button.is-primary.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten(#00d1b2, 5%);
+    box-shadow: 0 0 5px 0 lighten($accent-color-1--light, 5%);
     background-color: transparent;
-    color: lighten($accent-color-3--light, 10%);
+    color: lighten($accent-color-1--light, 10%);
   }
 
   .button.is-warning.is-outlined:hover,
@@ -250,8 +300,10 @@ html.html-light,
     color: rgba(255, 255, 255, 0.4);
   }
 
-  .title {
+  .title,
+  .title svg path {
     color: $text-color--light;
+    fill: $text-color--light;
   }
 
   .icon-circle {
@@ -259,7 +311,7 @@ html.html-light,
   }
 
   .icon-circle path {
-    fill: $accent-color-3--light;
+    fill: lighten($accent-color-3--light, 20%);
   }
 
   .icon-circle:hover path,
@@ -269,22 +321,22 @@ html.html-light,
   }
 
   .level--container {
-    background-color: lighten($background-color--light, 3%);
-    border: 3px solid lighten($background-color--light, 2%);
+    background-color: lighten($background-color--light, 2%);
+    border: 3px solid lighten($background-color--light, 1%);
   }
 
   .level--header {
-    background-color: lighten($background-color--light, 5%);
-    border-bottom: 1px solid lighten($background-color--light, 20%);
+    background-color: lighten($background-color--light, 3%);
+    border-bottom: 1px solid lighten($background-color--light, 1%);
   }
 
   .level--body {
-    background-color: lighten($background-color--light, 10%);
+    background-color: lighten($background-color--light, 6%);
   }
 
   .level--footer {
-    background-color: lighten($background-color--light, 5%);
-    border-color: lighten($background-color--light, 20%);
+    background-color: lighten($background-color--light, 3%);
+    border-color: lighten($background-color--light, 1%);
   }
 
   .tabs ul {
@@ -311,50 +363,6 @@ html.html-light,
     border-bottom-color: rgb(219, 219, 219);
   }
 
-  .tabs.is-boxed button {
-    border-color: transparent;
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-    border-radius: 4px 4px 0 0;
-  }
-
-  .text-input--filename {
-    border-width: 1px;
-    line-height: 1;
-    max-width: initial;
-    font-size: 0.75rem;
-    width: 320px;
-  }
-
-  .text-input--filename-control {
-    width: 320px;
-  }
-
-  .file-download--container {
-    margin-top: 0;
-    width: 100%;
-  }
-
-  .is-addon {
-    font-size: 0.875rem;
-    padding: 2px 20px;
-  }
-
-  .text-input--filename-button {
-    border-left: none;
-    border-top: none;
-    border-top-right-radius: 0;
-    height: 42px;
-  }
-
-  .button.text-input--filename-button.is-primary.is-outlined:hover,
-  .button.text-input--filename-button.is-primary.is-outlined:active,
-  .button.text-input--filename-button.is-primary.is-outlined:focus {
-    box-shadow: none;
-  }
-
   .delete.is-warning:hover,
   .modal-close.is-warning:hover,
   .delete.is-warning:focus,
@@ -366,13 +374,13 @@ html.html-light,
   .modal-close.is-warning.is-outlined::before,
   .delete.is-warning.is-outlined::after,
   .modal-close.is-warning.is-outlined::after {
-    background-color: $brand-warning;
+    background-color: $brand-warning--light;
   }
 
   .is-warning.is-outlined,
   .is-warning.is-outlined,
   .is-warning.is-outlined {
-    border-color: $brand-warning;
+    border-color: $brand-warning--light;
   }
 
   .is-warning.is-outlined:hover,
@@ -404,8 +412,75 @@ html.html-light,
     }
   }
 
+  .navbar-dropdown {
+    border: 0;
+  }
+
+  .navbar-item.has-dropdown:hover .navbar-link,
+  .navbar-item.has-dropdown.is-active .navbar-link {
+    background-color: lighten($accent-color-1--light, 55%);
+    transition: all 0.1s ease-in-out;
+  }
+
   .navbar-item,
   .navbar-item:focus {
-    color: $nav-link-color--light;
+    color: $gray--light;
   }
+
+  .navbar-item a.navbar-item {
+    color: $accent-color-1--light;
+  }
+
+  .navbar.is-fixed-top.navbar--row-one {
+    &:before {
+      background: linear-gradient(183deg, lighten($background-color--light, 10%), lighten($background-color--light, 15%) 100%);
+      opacity: 1;
+    }
+    &:after {
+      opacity: 0;
+    }
+  }
+
+  .navbar.is-fixed-top.navbar--row-two {
+    border-color: darken($background-color--light, 2%);
+
+    &:before {
+      background: linear-gradient(177deg, lighten($background-color--light, 6%), lighten($background-color--light, 2%) 100%);
+      opacity: 1;
+    }
+    &:after {
+      opacity: 0;
+    }
+  }
+
+  a.navbar-item:hover,
+  a.navbar-item.is-active,
+  .navbar-link:hover,
+  .navbar-link.is-active {
+    background-color: inherit;
+    color: $text-color--light;
+  }
+
+  .navbar-brand a {
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .navbar-brand a:hover,
+  .navbar-brand a:focus,
+  .navbar-brand a:active {
+    color: $text-color--light;
+  }
+
+  @keyframes pulse--light {
+    0% {
+      box-shadow: 0 0 0 0 rgba(30, 100, 202, 0.8);
+    }
+    70% {
+      box-shadow: 0 0 0 20px rgba(30, 100, 202, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(30, 100, 202, 0);
+    }
+  }
+
 }

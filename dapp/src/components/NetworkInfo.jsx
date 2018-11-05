@@ -42,32 +42,30 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
   connect(mapStateToProps)(
     function({ address, ethBalance, networkName, tilwBalance }) {
       return (
-        <div className="navbar-menu">
-          <div className="navbar-end">
-            <div className="navbar-item has-text-transparent-white">
-              <span>
-                <span className={classnames(`nav--circle`, `color-${networkName.toLowerCase()}` )} />
-                &nbsp;
-                {networkName}
-              </span>
-            </div>
-            <div className="navbar-item">
-              <span className="navbar-item has-text-transparent-white">
-                {displayWeiToEther(tilwBalance)} TILW
-              </span>
-            </div>
-            <div className="navbar-item">
-              <span className="navbar-item has-text-transparent-white">
-                <EtherFlip wei={ethBalance} />
-              </span>
-            </div>
-            <div className="navbar-item">
-              <span className="navbar-item has-text-transparent-white">
-                <EthAddress address={address} disallowFull={true} />
-              </span>
-            </div>
+        <React.Fragment>
+          <div className="navbar-item has-text-transparent-white">
+            <span>
+              <span className={classnames(`nav--circle`, `color-${networkName.toLowerCase()}` )} />
+              &nbsp;
+              {networkName}
+            </span>
           </div>
-        </div>
+          <div className="navbar-item">
+            <span className="navbar-item has-text-transparent-white">
+              {displayWeiToEther(tilwBalance)} TILW
+            </span>
+          </div>
+          <div className="navbar-item">
+            <span className="navbar-item has-text-transparent-white">
+              <EtherFlip wei={ethBalance} />
+            </span>
+          </div>
+          <div className="navbar-item">
+            <span className="navbar-item has-text-transparent-white">
+              <EthAddress address={address} disallowFull={true} />
+            </span>
+          </div>
+        </React.Fragment>
       )
     }
   )

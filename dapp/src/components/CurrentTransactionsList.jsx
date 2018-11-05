@@ -72,7 +72,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       if (this.props.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
           <div className="blank-state">
-            <div className="blank-state--inner text-center text-gray">
+            <div className="blank-state--inner has-text-centered text-gray">
               Currently no ongoing transactions.
             </div>
           </div>

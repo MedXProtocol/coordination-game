@@ -102,7 +102,19 @@ export const Header = ReactTimeout(
 
                     <CurrentTransactionsList />
 
-                    <NetworkInfo />
+                    <div className="navbar-menu">
+                      <div className="navbar-end">
+                        <div className="navbar-item">
+                          <span className="navbar-item">
+                            <button onClick={this.props.toggleTheme} className="has-text-transparent-white">
+                              {this.props.isLight === 'true' ? '.' : ' '}
+                            </button>
+                          </span>
+                        </div>
+
+                        <NetworkInfo />
+                      </div>
+                    </div>
                   </div>
                 </nav>
 

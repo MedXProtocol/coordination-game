@@ -55,7 +55,8 @@ const App = connect(mapStateToProps)(
       constructor(props) {
         super(props)
         this.state = {
-          sagasReady: false
+          sagasReady: false,
+          isLight: false
         }
       }
 
@@ -67,14 +68,7 @@ const App = connect(mapStateToProps)(
           })
         }, 600)
 
-        window.addEventListener("beforeunload", this.unload)
-        window.addEventListener("focus", this.refocus)
         this.onAccountChangeSignOut(this.props)
-      }
-
-      componentWillUnmount () {
-        window.removeEventListener("beforeunload", this.unload)
-        window.removeEventListener("focus", this.refocus)
       }
 
       componentWillReceiveProps (nextProps) {
@@ -87,18 +81,20 @@ const App = connect(mapStateToProps)(
         const networkDoesNotMatch = this.props.networkId && this.props.networkId !== nextProps.networkId
 
         if (addressDoesNotMatch || networkDoesNotMatch) {
-          this.signOut()
+          this.reloadPage()
         }
       }
 
-      unload = () => {
-        this.signOut()
-      }
-
-      signOut () {
+      reloadPage () {
         if (window) {
           window.location.reload(true)
         }
+      }
+
+      toggleTheme = (e) => {
+        e.preventDefault()
+
+        this.setState({ isLight: !this.state.isLight })
       }
 
       render() {
@@ -106,11 +102,13 @@ const App = connect(mapStateToProps)(
           getTilw = null,
           header = null
 
-        // if (this.state.sagasReady) {
-          betaFaucetModal = <BetaFaucetModal  />
-          getTilw = <GetTILW  />
-          header = <Header isOwner={this.props.isOwner} />
-        // }
+        betaFaucetModal = <BetaFaucetModal  />
+        getTilw = <GetTILW  />
+        header = <Header
+          isOwner={this.props.isOwner}
+          toggleTheme={this.toggleTheme}
+          isLight={this.state.isLight.toString()}
+        />
 
         if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
           if (this.state.debugging) {
@@ -133,7 +131,7 @@ const App = connect(mapStateToProps)(
         }
 
         return (
-          <BodyClass>
+          <BodyClass isLight={this.state.isLight}>
             <React.Fragment>
               {getTilw}
               {betaFaucetModal}

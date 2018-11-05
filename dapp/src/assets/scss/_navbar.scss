@@ -6,13 +6,39 @@
   margin-bottom: 0;
   padding: 0;
   z-index: 3;
+
+  transition: all 0.5s ease-in-out;
+
+  @media screen and (min-width: 1088px) {
+    max-height: $navbar-height;
+    min-height: $navbar-height;
+  }
 }
 
 .navbar-brand,
 .navbar-tabs,
 .navbar > .container {
-  max-height: $navbar-height;
   min-height: $navbar-height;
+}
+
+.navbar-item.has-dropdown .navbar-link {
+  padding-top: 0.25rem;
+}
+
+.navbar-item.has-dropdown:hover .navbar-dropdown {
+  transition: all 0.5s ease-in-out;
+
+  @media screen and (min-width: 1088px) {
+    left: 0;
+    opacity: 1;
+  }
+}
+
+.navbar-dropdown {
+  @media screen and (min-width: 1088px) {
+    left: -10000px;
+    opacity: 0;
+  }
 }
 
 .navbar > .container .navbar-brand,
@@ -22,26 +48,45 @@
   }
 }
 
-.navbar {
-  @media screen and (min-width: 1088px) {
-    max-height: $navbar-height;
-    min-height: $navbar-height;
-  }
+.navbar::before,
+.navbar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  z-index: -100;
+  transition: all 0.5s ease-in-out;
 }
 
 .navbar.is-fixed-top.navbar--row-one {
-  background: linear-gradient(183deg, lighten($background-color, 10%), lighten($background-color, 15%) 100%);
   z-index: 9;
+
+  &:before {
+    opacity: 0;
+  }
+
+  &:after {
+    background: linear-gradient(183deg, lighten($background-color, 10%), lighten($background-color, 15%) 100%);
+    opacity: 1;
+  }
 }
 
 .navbar.is-fixed-top.navbar--row-two {
-  background: linear-gradient(177deg, lighten($background-color, 6%), lighten($background-color, 2%) 100%);
   border-bottom: 4px solid black;
-  z-index: 8;
-}
-
-.navbar.is-fixed-top.navbar--row-two {
   top: $navbar-height;
+  z-index: 8;
+
+  &:before {
+    opacity: 0;
+  }
+  &:after {
+    background: linear-gradient(177deg, lighten($background-color, 6%), lighten($background-color, 2%) 100%);
+    opacity: 1;
+  }
 }
 
 .navbar-item .navbar-item,
@@ -95,9 +140,7 @@ a.navbar-item.is-active,
   height: 0.625rem;
   width: 0.625rem;
   margin-right: 3px;
-  // top: 28px;
   left: 2px;
-  // position: absolute;
   z-index: 1;
   display: inline-block;
 }
