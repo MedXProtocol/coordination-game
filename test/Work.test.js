@@ -47,7 +47,7 @@ contract('Work', (accounts) => {
   }
 
   describe('constructor()', () => {
-    xit('should be constructed properly', async () => {
+    it('should be constructed properly', async () => {
       assert.equal((await work.requiredStake()).toString(), requiredStake)
       assert.equal((await work.token()), token.address)
       assert.equal((await work.jobStake()), jobStake)
@@ -55,7 +55,7 @@ contract('Work', (accounts) => {
   });
 
   describe('depositStake()', () => {
-    xit('should transfer the stake and add the sender as a staker', async () => {
+    it('should transfer the stake and add the sender as a staker', async () => {
       await work.depositStake({ from: staker })
       debug(`depositStake(): work.depositStake()`)
       assert.equal(await token.balanceOf(work.address), requiredStake)
@@ -65,7 +65,7 @@ contract('Work', (accounts) => {
   })
 
   describe('selectWorker()', () => {
-    xit('should select a worker based on modulo input', async () => {
+    it('should select a worker based on modulo input', async () => {
       await work.depositStake({ from: staker })
 
       assert.equal(await work.selectWorker(42), staker)
@@ -73,7 +73,7 @@ contract('Work', (accounts) => {
   })
 
   describe('withdrawStake()', () => {
-    xit('should allow a staked user to withdraw their tokens', async () => {
+    it('should allow a staked user to withdraw their tokens', async () => {
       await work.depositStake({ from: staker })
       await work.withdrawStake({ from: staker })
       assert.equal(await work.isStaker(staker), false)
@@ -82,7 +82,7 @@ contract('Work', (accounts) => {
     })
 
     context('when multiple stakers', () => {
-      xit('should cleanly shorten when last element', async () => {
+      it('should cleanly shorten when last element', async () => {
         await work.depositStake({ from: staker })
         await work.depositStake({ from: staker2 })
         await work.withdrawStake({ from: staker })
@@ -107,13 +107,13 @@ contract('Work', (accounts) => {
         await work.depositStake({ from: staker })
       })
 
-      xit('should do nothing if called by anyone', async () => {
+      it('should do nothing if called by anyone', async () => {
         await expectThrow(async () => {
           await work.withdrawJobStake(staker)
         })
       })
 
-      xit('should withdraw the job stake when called by the job manager', async () => {
+      it('should withdraw the job stake when called by the job manager', async () => {
         const startingBalance = await balanceOf(staker)
         await work.withdrawJobStake(staker, { from: jobManager })
         const finishingBalance = await balanceOf(staker)
@@ -126,7 +126,7 @@ contract('Work', (accounts) => {
           await work.withdrawJobStake(staker, { from: jobManager })
         })
 
-        xit('should suspend the staker', async () => {
+        it('should suspend the staker', async () => {
           await work.withdrawJobStake(staker, { from: jobManager })
           assert.equal(await work.isSuspended(staker), true, 'staker is suspended')
         })
@@ -140,7 +140,7 @@ contract('Work', (accounts) => {
         await work.depositStake({ from: staker })
       })
 
-      xit('should add tokens to the stakers balance', async () => {
+      it('should add tokens to the stakers balance', async () => {
         const startingBalance = await balanceOf(staker)
         await work.depositJobStake(staker, { from: jobManager })
         const finishingBalance = await balanceOf(staker)
@@ -154,7 +154,7 @@ contract('Work', (accounts) => {
           assert.equal(await work.isSuspended(staker), true, 'staker is suspended')
         })
 
-        xit('should make the staker active again', async () => {
+        it('should make the staker active again', async () => {
           await work.depositJobStake(staker, { from: jobManager })
           assert.equal(await work.isSuspended(staker), false, 'staker is not suspended')
           assert.equal(await work.isStaker(staker), true, 'staker is active')
@@ -167,7 +167,7 @@ contract('Work', (accounts) => {
     const newRequiredStake = web3.toWei('30', 'ether')
     const newJobStake = web3.toWei('3', 'ether')
 
-    xit('should work for the contract owner', async () => {
+    it('should work for the contract owner', async () => {
       assert.equal(await work.requiredStake(), requiredStake)
       assert.equal(await work.jobStake(), jobStake)
 
@@ -177,7 +177,7 @@ contract('Work', (accounts) => {
       assert.equal(await work.jobStake(), newJobStake)
     })
 
-    xit('should not work for anyone but the owner', async () => {
+    it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
         await work.updateSettings(newRequiredStake, newJobStake, {
           from: staker2
