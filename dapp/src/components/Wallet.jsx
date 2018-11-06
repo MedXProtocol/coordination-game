@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
+import Odometer from 'react-odometerjs'
 import {
   cacheCall,
   cacheCallValueBigNumber,
@@ -72,50 +73,39 @@ export const Wallet = connect(mapStateToProps)(
               <nav className="level level--body">
                 <div className="level-item has-text-centered">
                   <div>
-                    <p className="heading">
+                    <span className="heading">
                       Balance
-                    </p>
-                    <p className="title">
-                      {displayWeiToEther(this.props.tilwBalance)}
-                    </p>
+                    </span>
+                    <span className="title">
+                      <Odometer value={displayWeiToEther(this.props.tilwBalance)} />
+                    </span>
                   </div>
                 </div>
               </nav>
 
               <nav className="level level--footer">
-                {/*
                 <div className="level-item has-text-centered">
                   <div>
-                    <p className="heading">
-                      Verification Job Deposit:
-                    </p>
-                    <p className="title">
-                      {displayWeiToEther(this.props.jobStake)}
-                    </p>
-                  </div>
-                </div>
-                */}
-
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">
+                    <span className="heading">
                       Approved:
-                    </p>
-                    <p className="title">
-                      {displayWeiToEther(this.props.allowance)}
-                    </p>
+                    </span>
+                    <span className="title">
+                      <Odometer value={displayWeiToEther(this.props.allowance)} />
+                    </span>
                   </div>
                 </div>
                 <div className="level-item has-text-centered">
                   <div>
-                    <p className="heading">
+                    <span className="heading">
                       {this.props.staked > 0 ? 'Staked:' : 'Required Stake:'}
-                    </p>
-                    <p className="title">
-                      {this.props.staked > 0
-                        ? displayWeiToEther(this.props.staked)
-                        : displayWeiToEther(this.props.requiredStake)}
-                    </p>
+                    </span>
+                    <span className="title">
+                      {
+                        this.props.staked > 0
+                          ? <Odometer value={displayWeiToEther(this.props.staked)} />
+                          : <Odometer value={displayWeiToEther(this.props.requiredStake)} />
+                      }
+                    </span>
                   </div>
                 </div>
               </nav>

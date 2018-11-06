@@ -6,6 +6,7 @@ import { AppContainer } from '~/components/App'
 import { store } from '~/store'
 import * as serviceWorker from './serviceWorker'
 
+import 'odometer/themes/odometer-theme-minimal.css'
 import 'bulma/css/bulma.css'
 import './index.scss'
 

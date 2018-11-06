@@ -2,13 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import classnames from 'classnames'
+import Odometer from 'react-odometerjs'
 import {
   contractByName,
   cacheCallValueBigNumber,
   cacheCall,
   withSaga
 } from 'saga-genesis'
-import { EtherFlip } from '~/components/EtherFlip'
 import { EthAddress } from '~/components/EthAddress'
 import { networkIdToName } from '~/utils/networkIdToName'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
@@ -52,12 +52,12 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
           </div>
           <div className="navbar-item">
             <span className="navbar-item has-text-transparent-white">
-              {displayWeiToEther(tilwBalance)} TILW
+              <Odometer value={displayWeiToEther(tilwBalance)} />&nbsp;TILW
             </span>
           </div>
           <div className="navbar-item">
             <span className="navbar-item has-text-transparent-white">
-              <EtherFlip wei={ethBalance} />
+              <Odometer value={displayWeiToEther(ethBalance)} />&nbsp;Ξ
             </span>
           </div>
           <div className="navbar-item">

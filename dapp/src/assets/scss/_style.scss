@@ -387,6 +387,15 @@ header {
   position: fixed;
   right: 20px;
   width: 100px;
+
+  animation-name: shake;
+  animation-duration: 6s;
+  animation-timing-function: cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  animation-iteration-count: infinite;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  perspective: 1000px;
+  z-index: 500;
 }
 
 .button.button--getTilw:hover,
@@ -396,15 +405,10 @@ header {
   opacity: 1;
 }
 
-.button.button--getTilw {
-  animation-name: shake;
-  animation-duration: 6s;
-  animation-timing-function: cubic-bezier(0.36, 0.07, 0.19, 0.97);
-  animation-iteration-count: infinite;
-  backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
-  perspective: 1000px;
-  z-index: 500;
+.button.button--getTilw.is-hidden {
+  display: block !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .button.button--amount-to-stake {
@@ -747,4 +751,9 @@ section {
 
 .antd-icon {
   margin-top: -3px;
+}
+
+.icon-export {
+  position: relative;
+  top: 2px;
 }

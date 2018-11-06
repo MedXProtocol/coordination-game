@@ -10,8 +10,8 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileExport } from '@fortawesome/free-solid-svg-icons'
+import { ExportOutline } from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
 import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
@@ -210,9 +210,8 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                 )}
               >
                 <button onClick={this.exportAll} className="is-size-7">
-                  <FontAwesomeIcon
-                    icon={faFileExport}
-                  /> Export a Backup
+                  <AntdIcon type={ExportOutline} className="antd-icon icon-export" />&nbsp;
+                  Export a Backup
                 </button>
               </div>
 

@@ -49,17 +49,23 @@ export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
     class _GetTILW extends Component {
 
       render() {
-        let getTilw
-
-        if (
+        const visible = (
           this.props.workTokenAddress &&
-          this.props.tilwBalance !== undefined &&
-          this.props.tilwBalance < 25 &&
+          (this.props.tilwBalance !== undefined) &&
+          (this.props.tilwBalance < 25) &&
           this.props.betaFaucetModalDismissed
-        ) {
-          getTilw = <button
+        )
+
+        return (
+          <button
             onClick={this.props.dispatchShowBetaFaucetModal}
-            className={classnames('button', 'button--getTilw')}
+            className={classnames(
+              'button',
+              'button--getTilw',
+              {
+                'is-hidden': !visible
+              }
+            )}
           >
             <img
               src={GetTILWCoinImg}
@@ -68,11 +74,7 @@ export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
               srcSet={`${GetTILWCoinImg} 1x, ${GetTILWCoinImg2x} 2x`}
             />
           </button>
-        } else {
-          getTilw = null
-        }
-
-        return getTilw
+        )
       }
 
     }

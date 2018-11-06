@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+// import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IndexedAddressArray.sol';
@@ -8,6 +9,7 @@ import './IndexedAddressArray.sol';
 
 contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
+  // using SafeMath for uint256;
 
   address public jobManager;
 
@@ -112,7 +114,7 @@ contract Work is Ownable {
 
   function deposit(address _worker, uint256 _amount) internal {
     uint256 newBalance = balances[_worker] + _amount;
-    
+
     // allow them to stake more than any upper bound for now
     // require(newBalance <= requiredStake, 'stake is below the limit');
 
@@ -135,5 +137,17 @@ contract Work is Ownable {
     jobStake = _jobStake;
 
     emit SettingsUpdated(requiredStake, jobStake);
+  }
+
+  function getVerifiersCount() external view returns (uint256 verifiersCount) {
+    return stakers.addresses.length;
+  }
+
+  function getVerifierByIndex(uint256 index) external view returns (address verifierAddress) {
+    if (stakers.addresses.length > 0) {
+      return stakers.addressAtIndex(index);
+    } else {
+      return address(0);
+    }
   }
 }

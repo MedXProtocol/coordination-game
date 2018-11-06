@@ -16,6 +16,7 @@ import { GetTILWLink } from '~/components/GetTILWLink'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
 import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep1'
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
@@ -171,7 +172,7 @@ export const VerifierStake = connect(mapStateToProps)(
                         canApprove={this.canApprove}
                       />
                       {needsTILWMessage}
-                      
+
                       <VerifierStakeStep2
                         {...this.props}
                         stakeComplete={this.stakeComplete}
@@ -180,6 +181,15 @@ export const VerifierStake = connect(mapStateToProps)(
                     </React.Fragment>
                   )
               }
+
+              <hr />
+
+              <div className="is-clearfix">
+                <h6 className="is-size-6">
+                  Active Verifiers:
+                </h6>
+              </div>
+              <VerifiersTable />
             </div>
           )
         }

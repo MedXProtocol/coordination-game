@@ -29,4 +29,8 @@ library IndexedAddressArray {
     return self.indices[_value] != 0 ||
            (self.addresses.length > 0 && self.addresses[0] == _value);
   }
+
+  function addressAtIndex(Data storage self, uint256 _index) internal returns (address) {
+    return self.addresses[_index];
+  }
 }

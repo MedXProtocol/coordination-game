@@ -11,6 +11,8 @@ var coordinationGameAddress = ''
 var workAddress = ''
 var workTokenAddress = ''
 
+web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: betaFaucetAddress, value: web3.toWei(900, "ether") })
+
 BetaFaucet.at(betaFaucetAddress).then(i => bf = i)
 CoordinationGame.at(coordinationGameAddress).then(i => cg = i)
 WorkToken.at(workTokenAddress).then(i => wt = i)
