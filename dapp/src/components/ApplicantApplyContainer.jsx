@@ -284,10 +284,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
-            { type: 'uint256', value: random }
+            { type: 'uint256', value: random.toString() }
           )
           const randomHash = getWeb3().utils.soliditySha3(
-            { type: 'uint256', value: random }
+            { type: 'uint256', value: random.toString() }
           )
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
