@@ -1,0 +1,17 @@
+.__react_component_tooltip {
+  font-size: 0.75rem;
+  line-height: 1.7;
+  padding: 1rem;
+  text-align: center;
+}
+
+.__react_component_tooltip.type-dark {
+  background-color: white;
+  color: #333;
+}
+
+.__react_component_tooltip.type-dark.place-top:after {
+  border-top-color: white;
+  border-top-style: solid;
+  border-top-width: 7px;
+}

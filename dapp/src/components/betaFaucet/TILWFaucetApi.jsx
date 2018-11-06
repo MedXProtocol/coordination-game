@@ -124,7 +124,7 @@ export const TILWFaucetApi = ReactTimeout(
           <h5 className="is-size-5">
             Current Balance: <TILW wei={this.props.tilwBalance} />
           </h5>
-          <p className="small text-center">
+          <p className="small">
             <span className="eth-address text-gray">For address:&nbsp;
               <EthAddress address={this.props.address} />
             </span>

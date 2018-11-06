@@ -126,7 +126,7 @@ export const EthFaucetAPI = ReactTimeout(
             Current Balance:
             &nbsp; <EtherFlip wei={this.props.ethBalance} />
           </h5>
-          <p className="small text-center">
+          <p className="small">
             <span className="eth-address text-gray">For address:&nbsp;
               <EthAddress address={this.props.address} />
             </span>

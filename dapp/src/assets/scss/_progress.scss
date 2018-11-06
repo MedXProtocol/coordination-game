@@ -49,7 +49,7 @@
     top: 6px;
     left: 50%;
     width: 0%;
-    transition: width 1s ease-in;
+    transition: width 1s ease-in-out;
     height: 5px;
     background: $gray;
     z-index: -1;

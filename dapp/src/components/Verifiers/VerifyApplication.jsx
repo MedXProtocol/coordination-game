@@ -19,6 +19,7 @@ import {
 } from 'saga-genesis'
 import { LoadingLines } from '~/components/LoadingLines'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
 import * as routes from '~/../config/routes'
 
@@ -161,6 +162,8 @@ export const VerifyApplication = connect(mapStateToProps)(
             return (
               <div className={classnames(
               )}>
+                <ScrollToTop />
+
                 <div className="has-text-right">
                   <button
                     className="is-warning is-outlined is-pulled-right delete is-large"

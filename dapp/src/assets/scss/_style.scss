@@ -59,6 +59,10 @@ button:active {
   color: lighten($accent-color-1, 25%);
 }
 
+abbr {
+  border-bottom: 1px dotted white;
+}
+
 h1,
 h2,
 h3,

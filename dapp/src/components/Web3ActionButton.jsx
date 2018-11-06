@@ -73,6 +73,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
         console.log(`Making call to ${contractAddress}#${method} with args`, args)
         console.log('txid is: ', txId)
 
+
         this.setState({
           txHandler: new TransactionStateHandler(),
           txId

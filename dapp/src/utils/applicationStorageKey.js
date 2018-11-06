@@ -1,3 +1,3 @@
-export function applicationStorageKey(networkId, applicationId) {
-  return `application-${networkId}-${applicationId}`
+export function applicationStorageKey(networkId, address, applicationCreatedAt) {
+  return `application-${networkId}-${address}-${applicationCreatedAt}`
 }

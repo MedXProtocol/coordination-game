@@ -5,7 +5,6 @@ import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
-import BN from 'bn.js'
 import {
   withSaga,
   cacheCallValue,
@@ -17,8 +16,7 @@ import {
 // import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { storageAvailable } from '~/services/storageAvailable'
-import { applicationStorageKey } from '~/utils/applicationStorageKey'
+import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
 import { get } from 'lodash'
@@ -61,31 +59,16 @@ function mapStateToProps(state, { applicationId }) {
     applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
   }
 
-  if (storageAvailable('localStorage')) {
-    let applicationObject
-    const key = applicationStorageKey(networkId, applicationId)
-    const applicationJson = localStorage.getItem(key)
-
-    if (applicationJson) {
-      applicationObject = JSON.parse(applicationJson)
-      applicationRowObject = {
-        ...applicationRowObject,
-        random: applicationObject.random,
-        secret: applicationObject.secret
-      }
-    }
-  } else {
-    console.warn('Unable to read from localStorage')
-  }
+  applicationRowObject = retrieveApplicationDetailsFromLocalStorage(
+    applicationRowObject,
+    networkId,
+    address,
+    createdAt
+  )
 
   applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
   applicationRowObject.applicantRevealExpiresAt      = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
-  // console.log('Current time: ', latestBlockTimestamp)
-  // console.log('verifierSubmitSecretExpires at: ', applicationRowObject.verifierSubmitSecretExpiresAt)
-  // console.log('verifierSubmitSecretExpires in: ', (applicationRowObject.verifierSubmitSecretExpiresAt - latestBlockTimestamp))
-  // console.log('applicantRevealExpires at: ', applicationRowObject.applicantRevealExpiresAt)
-  // console.log('applicantRevealExpires in: ', (applicationRowObject.applicantRevealExpiresAt - latestBlockTimestamp))
-  //
+
   // If this applicationRowObject has an ongoing blockchain transaction this will update
   // const reversedTransactions = transactions.reverse().filter(transaction => {
   //   const { call, confirmed, error } = transaction
@@ -236,7 +219,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
       render () {
         let expirationMessage,
-          hintRandomAndExport
+          hintRandomAndSecret
 
         const {
           applicationRowObject,
@@ -256,16 +239,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           verifierSubmitSecretExpiresAt
         } = applicationRowObject
 
-        // let { error, transactionId } = applicationRowObject
-
-        // const pendingTransaction = (
-        //      !defined(applicationRowObject.status)
-        //   || (applicationRowObject.status === applicationStatus('Pending'))
-        // )
-
         const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
         const loadingOrCreatedAtTimestamp = createdAtDisplay
-        // const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
 
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
@@ -285,6 +260,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             secretAsHex = getWeb3().utils.sha3(secret.toString())
           }
 
+          console.log(applicationId, secretAsHex, random.toString())
+
           expirationMessage = (
             <React.Fragment>
               <span className="has-text-grey">Reveal your secret before:</span>
@@ -293,7 +270,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                 <Web3ActionButton
                   contractAddress={this.props.coordinationGameAddress}
                   method='applicantRevealSecret'
-                  args={[applicationId, secretAsHex, new BN(random)]}
+                  args={[applicationId, secretAsHex, random.toString()]}
                   buttonText='Reveal Secret'
                   confirmationMessage='"Reveal Secret" transaction confirmed.'
                   txHashMessage='"Reveal Secret" transaction sent successfully -
@@ -308,26 +285,31 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
         }
 
-        hintRandomAndExport = (
-          <React.Fragment>
-            Hint: {hint}
-            <br />Random: {random}
-          </React.Fragment>
-        )
-        // uint256 _applicationId,
-        // bytes32 _secret,
-        // uint256 _randomNumber
+        if (hint && secret && random) {
+          hintRandomAndSecret = (
+            <React.Fragment>
+              <strong>Hint:</strong> {hint}
+              <br /><strong>Secret:</strong> {secret}
+              <br /><strong>Random:</strong> {random.toString()}
+            </React.Fragment>
+          )
+        } else {
+          hintRandomAndSecret = (
+            <abbr data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
+          )
+        }
+
         return (
           <div className={classnames(
             'list--item',
             /*,
             { 'list--item__pending': pendingTransaction }
           */)}>
-            <span className="list--item__id text-center">
+            <span className="list--item__id">
               #{applicationId}
             </span>
 
-            <span className="list--item__date text-center">
+            <span className="list--item__date">
               <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
@@ -341,11 +323,17 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
               </span>
             </span>
 
-            <span className="list--item__status text-center">
-              {hintRandomAndExport}
+            <span className="list--item__status">
+              {hintRandomAndSecret}
+              <ReactTooltip
+                html={true}
+                effect='solid'
+                place={'top'}
+                wrapper='span'
+              />
             </span>
 
-            <span className="list--item__view text-center">
+            <span className="list--item__view">
               {isBlank(verifier)
                 ? (
                     <Web3ActionButton

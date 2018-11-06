@@ -10,7 +10,7 @@
   transition: all 0.5s ease-in-out;
 
   @media screen and (min-width: 1088px) {
-    max-height: $navbar-height;
+    // max-height: $navbar-height;
     min-height: $navbar-height;
   }
 }

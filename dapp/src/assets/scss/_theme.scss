@@ -9,7 +9,7 @@ $brand-primary--light: $accent-color-2;
 $brand-link--light: $blue;
 $brand-info--light: $cyan;
 $brand-success--light: $brand-primary--light;
-$brand-warning--light: $yellow;
+$brand-warning--light: saturate($accent-color-3--light, 20%);
 $brand-danger--light: $red;
 
 $gray--light: #afc3c4;
@@ -25,12 +25,16 @@ html.html-light,
 }
 
 .html-light {
+  abbr {
+    border-color: black;
+  }
+
   ::placeholder {
     color: lighten($accent-color-1--light, 30%);
   }
 
   hr {
-    background-color: $dark-gray;
+    background-color: $dark-gray--light;
   }
 
   button {
@@ -95,7 +99,7 @@ html.html-light,
   }
 
   .text-input {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.7);
     border-color: white;
     color: lighten($text-color--light, 25%);
   }
@@ -238,12 +242,7 @@ html.html-light,
     color: saturate($accent-color-3--light, 40%) !important;
   }
 
-  .button.is-warning.is-outlined:hover,
-  .button.is-warning.is-outlined:active,
-  .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten($text-color--light, 5%);
-    color: $text-color--light;
-  }
+
 
   .button.is-light:hover,
   .button.is-light:focus,
@@ -269,9 +268,10 @@ html.html-light,
   .button.is-warning.is-outlined:hover,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
+    box-shadow: 0 0 5px 0 lighten($accent-color-1--light, 30%);
     background-color: transparent;
-    color: $text-color--light;
+    border-color: $accent-color-1--light;
+    color: $accent-color-1--light;
   }
 
   .button.is-light.is-text {
@@ -381,6 +381,7 @@ html.html-light,
   .is-warning.is-outlined,
   .is-warning.is-outlined {
     border-color: $brand-warning--light;
+    color: $brand-warning--light;
   }
 
   .is-warning.is-outlined:hover,
@@ -397,9 +398,9 @@ html.html-light,
     background-color: $text-color--light;
   }
 
-  @keyframes attention-grabby {
+  @keyframes attention-grabby--light {
     0% {
-      color: white;
+      color: $accent-color-1--light;
     }
     40% {
       color: $nav-link-color--light;
@@ -408,7 +409,7 @@ html.html-light,
       color: $nav-link-color--light;
     }
     100% {
-      color: white;
+      color: $accent-color-1--light;
     }
   }
 
@@ -433,7 +434,7 @@ html.html-light,
 
   .navbar.is-fixed-top.navbar--row-one {
     &:before {
-      background: linear-gradient(183deg, lighten($background-color--light, 10%), lighten($background-color--light, 15%) 100%);
+      background: linear-gradient(183deg, lighten($background-color--light, 6%), lighten($background-color--light, 12%) 100%);
       opacity: 1;
     }
     &:after {
@@ -442,10 +443,10 @@ html.html-light,
   }
 
   .navbar.is-fixed-top.navbar--row-two {
-    border-color: darken($background-color--light, 2%);
+    border-color: darken($background-color--light, 1%);
 
     &:before {
-      background: linear-gradient(177deg, lighten($background-color--light, 6%), lighten($background-color--light, 2%) 100%);
+      background: linear-gradient(177deg, lighten($background-color--light, 2%), lighten($background-color--light, 4%) 100%);
       opacity: 1;
     }
     &:after {
@@ -483,4 +484,16 @@ html.html-light,
     }
   }
 
+  .__react_component_tooltip.type-dark {
+    background-color: black;
+    color: #ccc;
+  }
+
+  .__react_component_tooltip.type-dark.place-top:after {
+    border-top-color: black;
+  }
+
+  .is-attention-grabby:not(.is-active) {
+    animation: attention-grabby--light 4s infinite ease-in;
+  }
 }

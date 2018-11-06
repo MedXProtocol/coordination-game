@@ -11,7 +11,7 @@ export const FourOhFour = class _FourOhFour extends Component {
       <div>
         <PageTitle title='fourOhFour' />
 
-        <h5 className="is-size-5 text-center">
+        <h5 className="is-size-5">
           404
         </h5>
 

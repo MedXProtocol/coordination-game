@@ -133,11 +133,11 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           <div className={classnames(
             'list--item',
           )}>
-            <span className="list--item__id text-center">
+            <span className="list--item__id">
               #{applicationId}
             </span>
 
-            <span className="list--item__date text-center">
+            <span className="list--item__date">
               <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
@@ -151,7 +151,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               </span>
             </span>
 
-            <span className='list--item__status text-center'>
+            <span className='list--item__status'>
               {expirationMessage}
             </span>
 

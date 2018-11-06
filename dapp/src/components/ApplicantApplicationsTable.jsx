@@ -15,11 +15,10 @@ import { faFileExport } from '@fortawesome/free-solid-svg-icons'
 import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
-import { storageAvailable } from '~/services/storageAvailable'
-import { applicationStorageKey } from '~/utils/applicationStorageKey'
+import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 
 function mapStateToProps(state) {
-  let applicationIds = []
+  let applicationObjects = []
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const transactions = get(state, 'sagaGenesis.transactions')
@@ -30,7 +29,7 @@ function mapStateToProps(state) {
 
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
-    applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {
+    applicationObjects = range(applicationCount, -1).reduce((accumulator, index) => {
       const applicationId = cacheCallValueInt(
         state,
         coordinationGameAddress,
@@ -38,9 +37,10 @@ function mapStateToProps(state) {
         address,
         index
       )
+      const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
 
-      if (applicationId) {
-        accumulator.push(applicationId)
+      if (applicationId && createdAt) {
+        accumulator.push({ applicationId, createdAt })
       }
 
       return accumulator
@@ -49,7 +49,7 @@ function mapStateToProps(state) {
 
   return {
     applicationCount,
-    applicationIds,
+    applicationObjects,
     address,
     coordinationGameAddress,
     networkId,
@@ -75,6 +75,7 @@ function* applicantApplicationsTableSaga({
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
 
         if (applicationId) {
+          yield cacheCall(coordinationGameAddress, 'createdAt', applicationId)
           yield cacheCall(coordinationGameAddress, 'verifiers', applicationId)
         }
       })
@@ -99,37 +100,33 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
         csvData = () => {
           const data = []
 
-          this.props.applicationIds.forEach((applicationId) => {
-            let applicationData = {
-              applicationId,
+          this.props.applicationObjects.forEach((applicationObject) => {
+            let appObject = {
+              applicationId: applicationObject.applicationId,
               hint: 'unknown',
               random: 'unknown',
               secret: 'unknown'
             }
 
-            if (storageAvailable('localStorage')) {
-              const key = applicationStorageKey(this.props.networkId, applicationId)
-              const applicationJson = localStorage.getItem(key)
+            appObject = retrieveApplicationDetailsFromLocalStorage(
+              appObject,
+              this.props.networkId,
+              this.props.address,
+              applicationObject.createdAt
+            )
 
-              if (applicationJson) {
-                applicationData = JSON.parse(applicationJson)
-              }
-            } else {
-              console.warn('Unable to read from localStorage')
-            }
-
-            data.push(applicationData)
+            data.push(appObject)
           })
 
           return data
         }
 
-        renderApplicationRows(applicationIds) {
-          // renderApplicationRows(applicationIds, transactions, applicationCount) {
-          let applicationRows = applicationIds.map((applicationId, index) => {
+        renderApplicationRows(applicationObjects) {
+          // renderApplicationRows(applicationObjects, transactions, applicationCount) {
+          let applicationRows = applicationObjects.map((applicationObject, index) => {
             return (
               <ApplicantApplicationRow
-                applicationId={applicationId}
+                applicationId={applicationObject.applicationId}
                 key={`application-row-${index}`}
               />
             )
@@ -165,28 +162,28 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
 
         render() {
           let noApplications, loadingLines, applicationRows
-          const { applicationIds, applicationCount } = this.props
+          const { applicationObjects, applicationCount } = this.props
           const loading = applicationCount === undefined
 
           if (loading) {
             loadingLines = (
               <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
+                <div className="blank-state--inner text-gray">
                   <LoadingLines visible={true} />
                 </div>
               </div>
             )
-          } else if (!applicationIds.length) {
+          } else if (!applicationObjects.length) {
             noApplications = (
               <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
+                <div className="blank-state--inner text-gray">
                   <span className="is-size-6">You have not applied yet.</span>
                 </div>
               </div>
             )
           } else {
             applicationRows = (
-              this.renderApplicationRows(applicationIds)
+              this.renderApplicationRows(applicationObjects)
             )
           }
 

@@ -24,8 +24,7 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { storageAvailable } from '~/services/storageAvailable'
-import { applicationStorageKey } from '~/utils/applicationStorageKey'
+import { storeApplicationDetailsInLocalStorage } from '~/services/storeApplicationDetailsInLocalStorage'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
@@ -33,7 +32,9 @@ import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps(state) {
-  let verifier
+  let verifier,
+    applicantsLastApplicationCreatedAt
+
   const transactions = get(state, 'sagaGenesis.transactions')
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
@@ -41,43 +42,29 @@ function mapStateToProps(state) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const workTokenAddress = contractByName(state, 'WorkToken')
 
-  // const minDeposit = cacheCallValueBigNumber(state, coordinationGameAddress, 'minDeposit')
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const approveTx = transactionFinders.approve(state)
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
-
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
-  // console.log('applicantsApplicationCount', applicantsApplicationCount)
-
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
-  // console.log('applicantsLastApplicationId', applicantsLastApplicationId)
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
-
-    // const applicationId = cacheCallValueInt(
-    //   state,
-    //   coordinationGameAddress,
-    //   "applicantsApplicationIndices",
-    //   address,
-    //   index
-    // )
-    //
-    // this.props.applicantsApplicationCount !== nextProps.applicantsApplicationCount
+    applicantsLastApplicationCreatedAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
   }
 
   return {
     applicantsApplicationCount,
+    applicantsLastApplicationCreatedAt,
     applicantsLastApplicationId,
     applicationStakeAmount,
     approveTx,
     address,
     coordinationGameAddress,
     coordinationGameAllowance,
-    // minDeposit,
     networkId,
     tilwBalance,
     transactions,
@@ -103,6 +90,7 @@ function* applicantApplySaga({
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
+    yield cacheCall(coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
     yield cacheCall(coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
   }
 }
@@ -145,18 +133,15 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
         }
 
         componentWillMount(){
-            document.addEventListener("keydown", this._handleKeyDown.bind(this));
+          document.addEventListener("keydown", this._handleKeyDown.bind(this));
         }
 
         componentWillReceiveProps (nextProps) {
-          if (
-            this.props.applicantsLastApplicationId !== undefined &&
-            this.props.applicantsLastApplicationId !== nextProps.applicantsLastApplicationId
-          ) {
+          if (this.newApplication(nextProps)) {
             this.setState({
               applicationCreated: true
             })
-            this.storeApplicationDetailsInLocalStorage(nextProps)
+            storeApplicationDetailsInLocalStorage(nextProps, this.state)
           }
 
           this.registerWorkTokenApproveHandlers(nextProps)
@@ -164,21 +149,17 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           this.registerCoordinationGameSelectVerifierHandler(nextProps)
         }
 
-        storeApplicationDetailsInLocalStorage = (nextProps) => {
-          if (storageAvailable('localStorage')) {
-            const key = applicationStorageKey(nextProps.networkId, nextProps.applicantsLastApplicationId)
-            const applicationObject = {
-              applicationId: nextProps.applicantsLastApplicationId,
-              random: this.state.random,
-              hint: `${this.state.hintLeft} + ${this.state.hintRight}`,
-              secret: this.state.hint
-            }
-            console.log('here!', this.state.hint, applicationObject, applicationObject.secret)
-            localStorage.setItem(key, JSON.stringify(applicationObject))
-            console.log(key, "storing secret, random, hint and applicationId", applicationObject)
-          } else {
-            console.warn('Unable to set application data - no access to localStorage')
-          }
+        newApplication = (nextProps) => {
+          const lastCreatedAt = this.props.applicantsLastApplicationCreatedAt
+          const newCreatedAt = nextProps.applicantsLastApplicationCreatedAt
+          const timestampChanged = lastCreatedAt !== newCreatedAt
+
+          return (
+            !defined(lastCreatedAt) &&
+              defined(newCreatedAt) &&
+              timestampChanged      &&
+              defined(this.state.random)
+          )
         }
 
         registerWorkTokenApproveHandlers = (nextProps) => {
@@ -297,7 +278,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           // needs to be BN ?
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
-          const random = new BN(Math.ceil(Math.random(1) * 1000000))
+          const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
+          console.log('original random is: ', random, random.toString())
 
           const secretRandomHash = getWeb3().utils.sha3(
             ['bytes32', 'uint256'],

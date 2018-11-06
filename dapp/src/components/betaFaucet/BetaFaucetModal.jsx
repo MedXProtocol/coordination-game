@@ -37,7 +37,7 @@ function mapStateToProps (state) {
   const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
 
   const needsEth = (weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
-  const needsTILW = (weiToEther(tilwBalance) < 1500)
+  const needsTILW = (weiToEther(tilwBalance) < 100)
 
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&

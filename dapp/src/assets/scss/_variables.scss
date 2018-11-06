@@ -11,14 +11,14 @@ $red:          hsl(348, 100%, 61%) !default
 // DARK THEME COLOURS
 $background-color: #0e0b16;
 $background-color--lighter: lighten(#0e0b16, 10%);
-$accent-color-1: #a239ca;
-$accent-color-2: #470776;
-$accent-color-3: lighten(#00d1b2, 5%);
+$accent-color-1: #a239ca; // light purple
+$accent-color-2: #470776; // dark purple
+$accent-color-3: lighten(#00d1b2, 5%); // light blue
 
 $brand-primary: $accent-color-2;
 $brand-link: $blue;
 $brand-info: $cyan;
-$brand-success: $brand-primary; //  make success and primary equal (on purpose)
+$brand-success: $accent-color-3;
 $brand-warning: $yellow;
 $brand-danger: $red;
 
