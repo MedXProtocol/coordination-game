@@ -26,8 +26,6 @@ wt.mint('0x5de6eb9f504dc50d33357b61364660db064b623d', 50000000000000000000000)
 wt.mint('0x376de69d2a7130a7d41d052129e8b25335fc1c6e', 50000000000000000000000)
 wt.mint('0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97', 50000000000000000000000)
 
-w.setJobManager(coordinationGameAddress)
-
 var address = '0x061f4af068d28a2ead064c91388d4b25598d6d35'
 wt.approve(w.address, 1000000000000000000000, { from: address })
 w.depositStake({ from: address })

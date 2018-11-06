@@ -27,11 +27,13 @@ function mapStateToProps(state) {
   const workAddress = contractByName(state, 'Work')
 
   const verifierCount = cacheCallValueInt(state, workAddress, 'getVerifiersCount')
+  console.log(verifierCount)
 
   if (verifierCount && verifierCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
     verifierAddresses = range(verifierCount, -1).reduce((accumulator, index) => {
       const verifierAddress = cacheCallValue(state, workAddress, "getVerifierByIndex", index)
+      console.log(verifierAddress)
 
       if (verifierAddress) {
         accumulator.push(verifierAddress)
@@ -53,21 +55,24 @@ function mapStateToProps(state) {
 
 function* verifiersTableSaga({
   workAddress,
-  address,
   verifierCount
 }) {
-  if (!workAddress || !address || !verifierCount) { return null }
+  if (!workAddress) { return null }
+  console.log(workAddress)
+  console.log(verifierCount)
 
   yield cacheCall(workAddress, 'getVerifiersCount')
 
-  if (verifierCount && verifierCount !== 0) {
-    const indices = range(verifierCount)
-    yield all(
-      indices.map(function*(index) {
-        yield cacheCall(workAddress, "getVerifierByIndex", index)
-      })
-    )
-  }
+  // if (verifierCount && verifierCount !== 0) {
+  //   const indices = range(verifierCount)
+  //   console.log(indices)
+  //   yield all(
+  //     indices.map(function* (index) {
+  //       console.lccog(index)
+  //       yield cacheCall(workAddress, "getVerifierByIndex", index)
+  //     })
+  //   )
+  // }
 }
 
 export const VerifiersTable = connect(mapStateToProps)(
