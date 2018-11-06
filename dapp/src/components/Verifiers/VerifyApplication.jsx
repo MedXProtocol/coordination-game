@@ -113,15 +113,18 @@ export const VerifyApplication = connect(mapStateToProps)(
           handleVerifierSecretSubmit = (e) => {
             e.preventDefault()
 
-            const { send, coordinationGameAddress } = this.props
+            const { send, coordinationGameAddress, applicationId } = this.props
 
-            const secret = getWeb3().utils.sha3(this.state.secret)
+            const padLeft = getWeb3().utils.padLeft
+            const toHex = getWeb3().utils.toHex
+
+            const secretAsHex = padLeft(toHex(this.state.secret), 32)
 
             const verifierSubmitSecretTxId = send(
               coordinationGameAddress,
               'verifierSubmitSecret',
-              this.props.applicationId,
-              secret
+              applicationId,
+              secretAsHex
             )()
 
             this.setState({

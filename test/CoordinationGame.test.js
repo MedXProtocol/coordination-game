@@ -13,6 +13,7 @@ const createTILRegistry = require('../migrations/support/createTILRegistry')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
+const leftPadHexString = require('./helpers/leftPadHexString')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
@@ -32,7 +33,7 @@ contract('CoordinationGame', (accounts) => {
   const verifier = accounts[1]
   const verifier2 = accounts[2]
 
-  const secret = '0x85dd39c91a64167ba20732b228251e67caed1462d4bcf036af88dc6856d0fdcc'
+  const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const random = new BN("4312341235")
   const hint = web3.toHex("Totally bogus hint")
 

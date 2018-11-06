@@ -59,7 +59,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
         }
       }
 
-      handleSubmitSelectVerifier = (e) => {
+      handleSend = (e) => {
         e.preventDefault()
 
         const { send, contractAddress, method, args } = this.props
@@ -84,7 +84,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
         const { buttonText, contractAddress } = this.props
 
         return (
-          <form onSubmit={this.handleSubmitSelectVerifier}>
+          <form onSubmit={this.handleSend}>
             <button
               disabled={!contractAddress || this.state.txHandler}
               type="submit"

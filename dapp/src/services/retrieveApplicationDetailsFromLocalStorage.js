@@ -22,11 +22,11 @@ export const retrieveApplicationDetailsFromLocalStorage = (
 
       return applicationRowObject
     } else {
-      console.warn(`Value not found for key ${key} in localStorage`)
+      // console.warn(`Value not found for key ${key} in localStorage`)
       return applicationRowObject
     }
   } else {
-    console.warn("Unable to read from localStorage, doesn't exist or no access!")
+    console.error("Unable to read from localStorage, doesn't exist or no access!")
     return applicationRowObject
   }
 }

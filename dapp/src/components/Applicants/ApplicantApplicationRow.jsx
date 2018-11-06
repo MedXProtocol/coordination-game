@@ -40,12 +40,15 @@ function mapStateToProps(state, { applicationId }) {
   const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
   const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
 
+  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
+
   hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
   if (hint) {
     hint = getWeb3().utils.hexToAscii(hint)
   }
 
   applicationRowObject = {
+    applicantsSecret,
     applicationId,
     createdAt,
     hint,
@@ -110,6 +113,7 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
     cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
+    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'secondsInADay'),
     cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
@@ -229,6 +233,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
         let {
           applicantRevealExpiresAt,
+          applicantsSecret,
           applicationId,
           createdAt,
           hint,
@@ -247,18 +252,31 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
+        const applicantRevealedSecret = !isBlank(applicantsSecret)
+        const applicantWon = (applicantsSecret === verifiersSecret)
 
-        if (!isBlank(verifier) && !verifierSubmittedSecret) {
+        if (applicantRevealedSecret) {
+          expirationMessage = (
+            <React.Fragment>
+              Application Complete
+              <br /><strong>{applicantWon ? `You Won!` : `You Lost`}</strong>
+              <br />{applicantWon ? `(Verifier's secret matched yours)` : `(Verifier's secret did not match yours)`}
+            </React.Fragment>
+          )
+        } else if (!isBlank(verifier) && !verifierSubmittedSecret) {
           expirationMessage = (
             <React.Fragment>
               <span className="has-text-grey">Waiting on Verifier until:</span>
               <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
             </React.Fragment>
           )
-        } else if (verifierSubmittedSecret && defined(random)) {
+        } else if (verifierSubmittedSecret && defined(random) && defined(secret)) {
           let secretAsHex
+          const padLeft = getWeb3().utils.padLeft
+          const toHex = getWeb3().utils.toHex
+
           if (secret) {
-            secretAsHex = getWeb3().utils.sha3(secret.toString())
+            secretAsHex = padLeft(toHex(secret.toString()), 32)
           }
 
           expirationMessage = (
@@ -333,7 +351,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__view">
-              {isBlank(verifier)
+              {isBlank(verifier) && hint && secret && random
                 ? (
                     <Web3ActionButton
                       contractAddress={this.props.coordinationGameAddress}

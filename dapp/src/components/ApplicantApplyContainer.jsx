@@ -279,16 +279,16 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
-          console.log('original random is: ', random, random.toString())
 
-          const secretRandomHash = getWeb3().utils.sha3(
-            ['bytes32', 'uint256'],
-            [this.state.secret, random]
-          ).toString('hex')
-          const randomHash = getWeb3().utils.sha3(
-            ['uint256'],
-            [random]
-          ).toString('hex')
+          const secretAsHex = padLeft(toHex(new BN(this.state.secret)), 32)
+
+          const secretRandomHash = getWeb3().utils.soliditySha3(
+            { type: 'bytes32', value: secretAsHex },
+            { type: 'uint256', value: random.toString() }
+          )
+          const randomHash = getWeb3().utils.soliditySha3(
+            { type: 'uint256', value: random.toString() }
+          )
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
           const hint = padLeft(toHex(hintString), 32)
@@ -318,8 +318,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             'applicantRandomlySelectVerifier',
             this.props.applicantsLastApplicationId
           )()
-          console.log('Making call to coordinationGameAddress#applicantRandomlySelectVerifier with app Id', this.props.applicantsLastApplicationId)
-          console.log('txid is: ', coordinationGameSelectVerifierTxId)
 
           this.setState({
             coordinationGameSelectVerifierHandler: new TransactionStateHandler(),

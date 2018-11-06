@@ -31,12 +31,15 @@ function mapStateToProps(state, { applicationId }) {
   const secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
   const applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
   const verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+
   const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
+  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
 
   applicationRowObject = {
     applicationId,
     createdAt,
-    updatedAt
+    updatedAt,
+    verifiersSecret
   }
 
   applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
@@ -47,6 +50,7 @@ function mapStateToProps(state, { applicationId }) {
 
   return {
     applicationRowObject,
+    applicantsSecret,
     address,
     coordinationGameAddress,
     latestBlockTimestamp,
@@ -61,6 +65,7 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
+    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'secondsInADay'),
     cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
     cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
@@ -81,6 +86,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const {
           applicationRowObject,
+          applicantsSecret,
           latestBlockTimestamp,
           verifiersSecret
         } = this.props
@@ -100,9 +106,18 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
+        const applicantRevealedSecret = !isBlank(applicantsSecret)
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
+        const applicantWon = (applicantsSecret === verifiersSecret)
 
-        if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
+        if (applicantRevealedSecret) {
+          expirationMessage = (
+            <React.Fragment>
+              Application Complete
+              <br /><strong>{applicantWon ? `Applicant Won!` : `Applicant Lost`}</strong>
+            </React.Fragment>
+          )
+        } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
           expirationMessage = <span className="has-text-warning">Cannot Verify, Verification Expiry Passed</span>
         } else if (!verifierSubmittedSecret) {
           expirationMessage = (
