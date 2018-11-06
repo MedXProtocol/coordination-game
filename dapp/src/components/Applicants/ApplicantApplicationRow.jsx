@@ -19,6 +19,7 @@ import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
+import { defined } from '~/utils/defined'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationId }) {
@@ -254,13 +255,11 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
               <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
             </React.Fragment>
           )
-        } else if (verifierSubmittedSecret) {
+        } else if (verifierSubmittedSecret && defined(random)) {
           let secretAsHex
           if (secret) {
             secretAsHex = getWeb3().utils.sha3(secret.toString())
           }
-
-          console.log(applicationId, secretAsHex, random.toString())
 
           expirationMessage = (
             <React.Fragment>
