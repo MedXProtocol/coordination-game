@@ -175,9 +175,11 @@ contract('CoordinationGame', (accounts) => {
     it('should allow a user to start the game', async () => {
       let applicantsApplicationCount
 
-      applicantsApplicationCount = new BN(await coordinationGame.getApplicantsApplicationCount({
+      var appCount = await coordinationGame.getApplicantsApplicationCount({
         from: applicant
-      }).toString())
+      })
+
+      applicantsApplicationCount = new BN(appCount.toString())
       assert.equal(applicantsApplicationCount.toString(), new BN(0).toString(), "Applicant's Application Count was 0")
 
       await newApplicantStartsGame()
@@ -190,9 +192,11 @@ contract('CoordinationGame', (accounts) => {
       assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
       assert.equal(storedHint, hint, 'hint matches')
 
-      applicantsApplicationCount = new BN(await coordinationGame.getApplicantsApplicationCount({
+      appCount = await coordinationGame.getApplicantsApplicationCount({
         from: applicant
-      }).toString())
+      })
+
+      applicantsApplicationCount = new BN(appCount.toString())
       assert.equal(applicantsApplicationCount.toString(), new BN(1).toString(), "Applicant's Application Count increased")
     })
   })
@@ -225,9 +229,9 @@ contract('CoordinationGame', (accounts) => {
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
         assert([verifier, verifier2].includes(selectedVerifier), '1st verifier matches')
 
-        const verifiersApplicationCount = new BN(await coordinationGame.getVerifiersApplicationCount({
+        const verifiersApplicationCount = new BN((await coordinationGame.getVerifiersApplicationCount({
           from: selectedVerifier
-        }).toString())
+        })).toString())
         assert.equal(verifiersApplicationCount.toString(), new BN(1).toString(), "Verifier's Application Count increased")
       })
 

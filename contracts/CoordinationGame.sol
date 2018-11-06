@@ -346,11 +346,11 @@ contract CoordinationGame is Ownable {
     return bytes32(_applicationId);
   }
 
-  function getApplicantsApplicationCount() external view returns (uint256 applicantsApplicationCount) {
+  function getApplicantsApplicationCount() external view returns (uint256) {
     return applicantsApplicationIndices[msg.sender].length;
   }
 
-  function getApplicantsLastApplicationID() external view returns (uint256 applicationId) {
+  function getApplicantsLastApplicationID() external view returns (uint256) {
     if (applicantsApplicationIndices[msg.sender].length > 0) {
       uint256 index = applicantsApplicationIndices[msg.sender].length.sub(1);
       return applicantsApplicationIndices[msg.sender][index];
