@@ -27,7 +27,6 @@ function mapStateToProps(state) {
   const workAddress = contractByName(state, 'Work')
 
   const verifierCount = cacheCallValueInt(state, workAddress, 'getVerifiersCount')
-  console.log(verifierCount)
 
   if (verifierCount && verifierCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
@@ -41,8 +40,6 @@ function mapStateToProps(state) {
       return accumulator
     }, [])
   }
-
-  console.log(verifierAddresses)
 
   return {
     verifierCount,
@@ -59,7 +56,7 @@ function* verifiersTableSaga({
   address,
   verifierCount
 }) {
-  if (!workAddress || !address) { return null }
+  if (!workAddress || !address || !verifierCount) { return null }
 
   yield cacheCall(workAddress, 'getVerifiersCount')
 
@@ -114,7 +111,7 @@ export const VerifiersTable = connect(mapStateToProps)(
               </div>
             </div>
           )
-        } else if (!verifierAddresses.length) {
+        } else if (verifierCount === 0) {
           noApplications = (
             <div className="blank-state">
               <div className="blank-state--inner text-gray">
