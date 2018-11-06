@@ -192,7 +192,13 @@ contract CoordinationGame is Ownable {
 
     // TODO: How are we converting the blockhas to a random number?
     uint256 randomNum = uint256(blockhash(randomBlockNumbers[_applicationId]));
+    uint256 workerOffset = 0;
+
     address selectedVerifier = work.selectWorker(randomNum);
+    while (selectedVerifier == msg.sender) {
+      workerOffset += 1;
+      selectedVerifier = work.selectWorker(randomNum + workerOffset);
+    }
 
     if (previousVerifier != address(0)) {
       require(
@@ -209,7 +215,7 @@ contract CoordinationGame is Ownable {
 
       // If we chose this verifier last time let's choose a different one
       if (selectedVerifier == previousVerifier) {
-        selectedVerifier = work.selectWorker(randomNum - 1);
+        selectedVerifier = work.selectWorker(randomNum + workerOffset + 1);
       }
 
       require(selectedVerifier != previousVerifier, 'new verifier is not the same as the previous one');
