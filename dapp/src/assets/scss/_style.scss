@@ -377,6 +377,13 @@ header {
   background-color: transparent;
   color: #ccc;
   font-weight: normal;
+  opacity: 0.5;
+  text-decoration: none;
+}
+
+.button.is-light.is-text:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 .button.button--getTilw {
