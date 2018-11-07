@@ -170,6 +170,14 @@ contract('CoordinationGame', (accounts) => {
   //   await coordinationGame.verifierChallenge(applicationId, { from: selectedVerifier })
   // }
 
+  describe('selectVerifier()', () => {
+    it('should skip the applicant when they select themselves', async () => {
+      const zeroVerifier = await work.selectWorker(0)
+      assert.equal(zeroVerifier, verifier)
+      const selectedVerifier = await coordinationGame.selectVerifier(verifier, 0);
+      assert.equal(selectedVerifier, verifier2)
+    })
+  })
 
   describe('start()', () => {
     it('should allow a user to start the game', async () => {

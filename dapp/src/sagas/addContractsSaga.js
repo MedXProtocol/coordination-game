@@ -16,7 +16,7 @@ export const addTruffleArtifactAddresses = function* (contractJson) {
     var networkConfig = contractJson.networks[networkId]
 
     if (networkId === '1234')
-      console.log(contractJson.contractName, networkConfig.address)
+      console.log(`var ${contractJson.contractName[0].toLowerCase()}${contractJson.contractName.slice(1)}Address = '${networkConfig.address}'`)
 
     yield addContract({
       networkId,
