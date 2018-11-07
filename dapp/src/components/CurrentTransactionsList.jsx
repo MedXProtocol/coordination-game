@@ -12,6 +12,7 @@ const txNames = {
   'approve': 'TILW Approval',
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
+  'applicantRevealSecret': 'Finalizing Aplpication',
   'depositStake': 'Depositing TILW Stake',
   'updateSettings': 'Update Settings',
   'verifierSubmitSecret': 'Submitting Secret'

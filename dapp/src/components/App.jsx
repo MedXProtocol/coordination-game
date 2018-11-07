@@ -27,6 +27,8 @@ import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
+import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
+import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps (state) {
@@ -54,9 +56,12 @@ const App = connect(mapStateToProps)(
     class extends Component {
       constructor(props) {
         super(props)
+
+        const theme = retrieveKeyValFromLocalStorage('theme')
+
         this.state = {
           sagasReady: false,
-          isLight: false
+          isLight: theme === 'light'
         }
       }
 
@@ -94,7 +99,11 @@ const App = connect(mapStateToProps)(
       toggleTheme = (e) => {
         e.preventDefault()
 
-        this.setState({ isLight: !this.state.isLight })
+        this.setState({
+          isLight: !this.state.isLight
+        }, () => {
+          storeKeyValInLocalStorage('theme', this.state.isLight ? 'light' : 'dark')
+        })
       }
 
       render() {
