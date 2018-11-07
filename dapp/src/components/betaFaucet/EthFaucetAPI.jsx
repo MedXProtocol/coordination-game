@@ -3,10 +3,10 @@ import ReactTimeout from 'react-timeout'
 import PropTypes from 'prop-types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
-import { axiosInstance } from '~/../config/axiosConfig'
+import { toastr } from '~/toastr'
 import { EthAddress } from '~/components/EthAddress'
-import { LoadingLines } from '~/components/LoadingLines'
 import { EtherFlip } from '~/components/EtherFlip'
+import { axiosInstance } from '~/../config/axiosConfig'
 
 export const EthFaucetAPI = ReactTimeout(
   class _EthFaucetAPI extends Component {
@@ -17,19 +17,28 @@ export const EthFaucetAPI = ReactTimeout(
       super(props)
 
       this.state = {
-        isSending: false,
-        errorMessage: '',
-        response: {}
+        isSending: false
       }
     }
 
     handleSendEther = (event) => {
       event.preventDefault()
       this.setState({
-        isSending: true,
-        errorMessage: '',
-        response: {}
+        isSending: true
       }, this.doSendEther)
+    }
+
+    englishErrorMessage = (message) => {
+      return 'There was an error (you may have been sent this previously). If the problem persists please contact MedX Protocol on Telegram'
+    }
+
+    showToastrError = (message) => {
+      toastr.error(this.englishErrorMessage(message),
+        {
+          url: 'https://t.me/MedXProtocol',
+          text: 'Contact Support'
+        }
+      )
     }
 
     doSendEther = async () => {
@@ -38,18 +47,17 @@ export const EthFaucetAPI = ReactTimeout(
 
         if (response.status === 200) {
           this.setState({
-            responseMessage: "We're sending you Ether",
             txHash: response.data.txHash
           })
+
+          toastr.success("We're sending you Ether - It will take a few moments to arrive.")
+
           this.props.addExternalTransaction('sendEther', response.data.txHash)
           this.props.setTimeout(() => {
             this.props.handleMoveToNextStep()
           }, 2000)
         } else {
-          this.setState({
-            responseMessage: '',
-            errorMessage: `There was an error: ${response.data}`
-          })
+          this.showToastrError(response.data)
 
           this.props.setTimeout(() => {
             this.setState({
@@ -58,10 +66,8 @@ export const EthFaucetAPI = ReactTimeout(
           }, 1000)
         }
       } catch (error) {
-        this.setState({
-          responseMessage: '',
-          errorMessage: error.message
-        })
+        this.showToastrError(error.message)
+
         this.props.setTimeout(() => {
           this.setState({
             isSending: false
@@ -71,50 +77,7 @@ export const EthFaucetAPI = ReactTimeout(
     }
 
     render () {
-      const { isSending, responseMessage, errorMessage } = this.state
-
-      if (errorMessage) {
-        var englishErrorMessage = (
-          <small>
-            <br />
-            There was an error while sending you Ether, you may have already received it or it's on the way. If the problem persists please contact MedX Protocol on Telegram and we can send you Ropsten Testnet Ether:
-            &nbsp; <a
-              target="_blank"
-              href="https://t.me/MedXProtocol"
-              rel="noopener noreferrer">Contact Support</a>
-          </small>
-        )
-
-        var errorParagraph = (
-          <p className="text-danger">
-            {errorMessage}
-            {englishErrorMessage}
-            <br />
-            <br />
-          </p>
-        )
-      }
-
-      if (responseMessage) {
-        var successParagraph = (
-          <p>
-            <strong>{responseMessage}</strong>
-            <br />
-            <small>
-              Please wait, this may take up to a couple of minutes ...
-            </small>
-            <br/>
-          </p>
-        )
-      }
-
-      const responseWell = (
-        <div className="well beta-faucet--well">
-          <LoadingLines visible={isSending} /> &nbsp;
-          {successParagraph}
-          {errorParagraph}
-        </div>
-      )
+      const { isSending } = this.state
 
       return (
         <div>
@@ -124,16 +87,20 @@ export const EthFaucetAPI = ReactTimeout(
             &nbsp; <EtherFlip wei={this.props.ethBalance} />
           </h5>
           <p className="small">
-            <span className="eth-address text-gray">For address:&nbsp;
+            <span className="eth-address has-text-grey-light">For address:&nbsp;
               <EthAddress address={this.props.address} />
             </span>
           </p>
-          <hr />
-          <p className="is-size-6">
-            You're low on ether. Not to worry! We can have some sent to your account:
-          </p>
           <br />
+          <p className="is-size-5">
+            You're low on Ether
+            <br />
+            <span className="is-size-7 has-text-grey-light">
+              Not to worry! We can have some sent to your account:
+            </span>
+          </p>
           <p>
+            <br />
             <a
               disabled={isSending}
               href={this.faucetLambdaURI}
@@ -141,12 +108,11 @@ export const EthFaucetAPI = ReactTimeout(
               className="button is-primary is-outlined"
             >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
           </p>
-          {isSending || responseMessage || errorMessage ? responseWell : ''}
           <br />
           <p>
             <button
               onClick={this.props.handleMoveToNextStep}
-              className="button is-light is-text"
+              className="button is-light is-text is-small"
             >skip this for now</button>
           </p>
         </div>
