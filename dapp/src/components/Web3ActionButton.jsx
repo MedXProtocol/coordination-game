@@ -71,7 +71,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
           ...args
         )()
         console.log(`Making call to ${contractAddress}#${method} with args`, args)
-        console.log('txid is: ', txId)
+        // console.log('txid is: ', txId)
 
 
         this.setState({

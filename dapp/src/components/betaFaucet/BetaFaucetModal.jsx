@@ -64,7 +64,7 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ workTokenAddress, betaFaucetAddress, address }) {
+function* betaFaucetModalSaga({ workTokenAddress, betaFaucetAddress, address }) {
   if (!workTokenAddress || !betaFaucetAddress || !address) { return }
 
   yield all([
@@ -93,7 +93,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga)(
+  withSaga(betaFaucetModalSaga)(
     class _BetaFaucetModal extends Component {
 
       componentWillReceiveProps(nextProps) {

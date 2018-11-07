@@ -5,23 +5,24 @@ import { hot } from 'react-hot-loader'
 import { withRouter, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { Admin } from '~/components/Admin/Admin'
-import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
-import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
-import { BodyClass } from '~/components/BodyClass'
-import { DebugLog } from '~/components/DebugLog'
-import { FourOhFour } from '~/components/FourOhFour'
-import { LoginToMetaMask } from '~/components/LoginToMetaMask'
-import { GetTILW } from '~/components/GetTILW'
-import { GetWallet } from '~/components/GetWallet'
-import { Header } from '~/components/Header'
-import { Home } from '~/components/Home'
 import {
   cacheCall,
   cacheCallValue,
   contractByName,
   withSaga
 } from 'saga-genesis'
+import { Admin } from '~/components/Admin/Admin'
+import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
+import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
+import { BodyClass } from '~/components/BodyClass'
+import { DebugLog } from '~/components/DebugLog'
+import { FAQModal } from '~/components/FAQModal'
+import { FourOhFour } from '~/components/FourOhFour'
+import { GetTILW } from '~/components/GetTILW'
+import { GetWallet } from '~/components/GetWallet'
+import { Header } from '~/components/Header'
+import { Home } from '~/components/Home'
+import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 // import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
@@ -107,12 +108,14 @@ const App = connect(mapStateToProps)(
       }
 
       render() {
-        let betaFaucetModal = null,
-          getTilw = null,
-          header = null
+        let betaFaucetModal,
+          faqModal,
+          getTilw,
+          header
 
-        betaFaucetModal = <BetaFaucetModal  />
-        getTilw = <GetTILW  />
+        betaFaucetModal = <BetaFaucetModal />
+        faqModal = <FAQModal />
+        getTilw = <GetTILW />
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}
@@ -144,6 +147,7 @@ const App = connect(mapStateToProps)(
             <React.Fragment>
               {getTilw}
               {betaFaucetModal}
+              {faqModal}
               <GetWallet />
               <LoginToMetaMask />
               <ReduxToastr
