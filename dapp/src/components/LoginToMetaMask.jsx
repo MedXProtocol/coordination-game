@@ -35,9 +35,6 @@ export const LoginToMetaMask =
         this.props.setTimeout(
           () => {
             this.interval = this.props.setInterval(this.checkEthereum, 1000)
-            console.log('here')
-            console.log(this.interval)
-
 
             this.setState({
               enoughTimePassed: true
@@ -87,7 +84,6 @@ export const LoginToMetaMask =
       }
 
       checkEthereum = async () => {
-        console.log('checking')
         if (window.ethereum) {
           let isUnlocked,
             isEnabled,
