@@ -33,6 +33,8 @@ contract BetaFaucet is Ownable {
    * @param _workToken - the address of the previously deployed Work token contract
    */
   function init(WorkToken _workToken) external {
+    require(workToken == address(0));
+    owner = msg.sender;
     workToken = _workToken;
   }
 

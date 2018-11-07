@@ -1,3 +1,4 @@
+
 const expectThrow = require('./helpers/expectThrow')
 const WorkToken = artifacts.require("./WorkToken.sol")
 const BetaFaucetArtifact = artifacts.require('./BetaFaucet.sol')
@@ -17,7 +18,7 @@ contract('BetaFaucet', function (accounts) {
   })
 
   describe('init()', () => {
-    xit('should not be called again', async () => {
+    it('should not be called again', async () => {
       await expectThrow(async () => {
         await betaFaucetInstance.init(workTokenInstance.address)
       })
