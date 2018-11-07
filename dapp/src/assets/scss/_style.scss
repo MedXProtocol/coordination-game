@@ -482,9 +482,10 @@ header {
               linear-gradient(336deg, rgba(20,15,30,0.8), rgba(20,10,30,0.5) 70%);
 
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
-  padding: 4rem;
+  padding: 3rem 2rem;
 
   @media screen and (max-width: 768px) {
+    margin: 0;
     padding: 3rem 1.5rem;
   }
 }

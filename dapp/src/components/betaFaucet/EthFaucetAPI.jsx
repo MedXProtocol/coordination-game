@@ -99,11 +99,10 @@ export const EthFaucetAPI = ReactTimeout(
         var successParagraph = (
           <p>
             <strong>{responseMessage}</strong>
+            <br />
             <small>
-              <br/>
               Please wait, this may take up to a couple of minutes ...
             </small>
-            <br/>
             <br/>
           </p>
         )
@@ -111,9 +110,7 @@ export const EthFaucetAPI = ReactTimeout(
 
       const responseWell = (
         <div className="well beta-faucet--well">
-          <br />
           <LoadingLines visible={isSending} /> &nbsp;
-          <br />
           {successParagraph}
           {errorParagraph}
         </div>
@@ -145,7 +142,6 @@ export const EthFaucetAPI = ReactTimeout(
             >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
           </p>
           {isSending || responseMessage || errorMessage ? responseWell : ''}
-          <br />
           <br />
           <p>
             <button

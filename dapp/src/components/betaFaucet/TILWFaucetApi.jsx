@@ -98,11 +98,10 @@ export const TILWFaucetApi = ReactTimeout(
         var successParagraph = (
           <p>
             <strong>{responseMessage}</strong>
+            <br />
             <small>
-              <br/>
               Please wait, this may take up to a couple of minutes ...
             </small>
-            <br/>
             <br/>
           </p>
         )
@@ -110,9 +109,7 @@ export const TILWFaucetApi = ReactTimeout(
 
       const responseWell = (
         <React.Fragment>
-          <br />
           <LoadingLines visible={isSending} /> &nbsp;
-          <br />
           {successParagraph}
           {errorParagraph}
         </React.Fragment>
@@ -143,7 +140,6 @@ export const TILWFaucetApi = ReactTimeout(
             >{isSending ? 'Sending ...' : 'Mint Me TILW'}</a>
           </p>
           {isSending || responseMessage || errorMessage ? responseWell : ''}
-          <br />
           <br />
           <p>
             <button

@@ -28,7 +28,9 @@ export const EthAddress = class _EthAddress extends Component {
     }
 
     return (
-      <span title={address} className='address' data-tip={!this.state.showFull ? 'Show Full Address' : ''}>
+      <span title={address} className='address' data-tip={
+        (!this.props.disallowFull && !this.state.showFull) ? 'Show Full Address' : ''
+      }>
         {displayed}
       </span>
     )
