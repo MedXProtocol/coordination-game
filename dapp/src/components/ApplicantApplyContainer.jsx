@@ -284,10 +284,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const secretAsHex = padLeft(toHex(this.state.secret), 32)
 
-          console.log('this.state.secret', this.state.secret)
-          console.log('secretAsHex', secretAsHex)
-          console.log('random', random.toString())
-
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
             { type: 'uint256', value: random.toString() }
@@ -295,9 +291,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           const randomHash = getWeb3().utils.soliditySha3(
             { type: 'uint256', value: random.toString() }
           )
-
-          console.log('secretRandomHash', secretRandomHash)
-          console.log('randomHash', randomHash)
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
           const hint = padLeft(toHex(hintString), 32)
