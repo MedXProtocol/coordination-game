@@ -1,6 +1,6 @@
 // LIGHT THEME COLOURS
 $text-color--light: #333;
-$background-color--light: #eff4f7;
+$background-color--light: #f4f4f4;
 $accent-color-1--light: #51a5d1; // blue
 $accent-color-2--light: #f8aa2f; // orange
 $accent-color-3--light: #13e99b; // green
@@ -48,6 +48,10 @@ html.html-light,
 
   .has-text-grey-light {
     color: lighten($text-color--light, 20%) !important;
+  }
+
+  .has-text-grey-lighter {
+    color: lighten($text-color--light, 50%) !important;
   }
 
   .has-text-transparent-white,
@@ -337,7 +341,6 @@ html.html-light,
 
   .level--container {
     background-color: lighten($background-color--light, 2%);
-    border: 3px solid lighten($background-color--light, 1%);
   }
 
   .level--header {
@@ -450,7 +453,15 @@ html.html-light,
   }
 
   .navbar-item a.navbar-item {
-    color: $accent-color-1--light;
+    color: lighten(saturate($accent-color-1--light, 50%), 15%);
+  }
+
+  a.navbar-item:hover,
+  a.navbar-item.is-active,
+  .navbar-link:hover,
+  .navbar-link.is-active {
+    background-color: inherit;
+    color: darken(saturate($accent-color-1--light, 100%), 15%);
   }
 
   .navbar.is-fixed-top.navbar--row-one {
@@ -473,14 +484,6 @@ html.html-light,
     &:after {
       opacity: 0;
     }
-  }
-
-  a.navbar-item:hover,
-  a.navbar-item.is-active,
-  .navbar-link:hover,
-  .navbar-link.is-active {
-    background-color: inherit;
-    color: lighten(saturate($accent-color-1--light, 50%), 15%);
   }
 
   .navbar-brand a {

@@ -278,7 +278,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           // needs to be BN ?
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
-          const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
+          // const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
+
+          const random = new BN('1587875817')
 
           const secretAsHex = padLeft(toHex(new BN(this.state.secret)), 32)
 
@@ -299,6 +301,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
           const hint = padLeft(toHex(hintString), 32)
+
+          window.web31 = getWeb3()
+          window.bnn = BN
 
           const coordinationGameStartTxId = send(
             coordinationGameAddress,

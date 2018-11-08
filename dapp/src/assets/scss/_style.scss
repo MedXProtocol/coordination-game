@@ -561,7 +561,8 @@ section {
 
 .level--container {
   background-color: lighten($background-color, 3%);
-  border: 3px solid lighten($background-color, 2%);
+  border: 0;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
 .level--header {
