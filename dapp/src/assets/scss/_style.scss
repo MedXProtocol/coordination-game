@@ -329,7 +329,12 @@ header {
 }
 
 .section {
+  min-height: 100%;
   padding: 6rem 1.5rem 2rem;
+
+  @media screen and (max-width: 1088px) {
+    padding-top: 2rem;
+  }
 }
 
 .has-text-primary {
@@ -510,10 +515,6 @@ header {
     max-height: calc(100vh - 20px);
     width: 1020px;
   }
-}
-
-section {
-  min-height: 100%;
 }
 
 .svg-inline--fa.fa-w-10.fa-ethereum {

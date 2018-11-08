@@ -435,6 +435,10 @@ html.html-light,
     }
   }
 
+  .navbar-burger:hover {
+    background-color: rgba(200, 240, 255, 0.5);
+  }
+
   .navbar-dropdown {
     border: 0;
   }
@@ -468,7 +472,7 @@ html.html-light,
 
   .navbar.is-fixed-top.navbar--row-one {
     &:before {
-      background: linear-gradient(183deg, lighten($background-color--light, 5%), $background-color--light 100%);
+      background: linear-gradient(183deg, darken($background-color--light, 5%), darken($background-color--light, 3%) 100%);
       opacity: 1;
     }
     &:after {
@@ -477,14 +481,19 @@ html.html-light,
   }
 
   .navbar.is-fixed-top.navbar--row-two {
-    border-color: darken($background-color--light, 2%);
+    // min
+    @media screen and (min-width: 1088px) {
+      border-color: darken($background-color--light, 2%);
 
-    &:before {
-      background: linear-gradient(177deg, lighten($background-color--light, 2%), lighten($background-color--light, 4%) 100%);
-      opacity: 1;
+      &:after {
+        background: linear-gradient(177deg, lighten($background-color--light, 2%), lighten($background-color--light, 4%) 100%);
+        opacity: 1;
+      }
     }
-    &:after {
-      opacity: 0;
+
+    // max
+    @media screen and (max-width: 1088px) {
+      top: 70px;
     }
   }
 
