@@ -22,7 +22,6 @@ function mapStateToProps(state) {
   const showFaqModal = (
     retrieveKeyValFromLocalStorage('dontShowFaqModal') !== 'true'
   ) && get(state, 'faqModal.showFaqModal')
-  console.log('showFaqModal', showFaqModal)
 
   // START beta faucet specific (to avoid opening FAQ when Beta Faucet is open)
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
@@ -81,7 +80,6 @@ export const FAQModal =
         super(props)
 
         const modalState = retrieveKeyValFromLocalStorage('dontShowFaqModal') !== 'true'
-        console.log('modalState', modalState)
 
         this.state = {
           modalState
