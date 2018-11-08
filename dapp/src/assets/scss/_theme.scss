@@ -224,7 +224,7 @@ html.html-light,
 
   .progress--step:before {
     background-color: white;
-    border: 1px solid white;
+    border-color: white;
   }
 
   .progress--step.is-active {
@@ -242,7 +242,7 @@ html.html-light,
   }
 
   .progress--step.is-complete:before {
-    background: $accent-color-1--light;
+    background: $accent-color-3--light;
     border-color: $background-color--light;
   }
 
@@ -380,7 +380,6 @@ html.html-light,
   .tabs.is-boxed li.is-active button {
     border-color: $accent-color-3--light;
     border-color: transparent;
-    border-bottom-color: rgb(219, 219, 219);
   }
 
   .delete.is-warning:hover,

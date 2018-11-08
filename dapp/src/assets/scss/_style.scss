@@ -641,7 +641,7 @@ section {
 }
 
 .tabs ul {
-  border-bottom-color: lighten($accent-color-3, 30%);
+  border-bottom-color: transparent;
   font-size: 0.875rem;
 }
 
@@ -662,19 +662,18 @@ section {
 
 .tabs button:hover {
   border-bottom-color: lighten($accent-color-3, 30%);
-  color: lighten($accent-color-3, 30%);
+  color: lighten($accent-color-1, 30%);
 }
 
 .tabs li.is-active button {
-  border-bottom-color: $accent-color-3;
-  color: $accent-color-3;
+  background: black;
+  border-bottom-color: $accent-color-1;
+  border-color: $accent-color-1;
+  color: $accent-color-1;
 }
 
 .tabs.is-boxed li.is-active button {
-  // background-color: #fff;
-  border-color: $accent-color-3;
-  border-bottom-color: rgb(219, 219, 219);
-  border-bottom-color: transparent !important;
+  border-color: transparent;
 }
 
 .tabs.is-boxed button {

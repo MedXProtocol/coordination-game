@@ -127,6 +127,9 @@ module.exports = {
   optimization: {
     minimizer: [
       new TerserPlugin({
+        cache: true,
+        sourceMap: true,
+        parallel: true,
         terserOptions: {
           parse: {
             // we want terser to parse ecma 8 code. However, we don't want it
@@ -136,6 +139,17 @@ module.exports = {
             // https://github.com/facebook/create-react-app/pull/4234
             ecma: 8,
           },
+          ecma: 8,
+          warnings: true,
+          mangle: true,
+          output: {
+            comments: false,
+            beautify: false
+          },
+          toplevel: true,
+          nameCache: null,
+          keep_classnames: true,
+          keep_fnames: true, // keep_fnames false will break our web3 / metamask integration code!
           compress: {
             ecma: 5,
             warnings: false,
@@ -150,23 +164,7 @@ module.exports = {
             // https://github.com/terser-js/terser/issues/120
             inline: 2,
           },
-          mangle: {
-            safari10: true,
-          },
-          output: {
-            ecma: 5,
-            comments: false,
-            // Turned on because emoji and regex is not minified properly using default
-            // https://github.com/facebook/create-react-app/issues/2488
-            ascii_only: true,
-          },
-        },
-        // Use multi-process parallel running to improve the build speed
-        // Default number of concurrent runs: os.cpus().length - 1
-        parallel: true,
-        // Enable file caching
-        cache: true,
-        sourceMap: shouldUseSourceMap,
+        }
       }),
       new OptimizeCSSAssetsPlugin({
         cssProcessorOptions: {

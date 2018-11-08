@@ -1,7 +1,6 @@
 .list--container {
   background: darken($background-color, 2%);
-  border: 2px solid $accent-color-2;
-  border-radius: 5px;
+  border-radius: 0;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   font-family: 'Comfortaa', sans-serif;
   transition: all 0.5s ease-in-out;
@@ -48,7 +47,7 @@
 }
 
 .list--item:hover {
-  background-color: darken($accent-color-2, 13%);
+  background-color: darken($accent-color-2, 17%);
 }
 
 .list--item__id,
