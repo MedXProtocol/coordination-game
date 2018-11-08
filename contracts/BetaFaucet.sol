@@ -21,21 +21,14 @@ contract BetaFaucet is Ownable {
   using SafeMath for uint256;
 
   // Constructor which allows us to fund contract on creation
-  constructor() public payable {
+  constructor(WorkToken _workToken) public payable {
+    require(workToken == address(0));
+    owner = msg.sender;
+    workToken = _workToken;
   }
 
   // `fallback` function called when eth is sent to this contract
   function () payable {
-  }
-
-  /**
-   * @dev - Creates a new BetaFaucet contract with the given parameters
-   * @param _workToken - the address of the previously deployed Work token contract
-   */
-  function init(WorkToken _workToken) external {
-    require(workToken == address(0));
-    owner = msg.sender;
-    workToken = _workToken;
   }
 
   function setWorkToken(WorkToken _workToken) external onlyOwner {
