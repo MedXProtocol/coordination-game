@@ -10,6 +10,8 @@ import {
   withSaga
 } from 'saga-genesis'
 import { Modal } from '~/components/Modal'
+import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
+import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import { weiToEther } from '~/utils/weiToEther'
@@ -17,10 +19,10 @@ import UndrawOldDaySvg from '~/assets/img/undraw_old_day_6x25.svg'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
-
-  const faqModalDismissed = get(state, 'faqModal.dontShowAgain') || get(state, 'faqModal.closed')
-  console.log('betaFaucetModalDismissed', betaFaucetModalDismissed)
-  console.log('faqModalDismissed', faqModalDismissed)
+  const showFaqModal = (
+    retrieveKeyValFromLocalStorage('dontShowFaqModal') !== 'true'
+  ) && get(state, 'faqModal.showFaqModal')
+  console.log('showFaqModal', showFaqModal)
 
   // START beta faucet specific (to avoid opening FAQ when Beta Faucet is open)
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
@@ -47,16 +49,8 @@ function mapStateToProps(state) {
     address,
     betaFaucetAddress,
     betaFaucetVisible,
-    faqModalDismissed,
+    showFaqModal,
     workTokenAddress
-  }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatchHideFAQModal: () => {
-      dispatch({ type: 'HIDE_FAQ_MODAL' })
-    }
   }
 }
 
@@ -70,6 +64,14 @@ function* faqModalSaga({ workTokenAddress, betaFaucetAddress, address }) {
   ])
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchHideFaqModal: () => {
+      dispatch({ type: 'HIDE_FAQ_MODAL' })
+    }
+  }
+}
+
 export const FAQModal =
   connect(mapStateToProps, mapDispatchToProps)(
     withSaga(faqModalSaga)(
@@ -78,17 +80,20 @@ export const FAQModal =
       constructor(props) {
         super(props)
 
+        const modalState = retrieveKeyValFromLocalStorage('dontShowFaqModal') !== 'true'
+        console.log('modalState', modalState)
+
         this.state = {
-          modalState: false
+          modalState
         }
       }
 
-      closeModal = () => {
+      handleCloseModal = () => {
         this.setState({
           modalState: false
-        }, () => {
-          this.props.dispatchHideFAQModal()
         })
+
+        this.props.dispatchHideFaqModal()
       }
 
       componentDidMount() {
@@ -100,21 +105,24 @@ export const FAQModal =
       }
 
       determineModalState(props) {
-        let newModalState = false
-
-        if (!isBlank(props.address) && !props.betaFaucetVisible && !props.faqModalDismissed) {
-          newModalState = true
+        if (!isBlank(props.address) && !props.betaFaucetVisible && props.showFaqModal) {
+          this.setState({
+            modalState: true
+          })
         }
+      }
 
-        this.setState({
-          modalState: newModalState
-        })
+      handleDontShow = (e) => {
+        e.preventDefault()
+
+        this.handleCloseModal()
+        storeKeyValInLocalStorage('dontShowFaqModal', 'true')
       }
 
       render () {
         return (
           <Modal
-            closeModal={this.closeModal}
+            closeModal={this.handleCloseModal}
             modalState={this.state.modalState}
             title="FAQ Modal"
           >
@@ -135,6 +143,25 @@ export const FAQModal =
               </h5>
               <p>
                 A Work contract is a mechanism that determines who is able to participate as a “Worker” in a cryptoeconomic system. To become an eligible Worker, a user must stake tokens. When a new Job is available, a Worker is selected to complete it.
+              </p>
+
+              <p>
+                <br />
+                <button
+                  onClick={this.handleCloseModal}
+                  className="button is-primary is-outlined"
+                >
+                  Cool, thanks! I'd like to play
+                </button>
+              </p>
+              <br />
+              <p>
+                <button
+                  onClick={this.handleDontShow}
+                  className="button is-light is-text is-small"
+                >
+                  don't show this message again
+                </button>
               </p>
             </div>
           </Modal>

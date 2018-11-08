@@ -28,31 +28,6 @@ export const Home = class _Home extends Component {
         </div>
 
         <ApplicantApplicationsTable topBorderless={true} />
-
-        <br />
-        <br />
-        <hr />
-
-        <div className="level--container">
-          <nav className="level level--footer">
-            <div className="level-item has-text-centered">
-              <p className="title">
-                <Link to={routes.APPLY} className="is-size-7">
-                  Apply to be on the Registry
-                </Link>
-              </p>
-            </div>
-
-            <div className="level-item has-text-centered">
-              <p className="title">
-                <Link to={routes.STAKE} className="is-size-7">
-                  Stake to become a Verifier
-                </Link>
-              </p>
-            </div>
-          </nav>
-        </div>
-
       </React.Fragment>
     )
   }
