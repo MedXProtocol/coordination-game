@@ -190,7 +190,6 @@ html.html-light,
   }
 
   .list--container {
-    background: white;
     border-color: transparent;
   }
 
@@ -204,8 +203,12 @@ html.html-light,
     color: lighten($text-color--light, 40%);
   }
 
-  .list--item__date {
-    color: $brand-info--light;
+  .list--item:nth-child(even) {
+    background-color: darken(white, 2%);
+  }
+
+  .list--item:hover .list--item__date {
+    color: $brand-info;
   }
 
   .list--item__view {
@@ -213,7 +216,7 @@ html.html-light,
   }
 
   .list--item:hover {
-    background-color: lighten($background-color--light, 3%);
+    background-color: darken(white, 5%);
   }
 
   .list--item:hover .list--item__id,
@@ -452,7 +455,7 @@ html.html-light,
   }
 
   .navbar-item a.navbar-item {
-    color: lighten(saturate($accent-color-1--light, 50%), 15%);
+    color: lighten(saturate($accent-color-1--light, 50%), 12%);
   }
 
   a.navbar-item:hover,
@@ -485,7 +488,7 @@ html.html-light,
     }
   }
 
-  .navbar-brand a {
+  .navbar-brand a.navbar-item {
     color: rgba(0, 0, 0, 0.9);
   }
 

@@ -666,7 +666,7 @@ section {
 }
 
 .tabs li.is-active button {
-  background: black;
+  background: #070709;
   border-bottom-color: $accent-color-1;
   border-color: $accent-color-1;
   color: $accent-color-1;
@@ -691,14 +691,22 @@ section {
   max-width: initial;
   font-size: 0.75rem;
   width: 320px;
+
+  @media screen and (max-width: 768px) {
+    width: 194px;
+  }
 }
 
 .text-input--filename-control {
   width: 320px;
+
+  @media screen and (max-width: 768px) {
+    width: 194px;
+  }
 }
 
 .file-download--container {
-  margin-top: 0;
+  margin-top: -4px;
   width: 100%;
 }
 

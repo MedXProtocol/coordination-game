@@ -83,7 +83,7 @@ export const VerifiersTable = connect(mapStateToProps)(
                 #{index + 1}
               </span>
 
-              <span className="list--item__eth-address">
+              <span className="list--item__status">
                 <EthAddress address={verifierAddress} />
                 &nbsp;&nbsp;
                 <EtherscanLink address={verifierAddress}>

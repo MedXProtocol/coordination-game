@@ -113,7 +113,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               var removeButton = (
                 <React.Fragment>
                   <button
-                    className="btn-link text-gray"
+                    className="btn-link has-text-grey"
                     onClick={(e) => {
                       e.preventDefault()
                       this.props.dispatchRemove(key)
