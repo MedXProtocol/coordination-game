@@ -278,11 +278,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           // needs to be BN ?
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
-          // const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
+          const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
-          const random = new BN('1587875817')
+          // const random = new BN('1587875817')
 
-          const secretAsHex = padLeft(toHex(new BN(this.state.secret)), 32)
+          const secretAsHex = padLeft(toHex(this.state.secret), 32)
 
           console.log('this.state.secret', this.state.secret)
           console.log('secretAsHex', secretAsHex)
