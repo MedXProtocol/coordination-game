@@ -395,7 +395,7 @@ contract CoordinationGame is Ownable {
 
   function applyToRegistry(uint256 _applicationId) internal {
     tilRegistry.token().approve(address(tilRegistry), applicantDeposits[_applicationId]);
-    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), applicantDeposits[_applicationId], "");
+    tilRegistry.applyFor(applicants[_applicationId], bytes32(_applicationId), applicantDeposits[_applicationId], "");
   }
 
   function autoChallenge(uint256 _applicationId) internal {

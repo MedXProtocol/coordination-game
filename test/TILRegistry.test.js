@@ -5,7 +5,7 @@ const WorkToken = artifacts.require('WorkToken.sol')
 
 const abi = require('ethereumjs-abi')
 const BN = require('bn.js')
-const debug = require('debug')('CoordinationGame.test.js')
+const debug = require('debug')('TILRegistry.test.js')
 const tdr = require('truffle-deploy-registry')
 const createTILRegistry = require('../migrations/support/createTILRegistry')
 const expectThrow = require('./helpers/expectThrow')
@@ -21,6 +21,7 @@ contract('TILRegistry', (accounts) => {
   let registry,
       registryFactory,
       workToken,
+      parameterizerAddress,
       roles
 
   before(async () => {
@@ -28,66 +29,42 @@ contract('TILRegistry', (accounts) => {
     registryFactory = await TILRegistryFactory.deployed()
     roles = await TILRoles.new()
     await roles.setRole(owner, 1, true) // owner is the job manager
+    parameterizerAddress = (await tdr.findLastByContractName(
+      web3.version.network,
+      'Parameterizer'
+    )).address
   })
 
   beforeEach(async () => {
-    registry = await registryFactory.createTILRegistry(
-      workToken.address,
-      [
-        // minimum deposit for listing to be whitelisted
-        listingStake,
-
-        // minimum deposit to propose a reparameterization
-        web3.toWei('10000000000', 'ether'),
-
-        // period over which applicants wait to be whitelisted
-        0,
-
-        // period over which reparmeterization proposals wait to be processed
-        3600 * 24 * 3, // 3 days
-
-        // length of commit period for voting
-        3600 * 24 * 3, // 3 days
-
-        // length of commit period for voting in parameterizer
-        3600 * 24 * 3, // 3 days
-
-        // length of reveal period for voting
-        3600 * 24 * 3, // 3 days
-
-        // length of reveal period for voting in parameterizer
-        3600 * 24 * 3, // 3 days
-
-        // percentage of losing party's deposit distributed to winning party
-        100,
-
-        // percentage of losing party's deposit distributed to winning party in parameterizer
-        50,
-
-        // type of majority out of 100 necessary for candidate success
-        30,
-
-        // type of majority out of 100 necessary for proposal success in parameterizer
-        30//,
-
-        // // length of time in seconds an applicant has to wait for the verifier to
-        // // submit a secret before choosing a new verifier
-        // 120
-      ],
-      "MedX Registry",
+    const addresses = await createTILRegistry(
+      registryFactory,
+      parameterizerAddress,
+      'MedX Token',
       roles.address
     )
+    registry = await TILRegistry.at(addresses.tilRegistryAddress)
+    await workToken.mint(owner, listingStake)
+    await workToken.approve(registry.address, listingStake)
   })
 
   describe('apply', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.apply(user1, '0x1', listingStake, '0x', { from: user2 })
+        await registry.applyFor(user1, '0x1', listingStake, '0x', { from: user2 })
       })
     })
 
-    it('should add an applicant', async () => {
-      await registry.apply(user1, '0x1', listingStake, '0x')
+    context('on success', () => {
+      const listingHash = '0x1000000000000000000000000000000000000000000000000000000000000000'
+
+      beforeEach(async () => {
+        await registry.applyFor(user1, listingHash, listingStake, '0x')
+      })
+
+      it('should add an applicant', async () => {
+        assert.equal(await registry.listingsLength(), 1)
+        assert.equal(await registry.listingAt(0), listingHash)
+      })
     })
   })
 })

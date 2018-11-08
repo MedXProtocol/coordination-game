@@ -36,7 +36,7 @@ contract TILRegistry is Registry, Ownable {
   @param _amount The number of tokens the applicant has staked
   @param _data Extra data
   */
-  function apply(address _applicant, bytes32 _listingHash, uint _amount, string _data) external onlyJobManager {
+  function applyFor(address _applicant, bytes32 _listingHash, uint _amount, string _data) external onlyJobManager {
     require(!isWhitelisted(_listingHash), "listingHash is not whitelisted");
     require(!appWasMade(_listingHash), "application was not made");
     require(_amount >= parameterizer.get("minDeposit"), "amount is greater or equal to min");
