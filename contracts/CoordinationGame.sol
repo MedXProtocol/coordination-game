@@ -1,16 +1,17 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "tcr/Parameterizer.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
+import "zos-lib/contracts/Initializable.sol";
 
 /**
 @title CoordinationGame
 @author Brendan Asselstine, Chuck Bergeron
 @notice This contract stores work tokens in a pool which are applicant applicantDeposits
 **/
-contract CoordinationGame is Ownable {
+contract CoordinationGame is Initializable, Ownable {
   using SafeMath for uint256;
   Work work;
   TILRegistry tilRegistry;
@@ -118,7 +119,10 @@ contract CoordinationGame is Ownable {
     Work _work,
     TILRegistry _tilRegistry,
     uint256 _applicationStakeAmount
-  ) public {
+  ) public initializer {
+    require(_tilRegistry != address(0));
+    require(_work != address(0));
+    Ownable.initialize(msg.sender);
     work = _work;
     tilRegistry = _tilRegistry;
     applicationStakeAmount = _applicationStakeAmount;

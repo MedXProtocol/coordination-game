@@ -1,0 +1,16 @@
+{
+  "zosversion": "2",
+  "name": "coordination-game",
+  "version": "0.1.0",
+  "contracts": {
+    "AttributeStore": "AttributeStore",
+    "DLL": "DLL",
+    "Parameterizer": "Parameterizer",
+    "WorkToken": "WorkToken",
+    "Work": "Work",
+    "CoordinationGame": "CoordinationGame",
+    "BetaFaucet": "BetaFaucet",
+    "Test": "Test"
+  },
+  "dependencies": {}
+}

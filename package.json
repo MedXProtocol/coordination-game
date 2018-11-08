@@ -15,16 +15,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "ganache-cli": "^6.1.8",
+    "zos": "^2.0.1",
+    "truffle-hdwallet-provider": "^0.0.6"
+  },
+  "dependencies": {
     "abi-decoder": "^1.2.0",
     "debug": "^4.1.0",
     "ethereumjs-abi": "^0.6.5",
-    "ganache-cli": "^6.1.8",
-    "truffle": "^4.1.14",
-    "web3": "^1.0.0-beta.36"
-  },
-  "dependencies": {
-    "openzeppelin-solidity": "1.12.0",
-    "truffle-deploy-registry": "^0.4.1",
-    "truffle-hdwallet-provider": "^0.0.6"
+    "openzeppelin-eth": "^2.0.2",
+    "zos-lib": "^2.0.1"
   }
 }

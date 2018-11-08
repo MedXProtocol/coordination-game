@@ -31,14 +31,14 @@ contract TILRegistryFactory {
     );
     emit TILRegistryCreated(msg.sender, address(tilRegistry));
 
-    address coordinationGameAddress = coordinationGameFactory.createCoordinationGame(
-      _work,
-      tilRegistry,
-      msg.sender,
-      _applicationStakeAmount
-    );
-    tilRegistry.setCoordinationGame(coordinationGameAddress);
-    tilRegistry.transferOwnership(msg.sender);
+    // address coordinationGameAddress = coordinationGameFactory.createCoordinationGame(
+    //   _work,
+    //   tilRegistry,
+    //   msg.sender,
+    //   _applicationStakeAmount,
+    //   coordinationGameAddress
+    // );
+    // tilRegistry.transferOwnership(msg.sender);
 
     return tilRegistry;
   }
