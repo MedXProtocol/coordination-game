@@ -3,17 +3,15 @@ const abiDecoder = require('abi-decoder')
 module.exports = async function (
   tilRegistryFactory,
   parameterizerAddress,
-  workAddress,
   name,
-  applicationStakeAmount
+  roles
 ) {
   let tilRegistryAddress, transactionHash
 
-  await tilRegistryFactory.createTILRegistry(
+  await tilRegistryFactory.createTILRegistryWithParameterizer(
     parameterizerAddress,
-    workAddress,
     name,
-    applicationStakeAmount
+    roles
   ).then(async (transactionReceipt) => {
     const { tx, receipt } = transactionReceipt
     transactionHash = tx
@@ -21,8 +19,9 @@ module.exports = async function (
 
     const decoded = abiDecoder.decodeLogs(receipt.logs)
 
-    const NewRegistry = decoded[0]
-    tilRegistryAddress = NewRegistry.events.find(arg => arg.name === 'tilRegistry').value
+    const TILRegistryCreated = decoded[0]
+    tilRegistryAddress =
+      TILRegistryCreated.events.find(arg => arg.name === 'tilRegistry').value
   })
 
   return {

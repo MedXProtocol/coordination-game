@@ -1,7 +1,9 @@
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
+const CoordinationGameFactory = artifacts.require('CoordinationGameFactory.sol')
 const Parameterizer = artifacts.require('Parameterizer.sol')
 const TILRegistry = artifacts.require('TILRegistry.sol')
 const TILRegistryFactory = artifacts.require('TILRegistryFactory.sol')
+const TILRoles = artifacts.require('TILRoles.sol')
 const Work = artifacts.require('Work.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
 
@@ -10,6 +12,7 @@ const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
 const createTILRegistry = require('../migrations/support/createTILRegistry')
+const createCoordinationGame = require('../migrations/support/createCoordinationGame')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
@@ -27,7 +30,8 @@ contract('CoordinationGame', (accounts) => {
     applicationId,
     applicantRevealTimeoutInDays,
     verifierTimeoutInDays,
-    secondsInADay
+    secondsInADay,
+    roles
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -54,6 +58,8 @@ contract('CoordinationGame', (accounts) => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     workStake = await work.requiredStake()
+    roles = await TILRoles.deployed()
+    coordinationGameFactory = await CoordinationGameFactory.deployed()
     const parameterizerAddress = (await tdr.findLastByContractName(
       web3.version.network,
       'Parameterizer'
@@ -74,9 +80,8 @@ contract('CoordinationGame', (accounts) => {
     const addresses = await createTILRegistry(
       tilRegistryFactoryInstance,
       parameterizer.address,
-      work.address,
       'TILRegistry',
-      applicationStakeAmount
+      roles.address
     )
 
     tilRegistry = TILRegistry.at(addresses.tilRegistryAddress)
@@ -85,13 +90,20 @@ contract('CoordinationGame', (accounts) => {
     const tilRegistryOwnerAddress = await tilRegistry.owner.call()
     assert.equal(tilRegistryOwnerAddress, applicant, 'tilRegistry owner is first account')
 
-    const coordinationGameAddress = await tilRegistry.coordinationGame()
+    const coordinationGameAddresses = await createCoordinationGame(
+      coordinationGameFactory,
+      work.address,
+      addresses.tilRegistryAddress,
+      applicant,
+      applicationStakeAmount
+    )
+
+    const coordinationGameAddress = coordinationGameAddresses.coordinationGameAddress
     coordinationGame = await CoordinationGame.at(coordinationGameAddress)
+    await roles.setRole(coordinationGameAddress, 1, true)
 
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
     assert.equal(coordinationGameOwnerAddress, applicant, 'coord game owner is first account')
-
-    await work.setJobManager(coordinationGameAddress)
 
     secondsInADay = await coordinationGame.secondsInADay()
     debug(`secondsInADay is ${secondsInADay.toString()}`)
