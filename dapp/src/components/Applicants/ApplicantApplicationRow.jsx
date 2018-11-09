@@ -296,6 +296,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                   method='applicantRevealSecret'
                   args={[applicationId, secretAsHex, random.toString()]}
                   buttonText='Reveal Secret'
+                  loadingText='Revealing'
+                  isSmall={true}
                   confirmationMessage='"Reveal Secret" transaction confirmed.'
                   txHashMessage='"Reveal Secret" transaction sent successfully -
                     it will take a few minutes to confirm on the Ethereum network.'/>
@@ -304,7 +306,21 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         }
 
         if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Verifier Failed to Respond</span>
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-warning">Verifier Failed to Respond</span>
+              <Web3ActionButton
+                contractAddress={this.props.coordinationGameAddress}
+                method='applicantRandomlySelectVerifier'
+                args={[applicationId]}
+                isSmall={true}
+                buttonText='Request New Verifier'
+                loadingText='Requesting New Verifier'
+                confirmationMessage='New verifier request confirmed.'
+                txHashMessage='New verifier request sent successfully -
+                  it will take a few minutes to confirm on the Ethereum network.' />
+            </React.Fragment>
+          )
         } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
           expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
         }
@@ -370,9 +386,11 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                       method='applicantRandomlySelectVerifier'
                       args={[applicationId]}
                       buttonText='Request Verification'
+                      loadingText='Requesting'
+                      isSmall={true}
                       confirmationMessage='Verification request confirmed.'
                       txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.'/>
+                        it will take a few minutes to confirm on the Ethereum network.' />
                   )
                 : expirationMessage
               }
