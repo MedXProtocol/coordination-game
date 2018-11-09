@@ -144,6 +144,9 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           )
         }
 
+        // necessary to show the verifier on 1st-time component load
+        ReactTooltip.rebuild()
+
         return (
           <div className={classnames(
             'list--item',
@@ -153,24 +156,25 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             </span>
 
             <span className="list--item__date">
-              <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
                 <ReactTooltip
+                  id='date-tooltip'
                   html={true}
                   effect='solid'
                   place={'top'}
                   wrapper='span'
                 />
                 {loadingOrUpdatedAtTimestamp}
-              </span>
+              </abbr>
             </span>
 
             <span className='list--item__status'>
               {expirationMessage}
             </span>
 
-            <span className="list--item__view text-right">
+            <span className="list--item__view">
               {verifyAction}
             </span>
           </div>

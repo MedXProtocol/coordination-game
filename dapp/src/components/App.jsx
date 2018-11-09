@@ -180,7 +180,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               <section className='section'>
                 <div className='container is-fluid'>
                   <div className='columns'>
-                    <div className='column is-8 is-offset-2'>
+                    <div className='column is-8-widescreen is-offset-2-widescreen'>
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
@@ -216,19 +216,23 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
 
                     <nav className="level level--footer">
                       <div className="level-item has-text-centered">
-                        <p className="title">
-                          <Link to={routes.APPLY} className="is-size-7">
-                            Apply to be on the Registry
-                          </Link>
-                        </p>
+                        <div>
+                          <p className="title">
+                            <Link to={routes.APPLY} className="is-size-7">
+                              Apply to be on the Registry
+                            </Link>
+                          </p>
+                        </div>
                       </div>
 
                       <div className="level-item has-text-centered">
-                        <p className="title">
-                          <Link to={routes.STAKE} className="is-size-7">
-                            Stake to become a Verifier
-                          </Link>
-                        </p>
+                        <div>
+                          <p className="title">
+                            <Link to={routes.STAKE} className="is-size-7">
+                              Stake to become a Verifier
+                            </Link>
+                          </p>
+                        </div>
                       </div>
                     </nav>
                   </div>
