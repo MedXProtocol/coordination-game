@@ -4,51 +4,13 @@ $ npm i && truffle install
 
 These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
 
-## Config Cheatsheet (fill in the vars with your deployed contract addresses)
+# Setup
 
-var betaFaucetAddress = ''
-var coordinationGameAddress = ''
-var workAddress = ''
-var workTokenAddress = ''
+Once the contracts are migrated, run bootstrap to mint tokens and fill the faucet:
 
-web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: betaFaucetAddress, value: web3.toWei(900, "ether") })
-
-BetaFaucet.at(betaFaucetAddress).then(i => bf = i)
-CoordinationGame.at(coordinationGameAddress).then(i => cg = i)
-WorkToken.at(workTokenAddress).then(i => wt = i)
-Work.at(workAddress).then(i => w = i)
-
-wt.mint(betaFaucetAddress, 50000000000000000000000)
-
-wt.mint('0x061f4af068d28a2ead064c91388d4b25598d6d35', 50000000000000000000000)
-wt.mint('0x8a23c3556fa6a8fd38c86597acfd0151ac62861c', 50000000000000000000000)
-wt.mint('0x5de6eb9f504dc50d33357b61364660db064b623d', 50000000000000000000000)
-wt.mint('0x376de69d2a7130a7d41d052129e8b25335fc1c6e', 50000000000000000000000)
-wt.mint('0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97', 50000000000000000000000)
-
-var address = '0x061f4af068d28a2ead064c91388d4b25598d6d35'
-wt.approve(w.address, 1000000000000000000000, { from: address })
-w.depositStake({ from: address })
-
-var address = '0x8a23c3556fa6a8fd38c86597acfd0151ac62861c'
-wt.approve(w.address, 1000000000000000000000, { from: address })
-w.depositStake({ from: address })
-
-var address = '0x5de6eb9f504dc50d33357b61364660db064b623d'
-wt.approve(w.address, 1000000000000000000000, { from: address })
-w.depositStake({ from: address })
-
-var address = '0x376de69d2a7130a7d41d052129e8b25335fc1c6e'
-wt.approve(w.address, 1000000000000000000000, { from: address })
-w.depositStake({ from: address })
-
-var address = '0x681bd7f52d97d5b352bb6531ff9cda928bbd3d97'
-wt.approve(w.address, 1000000000000000000000, { from: address })
-w.depositStake({ from: address })
-
-
-
-// Don't forget to manually send the betaFaucetAddress some ether !
+```
+$ npm run bootstrap
+```
 
 ## Usage
 
