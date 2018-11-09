@@ -35,15 +35,18 @@ function mapStateToProps(state, { currentPage, pageSize }) {
     listingsCount,
     startIndex,
     endIndex,
+    listingsCount,
     listingHashes
   }
 }
 
 function* listingsSaga({ TILRegistry, startIndex, endIndex }) {
   if (!TILRegistry) { return }
-  yield cacheCall(TILRegistry, 'listingsLength')
+  const listingsCount = yield cacheCall(TILRegistry, 'listingsLength')
   yield all(range(startIndex, endIndex).map(function* (index) {
-    yield cacheCall(TILRegistry, 'listingAt', index)
+    if (index < listingsCount) {
+      yield cacheCall(TILRegistry, 'listingAt', index)
+    }
   }))
 }
 
@@ -61,7 +64,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
           </div>
         </div>
       )
-    } else if (listingsCount === 0) {
+    } else if (parseInt(listingsCount, 10) === 0) {
       var noListings = (
         <div className="blank-state">
           <div className="blank-state--inner has-text-grey-lighter">
