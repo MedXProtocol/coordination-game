@@ -1,4 +1,5 @@
-export const HOME = '/:currentPage'
+export const HOME = '/'
+export const HOME_WITH_PAGE = '/:currentPage'
 export const ADMIN = '/admin'
 export const APPLY = '/applicants/apply'
 export const STAKE = '/verifiers/stake'
