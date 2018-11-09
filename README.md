@@ -6,10 +6,10 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 ## Config Cheatsheet (fill in the vars with your deployed contract addresses)
 
-var betaFaucetAddress = '0xcc32e4622beb6070227d2c5fe17ee325c105fba1'
-var coordinationGameAddress = '0xcd0bd2c5f78021e3871630d0b87e9a30e54e55e1'
-var workAddress = '0x863a239d80983041f8df64353c066a035c507b3e'
-var workTokenAddress = '0xc2db215cc52d3784809d6c7cd1b6e807e9f71fb1'
+var betaFaucetAddress = ''
+var coordinationGameAddress = ''
+var workAddress = ''
+var workTokenAddress = ''
 
 web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: betaFaucetAddress, value: web3.toWei(900, "ether") })
 

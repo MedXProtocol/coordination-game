@@ -467,28 +467,47 @@ contract('CoordinationGame', (accounts) => {
 
   describe('when updating settings', () => {
     const newApplicationStakeAmount = web3.toWei('30', 'ether')
-    const newBaseApplicationFee = web3.toWei('30', 'ether')
+    const newBaseApplicationFeeUsdWei = web3.toWei('30', 'ether')
+
+    const newSecondsInADay = 2000
+    const newVerifierTimeoutInDays = 1
+    const newApplicantRevealTimeoutInDays = 2
 
     it('should work for the contract owner', async () => {
       assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
+      assert.equal(await coordinationGame.baseApplicationFeeUsdWei(), baseApplicationFeeUsdWei)
 
-      // y u no work?
+      assert.equal(await coordinationGame.secondsInADay(), secondsInADay)
+      assert.equal(await coordinationGame.verifierTimeoutInDays(), verifierTimeoutInDays)
+      assert.equal(await coordinationGame.applicantRevealTimeoutInDays(), applicantRevealTimeoutInDays)
+
       await coordinationGame.updateSettings(
         newApplicationStakeAmount,
-        newBaseApplicationFee,
+        newBaseApplicationFeeUsdWei,
+        newSecondsInADay,
+        newVerifierTimeoutInDays,
+        newApplicantRevealTimeoutInDays,
         {
           from: coordinationGameOwnerAddress
         }
       )
 
       assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)
+      assert.equal(await coordinationGame.baseApplicationFeeUsdWei(), newBaseApplicationFeeUsdWei)
+
+      assert.equal(await coordinationGame.secondsInADay(), newSecondsInADay)
+      assert.equal(await coordinationGame.verifierTimeoutInDays(), newVerifierTimeoutInDays)
+      assert.equal(await coordinationGame.applicantRevealTimeoutInDays(), newApplicantRevealTimeoutInDays)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
         await coordinationGame.updateSettings(
           newApplicationStakeAmount,
-          newBaseApplicationFee,
+          newBaseApplicationFeeUsdWei,
+          newSecondsInADay,
+          newVerifierTimeoutInDays,
+          newApplicantRevealTimeoutInDays
           {
             from: verifier
           }

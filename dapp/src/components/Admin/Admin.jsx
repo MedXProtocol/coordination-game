@@ -28,18 +28,25 @@ function mapStateToProps(state) {
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const baseApplicationFeeUsdWei = cacheCallValueBigNumber(state, coordinationGameAddress, 'baseApplicationFeeUsdWei')
 
+  const secondsInADay = cacheCallValueBigNumber(state, coordinationGameAddress, 'secondsInADay')
+  const verifierTimeoutInDays = cacheCallValueBigNumber(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const applicantRevealTimeoutInDays = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
 
   return {
     address,
     applicationStakeAmount,
+    applicantRevealTimeoutInDays,
     baseApplicationFeeUsdWei,
     coordinationGameAddress,
     networkId,
     jobStake,
     requiredStake,
+    secondsInADay,
     transactions,
+    verifierTimeoutInDays,
     workAddress
   }
 }
@@ -55,7 +62,10 @@ function* adminSaga({
     cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake'),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
-    cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei')
+    cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei'),
+    cacheCall(coordinationGameAddress, 'secondsInADay'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays'),
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays')
   ])
 }
 
@@ -124,7 +134,10 @@ export const Admin = connect(mapStateToProps)(
             coordinationGameAddress,
             'updateSettings',
             this.newOrCurrentValue('applicationStakeAmount'),
-            this.newOrCurrentValue('baseApplicationFeeUsdWei')
+            this.newOrCurrentValue('baseApplicationFeeUsdWei'),
+            this.newOrCurrentValue('secondsInADay'),
+            this.newOrCurrentValue('verifierTimeoutInDays'),
+            this.newOrCurrentValue('applicantRevealTimeoutInDays')
           )()
 
           this.setState({
@@ -210,6 +223,59 @@ export const Admin = connect(mapStateToProps)(
                     />
                     <span className="help has-text-grey">
                       Currently: {displayWeiToEther(this.props.baseApplicationFeeUsdWei)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="columns">
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Seconds in a Day</strong>
+                      <span className="is-size-7 is-block has-text-grey">(default is 86,400)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="secondsInADay"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.secondsInADay || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.secondsInADay}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Verifier Timeout</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in days)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="verifierTimeoutInDays"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.verifierTimeoutInDays || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.verifierTimeoutInDays}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Applicant Reveal Timeout</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in days)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="applicantRevealTimeoutInDays"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.applicantRevealTimeoutInDays || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.applicantRevealTimeoutInDays}
                     </span>
                   </div>
                 </div>

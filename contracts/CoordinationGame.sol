@@ -98,7 +98,10 @@ contract CoordinationGame is Ownable {
 
   event SettingsUpdated(
     uint256 applicationStakeAmount,
-    uint256 baseApplicationFeeUsdWei
+    uint256 baseApplicationFeeUsdWei,
+    uint256 secondsInADay,
+    uint256 verifierTimeoutInDays,
+    uint256 applicantRevealTimeoutInDays
   );
 
   modifier onlyApplicant(uint256 _applicationId) {
@@ -439,12 +442,25 @@ contract CoordinationGame is Ownable {
 
   function updateSettings(
     uint256 _applicationStakeAmount,
-    uint256 _baseApplicationFeeUsdWei
+    uint256 _baseApplicationFeeUsdWei,
+    uint256 _secondsInADay,
+    uint256 _verifierTimeoutInDays,
+    uint256 _applicantRevealTimeoutInDays
   ) public onlyOwner {
     setApplicationStakeAmount(_applicationStakeAmount);
     setBaseApplicationFeeUsdWei(_baseApplicationFeeUsdWei);
 
-    emit SettingsUpdated(applicationStakeAmount, baseApplicationFeeUsdWei);
+    setSecondsInADay(_secondsInADay);
+    setVerifierTimeoutInDays(_verifierTimeoutInDays);
+    setApplicantRevealTimeoutInDays(_applicantRevealTimeoutInDays);
+
+    emit SettingsUpdated(
+      applicationStakeAmount,
+      baseApplicationFeeUsdWei,
+      secondsInADay,
+      verifierTimeoutInDays,
+      applicantRevealTimeoutInDays
+    );
   }
 
   function setSecondsInADay(uint256 _secondsInADay) public onlyOwner {
