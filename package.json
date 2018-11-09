@@ -10,7 +10,8 @@
     "staging-build": "./scripts/build.sh",
     "test": "npm run compile && $(npm bin)/truffle test",
     "start": "./scripts/ganache.sh",
-    "lambda": "cd lambda && ./lambda-serve.sh"
+    "lambda": "cd lambda && ./lambda-serve.sh",
+    "bootstrap": "truffle exec scripts/bootstrap.js"
   },
   "author": "",
   "license": "ISC",
