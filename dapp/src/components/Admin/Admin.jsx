@@ -5,6 +5,7 @@ import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import {
   cacheCall,
+  cacheCallValueInt,
   cacheCallValueBigNumber,
   contractByName,
   TransactionStateHandler,
@@ -28,9 +29,9 @@ function mapStateToProps(state) {
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const baseApplicationFeeUsdWei = cacheCallValueBigNumber(state, coordinationGameAddress, 'baseApplicationFeeUsdWei')
 
-  const secondsInADay = cacheCallValueBigNumber(state, coordinationGameAddress, 'secondsInADay')
-  const verifierTimeoutInDays = cacheCallValueBigNumber(state, coordinationGameAddress, 'verifierTimeoutInDays')
-  const applicantRevealTimeoutInDays = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+  const secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
+  const verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
 
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
@@ -133,8 +134,8 @@ export const Admin = connect(mapStateToProps)(
           const coordinationGameSettingsTxId = send(
             coordinationGameAddress,
             'updateSettings',
-            this.newOrCurrentValue('applicationStakeAmount'),
-            this.newOrCurrentValue('baseApplicationFeeUsdWei'),
+            this.newOrCurrentBigNumber('applicationStakeAmount'),
+            this.newOrCurrentBigNumber('baseApplicationFeeUsdWei'),
             this.newOrCurrentValue('secondsInADay'),
             this.newOrCurrentValue('verifierTimeoutInDays'),
             this.newOrCurrentValue('applicantRevealTimeoutInDays')
@@ -154,8 +155,8 @@ export const Admin = connect(mapStateToProps)(
           const workSettingsTxId = send(
             workAddress,
             'updateSettings',
-            this.newOrCurrentValue('requiredStake'),
-            this.newOrCurrentValue('jobStake')
+            this.newOrCurrentBigNumber('requiredStake'),
+            this.newOrCurrentBigNumber('jobStake')
           )()
 
           this.setState({
@@ -170,9 +171,15 @@ export const Admin = connect(mapStateToProps)(
           })
         }
 
-        newOrCurrentValue = (stateVar) => {
+        newOrCurrentBigNumber = (stateVar) => {
           return this.state[stateVar]
             ? etherToWei(this.state[stateVar])
+            : this.props[stateVar]
+        }
+
+        newOrCurrentValue = (stateVar) => {
+          return this.state[stateVar]
+            ? this.state[stateVar]
             : this.props[stateVar]
         }
 

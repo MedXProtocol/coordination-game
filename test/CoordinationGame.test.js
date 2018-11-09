@@ -474,12 +474,8 @@ contract('CoordinationGame', (accounts) => {
     const newApplicantRevealTimeoutInDays = 2
 
     it('should work for the contract owner', async () => {
-      assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
-      assert.equal(await coordinationGame.baseApplicationFeeUsdWei(), baseApplicationFeeUsdWei)
-
-      assert.equal(await coordinationGame.secondsInADay(), secondsInADay)
-      assert.equal(await coordinationGame.verifierTimeoutInDays(), verifierTimeoutInDays)
-      assert.equal(await coordinationGame.applicantRevealTimeoutInDays(), applicantRevealTimeoutInDays)
+      assert.equal((await coordinationGame.applicationStakeAmount()).toString(), applicationStakeAmount.toString())
+      assert.equal((await coordinationGame.baseApplicationFeeUsdWei()).toString(), baseApplicationFeeUsdWei.toString())
 
       await coordinationGame.updateSettings(
         newApplicationStakeAmount,
@@ -507,7 +503,7 @@ contract('CoordinationGame', (accounts) => {
           newBaseApplicationFeeUsdWei,
           newSecondsInADay,
           newVerifierTimeoutInDays,
-          newApplicantRevealTimeoutInDays
+          newApplicantRevealTimeoutInDays,
           {
             from: verifier
           }

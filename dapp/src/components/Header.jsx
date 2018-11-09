@@ -112,7 +112,6 @@ export const Header = ReactTimeout(
                       </div>
 
                       <button
-                        role="button"
                         className={classnames(
                           'navbar-burger',
                           'burger',

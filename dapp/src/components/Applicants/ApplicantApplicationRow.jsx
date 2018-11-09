@@ -212,7 +212,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
       //   } else {
       //     action = (
       //       <React.Fragment>
-      //         <span className="list--item__view__text">View Application&nbsp;</span>
+      //         <span className="list--item__view__view">View Application&nbsp;</span>
       //         <FontAwesomeIcon
       //           icon={faChevronCircleRight} />
       //       </React.Fragment>

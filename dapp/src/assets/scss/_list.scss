@@ -87,7 +87,7 @@
 }
 
 .list--item__status {
-  grid-column: span 4;
+  grid-column: span 3;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 6;
@@ -99,7 +99,7 @@
 }
 
 .list--item__view {
-  grid-column: span 3;
+  grid-column: span 4;
   text-align: right;
 
   @media screen and (max-width: 1200px) {
@@ -181,7 +181,6 @@
 
 .list--item__view {
   color: darken($gray, 35%);
-  float: right;
   font-weight: 700;
   transition: color 200ms ease-in;
   margin-right: 30px;
@@ -192,12 +191,6 @@
 
   @media (max-width: 768px) {
     margin: 0 0 0 auto;
-  }
-}
-
-.list--item__view__text {
-  @media (max-width: 768px) {
-    display: none;
   }
 }
 
@@ -213,10 +206,6 @@
   height: 28px;
   margin: 0 auto;
   padding-top: 5px;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 }
 
 .list--item button.btn-danger {
