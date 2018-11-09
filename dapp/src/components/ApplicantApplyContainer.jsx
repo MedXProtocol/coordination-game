@@ -53,8 +53,6 @@ function mapStateToProps(state) {
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
   const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
-  console.log(displayWeiToEther(weiPerApplication))
-
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
     applicantsLastApplicationCreatedAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
@@ -532,17 +530,16 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                     className="button is-outlined is-primary"
                                     disabled={this.state.coordinationGameStartHandler}
                                   >
-                                    Submit Hint &amp; Secret
+                                    Submit Hint &amp; Secret <LoadingLines
+                                      visible={this.state.coordinationGameStartHandler}
+                                    />
                                   </button>
+
                                   <br />
                                   <p className="help has-text-grey">
                                     <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
                                   </p>
 
-
-                                  <LoadingLines
-                                    visible={this.state.coordinationGameStartHandler}
-                                  />
                                 </div>
                               </Flipped>
 

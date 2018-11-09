@@ -499,20 +499,20 @@ contract('CoordinationGame', (accounts) => {
 
   describe('usdWeiPerEther()', () => {
     it('should be read from the ether price feed', async () => {
-      assert.equal((await coordinationGame.usdWeiPerEther()).toString(), web3.toWei('300.52', 'ether'))
+      assert.equal((await coordinationGame.usdWeiPerEther()).toString(), web3.toWei('210.83', 'ether'))
     })
   })
 
   describe('weiPerApplication()', () => {
     it('should dynamically calculate the application fee', async () => {
-      assert.equal((await coordinationGame.weiPerApplication()).toString(), '83189138826034000')
+      assert.equal((await coordinationGame.weiPerApplication()).toString(), '118578949864819000')
     })
   })
 
   describe('setBaseApplicationFeeUsdWei(uint256)', () => {
     it('should update the base application fee', async () => {
       await coordinationGame.setBaseApplicationFeeUsdWei(web3.toWei('15', 'ether'))
-      assert.equal((await coordinationGame.weiPerApplication()).toString(), '49913483295620000')
+      assert.equal((await coordinationGame.weiPerApplication()).toString(), '71147369918891000')
     })
   })
 

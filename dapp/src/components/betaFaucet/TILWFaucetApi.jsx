@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { toastr } from '~/toastr'
 import { EthAddress } from '~/components/EthAddress'
 import { TILW } from '~/components/TILW'
+import { LoadingLines } from '~/components/LoadingLines'
 import { axiosInstance } from '~/../config/axiosConfig'
 import TILWCoinImg from '~/assets/img/tilw-coin.svg'
 
@@ -105,7 +106,13 @@ export const TILWFaucetApi = ReactTimeout(
               onClick={this.handleMintTILW}
               href={this.faucetLambdaURI}
               className="button is-primary is-outlined"
-            >{isSending ? 'Sending ...' : 'Send Me TILW'}</a>
+            >
+              {isSending ? (
+                <React.Fragment>
+                  Sending <LoadingLines visible={isSending} />
+                </React.Fragment>
+              ) : 'Send Me TILW'}
+            </a>
           </p>
           <br />
           <p>
