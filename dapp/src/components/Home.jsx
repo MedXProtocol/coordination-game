@@ -13,7 +13,7 @@ export const Home = class _Home extends Component {
         <PageTitle title='home' />
         <ScrollToTop />
 
-        <Listings />
+        <Listings currentPage={this.props.match.params.page} />
       </React.Fragment>
     )
   }
