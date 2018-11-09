@@ -23,6 +23,7 @@ import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingButton } from '~/components/LoadingButton'
 import { LoadingLines } from '~/components/LoadingLines'
+import { Modal } from '~/components/Modal'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -112,8 +113,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             hintRight: '',
             hint: '...',
             secret: '',
+            stepManual: 0,
             applicationCreated: false,
-            stepManual: 0
+            beforeUnloadTriggered: false
           }
         }
 
@@ -137,7 +139,25 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           }
         }
 
-        componentWillMount(){
+        componentDidMount () {
+          if (window) {
+            window.onbeforeunload = this.handleBeforeUnload
+          }
+        }
+
+        handleBeforeUnload = () => {
+          if (this.step2Completed() && !this.step3Completed()) {
+            this.setState({
+              beforeUnloadTriggered: true
+            })
+
+            window.onbeforeunload = null
+
+            return true
+          }
+        }
+
+        componentWillMount () {
           document.addEventListener("keydown", this._handleKeyDown.bind(this));
         }
 
@@ -152,6 +172,18 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           this.registerWorkTokenApproveHandlers(nextProps)
           this.registerCoordinationGameStartHandler(nextProps)
           this.registerCoordinationGameSelectVerifierHandler(nextProps)
+        }
+
+        componentWillUnmount () {
+          if (window) {
+            window.onbeforeunload = null
+          }
+        }
+
+        handleCloseModal = () => {
+          this.setState({
+            beforeUnloadTriggered: false
+          })
         }
 
         newApplication = (nextProps) => {
@@ -626,6 +658,40 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 </h6>
               </div>
               <ApplicantApplicationsTable />
+
+              <Modal
+                closeModal={this.handleCloseModal}
+                modalState={this.state.beforeUnloadTriggered}
+                title="Unload warning modal"
+              >
+                <div className='has-text-centered'>
+                  <h3 className="is-size-3">
+                    You're leaving?
+                  </h3>
+
+                  <p>
+                    You haven't finished your application yet!
+                  </p>
+                  <p>
+                    Once you have finished the <strong>'Request Verification'</strong> step your application will be complete.
+                  </p>
+                  <br />
+
+                  <p>
+                    <br />
+                    <button
+                      onClick={this.handleCloseModal}
+                      className="button is-primary is-outlined"
+                    >
+                      Whoops, thanks for the reminder! I'll finish it up.
+                    </button>
+                  </p>
+                  <br />
+                  <p>
+                    We'll only warn you once, so feel free to leave if you would like!
+                  </p>
+                </div>
+              </Modal>
 
             </Flipper>
           )
