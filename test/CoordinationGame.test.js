@@ -142,13 +142,15 @@ contract('CoordinationGame', (accounts) => {
   }
 
   async function newApplicantStartsGame() {
+    const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
+
     await coordinationGame.start(
       secretRandomHash,
       randomHash,
       hint,
       {
         from: applicant,
-        value: baseApplicationFeeUsdWei
+        value: weiPerApplication
       }
     )
     applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
@@ -222,10 +224,10 @@ contract('CoordinationGame', (accounts) => {
         (await coordinationGame.minDeposit()).toString()
       )
 
-      const requiredDepositWei = await coordinationGame.requiredDepositWei()
+      const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
       assert.equal(
         (await coordinationGame.applicationBalancesInWei(1)).toString(),
-        '124783708239051000'
+        weiPerApplication
       )
     })
 
@@ -495,17 +497,8 @@ contract('CoordinationGame', (accounts) => {
     })
   })
 
-  describe('requiredDepositWei()', () => {
-    it('should return the ETH cost', async () => {
-      assert.equal(
-        (await coordinationGame.requiredDepositWei()).toString(),
-        '124783708239051000'
-      )
-    })
-  })
-
   describe('usdWeiPerEther()', () => {
-    it('should pull in the ether price feed', async () => {
+    it('should be read from the ether price feed', async () => {
       assert.equal((await coordinationGame.usdWeiPerEther()).toString(), web3.toWei('300.52', 'ether'))
     })
   })

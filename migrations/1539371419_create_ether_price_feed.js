@@ -18,7 +18,7 @@ module.exports = function(deployer, networkName) {
           if (!tdr.isDryRunNetworkName(networkName)) {
             tdr.appendInstance(instance)
 
-            await(instance.set(web3.toWei('300.52', 'ether')))
+            await(instance.set(web3.toWei('210.83', 'ether')))
           }
         })
     }

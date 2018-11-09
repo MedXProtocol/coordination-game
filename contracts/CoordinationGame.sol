@@ -164,7 +164,7 @@ contract CoordinationGame is Ownable {
     // make this configurable if we want to lock down 1 application per Eth address
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
-    uint256 depositWei = requiredDepositWei();
+    uint256 depositWei = weiPerApplication();
     require(msg.value >= depositWei, 'not enough ether');
 
     applicationCount += 1;
@@ -370,10 +370,6 @@ contract CoordinationGame is Ownable {
     emit ApplicantLost(_applicationId);
   }
 
-  // function applicationFeeTokenWei() public view returns (uint256) {
-  //   return weiPerApplication();
-  // }
-
   /**
   @notice Converts an application id into a listing hash key
   @param _applicationId the application id
@@ -461,11 +457,6 @@ contract CoordinationGame is Ownable {
 
   function setVerifierTimeoutInDays(uint256 _verifierTimeoutInDays) public onlyOwner {
     verifierTimeoutInDays = _verifierTimeoutInDays;
-  }
-
-  function requiredDepositWei() public view returns (uint256) {
-    uint256 applicationFeeWei = weiPerApplication();
-    return applicationFeeWei.add(applicationFeeWei.mul(50).div(100));
   }
 
   function setBaseApplicationFeeUsdWei(uint256 _baseApplicationFeeUsdWei) public onlyOwner {

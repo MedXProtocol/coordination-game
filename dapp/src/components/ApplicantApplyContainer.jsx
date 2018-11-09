@@ -6,6 +6,8 @@ import BN from 'bn.js'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { toastr } from '~/toastr'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValue,
@@ -16,9 +18,8 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { toastr } from '~/toastr'
-import { transactionFinders } from '~/finders/transactionFinders'
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
+import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
@@ -50,6 +51,9 @@ function mapStateToProps(state) {
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
+
+  console.log(displayWeiToEther(weiPerApplication))
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
@@ -69,6 +73,7 @@ function mapStateToProps(state) {
     tilwBalance,
     transactions,
     verifier,
+    weiPerApplication,
     workTokenAddress
   }
 }
@@ -87,6 +92,7 @@ function* applicantApplySaga({
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
     cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
+    cacheCall(coordinationGameAddress, 'weiPerApplication')
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
@@ -304,7 +310,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             secretRandomHash,
             randomHash,
             hint
-          )()
+          )({
+            value: this.props.weiPerApplication
+          })
 
           this.setState({
             coordinationGameStartHandler: new TransactionStateHandler(),
@@ -526,6 +534,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                   >
                                     Submit Hint &amp; Secret
                                   </button>
+                                  <br />
+                                  <p className="help has-text-grey">
+                                    <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
+                                  </p>
+
 
                                   <LoadingLines
                                     visible={this.state.coordinationGameStartHandler}
