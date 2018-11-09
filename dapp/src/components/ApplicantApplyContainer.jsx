@@ -6,6 +6,8 @@ import BN from 'bn.js'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { toastr } from '~/toastr'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValue,
@@ -16,10 +18,10 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { toastr } from '~/toastr'
-import { transactionFinders } from '~/finders/transactionFinders'
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
+import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
+import { LoadingButton } from '~/components/LoadingButton'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
@@ -50,6 +52,7 @@ function mapStateToProps(state) {
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
@@ -69,6 +72,7 @@ function mapStateToProps(state) {
     tilwBalance,
     transactions,
     verifier,
+    weiPerApplication,
     workTokenAddress
   }
 }
@@ -87,6 +91,7 @@ function* applicantApplySaga({
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
     cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
+    cacheCall(coordinationGameAddress, 'weiPerApplication')
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
@@ -284,10 +289,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const secretAsHex = padLeft(toHex(this.state.secret), 32)
 
-          console.log('this.state.secret', this.state.secret)
-          console.log('secretAsHex', secretAsHex)
-          console.log('random', random.toString())
-
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
             { type: 'uint256', value: random.toString() }
@@ -295,9 +296,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           const randomHash = getWeb3().utils.soliditySha3(
             { type: 'uint256', value: random.toString() }
           )
-
-          console.log('secretRandomHash', secretRandomHash)
-          console.log('randomHash', randomHash)
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
           const hint = padLeft(toHex(hintString), 32)
@@ -311,7 +309,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             secretRandomHash,
             randomHash,
             hint
-          )()
+          )({
+            value: this.props.weiPerApplication
+          })
 
           this.setState({
             coordinationGameStartHandler: new TransactionStateHandler(),
@@ -526,17 +526,16 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               <Flipped flipId="coolDiv">
                                 <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
                                   <br />
-                                  <button
-                                    type="submit"
-                                    className="button is-outlined is-primary"
-                                    disabled={this.state.coordinationGameStartHandler}
-                                  >
-                                    Submit Hint &amp; Secret
-                                  </button>
-
-                                  <LoadingLines
-                                    visible={this.state.coordinationGameStartHandler}
+                                  <LoadingButton
+                                    initialText='Submit Hint &amp; Secret'
+                                    loadingText='Submitting'
+                                    isLoading={this.state.coordinationGameStartHandler}
                                   />
+                                  <br />
+                                  <p className="help has-text-grey">
+                                    <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
+                                  </p>
+
                                 </div>
                               </Flipped>
 

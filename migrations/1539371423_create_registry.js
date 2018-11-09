@@ -1,3 +1,4 @@
+const CoordinationGame = artifacts.require('CoordinationGame.sol')
 const TILRegistryFactory = artifacts.require('TILRegistryFactory.sol')
 const TILRegistry = artifacts.require('TILRegistry.sol')
 const Parameterizer = artifacts.require('Parameterizer.sol')
@@ -20,6 +21,7 @@ module.exports = function(deployer, networkName) {
       name,
       roles.address
     )
+
     const tilRegistryInstance = await TILRegistry.at(addresses.tilRegistryAddress)
 
     if (!tdr.isDryRunNetworkName(networkName)) {

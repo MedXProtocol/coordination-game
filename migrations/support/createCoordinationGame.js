@@ -2,18 +2,22 @@ const abiDecoder = require('abi-decoder')
 
 module.exports = async function (
   coordinationGameFactory,
+  etherPriceFeedAddress,
   workAddress,
   registryAddress,
   owner,
-  applicationStakeAmount
+  applicationStakeAmount,
+  baseApplicationFeeUsdWei
 ) {
   let coordinationGameAddress, transactionHash
 
   await coordinationGameFactory.createCoordinationGame(
+    etherPriceFeedAddress,
     workAddress,
     registryAddress,
     owner,
-    applicationStakeAmount
+    applicationStakeAmount,
+    baseApplicationFeeUsdWei
   ).then(async (transactionReceipt) => {
     const { tx, receipt } = transactionReceipt
     transactionHash = tx

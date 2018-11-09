@@ -1,3 +1,4 @@
+const EtherPriceFeed = artifacts.require('EtherPriceFeed.sol')
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
 const CoordinationGameFactory = artifacts.require('CoordinationGameFactory.sol')
 const Parameterizer = artifacts.require('Parameterizer.sol')
@@ -21,6 +22,7 @@ const leftPadHexString = require('./helpers/leftPadHexString')
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
     coordinationGameOwnerAddress,
+    etherPriceFeed,
     workToken,
     work,
     workStake,
@@ -41,7 +43,8 @@ contract('CoordinationGame', (accounts) => {
   const random = new BN("4312341235")
   const hint = web3.toHex("Totally bogus hint")
 
-  const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply
+  const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
+  const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply in tokens
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -55,6 +58,7 @@ contract('CoordinationGame', (accounts) => {
   ).toString('hex')
 
   before(async () => {
+    etherPriceFeed = await EtherPriceFeed.deployed()
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     workStake = await work.requiredStake()
@@ -84,7 +88,7 @@ contract('CoordinationGame', (accounts) => {
       roles.address
     )
 
-    tilRegistry = TILRegistry.at(addresses.tilRegistryAddress)
+    tilRegistry = await TILRegistry.at(addresses.tilRegistryAddress)
     assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
 
     const tilRegistryOwnerAddress = await tilRegistry.owner.call()
@@ -92,10 +96,12 @@ contract('CoordinationGame', (accounts) => {
 
     const coordinationGameAddresses = await createCoordinationGame(
       coordinationGameFactory,
+      etherPriceFeed.address,
       work.address,
       addresses.tilRegistryAddress,
       applicant,
-      applicationStakeAmount
+      applicationStakeAmount,
+      baseApplicationFeeUsdWei
     )
 
     const coordinationGameAddress = coordinationGameAddresses.coordinationGameAddress
@@ -145,12 +151,15 @@ contract('CoordinationGame', (accounts) => {
   }
 
   async function newApplicantStartsGame() {
+    const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
+
     await coordinationGame.start(
       secretRandomHash,
       randomHash,
       hint,
       {
-        from: applicant
+        from: applicant,
+        value: weiPerApplication
       }
     )
     applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
@@ -218,6 +227,31 @@ contract('CoordinationGame', (accounts) => {
 
       applicantsApplicationCount = new BN(appCount.toString())
       assert.equal(applicantsApplicationCount.toString(), new BN(1).toString(), "Applicant's Application Count increased")
+
+      assert.equal(
+        (await coordinationGame.applicantTokenDeposits(1)).toString(),
+        (await coordinationGame.minDeposit()).toString()
+      )
+
+      const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
+      assert.equal(
+        (await coordinationGame.applicationBalancesInWei(1)).toString(),
+        weiPerApplication
+      )
+    })
+
+    it('should not allow starting an application without enough ether passed', async () => {
+      await expectThrow(async () => {
+        await coordinationGame.start(
+          secretRandomHash,
+          randomHash,
+          hint,
+          {
+            from: applicant,
+            value: 1234
+          }
+        )
+      })
     })
   })
 
@@ -442,24 +476,52 @@ contract('CoordinationGame', (accounts) => {
 
   describe('when updating settings', () => {
     const newApplicationStakeAmount = web3.toWei('30', 'ether')
+    const newBaseApplicationFee = web3.toWei('30', 'ether')
 
     it('should work for the contract owner', async () => {
       assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
 
       // y u no work?
-      await coordinationGame.updateSettings(newApplicationStakeAmount, {
-        from: coordinationGameOwnerAddress
-      })
+      await coordinationGame.updateSettings(
+        newApplicationStakeAmount,
+        newBaseApplicationFee,
+        {
+          from: coordinationGameOwnerAddress
+        }
+      )
 
       assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
-        await coordinationGame.updateSettings(newApplicationStakeAmount, {
-          from: verifier
-        })
+        await coordinationGame.updateSettings(
+          newApplicationStakeAmount,
+          newBaseApplicationFee,
+          {
+            from: verifier
+          }
+        )
       })
+    })
+  })
+
+  describe('usdWeiPerEther()', () => {
+    it('should be read from the ether price feed', async () => {
+      assert.equal((await coordinationGame.usdWeiPerEther()).toString(), web3.toWei('210.83', 'ether'))
+    })
+  })
+
+  describe('weiPerApplication()', () => {
+    it('should dynamically calculate the application fee', async () => {
+      assert.equal((await coordinationGame.weiPerApplication()).toString(), '118578949864819000')
+    })
+  })
+
+  describe('setBaseApplicationFeeUsdWei(uint256)', () => {
+    it('should update the base application fee', async () => {
+      await coordinationGame.setBaseApplicationFeeUsdWei(web3.toWei('15', 'ether'))
+      assert.equal((await coordinationGame.weiPerApplication()).toString(), '71147369918891000')
     })
   })
 

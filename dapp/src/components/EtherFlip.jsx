@@ -4,33 +4,31 @@ import React, {
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-  // cacheCall,
-  // cacheCallValue,
-  // withSaga,
-  // contractByName
+  cacheCall,
+  cacheCallValue,
+  withSaga,
+  contractByName
 } from 'saga-genesis'
 import { etherWeiToUsdWei } from '~/utils/etherWeiToUsdWei'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
 function mapStateToProps(state) {
+  const CoordinationGame = contractByName(state, 'CoordinationGame')
   return {
-    usdWeiPerEther: 123000000000000000000
+    usdWeiPerEther: cacheCallValue(state, CoordinationGame, 'usdWeiPerEther'),
+    CoordinationGame
   }
-  // const CasePaymentManager = contractByName(state, 'CasePaymentManager')
-  // return {
-  //   usdWeiPerEther: cacheCallValue(state, CasePaymentManager, 'usdWeiPerEther'),
-  //   CasePaymentManager
-  // }
 }
 
-// function* etherFlipSaga({ CasePaymentManager }) {
-//   if (!CasePaymentManager) { return }
-//   yield cacheCall(CasePaymentManager, 'usdWeiPerEther')
-// }
+function* etherFlipSaga({ CoordinationGame }) {
+  if (!CoordinationGame) { return }
+
+  yield cacheCall(CoordinationGame, 'usdWeiPerEther')
+}
 
 export const EtherFlip = connect(mapStateToProps)(
-  // withSaga(etherFlipSaga)(
+  withSaga(etherFlipSaga)(
     class _EtherFlip extends Component {
       static propTypes = {
         wei: PropTypes.any.isRequired,
@@ -82,5 +80,5 @@ export const EtherFlip = connect(mapStateToProps)(
         )
       }
     }
-  // )
+  )
 )
