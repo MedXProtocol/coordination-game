@@ -17,8 +17,9 @@ import {
   AuditOutline,
   BarsOutline,
   CheckCircleOutline,
-  IssuesCloseOutline,
   GoldOutline,
+  IssuesCloseOutline,
+  SettingOutline,
   WalletOutline
 } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
@@ -58,7 +59,8 @@ export const Header = ReactTimeout(
             super(props)
             this.state = {
               oneVisible: false,
-              twoVisible: false
+              twoVisible: false,
+              mobileMenuActive: false
             }
           }
 
@@ -74,6 +76,14 @@ export const Header = ReactTimeout(
                 twoVisible: true
               })
             }, 600)
+          }
+
+          toggleMobileMenu = (e) => {
+            const mobileMenuActive = !this.state.mobileMenuActive
+
+            this.setState({
+              mobileMenuActive
+            })
           }
 
           render () {
@@ -95,9 +105,26 @@ export const Header = ReactTimeout(
                       <div className="navbar-item">
                         <Link to={routes.HOME} className="navbar-item">
                           The Coordination Game
-                          &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                          <span className='is-hidden-touch'>
+                            &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                          </span>
                         </Link>
                       </div>
+
+                      <button
+                        role="button"
+                        className={classnames(
+                          'navbar-burger',
+                          'burger',
+                          { 'is-active': this.state.mobileMenuActive }
+                        )}
+                        data-target="navbar-menu"
+                        onClick={this.toggleMobileMenu}
+                      >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </button>
                     </div>
 
                     <CurrentTransactionsList />
@@ -128,7 +155,10 @@ export const Header = ReactTimeout(
                   )
                 }>
                   <div className="container is-fluid">
-                    <div className="navbar-menu">
+                    <div id="navbar-menu" className={classnames(
+                      'navbar-menu',
+                      { 'is-active': this.state.mobileMenuActive }
+                    )}>
                       {
                         this.props.isOwner ? (
                           <div className="navbar-start">
@@ -137,7 +167,9 @@ export const Header = ReactTimeout(
                                 activeClassName="is-active"
                                 to={routes.ADMIN}
                                 className="navbar-item"
+                                onClick={this.toggleMobileMenu}
                               >
+                                <AntdIcon type={SettingOutline} className="antd-icon" />&nbsp;
                                 Admin
                               </NavLink>
                             </div>
@@ -153,6 +185,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.HOME}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
                             View Registry
@@ -163,6 +196,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.APPLY}
                             className='navbar-item'
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={AuditOutline} className="antd-icon " />&nbsp;
                             Apply
@@ -173,6 +207,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.STAKE}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={GoldOutline} className="antd-icon" />&nbsp;
                             Stake
@@ -188,6 +223,7 @@ export const Header = ReactTimeout(
                                 'is-attention-grabby': applicationCount > 0
                               }
                             )}
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon
                               type={applicationCount > 0 ? IssuesCloseOutline : CheckCircleOutline}
@@ -201,6 +237,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.WALLET}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={WalletOutline} className="antd-icon" />&nbsp;
                             Wallet

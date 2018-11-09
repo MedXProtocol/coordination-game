@@ -14,6 +14,7 @@ const txNames = {
   'applicantRandomlySelectVerifier': 'Requesting Verification',
   'applicantRevealSecret': 'Finalizing Aplpication',
   'depositStake': 'Depositing TILW Stake',
+  'setBaseApplicationFeeUsdWei': 'Updating case fee',
   'updateSettings': 'Update Settings',
   'verifierSubmitSecret': 'Submitting Secret'
 }
@@ -113,7 +114,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               var removeButton = (
                 <React.Fragment>
                   <button
-                    className="btn-link text-gray"
+                    className="btn-link has-text-grey"
                     onClick={(e) => {
                       e.preventDefault()
                       this.props.dispatchRemove(key)

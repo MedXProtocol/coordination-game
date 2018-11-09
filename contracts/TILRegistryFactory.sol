@@ -15,9 +15,11 @@ contract TILRegistryFactory {
 
   function createTILRegistry(
     Parameterizer _parameterizer,
+    EtherPriceFeed _etherPriceFeed,
     Work _work,
     string _name,
-    uint256 _applicationStakeAmount
+    uint256 _applicationStakeAmount,
+    uint256 _baseApplicationFeeUsdWei
   )
     external
     returns (address)
@@ -32,10 +34,12 @@ contract TILRegistryFactory {
     emit TILRegistryCreated(msg.sender, address(tilRegistry));
 
     address coordinationGameAddress = coordinationGameFactory.createCoordinationGame(
+      _etherPriceFeed,
       _work,
       tilRegistry,
       msg.sender,
-      _applicationStakeAmount
+      _applicationStakeAmount,
+      _baseApplicationFeeUsdWei
     );
     tilRegistry.setCoordinationGame(coordinationGameAddress);
     tilRegistry.transferOwnership(msg.sender);

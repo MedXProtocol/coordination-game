@@ -12,17 +12,7 @@ contract('BetaFaucet', function (accounts) {
 
   before(async () => {
     workTokenInstance = await WorkToken.new()
-    betaFaucetInstance = await BetaFaucetArtifact.new()
-
-    await betaFaucetInstance.init(workTokenInstance.address)
-  })
-
-  describe('init()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await betaFaucetInstance.init(workTokenInstance.address)
-      })
-    })
+    betaFaucetInstance = await BetaFaucetArtifact.new(workTokenInstance.address)
   })
 
   describe('withdrawEther()', () => {

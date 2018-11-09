@@ -127,9 +127,9 @@ export const LoginToMetaMask =
                 ? (
                   <div className="text-center">
                     <br />
-                    <a className="button is-light is-primary " onClick={this.enableEthereum}>
+                    <button className="button is-light is-primary" onClick={this.enableEthereum}>
                       Authorize The Coordination Game
-                    </a>
+                    </button>
                     <br />
                     <br />
 

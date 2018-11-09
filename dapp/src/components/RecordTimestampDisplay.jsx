@@ -20,6 +20,6 @@ export const RecordTimestampDisplay = ({ timeInUtcSecondsSinceEpoch, delimiter }
   const entries = `${formattedCreatedAt.date} ${delimiter ? delimiter : `-`} ${formattedCreatedAt.time}`
 
   return (
-    <span className="text-gray" dangerouslySetInnerHTML={{__html: entries}} />
+    <span dangerouslySetInnerHTML={{__html: entries}} />
   )
 }

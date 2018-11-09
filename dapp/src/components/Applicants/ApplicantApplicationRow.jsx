@@ -259,14 +259,21 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           expirationMessage = (
             <React.Fragment>
               Application Complete
-              <br /><strong>{applicantWon ? `You Won!` : `You Lost`}</strong>
-              <br />{applicantWon ? `(Verifier's secret matched yours)` : `(Verifier's secret did not match yours)`}
+              <br />
+              <strong>
+                <abbr
+                  data-for='expiration-message-tooltip'
+                  data-tip={applicantWon ? `The Verifier's secret matched yours` : `The Verifier's secret did not match yours`}
+                >
+                  {applicantWon ? `You Won!` : `You Lost`}
+                </abbr>
+              </strong>
             </React.Fragment>
           )
         } else if (!isBlank(verifier) && !verifierSubmittedSecret) {
           expirationMessage = (
             <React.Fragment>
-              <span className="has-text-grey">Waiting on Verifier until:</span>
+              <span className="has-text-grey">Waiting on <abbr data-tip={verifier} data-for='expiration-message-tooltip'>Verifier</abbr> until:</span>
               <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
             </React.Fragment>
           )
@@ -312,9 +319,12 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         } else {
           hintRandomAndSecret = (
-            <abbr data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
+            <abbr data-for='hint-random-secret-tooltip' data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
           )
         }
+
+        // necessary to show the verifier on 1st-time component load
+        ReactTooltip.rebuild()
 
         return (
           <div className={classnames(
@@ -327,22 +337,24 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__date">
-              <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
                 <ReactTooltip
+                  id='date-tooltip'
                   html={true}
                   effect='solid'
                   place={'top'}
                   wrapper='span'
                 />
                 {loadingOrCreatedAtTimestamp}
-              </span>
+              </abbr>
             </span>
 
             <span className="list--item__status">
               {hintRandomAndSecret}
               <ReactTooltip
+                id='hint-random-secret-tooltip'
                 html={true}
                 effect='solid'
                 place={'top'}
@@ -364,6 +376,13 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                   )
                 : expirationMessage
               }
+              <ReactTooltip
+                id='expiration-message-tooltip'
+                html={true}
+                effect='solid'
+                place={'top'}
+                wrapper='span'
+              />
             </span>
           </div>
         )
