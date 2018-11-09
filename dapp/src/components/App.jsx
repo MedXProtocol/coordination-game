@@ -164,6 +164,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               {betaFaucetModal}
               {faqModal}
               <GetWallet />
+              <LoginToMetaMask />
               <ReduxToastr
                 timeOut={7000}
                 newestOnTop={true}
@@ -187,7 +188,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
-                        <Route path={routes.HOME_WITH_PAGE} component={Home} />
+                        <Route path={routes.LISTINGS} component={Home} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />

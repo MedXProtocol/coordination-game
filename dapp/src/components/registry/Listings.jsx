@@ -98,7 +98,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         <Pagination
           currentPage={parseInt(this.props.currentPage, 10)}
           totalPages={totalPages}
-          formatPageRoute={(number) => formatRoute(routes.HOME_WITH_PAGE, { currentPage: number })}
+          formatPageRoute={(number) => formatRoute(routes.LISTINGS, { currentPage: number })}
           />
       </React.Fragment>
     )
