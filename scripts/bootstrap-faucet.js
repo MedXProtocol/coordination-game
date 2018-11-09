@@ -2,7 +2,7 @@ const BetaFaucet = artifacts.require('BetaFaucet')
 const WorkToken = artifacts.require('WorkToken')
 const Work = artifacts.require('Work')
 
-const debug = require('debug')('bootstrap.js')
+const debug = require('debug')('bootstrap-faucet.js')
 
 async function setup() {
   const bf = await BetaFaucet.deployed()
@@ -15,7 +15,7 @@ async function setup() {
 }
 
 module.exports = function(callback) {
-  console.log('Starting bootstrap script...')
+  console.log('Starting bootstrap faucet script...')
   setup()
     .catch(error => console.error(error))
     .finally(callback)

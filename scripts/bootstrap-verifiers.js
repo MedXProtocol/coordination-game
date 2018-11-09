@@ -1,7 +1,7 @@
 const WorkToken = artifacts.require('WorkToken')
 const Work = artifacts.require('Work')
 
-const debug = require('debug')('bootstrap.js')
+const debug = require('debug')('bootstrap-verifiers.js')
 
 async function setup() {
   const wt = await WorkToken.deployed()
