@@ -1,7 +1,6 @@
 import React, {
-  PureComponent
+  Component
 } from 'react'
-import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { formatRoute } from 'react-router-named-routes'
 import { LoadingLines } from '~/components/LoadingLines'
@@ -11,6 +10,7 @@ import {
   cacheCallValue,
   contractByName
 } from 'saga-genesis'
+import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import * as routes from '~/../config/routes'
 import { Pagination } from '~/components/Pagination'
@@ -20,13 +20,15 @@ import { range } from 'lodash'
 function mapStateToProps(state, { currentPage, pageSize }) {
   const TILRegistry = contractByName(state, 'TILRegistry')
   const listingsCount = cacheCallValue(state, TILRegistry, 'listingsLength')
-
   const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
   const endIndex = startIndex + pageSize
-
-  const listingHashes = range(startIndex, endIndex).map((index) => {
-    return cacheCallValue(state, TILRegistry, 'listingAt', index)
-  })
+  const listingHashes = range(startIndex, endIndex).reduce((accumulator, index) => {
+    const hash = cacheCallValue(state, TILRegistry, 'listingAt', index)
+    if (hash) {
+      accumulator.push(hash)
+    }
+    return accumulator
+  }, [])
 
   return {
     TILRegistry,
@@ -38,13 +40,14 @@ function mapStateToProps(state, { currentPage, pageSize }) {
 }
 
 function* listingsSaga({ TILRegistry, startIndex, endIndex }) {
+  if (!TILRegistry) { return }
   yield cacheCall(TILRegistry, 'listingsLength')
-  yield range(startIndex, endIndex).map(function* (index) {
+  yield all(range(startIndex, endIndex).map(function* (index) {
     yield cacheCall(TILRegistry, 'listingAt', index)
-  })
+  }))
 }
 
-export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _Listings extends PureComponent {
+export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _Listings extends Component {
   render () {
     const totalPages = this.props.listingsCount / this.props.pageSize
     const { listingsCount } = this.props
@@ -58,7 +61,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
           </div>
         </div>
       )
-    } else if (listingsCount == 0) {
+    } else if (listingsCount === 0) {
       var noListings = (
         <div className="blank-state">
           <div className="blank-state--inner has-text-grey-lighter">
@@ -76,7 +79,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
       <React.Fragment>
         <div className="is-clearfix">
           <h6 className="is-size-6">
-            Listings
+            List
           </h6>
         </div>
 
@@ -90,7 +93,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         </div>
 
         <Pagination
-          currentPage={this.props.currentPage}
+          currentPage={parseInt(this.props.currentPage, 10)}
           totalPages={totalPages}
           formatPageRoute={(number) => formatRoute(routes.HOME_WITH_PAGE, { currentPage: number })}
           />
@@ -101,7 +104,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
 
 Listings.propTypes = {
   pageSize: PropTypes.number.isRequired,
-  currentPage: PropTypes.number
+  currentPage: PropTypes.any
 }
 
 Listings.defaultProps = {

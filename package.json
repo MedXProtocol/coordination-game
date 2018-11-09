@@ -11,7 +11,8 @@
     "test": "npm run compile && $(npm bin)/truffle test",
     "start": "./scripts/ganache.sh",
     "lambda": "cd lambda && ./lambda-serve.sh",
-    "bootstrap": "truffle exec scripts/bootstrap.js"
+    "bootstrap": "truffle exec scripts/bootstrap-faucet.js",
+    "bootstrap-verifiers": "truffle exec scripts/bootstrap-verifiers.js"
   },
   "author": "",
   "license": "ISC",

@@ -56,26 +56,21 @@ export class Pagination extends Component {
     this.calculatePageValues().forEach((value, index) => {
       if (value === '...') {
         pageListItems.push(
-          <li
-            key={`page-ellipsis-${index}`}
-            className={classnames(
-            )}
-          >
-            <span>
-              {value}
+          <li key={`page-ellipsis-${index}`} >
+            <span className='pagination-ellipsis'>
+              &hellip;
             </span>
           </li>
         )
       } else {
         pageListItems.push(
-          <li
-            key={`page-number-${value}`}
-            className={classnames(
-              'pagination--page-number',
-              { 'active': this.props.currentPage === value }
-            )}
-          >
-            <Link to={this.props.formatPageRoute(value)}>
+          <li key={`page-number-${value}`} >
+            <Link
+              to={this.props.formatPageRoute(value)}
+              className={classnames(
+                'pagination-link',
+                { 'is-current': this.props.currentPage === value }
+              )}>
               {value}
             </Link>
           </li>
@@ -93,9 +88,15 @@ export class Pagination extends Component {
   render () {
     if (this.props.totalPages > 1) {
       return (
-        <nav aria-label="Page navigation" className="text-center">
-          {this.renderPageNumbers()}
-        </nav>
+        <div className='card'>
+          <div className='card-content'>
+            <nav aria-label="Page navigation" className="pagination is-centered" role='navigation'>
+              <ul className='pagination-list'>
+                {this.renderPageNumbers()}
+              </ul>
+            </nav>
+          </div>
+        </div>
       )
     } else {
       return null
