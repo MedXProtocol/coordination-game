@@ -21,6 +21,7 @@ import {
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
 import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
+import { LoadingButton } from '~/components/LoadingButton'
 import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
@@ -525,16 +526,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               <Flipped flipId="coolDiv">
                                 <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
                                   <br />
-                                  <button
-                                    type="submit"
-                                    className="button is-outlined is-primary"
-                                    disabled={this.state.coordinationGameStartHandler}
-                                  >
-                                    Submit Hint &amp; Secret <LoadingLines
-                                      visible={this.state.coordinationGameStartHandler}
-                                    />
-                                  </button>
-
+                                  <LoadingButton
+                                    initialText='Submit Hint &amp; Secret'
+                                    loadingText='Submitting'
+                                    isLoading={this.state.coordinationGameStartHandler}
+                                  />
                                   <br />
                                   <p className="help has-text-grey">
                                     <EtherFlip wei={this.props.weiPerApplication} /> to submit an application

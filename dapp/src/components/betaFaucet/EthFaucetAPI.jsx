@@ -6,7 +6,7 @@ import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { toastr } from '~/toastr'
 import { EthAddress } from '~/components/EthAddress'
 import { EtherFlip } from '~/components/EtherFlip'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 import { axiosInstance } from '~/../config/axiosConfig'
 
 export const EthFaucetAPI = ReactTimeout(
@@ -102,16 +102,12 @@ export const EthFaucetAPI = ReactTimeout(
           </p>
           <p>
             <br />
-            <a
-              disabled={isSending}
-              href={this.faucetLambdaURI}
-              onClick={this.handleSendEther}
-              className="button is-primary is-outlined"
-            >{isSending ? (
-              <React.Fragment>
-                Sending <LoadingLines visible={isSending} />
-              </React.Fragment>
-            ) : 'Send Me Ether'}</a>
+            <LoadingButton
+              handleClick={this.handleSendEther}
+              initialText='Send Me Ether'
+              loadingText='Sending'
+              isLoading={isSending}
+            />
           </p>
           <br />
           <p>
