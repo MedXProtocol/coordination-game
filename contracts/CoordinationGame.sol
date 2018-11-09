@@ -2,16 +2,20 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "tcr/Parameterizer.sol";
+import "./EtherPriceFeed.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
 
 /**
 @title CoordinationGame
 @author Brendan Asselstine, Chuck Bergeron
-@notice This contract stores work tokens in a pool which are applicant applicantDeposits
+@notice This contract stores work tokens in a pool which are applicantTokenDeposits
+        as well as Ether balances in applicationBalancesInWei
 **/
 contract CoordinationGame is Ownable {
   using SafeMath for uint256;
+
+  EtherPriceFeed etherPriceFeed;
   Work work;
   TILRegistry tilRegistry;
 
@@ -20,13 +24,17 @@ contract CoordinationGame is Ownable {
   uint256 public applicantRevealTimeoutInDays;
 
   uint256 public applicationStakeAmount;
+  uint256 public baseApplicationFeeUsdWei;
 
   uint256 public applicationCount;
+
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (address => uint256[]) public verifiersApplicationIndices;
 
-  mapping (uint256 => uint256) public applicantDeposits;
+  mapping (uint256 => uint256) public applicationBalancesInWei;
+  mapping (uint256 => uint256) public applicantTokenDeposits;
+
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
@@ -89,7 +97,8 @@ contract CoordinationGame is Ownable {
   );
 
   event SettingsUpdated(
-    uint256 applicationStakeAmount
+    uint256 applicationStakeAmount,
+    uint256 baseApplicationFeeUsdWei
   );
 
   modifier onlyApplicant(uint256 _applicationId) {
@@ -114,14 +123,18 @@ contract CoordinationGame is Ownable {
          to add applicants to
   @param _applicationStakeAmount how much an applicant has to stake when applying
   */
-  function init(
+  constructor (
+    EtherPriceFeed _etherPriceFeed,
     Work _work,
     TILRegistry _tilRegistry,
-    uint256 _applicationStakeAmount
+    uint256 _applicationStakeAmount,
+    uint256 _baseApplicationFeeUsdWei
   ) public {
+    etherPriceFeed = _etherPriceFeed;
     work = _work;
     tilRegistry = _tilRegistry;
     applicationStakeAmount = _applicationStakeAmount;
+    baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
 
     secondsInADay = 86400;
     verifierTimeoutInDays = 4;
@@ -145,28 +158,36 @@ contract CoordinationGame is Ownable {
   @param _hint The hint for the verifier to determine the secret
   */
   function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
-    public
+    external
+    payable
   {
     // make this configurable if we want to lock down 1 application per Eth address
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
+    uint256 depositWei = weiPerApplication();
+    require(msg.value >= depositWei, 'not enough ether');
+
     applicationCount += 1;
     uint256 applicationId = applicationCount;
+
+    applicationBalancesInWei[applicationId] = msg.value;
+
     applicantsApplicationIndices[msg.sender].push(applicationId);
     applicants[applicationId] = msg.sender;
     secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
     randomHashes[applicationId] = _keccakOfRandom;
     hints[applicationId] = _hint;
+
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationId] = block.number + 1;
-    applicantDeposits[applicationId] = minDeposit();
+    applicantTokenDeposits[applicationId] = minDeposit();
 
     createdAt[applicationId] = block.timestamp;
     updatedAt[applicationId] = block.timestamp;
 
     // Transfer a deposit of work tokens from the Applicant to this contract
     require(
-      tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationId]),
+      tilRegistry.token().transferFrom(msg.sender, address(this), applicantTokenDeposits[applicationId]),
       '2nd token transfer succeeded'
     );
 
@@ -202,7 +223,7 @@ contract CoordinationGame is Ownable {
       );
 
       require(
-        work.token().transfer(applicants[_applicationId], applicantDeposits[_applicationId]),
+        work.token().transfer(applicants[_applicationId], applicantTokenDeposits[_applicationId]),
         'transferred old verifiers deposit to applicant'
       );
 
@@ -317,13 +338,13 @@ contract CoordinationGame is Ownable {
     verifierChallengedAt[_applicationId] = block.timestamp;
 
     /// Transfer the verifier's deposit back to them
-    work.token().approve(address(work), applicantDeposits[_applicationId]);
+    work.token().approve(address(work), applicantTokenDeposits[_applicationId]);
     work.depositJobStake(verifiers[_applicationId]);
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(
       applicants[_applicationId],
-      applicantDeposits[_applicationId]
+      applicantTokenDeposits[_applicationId]
     );
 
     updatedAt[_applicationId] = block.timestamp;
@@ -335,7 +356,7 @@ contract CoordinationGame is Ownable {
     wins[msg.sender] += 1;
     tilRegistry.updateStatus(bytes32(_applicationId));
 
-    tilRegistry.token().approve(address(work), applicantDeposits[_applicationId]);
+    tilRegistry.token().approve(address(work), applicantTokenDeposits[_applicationId]);
     work.depositJobStake(verifiers[_applicationId]);
 
     emit ApplicantWon(_applicationId);
@@ -394,16 +415,16 @@ contract CoordinationGame is Ownable {
   }
 
   function applyToRegistry(uint256 _applicationId) internal {
-    tilRegistry.token().approve(address(tilRegistry), applicantDeposits[_applicationId]);
-    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), applicantDeposits[_applicationId], "");
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
+    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), applicantTokenDeposits[_applicationId], "");
   }
 
   function autoChallenge(uint256 _applicationId) internal {
     require(
-      tilRegistry.token().balanceOf(address(this)) >= applicantDeposits[_applicationId],
+      tilRegistry.token().balanceOf(address(this)) >= applicantTokenDeposits[_applicationId],
       'we have enough deposit'
     );
-    tilRegistry.token().approve(address(tilRegistry), applicantDeposits[_applicationId]);
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
     tilRegistry.challenge(bytes32(_applicationId), "");
   }
 
@@ -416,10 +437,14 @@ contract CoordinationGame is Ownable {
     return tilRegistry.parameterizer().get("minDeposit");
   }
 
-  function updateSettings(uint256 _applicationStakeAmount) public onlyOwner {
+  function updateSettings(
+    uint256 _applicationStakeAmount,
+    uint256 _baseApplicationFeeUsdWei
+  ) public onlyOwner {
     setApplicationStakeAmount(_applicationStakeAmount);
+    setBaseApplicationFeeUsdWei(_baseApplicationFeeUsdWei);
 
-    emit SettingsUpdated(applicationStakeAmount);
+    emit SettingsUpdated(applicationStakeAmount, baseApplicationFeeUsdWei);
   }
 
   function setSecondsInADay(uint256 _secondsInADay) public onlyOwner {
@@ -432,6 +457,23 @@ contract CoordinationGame is Ownable {
 
   function setVerifierTimeoutInDays(uint256 _verifierTimeoutInDays) public onlyOwner {
     verifierTimeoutInDays = _verifierTimeoutInDays;
+  }
+
+  function setBaseApplicationFeeUsdWei(uint256 _baseApplicationFeeUsdWei) public onlyOwner {
+    require(_baseApplicationFeeUsdWei > 0);
+
+    baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
+  }
+
+  function weiPerApplication() public view returns (uint256) {
+    uint256 usdPerKwei = usdWeiPerEther().div(1000000000000000);
+    uint256 kweiPerApplication = baseApplicationFeeUsdWei.div(usdPerKwei);
+
+    return kweiPerApplication.mul(1000);
+  }
+
+  function usdWeiPerEther() public view returns (uint256) {
+    return uint256(etherPriceFeed.read());
   }
 
 }

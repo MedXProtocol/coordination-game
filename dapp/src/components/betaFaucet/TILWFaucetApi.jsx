@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { toastr } from '~/toastr'
 import { EthAddress } from '~/components/EthAddress'
 import { TILW } from '~/components/TILW'
+import { LoadingButton } from '~/components/LoadingButton'
 import { axiosInstance } from '~/../config/axiosConfig'
 import TILWCoinImg from '~/assets/img/tilw-coin.svg'
 
@@ -100,12 +101,13 @@ export const TILWFaucetApi = ReactTimeout(
 
           <p>
             <br />
-            <a
-              disabled={isSending}
-              onClick={this.handleMintTILW}
-              href={this.faucetLambdaURI}
-              className="button is-primary is-outlined"
-            >{isSending ? 'Sending ...' : 'Send Me TILW'}</a>
+
+            <LoadingButton
+              handleClick={this.handleMintTILW}
+              initialText='Send Me TILW'
+              loadingText='Sending'
+              isLoading={isSending}
+            />
           </p>
           <br />
           <p>

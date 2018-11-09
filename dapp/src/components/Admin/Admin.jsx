@@ -26,6 +26,7 @@ function mapStateToProps(state) {
   const workAddress = contractByName(state, 'Work')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
+  const baseApplicationFeeUsdWei = cacheCallValueBigNumber(state, coordinationGameAddress, 'baseApplicationFeeUsdWei')
 
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
@@ -33,6 +34,7 @@ function mapStateToProps(state) {
   return {
     address,
     applicationStakeAmount,
+    baseApplicationFeeUsdWei,
     coordinationGameAddress,
     networkId,
     jobStake,
@@ -52,7 +54,8 @@ function* adminSaga({
   yield all([
     cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake'),
-    cacheCall(coordinationGameAddress, 'applicationStakeAmount')
+    cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
+    cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei')
   ])
 }
 
@@ -117,14 +120,11 @@ export const Admin = connect(mapStateToProps)(
 
           const { send, coordinationGameAddress } = this.props
 
-          const newApplicationStakeAmount = this.state.applicationStakeAmount
-            ? etherToWei(this.state.applicationStakeAmount)
-            : this.props.applicationStakeAmount
-
           const coordinationGameSettingsTxId = send(
             coordinationGameAddress,
             'updateSettings',
-            newApplicationStakeAmount
+            this.newOrCurrentValue('applicationStakeAmount'),
+            this.newOrCurrentValue('baseApplicationFeeUsdWei')
           )()
 
           this.setState({
@@ -138,18 +138,11 @@ export const Admin = connect(mapStateToProps)(
 
           const { send, workAddress } = this.props
 
-          const newRequiredStake = this.state.requiredStake
-            ? etherToWei(this.state.requiredStake)
-            : this.props.requiredStake
-          const newJobStake = this.state.jobStake
-            ? etherToWei(this.state.jobStake)
-            : this.props.jobStake
-
           const workSettingsTxId = send(
             workAddress,
             'updateSettings',
-            newRequiredStake,
-            newJobStake
+            this.newOrCurrentValue('requiredStake'),
+            this.newOrCurrentValue('jobStake')
           )()
 
           this.setState({
@@ -162,6 +155,12 @@ export const Admin = connect(mapStateToProps)(
           this.setState({
             [e.target.name]: e.target.value
           })
+        }
+
+        newOrCurrentValue = (stateVar) => {
+          return this.state[stateVar]
+            ? etherToWei(this.state[stateVar])
+            : this.props[stateVar]
         }
 
         render() {
@@ -179,20 +178,41 @@ export const Admin = connect(mapStateToProps)(
               </h4>
 
               <form onSubmit={this.handleSubmitCoordinationGameSettings}>
-                <p className="is-size-7">
-                  <strong>TIL Application Stake Amount</strong>
-                  <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
-                </p>
-                <input
-                  type="text"
-                  name="applicationStakeAmount"
-                  className="text-input is-marginless"
-                  onChange={this.handleTextInputChange}
-                  value={this.state.applicationStakeAmount || ''}
-                />
-                <span className="help has-text-grey">
-                  Currently: {displayWeiToEther(this.props.applicationStakeAmount)}
-                </span>
+                <div className="columns">
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>TIL Application Stake Amount</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="applicationStakeAmount"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.applicationStakeAmount || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.applicationStakeAmount)}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>TIL Application Fee</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in USD)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="baseApplicationFeeUsdWei"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.baseApplicationFeeUsdWei || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.baseApplicationFeeUsdWei)}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="is-clearfix">
                   <button
