@@ -84,7 +84,7 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: 'ADD_EXTERNAL_TRANSACTION', transactionId, txType, txHash, call })
     },
     dispatchSagaGenesisTransaction: (transactionId, txType, txHash, call) => {
-      dispatch({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
+      dispatch({ type: 'ADD_TRANSACTION', transactionId, txHash, call })
     },
     dispatchSetBetaFaucetModalStep: (step) => {
       dispatch({ type: 'SET_BETA_FAUCET_MODAL_STEP', step })
@@ -125,7 +125,12 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
       addExternalTransaction = (txType, txHash) => {
         const id = nextId()
-        const call = { method: txType, address: '0x0444d61FE60A855d6f40C21f167B643fD5F17aF3' } // junk address for cache invalidator to be happy
+        const call = {
+          method: txType,
+          address: '0x0444d61FE60A855d6f40C21f167B643fD5F17aF3', // junk address for cache invalidator to be happy
+          hash: txHash
+        }
+
         this.props.dispatchAddExternalTransaction(id, txType, txHash, call)
         this.props.dispatchSagaGenesisTransaction(id, txType, txHash, call)
       }

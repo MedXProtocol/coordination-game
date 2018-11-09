@@ -97,7 +97,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
         if (loading) {
           loadingLines = (
             <div className="blank-state">
-              <div className="blank-state--inner has-text-grey-lighter">
+              <div className="blank-state--inner has-text-grey">
                 <LoadingLines visible={true} />
               </div>
             </div>
@@ -105,7 +105,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
         } else if (!applicationIds.length) {
           noApplications = (
             <div className="blank-state">
-              <div className="blank-state--inner has-text-grey-lighter">
+              <div className="blank-state--inner has-text-grey">
                 <span className="is-size-6">You currently have no applications to verify.</span>
               </div>
             </div>

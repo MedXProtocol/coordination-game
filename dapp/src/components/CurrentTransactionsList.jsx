@@ -10,6 +10,8 @@ import { txErrorToCode } from '~/services/txErrorToCode'
 
 const txNames = {
   'approve': 'TILW Approval',
+  'sendEther': 'Sending Ether',
+  'sendTILW': 'Sending TILW',
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
   'applicantRevealSecret': 'Finalizing Aplpication',
