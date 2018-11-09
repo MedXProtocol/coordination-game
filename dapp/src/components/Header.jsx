@@ -188,7 +188,7 @@ export const Header = ReactTimeout(
                             onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
-                            View Registry
+                            List
                           </NavLink>
                         </div>
                         <div className="navbar-item">

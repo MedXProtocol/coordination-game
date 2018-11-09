@@ -1,20 +1,11 @@
-const BetaFaucet = artifacts.require('BetaFaucet')
-const CoordinationGame = artifacts.require('CoordinationGame')
 const WorkToken = artifacts.require('WorkToken')
 const Work = artifacts.require('Work')
 
-const debug = require('debug')('bootstrap.js')
+const debug = require('debug')('bootstrap-verifiers.js')
 
 async function setup() {
-  const bf = await BetaFaucet.deployed()
-  const cg = await CoordinationGame.deployed()
   const wt = await WorkToken.deployed()
   const w = await Work.deployed()
-
-  await web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: bf.address, value: web3.toWei(10, "ether") })
-
-  await wt.mint(bf.address, 50000000000000000000000)
-  debug(`Minted to BetaFaucet ${bf.address}`)
 
   await wt.mint('0x061f4af068d28a2ead064c91388d4b25598d6d35', 50000000000000000000000)
   await wt.mint('0x8a23c3556fa6a8fd38c86597acfd0151ac62861c', 50000000000000000000000)
@@ -51,7 +42,7 @@ async function setup() {
 }
 
 module.exports = function(callback) {
-  console.log('Starting bootstrap script...')
+  console.log('Starting bootstrap verifiers script...')
   setup()
     .catch(error => console.error(error))
     .finally(callback)

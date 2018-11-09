@@ -4,6 +4,7 @@ pragma solidity ^0.4.24;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IndexedAddressArray.sol';
+import "./TILRoles.sol";
 
 // TODO: This contract needs events!
 
@@ -11,9 +12,8 @@ contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
   // using SafeMath for uint256;
 
-  address public jobManager;
-
   ERC20 public token;
+  TILRoles public roles;
 
   IndexedAddressArray.Data stakers;
   IndexedAddressArray.Data suspendedStakers;
@@ -22,6 +22,11 @@ contract Work is Ownable {
   uint256 public jobStake;
 
   mapping (address => uint256) public balances;
+
+  modifier onlyJobManager() {
+    require(roles.hasRole(msg.sender, uint(TILRoles.All.JOB_MANAGER)), "sender is job manager");
+    _;
+  }
 
   event SettingsUpdated(
     uint256 applicationStakeAmount,
@@ -38,29 +43,21 @@ contract Work is Ownable {
     _;
   }
 
-  modifier onlyJobManager() {
-    require(msg.sender == jobManager, 'sender is job manager');
-    _;
-  }
-
   constructor (
     ERC20 _token,
     uint256 _requiredStake,
-    uint256 _jobStake
+    uint256 _jobStake,
+    TILRoles _roles
   ) public {
     require(_token != address(0), '_token is defined');
-
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
+    require(_roles != address(0), '_roles is defined');
 
     token = _token;
-
     requiredStake = _requiredStake;
     jobStake = _jobStake;
-  }
-
-  function setJobManager(address _jobManager) onlyOwner {
-    jobManager = _jobManager;
+    roles = _roles;
   }
 
   function depositStake() public {
