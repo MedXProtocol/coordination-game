@@ -32,7 +32,6 @@ function mapStateToProps(state, { currentPage, pageSize }) {
 
   return {
     TILRegistry,
-    listingsCount,
     startIndex,
     endIndex,
     listingsCount,

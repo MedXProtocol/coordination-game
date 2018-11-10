@@ -305,12 +305,14 @@ html.html-light,
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .modal-content {
+  .modal-content--inner {
     background-color: lighten($background-color--light, 6%);
     background: linear-gradient(217deg, rgba(220,250,255, 1), rgba(220,240,255, 0.8) 70%),
                 linear-gradient(127deg, rgba(220,240,240, 1), rgba(220,240,255, 0.8) 70%),
                 linear-gradient(336deg, rgba(220,250,255, 1), rgba(220,250,255, 0.8) 70%);
+  }
 
+  .modal-content {
     box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
   }
 

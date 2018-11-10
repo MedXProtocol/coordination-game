@@ -487,6 +487,11 @@ header {
   overflow: initial;
 }
 
+.modal-content,
+.modal-card {
+  max-height: -webkit-fill-available;
+}
+
 .modal hr {
   background-color: rgba(255, 255, 255, 0.1);
   margin: 2rem auto;
@@ -504,25 +509,36 @@ header {
   border-radius: 0;
 }
 
-.modal-content {
+.modal-content--inner {
   background-color: lighten($background-color, 6%);
   background: linear-gradient(217deg, rgba(20,15,30,0.8), rgba(30,40,80,0.5) 70%),
               linear-gradient(127deg, rgba(6,12,18,0.8), rgba(10,20,30,0.5) 70%),
               linear-gradient(336deg, rgba(20,15,30,0.8), rgba(20,10,30,0.5) 70%);
 
-  box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
   padding: 3rem 2rem;
 
   @media screen and (max-width: 768px) {
-    margin: 0;
     padding: 3rem 1.5rem;
+  }
+}
+
+.modal-content {
+  box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
+
+  @media screen and (max-width: 768px) {
+    margin: 0;
+  }
+}
+
+.modal-content svg {
+  @media screen and (max-width: 768px) {
+    height: 100px;
+    width: 100px;
   }
 }
 
 .modal-content,
 .modal-card {
-  max-height: 100%;
-
   @media screen and (min-width: 769px) {
     max-height: calc(100vh - 40px);
     width: 640px;
@@ -794,4 +810,8 @@ header {
 .icon-export {
   position: relative;
   top: 2px;
+}
+
+.faq-h6 {
+  margin-top: 1.5rem;
 }
