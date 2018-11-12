@@ -37,10 +37,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps (dispatch) {
   return {
     dispatchSend: (transactionId, call, options, address) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
+      dispatch({ type: 'SG_SEND_TRANSACTION', transactionId, call, options, address })
     },
     dispatchRemove: (transactionId) => {
-      dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
+      dispatch({ type: 'SG_REMOVE_TRANSACTION', transactionId })
     }
   }
 }
