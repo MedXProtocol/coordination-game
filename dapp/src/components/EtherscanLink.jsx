@@ -25,7 +25,9 @@ export const EtherscanLink = connect(mapStateToProps)(class _EtherscanLink exten
 
     const { address, txHash, networkId } = this.props
 
-    if (defined(txHash) || !isBlank(address)) {
+    if (!txHash && !address) {
+      return null
+    } else {
       switch(networkId) {
         case 1:
           url = `https://etherscan.io`

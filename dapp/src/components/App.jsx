@@ -204,7 +204,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                     <nav className="level level--body">
                       <div className="level-item has-text-centered">
                         <div>
-                          <p className="heading is-size-3 has-text-grey-lighter">
+                          <p className="heading is-size-5 has-text-grey-lighter">
                             What is this?
                           </p>
                           <p className="title">

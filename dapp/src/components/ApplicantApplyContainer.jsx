@@ -48,7 +48,7 @@ function mapStateToProps(state) {
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
-  const approveTx = transactionFinders.approve(state)
+  const approveTx = transactionFinders.findByMethodName(state, 'approve')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')

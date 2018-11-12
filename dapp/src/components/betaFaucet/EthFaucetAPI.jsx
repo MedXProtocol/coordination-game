@@ -46,6 +46,8 @@ export const EthFaucetAPI = ReactTimeout(
       try {
         const response = await axiosInstance.get(`${this.faucetLambdaURI}?ethAddress=${this.props.address}`)
 
+        const txId = this.props.sendExternalTransaction('sendEther')
+
         if (response.status === 200) {
           this.setState({
             txHash: response.data.txHash
@@ -53,7 +55,8 @@ export const EthFaucetAPI = ReactTimeout(
 
           toastr.success("We're sending you Ether - It will take a few moments to arrive.")
 
-          this.props.addExternalTransaction('sendEther', response.data.txHash)
+          this.props.dispatchSagaGenesisTxHash(txId, response.data.txHash)
+
           this.props.setTimeout(() => {
             this.props.handleMoveToNextStep()
           }, 2000)

@@ -8,7 +8,7 @@ async function setup() {
   const bf = await BetaFaucet.deployed()
   const wt = await WorkToken.deployed()
 
-  await web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: bf.address, value: web3.toWei(10, "ether") })
+  await web3.eth.sendTransaction({ from: web3.eth.accounts[0], to: bf.address, value: web3.toWei(100, "ether") })
 
   await wt.mint(bf.address, 50000000000000000000000)
   debug(`Minted to BetaFaucet ${bf.address}`)

@@ -95,7 +95,7 @@
 
   // min
   @media screen and (min-width: 1088px) {
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid darken($background-color, 3%);
 
     &:after {
       background: linear-gradient(177deg, lighten($background-color, 6%), lighten($background-color, 2%) 100%);
@@ -111,7 +111,7 @@
 
 .navbar-menu.is-active {
   @media screen and (max-width: 1088px) {
-    background-color: black;
+    background-color: darken($background-color, 3%);
   }
 }
 

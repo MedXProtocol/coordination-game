@@ -168,7 +168,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
           if (loading) {
             loadingLines = (
               <div className="blank-state">
-                <div className="blank-state--inner has-text-grey-lighter">
+                <div className="blank-state--inner has-text-grey">
                   <LoadingLines visible={true} />
                 </div>
               </div>
@@ -176,7 +176,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
           } else if (!applicationObjects.length) {
             noApplications = (
               <div className="blank-state">
-                <div className="blank-state--inner has-text-grey-lighter">
+                <div className="blank-state--inner has-text-grey">
                   <span className="is-size-6">You have not applied yet.</span>
                 </div>
               </div>
