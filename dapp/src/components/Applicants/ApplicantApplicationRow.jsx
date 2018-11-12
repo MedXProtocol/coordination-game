@@ -306,7 +306,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         }
 
-        if (verifierChallengedAt !== '0') {
+        if (verifierChallengedAt !== 0) {
           expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
         } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
           expirationMessage = (

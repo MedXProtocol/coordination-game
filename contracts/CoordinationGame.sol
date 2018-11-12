@@ -315,8 +315,6 @@ contract CoordinationGame is Ownable {
 
     applicantSecrets[_applicationId] = _secret;
 
-    applyToRegistry(_applicationId);
-
     updatedAt[_applicationId] = block.timestamp;
 
     if (_secret != verifierSecrets[_applicationId]) {
@@ -359,21 +357,32 @@ contract CoordinationGame is Ownable {
   }
 
   function applicantWon(uint256 _applicationId) internal {
-    wins[msg.sender] += 1;
-    tilRegistry.updateStatus(bytes32(_applicationId));
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
+    tilRegistry.newListing(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
 
-    tilRegistry.token().approve(address(work), applicantTokenDeposits[_applicationId]);
-    work.depositJobStake(verifiers[_applicationId]);
+    wins[msg.sender] += 1;
+
+    /// Return the verifier's job stake
+    returnVerifierJobStake(_applicationId);
 
     emit ApplicantWon(_applicationId);
   }
 
   function applicantLost(uint256 _applicationId) internal {
+    // NOTE: This will change when we deposit the verifier's stake into the registry
+    returnVerifierJobStake(_applicationId);
+
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
+    tilRegistry.requestNewListing(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
+
     losses[msg.sender] += 1;
 
-    autoChallenge(_applicationId);
-
     emit ApplicantLost(_applicationId);
+  }
+
+  function returnVerifierJobStake(uint256 _applicationId) internal {
+    tilRegistry.token().approve(address(work), applicantTokenDeposits[_applicationId]);
+    work.depositJobStake(verifiers[_applicationId]);
   }
 
   /**
@@ -418,27 +427,13 @@ contract CoordinationGame is Ownable {
     return (block.timestamp - verifierSubmittedAt[_applicationId]) > applicantRevealTimeoutInSeconds;
   }
 
-  function applyToRegistry(uint256 _applicationId) internal {
-    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
-    tilRegistry.applyFor(applicants[_applicationId], bytes32(_applicationId), applicantTokenDeposits[_applicationId], "");
-  }
-
-  function autoChallenge(uint256 _applicationId) internal {
-    require(
-      tilRegistry.token().balanceOf(address(this)) >= applicantTokenDeposits[_applicationId],
-      'we have enough deposit'
-    );
-    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
-    tilRegistry.challenge(bytes32(_applicationId), "");
-  }
-
   function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
     return verifierSecrets[_applicationId] != 0;
   }
 
   // the 3rd-party TCR Registry contract uses this var:
   function minDeposit() public view returns (uint256) {
-    return tilRegistry.parameterizer().get("minDeposit");
+    return work.jobStake();
   }
 
   function updateSettings(

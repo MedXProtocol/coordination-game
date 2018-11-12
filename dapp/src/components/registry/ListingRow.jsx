@@ -31,9 +31,7 @@ export const ListingRow = connect(mapStateToProps)(
   withSaga(listingRowSaga)(
     class _ListingRow extends PureComponent {
       render () {
-
         const {
-          applicationExpiry,
           owner,
           unstakedDeposit
         } = this.props.listing || {}
@@ -45,7 +43,6 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className="list--item__date">
-              <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicationExpiry} />
             </span>
 
             <span className='list--item__status'>
