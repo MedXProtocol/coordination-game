@@ -7,7 +7,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { toastr } from '~/toastr'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 
 function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
@@ -81,20 +81,16 @@ export const Web3ActionButton = connect(mapStateToProps)(
       }
 
       render() {
-        const { buttonText, contractAddress } = this.props
+        const { buttonText, contractAddress, loadingText, isSmall } = this.props
 
         return (
           <form onSubmit={this.handleSend}>
-            <button
+            <LoadingButton
+              initialText={buttonText}
+              loadingText={loadingText}
+              isLoading={this.state.txHandler}
+              isSmall={isSmall}
               disabled={!contractAddress || this.state.txHandler}
-              type="submit"
-              className="button is-outlined is-primary is-small"
-            >
-              {buttonText}
-            </button>&nbsp;
-
-            <LoadingLines
-              visible={this.state.txHandler}
             />
           </form>
         )

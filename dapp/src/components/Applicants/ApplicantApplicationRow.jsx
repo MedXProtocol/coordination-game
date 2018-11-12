@@ -23,11 +23,10 @@ import { defined } from '~/utils/defined'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicantRevealTimeoutInDays,
+  let applicantRevealTimeoutInSeconds,
     applicationRowObject,
     hint,
-    secondsInADay,
-    verifierTimeoutInDays
+    verifierTimeoutInSeconds
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
@@ -60,9 +59,8 @@ function mapStateToProps(state, { applicationId }) {
   }
 
   if (!isBlank(verifier)) {
-    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
-    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
-    applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+    verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+    applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
   }
 
   applicationRowObject = retrieveApplicationDetailsFromLocalStorage(
@@ -72,8 +70,8 @@ function mapStateToProps(state, { applicationId }) {
     createdAt
   )
 
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  applicationRowObject.applicantRevealExpiresAt      = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+  applicationRowObject.applicantRevealExpiresAt      = updatedAt + applicantRevealTimeoutInSeconds
 
   // If this applicationRowObject has an ongoing blockchain transaction this will update
   // const reversedTransactions = transactions.reverse().filter(transaction => {
@@ -118,9 +116,8 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'secondsInADay'),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
   ])
 }
 
@@ -215,7 +212,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
       //   } else {
       //     action = (
       //       <React.Fragment>
-      //         <span className="list--item__view__text">View Application&nbsp;</span>
+      //         <span className="list--item__view__view">View Application&nbsp;</span>
       //         <FontAwesomeIcon
       //           icon={faChevronCircleRight} />
       //       </React.Fragment>
@@ -300,6 +297,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                   method='applicantRevealSecret'
                   args={[applicationId, secretAsHex, random.toString()]}
                   buttonText='Reveal Secret'
+                  loadingText='Revealing'
+                  isSmall={true}
                   confirmationMessage='"Reveal Secret" transaction confirmed.'
                   txHashMessage='"Reveal Secret" transaction sent successfully -
                     it will take a few minutes to confirm on the Ethereum network.'/>
@@ -310,7 +309,21 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         if (verifierChallengedAt !== '0') {
           expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
         } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Verifier Failed to Respond</span>
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-warning">Verifier Failed to Respond</span>
+              <Web3ActionButton
+                contractAddress={this.props.coordinationGameAddress}
+                method='applicantRandomlySelectVerifier'
+                args={[applicationId]}
+                isSmall={true}
+                buttonText='Request New Verifier'
+                loadingText='Requesting New Verifier'
+                confirmationMessage='New verifier request confirmed.'
+                txHashMessage='New verifier request sent successfully -
+                  it will take a few minutes to confirm on the Ethereum network.' />
+            </React.Fragment>
+          )
         } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
           expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
         }
@@ -376,9 +389,11 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                       method='applicantRandomlySelectVerifier'
                       args={[applicationId]}
                       buttonText='Request Verification'
+                      loadingText='Requesting'
+                      isSmall={true}
                       confirmationMessage='Verification request confirmed.'
                       txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.'/>
+                        it will take a few minutes to confirm on the Ethereum network.' />
                   )
                 : expirationMessage
               }

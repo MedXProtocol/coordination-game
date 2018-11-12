@@ -30,9 +30,8 @@ contract('CoordinationGame', (accounts) => {
     parameterizer,
     tilRegistry,
     applicationId,
-    applicantRevealTimeoutInDays,
-    verifierTimeoutInDays,
-    secondsInADay,
+    applicantRevealTimeoutInSeconds,
+    verifierTimeoutInSeconds,
     roles
 
   const applicant = accounts[0]
@@ -111,18 +110,15 @@ contract('CoordinationGame', (accounts) => {
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
     assert.equal(coordinationGameOwnerAddress, applicant, 'coord game owner is first account')
 
-    secondsInADay = await coordinationGame.secondsInADay()
-    debug(`secondsInADay is ${secondsInADay.toString()}`)
+    // Add one to the timeouts so that we can use them to increaseTime and timeout
+    applicantRevealTimeoutInSeconds = await coordinationGame.applicantRevealTimeoutInSeconds()
+    applicantRevealTimeoutInSeconds = new BN(applicantRevealTimeoutInSeconds.toString()).add(new BN(1))
+    debug(`applicantRevealTimeoutInSeconds is ${applicantRevealTimeoutInSeconds.toString()}`)
 
     // Add one to the timeouts so that we can use them to increaseTime and timeout
-    applicantRevealTimeoutInDays = await coordinationGame.applicantRevealTimeoutInDays()
-    applicantRevealTimeoutInDays = new BN(applicantRevealTimeoutInDays.toString()).add(new BN(1))
-    debug(`applicantRevealTimeoutInDays is ${applicantRevealTimeoutInDays.toString()}`)
-
-    // Add one to the timeouts so that we can use them to increaseTime and timeout
-    verifierTimeoutInDays = await coordinationGame.verifierTimeoutInDays()
-    verifierTimeoutInDays = new BN(verifierTimeoutInDays.toString()).add(new BN(1))
-    debug(`verifierTimeoutInDays is ${verifierTimeoutInDays.toString()}`)
+    verifierTimeoutInSeconds = await coordinationGame.verifierTimeoutInSeconds()
+    verifierTimeoutInSeconds = new BN(verifierTimeoutInSeconds.toString()).add(new BN(1))
+    debug(`verifierTimeoutInSeconds is ${verifierTimeoutInSeconds.toString()}`)
 
     debug(`Minting Deposit to Applicant ${minDeposit.toString()}...`)
     await workToken.mint(applicant, minDeposit)
@@ -309,8 +305,8 @@ contract('CoordinationGame', (accounts) => {
 
         context('and the verifier submission period has ended', () => {
           beforeEach(async () => {
-            debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
-            await increaseTime(verifierTimeoutInDays * secondsInADay)
+            debug(`increaseTime(${verifierTimeoutInSeconds})...`)
+            await increaseTime(verifierTimeoutInSeconds)
           })
 
           it('should not allow the applicant to select another verifier', async () => {
@@ -324,8 +320,8 @@ contract('CoordinationGame', (accounts) => {
 
       context('if the verifier submission period has ended', () => {
         beforeEach(async () => {
-          debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
-          await increaseTime(verifierTimeoutInDays * secondsInADay)
+          debug(`increaseTime(${verifierTimeoutInSeconds})...`)
+          await increaseTime(verifierTimeoutInSeconds)
         })
 
         it('should allow the applicant to select another verifier', async () => {
@@ -366,8 +362,8 @@ contract('CoordinationGame', (accounts) => {
     })
 
     it('should not allow the verifier to submit if too much time has passed', async () => {
-      debug(`increaseTime(${verifierTimeoutInDays * secondsInADay})...`)
-      await increaseTime(verifierTimeoutInDays * secondsInADay)
+      debug(`increaseTime(${verifierTimeoutInSeconds})...`)
+      await increaseTime(verifierTimeoutInSeconds)
 
       await expectThrow(async () => {
         await verifierSubmitSecret()
@@ -434,8 +430,8 @@ contract('CoordinationGame', (accounts) => {
 
     describe('when the timeframe for the applicant to reveal has passed', () => {
       it('should throw', async () => {
-        debug(`increaseTime(${applicantRevealTimeoutInDays * secondsInADay})...`)
-        await increaseTime(applicantRevealTimeoutInDays * secondsInADay)
+        debug(`increaseTime(${applicantRevealTimeoutInSeconds})...`)
+        await increaseTime(applicantRevealTimeoutInSeconds)
 
         await expectThrow(async () => {
           await applicantRevealsTheirSecret()
@@ -451,7 +447,7 @@ contract('CoordinationGame', (accounts) => {
         await expectThrow(async () => {
           await verifierChallenges(selectedVerifier)
         })
-        await increaseTime(applicantRevealTimeoutInDays * secondsInADay)
+        await increaseTime(applicantRevealTimeoutInSeconds)
 
         const verifierStartingBalance = (await work.balances(selectedVerifier)).toNumber()
         const applicantStartingBalance = (await workToken.balanceOf(applicant)).toNumber()
@@ -492,28 +488,39 @@ contract('CoordinationGame', (accounts) => {
 
   describe('when updating settings', () => {
     const newApplicationStakeAmount = web3.toWei('30', 'ether')
-    const newBaseApplicationFee = web3.toWei('30', 'ether')
+    const newBaseApplicationFeeUsdWei = web3.toWei('30', 'ether')
+
+    const newVerifierTimeoutInSeconds = 86400
+    const newApplicantRevealTimeoutInSeconds = 172800
 
     it('should work for the contract owner', async () => {
-      assert.equal(await coordinationGame.applicationStakeAmount(), applicationStakeAmount)
+      assert.equal((await coordinationGame.applicationStakeAmount()).toString(), applicationStakeAmount.toString())
+      assert.equal((await coordinationGame.baseApplicationFeeUsdWei()).toString(), baseApplicationFeeUsdWei.toString())
 
-      // y u no work?
       await coordinationGame.updateSettings(
         newApplicationStakeAmount,
-        newBaseApplicationFee,
+        newBaseApplicationFeeUsdWei,
+        newVerifierTimeoutInSeconds,
+        newApplicantRevealTimeoutInSeconds,
         {
           from: coordinationGameOwnerAddress
         }
       )
 
       assert.equal(await coordinationGame.applicationStakeAmount(), newApplicationStakeAmount)
+      assert.equal(await coordinationGame.baseApplicationFeeUsdWei(), newBaseApplicationFeeUsdWei)
+
+      assert.equal(await coordinationGame.verifierTimeoutInSeconds(), newVerifierTimeoutInSeconds)
+      assert.equal(await coordinationGame.applicantRevealTimeoutInSeconds(), newApplicantRevealTimeoutInSeconds)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
         await coordinationGame.updateSettings(
           newApplicationStakeAmount,
-          newBaseApplicationFee,
+          newBaseApplicationFeeUsdWei,
+          newVerifierTimeoutInSeconds,
+          newApplicantRevealTimeoutInSeconds,
           {
             from: verifier
           }

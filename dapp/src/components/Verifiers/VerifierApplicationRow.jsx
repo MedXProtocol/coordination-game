@@ -29,9 +29,8 @@ function mapStateToProps(state, { applicationId }) {
 
   const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
   const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-  const secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
-  const applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
-  const verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+  const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
   const verifierSubmittedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierSubmittedAt', applicationId)
   const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
 
@@ -46,11 +45,8 @@ function mapStateToProps(state, { applicationId }) {
     verifierChallengedAt
   }
 
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  applicationRowObject.applicantRevealExpiresAt    = verifierSubmittedAt + (secondsInADay * applicantRevealTimeoutInDays)
-  // console.log('Current time: ', latestBlockTimestamp)
-  // console.log('Expires at: ', applicationRowObject.verifierSubmitSecretExpiresAt)
-  // console.log('Expires in: ', (applicationRowObject.verifierSubmitSecretExpiresAt - latestBlockTimestamp))
+  applicationRowObject.applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
 
   return {
     applicationRowObject,
@@ -72,9 +68,8 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'secondsInADay'),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
   ])
 }
 

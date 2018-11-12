@@ -44,7 +44,10 @@ async function setup() {
 module.exports = function(callback) {
   console.log('Starting bootstrap verifiers script...')
   setup()
-    .catch(error => console.error(error))
-    .finally(callback)
+    .catch(error => {
+      console.error(error)
+      callback()
+    })
+    .then(() => callback())
   console.log('Done!')
 }
