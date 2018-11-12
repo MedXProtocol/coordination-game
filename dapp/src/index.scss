@@ -5,9 +5,9 @@
 @import './assets/scss/_toastr-animations.scss';
 @import './assets/scss/_toastr-overrides.scss';
 
-@import './assets/scss/_bulma-overrides.scss';
-
 @import 'bulma/bulma.sass';
+
+@import './assets/scss/_bulma-overrides.scss';
 
 @import './assets/scss/_animations.scss';
 @import './assets/scss/_current-transactions-list.scss';
