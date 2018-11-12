@@ -33,6 +33,7 @@ function mapStateToProps(state, { applicationId }) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
 
   const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
   const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
@@ -51,6 +52,7 @@ function mapStateToProps(state, { applicationId }) {
     applicantsSecret,
     applicationId,
     createdAt,
+    verifierChallengedAt,
     hint,
     verifier,
     verifiersSecret,
@@ -109,6 +111,7 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
+    cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
@@ -240,6 +243,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           random,
           secret,
           updatedAt,
+          verifierChallengedAt,
           verifier,
           verifiersSecret,
           verifierSubmitSecretExpiresAt
@@ -305,7 +309,9 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         }
 
-        if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
+        if (verifierChallengedAt !== '0') {
+          expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
+        } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
           expirationMessage = (
             <React.Fragment>
               <span className="has-text-warning">Verifier Failed to Respond</span>

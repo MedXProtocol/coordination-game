@@ -18,6 +18,7 @@ import {
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
 
 function mapStateToProps(state, { applicationId }) {
   let applicationRowObject = {}
@@ -31,6 +32,8 @@ function mapStateToProps(state, { applicationId }) {
   const secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
   const applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
   const verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
+  const verifierSubmittedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierSubmittedAt', applicationId)
+  const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
 
   const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
   const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
@@ -39,11 +42,12 @@ function mapStateToProps(state, { applicationId }) {
     applicationId,
     createdAt,
     updatedAt,
-    verifiersSecret
+    verifiersSecret,
+    verifierChallengedAt
   }
 
   applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  applicationRowObject.applicantRevealExpiresAt    = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  applicationRowObject.applicantRevealExpiresAt    = verifierSubmittedAt + (secondsInADay * applicantRevealTimeoutInDays)
   // console.log('Current time: ', latestBlockTimestamp)
   // console.log('Expires at: ', applicationRowObject.verifierSubmitSecretExpiresAt)
   // console.log('Expires in: ', (applicationRowObject.verifierSubmitSecretExpiresAt - latestBlockTimestamp))
@@ -62,6 +66,8 @@ function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId })
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
+    cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
+    cacheCall(coordinationGameAddress, 'verifierSubmittedAt', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
@@ -94,13 +100,13 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
         let {
           applicantRevealExpiresAt,
           applicationId,
+          verifierChallengedAt,
           createdAt,
           verifierSubmitSecretExpiresAt,
           updatedAt
         } = applicationRowObject
 
         const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
-
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
@@ -136,12 +142,35 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             </Link>
           )
         } else if (verifierSubmittedSecret) {
-          expirationMessage = (
-            <React.Fragment>
-              <span className="has-text-grey">Waiting on applicant to reveal secret before:</span>
-              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-            </React.Fragment>
-          )
+          if (latestBlockTimestamp > applicantRevealExpiresAt) {
+            if (verifierChallengedAt === '0') {
+              expirationMessage = (
+                <React.Fragment>
+                  <span className="has-text-grey">Applicant failed to reveal secret</span>
+                </React.Fragment>
+              )
+              verifyAction = (
+                <Web3ActionButton
+                  contractAddress={this.props.coordinationGameAddress}
+                  method='verifierChallenge'
+                  args={[applicationId]}
+                  buttonText='Challenge' />
+              )
+            } else {
+              expirationMessage = (
+                <React.Fragment>
+                  <span className="has-text-grey">You successfully challenged the application</span>
+                </React.Fragment>
+              )
+            }
+          } else {
+            expirationMessage = (
+              <React.Fragment>
+                <span className="has-text-grey">Waiting on applicant to reveal secret before:</span>
+                <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
+              </React.Fragment>
+            )
+          }
         }
 
         // necessary to show the verifier on 1st-time component load

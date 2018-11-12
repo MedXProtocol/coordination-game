@@ -23,7 +23,6 @@ import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
-// import { Web3Route } from '~/components/Web3Route'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
@@ -189,6 +188,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
+                        <Route path={routes.LISTINGS} component={Home} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />

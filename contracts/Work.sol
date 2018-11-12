@@ -1,19 +1,19 @@
 pragma solidity ^0.4.24;
 
-// import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zeppelin/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IndexedAddressArray.sol';
+import "./TILRoles.sol";
 
 // TODO: This contract needs events!
 
 contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
-  // using SafeMath for uint256;
-
-  address public jobManager;
+  using SafeMath for uint256;
 
   ERC20 public token;
+  TILRoles public roles;
 
   IndexedAddressArray.Data stakers;
   IndexedAddressArray.Data suspendedStakers;
@@ -22,6 +22,11 @@ contract Work is Ownable {
   uint256 public jobStake;
 
   mapping (address => uint256) public balances;
+
+  modifier onlyJobManager() {
+    require(roles.hasRole(msg.sender, uint(TILRoles.All.JOB_MANAGER)), "sender is job manager");
+    _;
+  }
 
   event SettingsUpdated(
     uint256 applicationStakeAmount,
@@ -38,29 +43,21 @@ contract Work is Ownable {
     _;
   }
 
-  modifier onlyJobManager() {
-    require(msg.sender == jobManager, 'sender is job manager');
-    _;
-  }
-
   constructor (
     ERC20 _token,
     uint256 _requiredStake,
-    uint256 _jobStake
+    uint256 _jobStake,
+    TILRoles _roles
   ) public {
     require(_token != address(0), '_token is defined');
-
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
+    require(_roles != address(0), '_roles is defined');
 
     token = _token;
-
     requiredStake = _requiredStake;
     jobStake = _jobStake;
-  }
-
-  function setJobManager(address _jobManager) onlyOwner {
-    jobManager = _jobManager;
+    roles = _roles;
   }
 
   function depositStake() public {
@@ -83,7 +80,7 @@ contract Work is Ownable {
 
   function withdrawJobStake(address _worker) external onlyJobManager returns (bool) {
     require(balances[_worker] >= jobStake, 'worker has enough stake for job');
-    balances[_worker] -= jobStake;
+    balances[_worker] = balances[_worker].sub(jobStake);
     token.transfer(msg.sender, jobStake);
     /// If the new stake amount is below the job amount, suspend them
     if (balances[_worker] < jobStake) {
@@ -113,12 +110,7 @@ contract Work is Ownable {
   }
 
   function deposit(address _worker, uint256 _amount) internal {
-    uint256 newBalance = balances[_worker] + _amount;
-
-    // allow them to stake more than any upper bound for now
-    // require(newBalance <= requiredStake, 'stake is below the limit');
-
-    balances[_worker] = newBalance;
+    balances[_worker] = balances[_worker].add(_amount);
     if (balances[_worker] >= jobStake) {
       if (suspendedStakers.hasAddress(_worker)) {
         suspendedStakers.removeAddress(_worker);

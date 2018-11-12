@@ -127,20 +127,19 @@ export const FAQModal =
             <div className='has-text-centered'>
               <UndrawOldDaySvg width="260" height="260" />
 
-              <h3 className="is-size-3">
+              <h6 className="is-size-6">
                 What is this?
-              </h3>
+              </h6>
 
               <p>
-                This is a game for incentivizing objective TCRs.
+                This is a game for incentivizing objective TCRs using a work contract.
               </p>
-              <br />
 
-              <h5 className="is-size-5">
+              <h6 className="is-size-6 faq-h6">
                 What is a work contract?
-              </h5>
+              </h6>
               <p>
-                A Work contract is a mechanism that determines who is able to participate as a “Worker” in a cryptoeconomic system. To become an eligible Worker, a user must stake tokens. When a new Job is available, a Worker is selected to complete it.
+                A work contract is a mechanism that determines who is able to participate as a “Worker” in a cryptoeconomic system. To become an eligible Worker, a user must stake tokens. When a new Job is available, a Worker is selected to complete it.
               </p>
 
               <p>
