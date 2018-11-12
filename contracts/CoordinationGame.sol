@@ -19,9 +19,8 @@ contract CoordinationGame is Ownable {
   Work work;
   TILRegistry tilRegistry;
 
-  uint256 public secondsInADay;
-  uint256 public verifierTimeoutInDays;
-  uint256 public applicantRevealTimeoutInDays;
+  uint256 public verifierTimeoutInSeconds;
+  uint256 public applicantRevealTimeoutInSeconds;
 
   uint256 public applicationStakeAmount;
   uint256 public baseApplicationFeeUsdWei;
@@ -99,9 +98,8 @@ contract CoordinationGame is Ownable {
   event SettingsUpdated(
     uint256 applicationStakeAmount,
     uint256 baseApplicationFeeUsdWei,
-    uint256 secondsInADay,
-    uint256 verifierTimeoutInDays,
-    uint256 applicantRevealTimeoutInDays
+    uint256 verifierTimeoutInSeconds,
+    uint256 applicantRevealTimeoutInSeconds
   );
 
   modifier onlyApplicant(uint256 _applicationId) {
@@ -139,9 +137,8 @@ contract CoordinationGame is Ownable {
     applicationStakeAmount = _applicationStakeAmount;
     baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
 
-    secondsInADay = 86400;
-    verifierTimeoutInDays = 4;
-    applicantRevealTimeoutInDays = 3;
+    verifierTimeoutInSeconds = 345600; // 4 * 86400
+    applicantRevealTimeoutInSeconds = 259200; // 3 * 86400
   }
 
   function setApplicationStakeAmount(uint256 _applicationStakeAmount)
@@ -414,13 +411,11 @@ contract CoordinationGame is Ownable {
   }
 
   function verifierSubmissionTimedOut(uint256 _applicationId) internal view returns (bool) {
-    return (block.timestamp - verifierSelectedAt[_applicationId])
-      > (verifierTimeoutInDays * secondsInADay);
+    return (block.timestamp - verifierSelectedAt[_applicationId]) > verifierTimeoutInSeconds;
   }
 
   function applicantRevealExpired(uint256 _applicationId) internal view returns (bool) {
-    return (block.timestamp - verifierSubmittedAt[_applicationId])
-      > (applicantRevealTimeoutInDays * secondsInADay);
+    return (block.timestamp - verifierSubmittedAt[_applicationId]) > applicantRevealTimeoutInSeconds;
   }
 
   function applyToRegistry(uint256 _applicationId) internal {
@@ -449,36 +444,33 @@ contract CoordinationGame is Ownable {
   function updateSettings(
     uint256 _applicationStakeAmount,
     uint256 _baseApplicationFeeUsdWei,
-    uint256 _secondsInADay,
-    uint256 _verifierTimeoutInDays,
-    uint256 _applicantRevealTimeoutInDays
+    uint256 _verifierTimeoutInSeconds,
+    uint256 _applicantRevealTimeoutInSeconds
   ) public onlyOwner {
     setApplicationStakeAmount(_applicationStakeAmount);
     setBaseApplicationFeeUsdWei(_baseApplicationFeeUsdWei);
 
-    setSecondsInADay(_secondsInADay);
-    setVerifierTimeoutInDays(_verifierTimeoutInDays);
-    setApplicantRevealTimeoutInDays(_applicantRevealTimeoutInDays);
+    setVerifierTimeoutInSeconds(_verifierTimeoutInSeconds);
+    setApplicantRevealTimeoutInSeconds(_applicantRevealTimeoutInSeconds);
 
     emit SettingsUpdated(
       applicationStakeAmount,
       baseApplicationFeeUsdWei,
-      secondsInADay,
-      verifierTimeoutInDays,
-      applicantRevealTimeoutInDays
+      verifierTimeoutInSeconds,
+      applicantRevealTimeoutInSeconds
     );
   }
 
-  function setSecondsInADay(uint256 _secondsInADay) public onlyOwner {
-    secondsInADay = _secondsInADay;
+  function setApplicantRevealTimeoutInSeconds(uint256 _applicantRevealTimeoutInSeconds) public onlyOwner {
+    require(_applicantRevealTimeoutInSeconds > 0);
+
+    applicantRevealTimeoutInSeconds = _applicantRevealTimeoutInSeconds;
   }
 
-  function setApplicantRevealTimeoutInDays(uint256 _applicantRevealTimeoutInDays) public onlyOwner {
-    applicantRevealTimeoutInDays = _applicantRevealTimeoutInDays;
-  }
+  function setVerifierTimeoutInSeconds(uint256 _verifierTimeoutInSeconds) public onlyOwner {
+    require(_verifierTimeoutInSeconds > 0);
 
-  function setVerifierTimeoutInDays(uint256 _verifierTimeoutInDays) public onlyOwner {
-    verifierTimeoutInDays = _verifierTimeoutInDays;
+    verifierTimeoutInSeconds = _verifierTimeoutInSeconds;
   }
 
   function setBaseApplicationFeeUsdWei(uint256 _baseApplicationFeeUsdWei) public onlyOwner {

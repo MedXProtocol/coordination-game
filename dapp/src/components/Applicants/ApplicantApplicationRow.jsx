@@ -23,11 +23,10 @@ import { defined } from '~/utils/defined'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicantRevealTimeoutInDays,
+  let applicantRevealTimeoutInSeconds,
     applicationRowObject,
     hint,
-    secondsInADay,
-    verifierTimeoutInDays
+    verifierTimeoutInSeconds
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
@@ -60,9 +59,8 @@ function mapStateToProps(state, { applicationId }) {
   }
 
   if (!isBlank(verifier)) {
-    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
-    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
-    applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+    verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+    applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
   }
 
   applicationRowObject = retrieveApplicationDetailsFromLocalStorage(
@@ -72,8 +70,8 @@ function mapStateToProps(state, { applicationId }) {
     createdAt
   )
 
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  applicationRowObject.applicantRevealExpiresAt      = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+  applicationRowObject.applicantRevealExpiresAt      = updatedAt + applicantRevealTimeoutInSeconds
 
   // If this applicationRowObject has an ongoing blockchain transaction this will update
   // const reversedTransactions = transactions.reverse().filter(transaction => {
@@ -118,9 +116,8 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'secondsInADay'),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
   ])
 }
 

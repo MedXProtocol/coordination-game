@@ -6,7 +6,7 @@ These smart contracts implement the MedX Protocol coordination game.  This game 
 
 # Setup
 
-Once the contracts are migrated, run bootstrap to mint tokens and fill the faucet:
+Once the contracts are compiled and migrated, run bootstrap to mint tokens and fill the faucet:
 
 ```
 $ npm run bootstrap
