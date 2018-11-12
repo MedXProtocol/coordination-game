@@ -1,9 +1,6 @@
 const EtherPriceFeed = artifacts.require('EtherPriceFeed.sol')
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
-const CoordinationGameFactory = artifacts.require('CoordinationGameFactory.sol')
-const Parameterizer = artifacts.require('Parameterizer.sol')
 const TILRegistry = artifacts.require('TILRegistry.sol')
-const TILRegistryFactory = artifacts.require('TILRegistryFactory.sol')
 const TILRoles = artifacts.require('TILRoles.sol')
 const Work = artifacts.require('Work.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
@@ -12,7 +9,6 @@ const abi = require('ethereumjs-abi')
 const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
 const tdr = require('truffle-deploy-registry')
-const createTILRegistry = require('../migrations/support/createTILRegistry')
 const createCoordinationGame = require('../migrations/support/createCoordinationGame')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
@@ -26,7 +22,6 @@ contract('CoordinationGame', (accounts) => {
     workToken,
     work,
     workStake,
-    minDeposit,
     parameterizer,
     tilRegistry,
     applicationId,
@@ -62,51 +57,23 @@ contract('CoordinationGame', (accounts) => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     workStake = await work.requiredStake()
+    jobStake = await work.jobStake()
     roles = await TILRoles.deployed()
-    coordinationGameFactory = await CoordinationGameFactory.deployed()
-    const parameterizerAddress = (await tdr.findLastByContractName(
-      web3.version.network,
-      'Parameterizer'
-    )).address
-    parameterizer = await Parameterizer.at(parameterizerAddress)
-    minDeposit = await parameterizer.get('minDeposit')
-
-    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
 
     await registerWorker(verifier)
     await registerWorker(verifier2)
   })
 
   beforeEach(async () => {
-    assert.equal((await parameterizer.token()), workToken.address, 'parameterizer token matches work token')
-
-    tilRegistryFactoryInstance = await TILRegistryFactory.deployed()
-    const addresses = await createTILRegistry(
-      tilRegistryFactoryInstance,
-      parameterizer.address,
-      'TILRegistry',
-      roles.address
-    )
-
-    tilRegistry = await TILRegistry.at(addresses.tilRegistryAddress)
+    tilRegistry = await TILRegistry.new(workToken.address, roles.address, work.address)
     assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
+    assert.equal(await tilRegistry.owner.call(), applicant, 'tilRegistry owner is first account')
 
-    const tilRegistryOwnerAddress = await tilRegistry.owner.call()
-    assert.equal(tilRegistryOwnerAddress, applicant, 'tilRegistry owner is first account')
-
-    const coordinationGameAddresses = await createCoordinationGame(
-      coordinationGameFactory,
-      etherPriceFeed.address,
-      work.address,
-      addresses.tilRegistryAddress,
-      applicant,
-      applicationStakeAmount,
-      baseApplicationFeeUsdWei
+    coordinationGame = await CoordinationGame.new(
+      etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
     )
 
-    const coordinationGameAddress = coordinationGameAddresses.coordinationGameAddress
-    coordinationGame = await CoordinationGame.at(coordinationGameAddress)
-    await roles.setRole(coordinationGameAddress, 1, true)
+    await roles.setRole(coordinationGame.address, 1, true)
 
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
     assert.equal(coordinationGameOwnerAddress, applicant, 'coord game owner is first account')
@@ -124,11 +91,11 @@ contract('CoordinationGame', (accounts) => {
     verifierTimeoutInDays = new BN(verifierTimeoutInDays.toString()).add(new BN(1))
     debug(`verifierTimeoutInDays is ${verifierTimeoutInDays.toString()}`)
 
-    debug(`Minting Deposit to Applicant ${minDeposit.toString()}...`)
-    await workToken.mint(applicant, minDeposit)
+    debug(`Minting Deposit to Applicant ${workStake.toString()}...`)
+    await workToken.mint(applicant, workStake)
 
-    debug(`Approving CoordinationGame to spend ${minDeposit.toString()} for applicant...`)
-    await workToken.approve(coordinationGameAddress, minDeposit, { from: applicant })
+    debug(`Approving CoordinationGame to spend ${workStake.toString()} for applicant...`)
+    await workToken.approve(coordinationGame.address, workStake, { from: applicant })
   })
 
   async function registerWorker(address) {
@@ -230,7 +197,7 @@ contract('CoordinationGame', (accounts) => {
 
       assert.equal(
         (await coordinationGame.applicantTokenDeposits(1)).toString(),
-        (await coordinationGame.minDeposit()).toString()
+        jobStake.toString()
       )
 
       const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
@@ -406,8 +373,8 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() won listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.equal(listing[4].toString(), '0', 'application is not challenged')
-        assert.equal(listing[1], true, 'application is whitelisted')
+        assert.equal(await tilRegistry.isListed(listingHash), true, 'application is listed')
+        assert.equal(await tilRegistry.isRequested(listingHash), false, 'application is requested')
       })
     })
 
@@ -427,8 +394,8 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.notEqual(listing[4].toString(), '0', 'application is challenged')
-        assert.notEqual(listing[1], true, 'application is not whitelisted')
+        assert.equal(await tilRegistry.isListed(listingHash), false, 'application is not listed')
+        assert.equal(await tilRegistry.isRequested(listingHash), true, 'application is requested')
       })
     })
 
@@ -443,8 +410,6 @@ contract('CoordinationGame', (accounts) => {
       })
 
       it('should allow the verifier to challenge', async () => {
-        const jobStake = (await work.jobStake()).toNumber()
-
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
 
         await verifierSubmitSecret()
@@ -460,7 +425,7 @@ contract('CoordinationGame', (accounts) => {
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
-        assert.equal(jobStake, applicationStakeAmount.toString())
+        assert.equal(jobStake.toString(), applicationStakeAmount.toString())
         await verifierChallenges(selectedVerifier)
 
         const verifierFinishingBalance = (await work.balances(selectedVerifier)).toNumber()
@@ -474,8 +439,8 @@ contract('CoordinationGame', (accounts) => {
           verifierEtherFinishingBalance - verifierEtherStartingBalance > (applicantEtherDeposit * 0.98), // minus gas
           'verifier was paid in ether'
         )
-        assert.equal(verifierFinishingBalance, verifierStartingBalance + jobStake, 'verifier deposit was returned')
-        assert.equal(applicantFinishingBalance, applicantStartingBalance + jobStake, 'applicant deposit was returned')
+        assert.equal(verifierFinishingBalance, verifierStartingBalance + jobStake.toNumber(), 'verifier deposit was returned')
+        assert.equal(applicantFinishingBalance, applicantStartingBalance + jobStake.toNumber(), 'applicant deposit was returned')
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)

@@ -8,16 +8,25 @@ module.exports = function(deployer, networkName) {
 
     switch(networkId) {
       case '1': // mainnet
-        // no-op
-        // return registry.register('0x729D19f657BD0614b4985Cf1D82531c67569197B')
+        if (!tdr.isDryRunNetworkName(networkName)) {
+          await tdr.append(deployer.network_id, {
+            contractName: 'EtherPriceFeed',
+            address: '0x729D19f657BD0614b4985Cf1D82531c67569197B'
+          })
+        }
+        break
       case '42': // kovan
-        // no-op
-        // return registry.register('0xa944bd4b25c9f186a846fd5668941aa3d3b8425f')
+        if (!tdr.isDryRunNetworkName(networkName)) {
+          await tdr.append(deployer.network_id, {
+            contractName: 'EtherPriceFeed',
+            address: '0xa944bd4b25c9f186a846fd5668941aa3d3b8425f'
+          })
+        }
+        break
       default: // localhost / ropsten / rinkeby
         return deployer.deploy(EtherPriceFeed).then(async (instance) => {
           if (!tdr.isDryRunNetworkName(networkName)) {
-            tdr.appendInstance(instance)
-
+            await tdr.appendInstance(instance)
             await(instance.set(web3.toWei('210.83', 'ether')))
           }
         })
