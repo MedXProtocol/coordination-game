@@ -22,7 +22,6 @@ contract('CoordinationGame', (accounts) => {
     workToken,
     work,
     workStake,
-    parameterizer,
     tilRegistry,
     applicationId,
     applicantRevealTimeoutInSeconds,

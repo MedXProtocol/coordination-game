@@ -48,6 +48,8 @@ module.exports = function(callback) {
       console.error(error)
       callback()
     })
-    .then(() => callback())
-  console.log('Done!')
+    .then(() => {
+      console.log('Done!')
+      callback()
+    })
 }
