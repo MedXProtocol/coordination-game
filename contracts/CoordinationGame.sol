@@ -335,11 +335,16 @@ contract CoordinationGame is Ownable {
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
     );
+    require(
+      verifierChallengedAt[_applicationId] == 0,
+      'verifier has not already challenged'
+    );
     verifierChallengedAt[_applicationId] = block.timestamp;
+    updatedAt[_applicationId] = block.timestamp;
 
     /// Transfer the verifier's deposit back to them
-    work.token().approve(address(work), applicantTokenDeposits[_applicationId]);
-    work.depositJobStake(verifiers[_applicationId]);
+    work.token().approve(address(work), work.jobStake());
+    work.depositJobStake(msg.sender);
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(
@@ -347,9 +352,10 @@ contract CoordinationGame is Ownable {
       applicantTokenDeposits[_applicationId]
     );
 
-    updatedAt[_applicationId] = block.timestamp;
-
     emit VerifierChallenged(_applicationId, msg.sender);
+
+    /// Transfer the applicant's application fee to the verifier
+    msg.sender.transfer(applicationBalancesInWei[_applicationId]);
   }
 
   function applicantWon(uint256 _applicationId) internal {

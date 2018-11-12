@@ -44,7 +44,7 @@ contract('CoordinationGame', (accounts) => {
   const hint = web3.toHex("Totally bogus hint")
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
-  const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply in tokens
+  const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -186,10 +186,10 @@ contract('CoordinationGame', (accounts) => {
     })
   }
 
-  // async function verifierChallenges(selectedVerifier) {
-  //   debug(`verifierChallenges`)
-  //   await coordinationGame.verifierChallenge(applicationId, { from: selectedVerifier })
-  // }
+  async function verifierChallenges(selectedVerifier) {
+    debug(`verifierChallenges`)
+    await coordinationGame.verifierChallenge(applicationId, { from: selectedVerifier })
+  }
 
   describe('selectVerifier()', () => {
     it('should skip the applicant when they select themselves', async () => {
@@ -442,35 +442,51 @@ contract('CoordinationGame', (accounts) => {
         })
       })
 
-      // it('should allow the verifier to challenge', async () => {
-      //   const selectedVerifier = await coordinationGame.verifiers(applicationId)
-      //   const verifierStartingBalance = new BN((await work.balances(selectedVerifier)).toString())
-      //   const applicantStartingBalance = new BN((await workToken.balanceOf(applicant)).toString())
-      //
-      //   debug(`applicantRevealSecret() won verifierSubmitSecret(${applicationId}, ${secret})...`)
-      //   await verifierSubmitSecret()
-      //   await expectThrow(async () => {
-      //     await verifierChallenges(selectedVerifier)
-      //   })
-      //   await increaseTime(applicantRevealTimeoutInDays)
-      //   await verifierChallenges(selectedVerifier)
-      //
-      //   const verifierFinishingBalance = new BN((await work.balances(selectedVerifier)).toString())
-      //   const applicantFinishingBalance = new BN((await workToken.balanceOf(applicant)).toString())
-      //
-      //   assert.equal(verifierFinishingBalance.toString(), verifierStartingBalance.toString(), 'verifier deposit was returned')
-      //   assert.equal(applicantStartingBalance.toString(), applicantFinishingBalance.toString(), 'applicant deposit was returned')
-      //
-      //   debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
-      //   const listingHash = await coordinationGame.getListingHash(applicationId)
-      //
-      //   debug(`applicantRevealSecret() failed listings(${listingHash})...`)
-      //   const listing = await tilRegistry.listings(listingHash)
-      //
-      //   /// These assertions essentially make sure there is no listing
-      //   assert.equal(listing[2].toString(), '0', 'there is no owner')
-      //   assert.equal(listing[0], '0', 'application has no expiry')
-      // })
+      it('should allow the verifier to challenge', async () => {
+        const jobStake = (await work.jobStake()).toNumber()
+
+        const selectedVerifier = await coordinationGame.verifiers(applicationId)
+
+        await verifierSubmitSecret()
+        await expectThrow(async () => {
+          await verifierChallenges(selectedVerifier)
+        })
+        await increaseTime(applicantRevealTimeoutInDays * secondsInADay)
+
+        const verifierStartingBalance = (await work.balances(selectedVerifier)).toNumber()
+        const applicantStartingBalance = (await workToken.balanceOf(applicant)).toNumber()
+        const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
+        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId)).toNumber()
+
+        debug(`verifier balance: ${verifierStartingBalance.toString()}`)
+        debug(`applicant balance: ${applicantStartingBalance.toString()}`)
+        assert.equal(jobStake, applicationStakeAmount.toString())
+        await verifierChallenges(selectedVerifier)
+
+        const verifierFinishingBalance = (await work.balances(selectedVerifier)).toNumber()
+        const verifierEtherFinishingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
+        const applicantFinishingBalance = (await workToken.balanceOf(applicant)).toNumber()
+
+        debug(`verifier finishing balance: ${verifierFinishingBalance}`)
+        debug(`applicant finishing balance: ${applicantFinishingBalance}`)
+
+        assert.ok(
+          verifierEtherFinishingBalance - verifierEtherStartingBalance > (applicantEtherDeposit * 0.98), // minus gas
+          'verifier was paid in ether'
+        )
+        assert.equal(verifierFinishingBalance, verifierStartingBalance + jobStake, 'verifier deposit was returned')
+        assert.equal(applicantFinishingBalance, applicantStartingBalance + jobStake, 'applicant deposit was returned')
+
+        debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
+        const listingHash = await coordinationGame.getListingHash(applicationId)
+
+        debug(`applicantRevealSecret() failed listings(${listingHash})...`)
+        const listing = await tilRegistry.listings(listingHash)
+
+        /// These assertions essentially make sure there is no listing
+        assert.equal(listing[2].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
+        assert.equal(listing[0], '0', 'application has no expiry')
+      })
     })
   })
 

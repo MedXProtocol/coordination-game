@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-// import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zeppelin/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IndexedAddressArray.sol';
@@ -10,7 +10,7 @@ import "./TILRoles.sol";
 
 contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
-  // using SafeMath for uint256;
+  using SafeMath for uint256;
 
   ERC20 public token;
   TILRoles public roles;
@@ -80,7 +80,7 @@ contract Work is Ownable {
 
   function withdrawJobStake(address _worker) external onlyJobManager returns (bool) {
     require(balances[_worker] >= jobStake, 'worker has enough stake for job');
-    balances[_worker] -= jobStake;
+    balances[_worker] = balances[_worker].sub(jobStake);
     token.transfer(msg.sender, jobStake);
     /// If the new stake amount is below the job amount, suspend them
     if (balances[_worker] < jobStake) {
@@ -110,12 +110,7 @@ contract Work is Ownable {
   }
 
   function deposit(address _worker, uint256 _amount) internal {
-    uint256 newBalance = balances[_worker] + _amount;
-
-    // allow them to stake more than any upper bound for now
-    // require(newBalance <= requiredStake, 'stake is below the limit');
-
-    balances[_worker] = newBalance;
+    balances[_worker] = balances[_worker].add(_amount);
     if (balances[_worker] >= jobStake) {
       if (suspendedStakers.hasAddress(_worker)) {
         suspendedStakers.removeAddress(_worker);
