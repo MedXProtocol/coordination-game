@@ -13,11 +13,8 @@ contract TILRegistry is Ownable {
   event NewListingRequested(address applicant, bytes32 listingHash);
 
   struct Listing {
-      uint applicationExpiry; // Expiration date of apply stage
-      bool whitelisted;       // Indicates registry status
       address owner;          // Owner of Listing
-      uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
-      uint challengeID;       // Corresponds to a PollID in PLCRVoting
+      uint unstakedDeposit;   // Number of tokens staked in the listing
   }
 
   mapping(bytes32 => Listing) public listings;
@@ -62,7 +59,6 @@ contract TILRegistry is Ownable {
     listing.owner = _applicant;
 
     // Sets apply stage end time
-    listing.applicationExpiry = 0;
     listing.unstakedDeposit = _deposit;
 
     // Transfers tokens from user to TILRegistry contract

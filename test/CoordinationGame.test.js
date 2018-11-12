@@ -449,8 +449,7 @@ contract('CoordinationGame', (accounts) => {
         const listing = await tilRegistry.listings(listingHash)
 
         /// These assertions essentially make sure there is no listing
-        assert.equal(listing[2].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
-        assert.equal(listing[0], '0', 'application has no expiry')
+        assert.equal(listing[0].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
       })
     })
   })
