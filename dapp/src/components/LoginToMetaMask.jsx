@@ -48,21 +48,29 @@ export const LoginToMetaMask =
         this.determineModalState(nextProps)
       }
 
-      componentWillUmount () {
-        this.props.clearInterval(this.interval)
+      componentWillUnmount() {
+        this.clearInterval()
       }
 
       determineModalState(nextProps) {
         let newModalState = false
         let props = nextProps ? nextProps : this.props
 
-        if (this.state.enoughTimePassed && window.web3 && !defined(props.address)) {
+        if (this.state.enoughTimePassed && !!window.web3 && !defined(props.address)) {
           newModalState = true
         }
 
         this.setState({
           modalState: newModalState
+        }, () => {
+          if (!this.state.modalState) {
+            this.clearInterval()
+          }
         })
+      }
+
+      clearInterval = () => {
+        this.props.clearInterval(this.interval)
       }
 
       enableEthereum = async (e) => {
@@ -93,6 +101,12 @@ export const LoginToMetaMask =
             isUnlocked = await window.ethereum._metamask.isUnlocked()
             isEnabled  = await window.ethereum._metamask.isEnabled()
             isApproved = await window.ethereum._metamask.isApproved()
+          }
+
+          // hack due to a MetaMask bug that shows up when you Quit Chrome and re-open Chrome
+          // right back to the tab using MetaMask
+          if ((isUnlocked && isApproved) && !defined(this.props.address)) {
+            window.location.reload(true)
           }
 
           this.setState({
@@ -127,7 +141,7 @@ export const LoginToMetaMask =
                 ? (
                   <div className="text-center">
                     <br />
-                    <button className="button is-light is-primary" onClick={this.enableEthereum}>
+                    <button className="button is-light is-primary is-outlined" onClick={this.enableEthereum}>
                       Authorize The Coordination Game
                     </button>
                     <br />
@@ -136,7 +150,10 @@ export const LoginToMetaMask =
                     {this.state.error ?
                       (
                         <p>
-                          There was an error: {this.state.error}
+                          Please authorize read-only access to your MetaMask accounts use the Coordination Game.
+                          <br />
+                          <span className="has-text-grey-lighter">You will still need to manually sign transactions yourself.</span>
+                          {/*There was an error: {this.state.error}*/}
                         </p>
 
                       ) : null

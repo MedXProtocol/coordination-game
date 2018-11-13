@@ -10,7 +10,6 @@ import {
 } from 'saga-genesis'
 import { connect } from 'react-redux'
 import { TILW } from '~/components/TILW'
-import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { EthAddress } from '~/components/EthAddress'
 
 function mapStateToProps(state, { listingHash }) {

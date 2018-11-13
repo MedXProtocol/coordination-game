@@ -286,6 +286,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
 
           const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
           const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
+          // console.log(valuesDefined, valuesAreEqual)
 
           return (this.state.stepManual > 0) ||
             (this.step2Completed() || (valuesDefined && valuesAreEqual))

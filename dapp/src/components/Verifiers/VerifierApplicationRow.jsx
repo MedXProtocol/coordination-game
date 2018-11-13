@@ -119,7 +119,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             </React.Fragment>
           )
         } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Cannot Verify, Verification Expiry Passed</span>
+          expirationMessage = <span className="has-text-grey">You missed the deadline to verify this</span>
         } else if (!verifierSubmittedSecret) {
           expirationMessage = (
             <React.Fragment>
@@ -131,14 +131,14 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           verifyAction = (
             <Link
               to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
-              className="button is-small is-warning is-outlined is-pulled-right"
+              className="button is-small has-text-warning is-outlined is-pulled-right"
             >
               Verify
             </Link>
           )
         } else if (verifierSubmittedSecret) {
           if (latestBlockTimestamp > applicantRevealExpiresAt) {
-            if (verifierChallengedAt === '0') {
+            if (verifierChallengedAt === 0) {
               expirationMessage = (
                 <React.Fragment>
                   <span className="has-text-grey">Applicant failed to reveal secret</span>
@@ -147,9 +147,11 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               verifyAction = (
                 <Web3ActionButton
                   contractAddress={this.props.coordinationGameAddress}
+                  isSmall={true}
                   method='verifierChallenge'
                   args={[applicationId]}
-                  buttonText='Challenge' />
+                  buttonText='Challenge'
+                  loadingText='Challenging' />
               )
             } else {
               expirationMessage = (
