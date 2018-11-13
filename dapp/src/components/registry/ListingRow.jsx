@@ -2,6 +2,7 @@ import React, {
   PureComponent
 } from 'react'
 import PropTypes from 'prop-types'
+import { all } from 'redux-saga/effects'
 import {
   withSaga,
   cacheCall,
@@ -11,22 +12,37 @@ import {
 import { connect } from 'react-redux'
 import { TILW } from '~/components/TILW'
 import { EthAddress } from '~/components/EthAddress'
+import { getWeb3 } from '~/utils/getWeb3'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 
 function mapStateToProps(state, { listingHash }) {
+  const web3 = getWeb3()
   const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
+  const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
+  const applicationId = web3.utils.hexToNumber(listingHash)
+  const hint = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'hints', applicationId) || '0x')
+  const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
+  const secret = web3.utils.hexToNumber(hexSecret || '0x')
   return {
     TILRegistry,
+    CoordinationGame,
     listing,
-    address
+    applicationId,
+    hint,
+    address,
+    secret
   }
 }
 
-function* listingRowSaga({ TILRegistry, listingHash }) {
-  if (!TILRegistry) { return }
-  yield cacheCall(TILRegistry, 'listings', listingHash)
+function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash, applicationId }) {
+  if (!TILRegistry || !CoordinationGame || !listingHash || !applicationId) { return }
+  yield all([
+    cacheCall(TILRegistry, 'listings', listingHash),
+    cacheCall(CoordinationGame, 'hints', applicationId),
+    cacheCall(CoordinationGame, 'applicantSecrets', applicationId)
+  ])
 }
 
 export const ListingRow = connect(mapStateToProps)(
@@ -65,10 +81,12 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className="list--item__date">
+              <TILW wei={unstakedDeposit} />
             </span>
 
             <span className='list--item__status'>
-              <TILW wei={unstakedDeposit} />
+              <strong>Hint:</strong> {this.props.hint}
+              <br /><strong>Secret:</strong> {this.props.secret}
             </span>
 
             <span className="list--item__view">
