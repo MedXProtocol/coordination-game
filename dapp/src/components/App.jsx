@@ -24,6 +24,7 @@ import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
@@ -163,6 +164,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               {betaFaucetModal}
               {faqModal}
               <GetWallet />
+              <NetworkCheckModal />
               <LoginToMetaMask />
               <Loading />
               <ReduxToastr
