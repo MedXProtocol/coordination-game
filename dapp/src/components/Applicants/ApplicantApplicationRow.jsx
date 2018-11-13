@@ -280,11 +280,9 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         } else if (verifierSubmittedSecret && defined(random) && defined(secret)) {
           let secretAsHex
-          const padLeft = getWeb3().utils.padLeft
-          const toHex = getWeb3().utils.toHex
 
           if (secret) {
-            secretAsHex = padLeft(toHex(secret.toString()), 32)
+            secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
           }
 
           expirationMessage = (

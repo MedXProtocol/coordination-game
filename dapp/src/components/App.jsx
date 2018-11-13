@@ -179,7 +179,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               <section className='section'>
                 <div className='container is-fluid'>
                   <div className='columns'>
-                    <div className='column is-8-widescreen is-offset-2-widescreen'>
+                    <div className='column is-10-widescreen is-offset-1-widescreen'>
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
