@@ -2,14 +2,13 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
 import Toggle from 'react-toggle'
-import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Link, NavLink } from 'react-router-dom'
 import { get } from 'lodash'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import {
-  cacheCall,
   cacheCallValueInt,
   contractByName,
   withSaga
@@ -28,29 +27,58 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon } from '@fortawesome/free-solid-svg-icons'
 import { faSun } from '@fortawesome/free-regular-svg-icons'
 import { NetworkInfo } from '~/components/NetworkInfo'
+import { verifierApplicationsService } from '~/services/verifierApplicationsService'
+import { verifierApplicationService } from '~/services/verifierApplicationService'
+import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
+import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
+  let applicationsToVerify = 0
+  let applicationIds = []
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+
+  if (applicationCount && applicationCount !== 0) {
+    applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)
+  }
+
+  for (let i = 0; i < applicationIds.length; i++) {
+    const applicationId = applicationIds[i]
+
+    const application = verifierApplicationService(state, applicationId, coordinationGameAddress)
+    const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
+
+    if (!verifierSubmittedSecret && (latestBlockTimestamp < application.verifierSubmitSecretExpiresAt)) {
+      applicationsToVerify += 1
+    }
+  }
 
   return {
     address,
+    applicationsToVerify,
     applicationCount,
+    applicationIds,
     coordinationGameAddress
   }
 }
 
-function* headerSaga({
-  coordinationGameAddress,
-  address
-}) {
-  if (!coordinationGameAddress || !address) { return null }
+function* headerSaga({ address, applicationCount, applicationIds, coordinationGameAddress }) {
+  if (!coordinationGameAddress || !address) { return }
 
-  yield all([
-    cacheCall(coordinationGameAddress, 'getVerifiersApplicationCount')
-  ])
+  yield verifierApplicationsSaga(coordinationGameAddress, address, applicationCount)
+
+  if (applicationIds && applicationIds.length !== 0) {
+    yield all(
+      applicationIds.map(function* (applicationId) {
+        yield verifierApplicationSaga(coordinationGameAddress, applicationId)
+      })
+    )
+  }
 }
 
 export const Header = ReactTimeout(
@@ -91,7 +119,7 @@ export const Header = ReactTimeout(
           }
 
           render () {
-            const { applicationCount } = this.props
+            const { applicationsToVerify } = this.props
 
             return (
               <React.Fragment>
@@ -231,16 +259,16 @@ export const Header = ReactTimeout(
                             className={classnames(
                               'navbar-item',
                               {
-                                'is-attention-grabby': applicationCount > 0
+                                'is-attention-grabby': applicationsToVerify > 0
                               }
                             )}
                             onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon
-                              type={applicationCount > 0 ? IssuesCloseOutline : CheckCircleOutline}
+                              type={applicationsToVerify > 0 ? IssuesCloseOutline : CheckCircleOutline}
                               className="antd-icon"
                             />
-                            &nbsp;{applicationCount > 0 ? applicationCount : ''} Verify
+                            &nbsp;{applicationsToVerify > 0 ? applicationsToVerify : ''} Verify
                           </NavLink>
                         </div>
                         <div className="navbar-item">
