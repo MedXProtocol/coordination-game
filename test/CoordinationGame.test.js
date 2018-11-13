@@ -24,9 +24,11 @@ contract('CoordinationGame', (accounts) => {
     workStake,
     tilRegistry,
     applicationId,
+    applicationVerifier,
     applicantRevealTimeoutInSeconds,
     verifierTimeoutInSeconds,
-    roles
+    roles,
+    weiPerApplication
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -71,6 +73,8 @@ contract('CoordinationGame', (accounts) => {
       etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
     )
 
+    weiPerApplication = await coordinationGame.weiPerApplication()
+
     await roles.setRole(coordinationGame.address, 1, true)
 
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
@@ -110,18 +114,17 @@ contract('CoordinationGame', (accounts) => {
         from: applicant
       }
     )
+    applicationVerifier = await coordinationGame.verifiers(applicationId)
   }
 
   async function newApplicantStartsGame() {
-    const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
-
     await coordinationGame.start(
       secretRandomHash,
       randomHash,
       hint,
       {
         from: applicant,
-        value: weiPerApplication
+        value: weiPerApplication.toString()
       }
     )
     applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
@@ -154,7 +157,7 @@ contract('CoordinationGame', (accounts) => {
   }
 
   describe('selectVerifier()', () => {
-    it('should skip the applicant when they select themselves', async () => {
+    xit('should skip the applicant when they select themselves', async () => {
       const zeroVerifier = await work.selectWorker(0)
       assert.equal(zeroVerifier, verifier)
       const selectedVerifier = await coordinationGame.selectVerifier(verifier, 0);
@@ -163,7 +166,7 @@ contract('CoordinationGame', (accounts) => {
   })
 
   describe('start()', () => {
-    it('should allow a user to start the game', async () => {
+    xit('should allow a user to start the game', async () => {
       let applicantsApplicationCount
 
       var appCount = await coordinationGame.getApplicantsApplicationCount({
@@ -195,14 +198,13 @@ contract('CoordinationGame', (accounts) => {
         jobStake.toString()
       )
 
-      const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
       assert.equal(
         (await coordinationGame.applicationBalancesInWei(1)).toString(),
-        weiPerApplication
+        weiPerApplication.toString()
       )
     })
 
-    it('should not allow starting an application without enough ether passed', async () => {
+    xit('should not allow starting an application without enough ether passed', async () => {
       await expectThrow(async () => {
         await coordinationGame.start(
           secretRandomHash,
@@ -219,7 +221,7 @@ contract('CoordinationGame', (accounts) => {
 
 
   describe('applicantRandomlySelectVerifier()', () => {
-    it('should not work before the next block has been mined', async () => {
+    xit('should not work before the next block has been mined', async () => {
       await expectThrow(async () => {
         await coordinationGame.applicantRandomlySelectVerifier(
           applicationId,
@@ -241,7 +243,7 @@ contract('CoordinationGame', (accounts) => {
         await applicantRandomlySelectsAVerifier()
       })
 
-      it('should set the verifier', async () => {
+      xit('should set the verifier', async () => {
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
         assert([verifier, verifier2].includes(selectedVerifier), '1st verifier matches')
 
@@ -251,7 +253,7 @@ contract('CoordinationGame', (accounts) => {
         assert.equal(verifiersApplicationCount.toString(), new BN(1).toString(), "Verifier's Application Count increased")
       })
 
-      it('should not be called again', async () => {
+      xit('should not be called again', async () => {
         await expectThrow(async () => {
           await applicantRandomlySelectsAVerifier()
         })
@@ -262,7 +264,7 @@ contract('CoordinationGame', (accounts) => {
           await verifierSubmitSecret()
         })
 
-        it('should not allow the applicant to select another verifier', async () => {
+        xit('should not allow the applicant to select another verifier', async () => {
           debug(`fault applicantRandomlySelectsAVerifier...`)
           await expectThrow(async () => {
             await applicantRandomlySelectsAVerifier()
@@ -275,7 +277,7 @@ contract('CoordinationGame', (accounts) => {
             await increaseTime(verifierTimeoutInSeconds)
           })
 
-          it('should not allow the applicant to select another verifier', async () => {
+          xit('should not allow the applicant to select another verifier', async () => {
             debug(`fault applicantRandomlySelectsAVerifier...`)
             await expectThrow(async () => {
               await applicantRandomlySelectsAVerifier()
@@ -290,7 +292,7 @@ contract('CoordinationGame', (accounts) => {
           await increaseTime(verifierTimeoutInSeconds)
         })
 
-        it('should allow the applicant to select another verifier', async () => {
+        xit('should allow the applicant to select another verifier', async () => {
           const firstVerifier = await coordinationGame.verifiers(applicationId)
 
           await applicantRandomlySelectsAVerifier()
@@ -314,20 +316,20 @@ contract('CoordinationGame', (accounts) => {
         await verifierSubmitSecret()
       })
 
-      it('should set the verifier secret', async () => {
+      xit('should set the verifier secret', async () => {
         debug('verifierSubmitSecret() verifierSubmitSecret')
         const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
         assert.equal(secret, storedVerifierSecret)
       })
 
-      it('should not be called again', async () => {
+      xit('should not be called again', async () => {
         await expectThrow(async () => {
           await verifierSubmitSecret()
         })
       })
     })
 
-    it('should not allow the verifier to submit if too much time has passed', async () => {
+    xit('should not allow the verifier to submit if too much time has passed', async () => {
       debug(`increaseTime(${verifierTimeoutInSeconds})...`)
       await increaseTime(verifierTimeoutInSeconds)
 
@@ -344,7 +346,7 @@ contract('CoordinationGame', (accounts) => {
       await applicantRandomlySelectsAVerifier()
     })
 
-    it('should not be called before the verifier has submitted', async () => {
+    xit('should not be called before the verifier has submitted', async () => {
       await expectThrow(async () => {
         await applicantRevealsTheirSecret()
       })
@@ -355,7 +357,7 @@ contract('CoordinationGame', (accounts) => {
         await verifierSubmitSecret()
       })
 
-      it('should add applicant to registry (and pay out verifier)', async () => {
+      xit('should add applicant to registry (and pay out verifier)', async () => {
         await applicantRevealsTheirSecret()
 
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
@@ -368,13 +370,12 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() won listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.equal(await tilRegistry.isListed(listingHash), true, 'application is listed')
-        assert.equal(await tilRegistry.isRequested(listingHash), false, 'application is requested')
+        assert.equal(listing[2], 0, 'application is listed')
       })
     })
 
     context('when the verifier has submitted different secret', async () => {
-      it('should make a challenge and go to vote', async () => {
+      xit('should make a challenge and go to vote', async () => {
         const differentSecret = '0x56'
 
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
@@ -389,13 +390,12 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.equal(await tilRegistry.isListed(listingHash), false, 'application is not listed')
-        assert.equal(await tilRegistry.isRequested(listingHash), true, 'application is requested')
+        assert.equal(listing[2], 1, 'application is challenged')
       })
     })
 
     describe('when the timeframe for the applicant to reveal has passed', () => {
-      it('should throw', async () => {
+      xit('should throw', async () => {
         debug(`increaseTime(${applicantRevealTimeoutInSeconds})...`)
         await increaseTime(applicantRevealTimeoutInSeconds)
 
@@ -404,7 +404,7 @@ contract('CoordinationGame', (accounts) => {
         })
       })
 
-      it('should allow the verifier to challenge', async () => {
+      xit('should allow the verifier to challenge', async () => {
         const selectedVerifier = await coordinationGame.verifiers(applicationId)
 
         await verifierSubmitSecret()
@@ -456,7 +456,7 @@ contract('CoordinationGame', (accounts) => {
     const newVerifierTimeoutInSeconds = 86400
     const newApplicantRevealTimeoutInSeconds = 172800
 
-    it('should work for the contract owner', async () => {
+    xit('should work for the contract owner', async () => {
       assert.equal((await coordinationGame.applicationStakeAmount()).toString(), applicationStakeAmount.toString())
       assert.equal((await coordinationGame.baseApplicationFeeUsdWei()).toString(), baseApplicationFeeUsdWei.toString())
 
@@ -477,7 +477,7 @@ contract('CoordinationGame', (accounts) => {
       assert.equal(await coordinationGame.applicantRevealTimeoutInSeconds(), newApplicantRevealTimeoutInSeconds)
     })
 
-    it('should not work for anyone but the owner', async () => {
+    xit('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
         await coordinationGame.updateSettings(
           newApplicationStakeAmount,
@@ -493,22 +493,83 @@ contract('CoordinationGame', (accounts) => {
   })
 
   describe('usdWeiPerEther()', () => {
-    it('should be read from the ether price feed', async () => {
+    xit('should be read from the ether price feed', async () => {
       assert.equal((await coordinationGame.usdWeiPerEther()).toString(), web3.toWei('210.83', 'ether'))
     })
   })
 
   describe('weiPerApplication()', () => {
-    it('should dynamically calculate the application fee', async () => {
+    xit('should dynamically calculate the application fee', async () => {
       assert.equal((await coordinationGame.weiPerApplication()).toString(), '118578949864819000')
     })
   })
 
   describe('setBaseApplicationFeeUsdWei(uint256)', () => {
-    it('should update the base application fee', async () => {
+    xit('should update the base application fee', async () => {
       await coordinationGame.setBaseApplicationFeeUsdWei(web3.toWei('15', 'ether'))
       assert.equal((await coordinationGame.weiPerApplication()).toString(), '71147369918891000')
     })
   })
 
+  describe('whistleblow()', () => {
+    beforeEach(async () => {
+      await newApplicantStartsGame()
+    })
+
+    xit('should give applicant ether and tokens to the whistleblower', async () => {
+      const blowerTokenBalance = await workToken.balanceOf(verifier2)
+      const blowerEtherBalance = await web3.eth.getBalance(verifier2)
+
+      debug(`whistleblow() ${typeof applicationId}, ${typeof random}`)
+
+      await coordinationGame.whistleblow(
+        applicationId.toString(), random.toString(),
+        { from: verifier2 }
+      )
+
+      const blowerNewTokenBalance = await workToken.balanceOf(verifier2)
+      const blowerNewEtherBalance = await web3.eth.getBalance(verifier2)
+      assert.equal(
+        blowerNewTokenBalance.toString(), blowerTokenBalance.plus(applicationStakeAmount).toString(),
+        'token balances match'
+      )
+      assert.ok(
+        blowerNewEtherBalance.sub(blowerEtherBalance).gt(weiPerApplication.mul(0.98)),
+        'ether balances match'
+      )
+      assert.equal(
+        await coordinationGame.whistleblowers(applicationId), verifier2,
+        'whistleblower has been set'
+      )
+    })
+
+    context('when called after a verifier has been selected', () => {
+      beforeEach(async () => {
+        await applicantRandomlySelectsAVerifier()
+      })
+
+      it('should return the verifiers job stake', async () => {
+        const verifierTokenBalance = await work.balances(applicationVerifier)
+        const verifierEtherBalance = await web3.eth.getBalance(applicationVerifier)
+
+        debug(`verifier: ${applicationVerifier}`)
+        debug(`verifierTokenBalance: ${verifierTokenBalance.toString()}`)
+
+        await coordinationGame.whistleblow(
+          applicationId.toString(), random.toString(),
+          { from: verifier2 }
+        )
+
+        const verifierNewTokenBalance = await work.balances(applicationVerifier)
+        const verifierNewEtherBalance = await web3.eth.getBalance(applicationVerifier)
+
+        debug(`verifierNewTokenBalance: ${verifierNewTokenBalance.toString()}`)
+
+        assert.equal(
+          verifierNewTokenBalance.toString(), verifierTokenBalance.plus(jobStake).toString(),
+          'token balances match'
+        )
+      })
+    })
+  })
 })
