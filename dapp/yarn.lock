@@ -9400,7 +9400,7 @@ safe-regex@^1.1.0:
 
 saga-genesis@MedXProtocol/saga-genesis#1.0.0-pre:
   version "0.1.0"
-  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/9d8370a8588881b35ef92e58177dd7f9947dad9b"
+  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/1c61b0c8adc5fd43a67f184a9450eb59006a5f6d"
   dependencies:
     debug "^4.1.0"
     ethjs-abi "^0.2.1"

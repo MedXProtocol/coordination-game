@@ -12,7 +12,7 @@ export const storeApplicationDetailsInLocalStorage = (
       application.applicantsLastApplicationCreatedAt
     )
 
-    console.log('in storeApplicationDetailsInLocalStorage', state.random, state.random.toString())
+    // console.log('in storeApplicationDetailsInLocalStorage', state.random, state.random.toString())
 
     const object = {
       applicationId: application.applicantsLastApplicationId,

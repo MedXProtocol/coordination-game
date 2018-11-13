@@ -306,6 +306,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
         if (verifierChallengedAt !== 0) {
           expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
+        } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
+          expirationMessage = <span className="has-text-grey">You missed the reveal secret deadline</span>
         } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
           expirationMessage = (
             <React.Fragment>
@@ -322,8 +324,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                   it will take a few minutes to confirm on the Ethereum network.' />
             </React.Fragment>
           )
-        } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
         }
 
         if (hint && secret && random) {

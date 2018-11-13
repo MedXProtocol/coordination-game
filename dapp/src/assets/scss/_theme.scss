@@ -557,11 +557,13 @@ html.html-light,
 
   .loading--overlay {
     background-color: $accent-color-1--light;
+    color: white;
   }
 
   .loading--overlay .is-info {
     color: pink;
     border-color: pink;
+    border-width: 2px;
   }
 
   .loading--overlay .is-info:hover {
@@ -571,5 +573,9 @@ html.html-light,
   .blank-state--inner .loader {
     border-left: 2px solid #ddd;
     border-bottom: 2px solid #ddd;
+  }
+
+  .has-text-warning {
+    color: #ec9d0d !important;
   }
 }

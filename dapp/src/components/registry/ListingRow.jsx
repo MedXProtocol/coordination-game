@@ -13,9 +13,11 @@ import { connect } from 'react-redux'
 import { TILW } from '~/components/TILW'
 import { EthAddress } from '~/components/EthAddress'
 import { getWeb3 } from '~/utils/getWeb3'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
 
 function mapStateToProps(state, { listingHash }) {
   const web3 = getWeb3()
+  const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
@@ -29,6 +31,7 @@ function mapStateToProps(state, { listingHash }) {
     listing,
     applicationId,
     hint,
+    address,
     secret
   }
 }
@@ -47,9 +50,29 @@ export const ListingRow = connect(mapStateToProps)(
     class _ListingRow extends PureComponent {
       render () {
         const {
+          TILRegistry,
+          address
+        } = this.props
+
+        const {
           owner,
-          unstakedDeposit
+          unstakedDeposit,
+          state
         } = this.props.listing || {}
+
+        if (owner === address && state === '0') {
+          var action =
+            <Web3ActionButton
+              contractAddress={TILRegistry}
+              method='withdrawListing'
+              args={[this.props.listingHash]}
+              buttonText='Withdraw'
+              loadingText='Withdrawing...'
+              className="button is-small is-warning is-outlined is-pulled-right"
+              confirmationMessage='Your listing has been withdrawn.'
+              txHashMessage='Withdraw listing request sent -
+                it will take a few minutes to confirm on the Ethereum network.' />
+        }
 
         return (
           <div className='list--item'>
@@ -67,6 +90,7 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className="list--item__view">
+              {action}
             </span>
           </div>
         )

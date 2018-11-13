@@ -36,7 +36,11 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         contractAddress: PropTypes.string.isRequired,
         method: PropTypes.string.isRequired,
         args: PropTypes.array.isRequired,
-        buttonText: PropTypes.string.isRequired
+        buttonText: PropTypes.string.isRequired,
+        loadingText: PropTypes.string.isRequired,
+        confirmationMessage: PropTypes.string.isRequired,
+        txHashMessage: PropTypes.string.isRequired,
+        isSmall: PropTypes.bool
       }
 
       constructor(props) {
@@ -106,6 +110,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               isLoading={this.state.txHandler}
               isSmall={isSmall}
               disabled={!contractAddress || this.state.txHandler}
+              className={this.props.className}
             />
           </form>
         )

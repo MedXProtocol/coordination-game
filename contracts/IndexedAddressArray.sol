@@ -31,6 +31,9 @@ library IndexedAddressArray {
   }
 
   function addressAtIndex(Data storage self, uint256 _index) internal returns (address) {
+    if (_index >= self.addresses.length) {
+      return address(0);
+    }
     return self.addresses[_index];
   }
 }
