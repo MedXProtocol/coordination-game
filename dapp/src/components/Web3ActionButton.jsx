@@ -110,6 +110,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               isLoading={this.state.txHandler}
               isSmall={isSmall}
               disabled={!contractAddress || this.state.txHandler}
+              className={this.props.className}
             />
           </form>
         )

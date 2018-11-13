@@ -9,17 +9,23 @@ import "./TILRoles.sol";
 contract TILRegistry is Ownable {
   using IndexedBytes32Array for IndexedBytes32Array.Data;
 
-  event NewListing(address applicant, bytes32 listingHash);
-  event NewListingRequested(address applicant, bytes32 listingHash);
+  enum ListingState {
+      LISTED,
+      CHALLENGED,
+      APPROVED
+  }
 
   struct Listing {
       address owner;          // Owner of Listing
       uint unstakedDeposit;   // Number of tokens staked in the listing
+      ListingState state;
   }
 
+  event NewListing(address owner, bytes32 listingHash, ListingState state);
+  event ListingWithdrawn(address owner, bytes32 listingHash);
+
   mapping(bytes32 => Listing) public listings;
-  IndexedBytes32Array.Data listed;
-  IndexedBytes32Array.Data requested;
+  IndexedBytes32Array.Data listingsIterator;
   ERC20 public token;
   TILRoles roles;
   Work work;
@@ -39,30 +45,42 @@ contract TILRegistry is Ownable {
   }
 
   function newListing(address _applicant, bytes32 _listingHash, uint256 _deposit) external onlyJobManager {
-    createNewListing(msg.sender, _applicant, _listingHash, _deposit);
-    listed.pushValue(_listingHash);
-    emit NewListing(_applicant, _listingHash);
+    createNewListing(msg.sender, _applicant, _listingHash, _deposit, ListingState.LISTED);
   }
 
-  function requestNewListing(address _applicant, bytes32 _listingHash, uint256 _deposit) external onlyJobManager {
-    createNewListing(msg.sender, _applicant, _listingHash, _deposit);
-    requested.pushValue(_listingHash);
-    emit NewListingRequested(_applicant, _listingHash);
+  function newListingChallenge(address _applicant, bytes32 _listingHash, uint256 _deposit) external onlyJobManager {
+    createNewListing(msg.sender, _applicant, _listingHash, _deposit, ListingState.CHALLENGED);
   }
 
-  function createNewListing(address _sender, address _applicant, bytes32 _listingHash, uint256 _deposit) internal {
+  function createNewListing(address _sender, address _applicant, bytes32 _listingHash, uint256 _deposit, ListingState state) internal {
     require(!appWasMade(_listingHash), "application was not made");
     require(_deposit >= work.jobStake(), "amount is greater or equal to min");
 
     // Sets owner
     Listing storage listing = listings[_listingHash];
     listing.owner = _applicant;
+    listing.state = state;
 
     // Sets apply stage end time
     listing.unstakedDeposit = _deposit;
 
     // Transfers tokens from user to TILRegistry contract
     require(token.transferFrom(_sender, this, _deposit));
+
+    listingsIterator.pushValue(_listingHash);
+    emit NewListing(_applicant, _listingHash, state);
+  }
+
+  function withdrawListing(bytes32 _listingHash) external {
+    Listing storage listing = listings[_listingHash];
+    require(msg.sender == listing.owner, 'sender is the listing owner');
+    require(listingsIterator.hasValue(_listingHash), 'listing is listingsIterator');
+    listingsIterator.removeValue(_listingHash);
+    uint256 stake = listing.unstakedDeposit;
+    delete listings[_listingHash];
+    token.transfer(msg.sender, stake);
+
+    emit ListingWithdrawn(msg.sender, _listingHash);
   }
 
   /**
@@ -74,18 +92,10 @@ contract TILRegistry is Ownable {
   }
 
   function listingsLength() public view returns (uint) {
-    return listed.length();
+    return listingsIterator.length();
   }
 
   function listingAt(uint256 _index) public view returns (bytes32) {
-    return listed.valueAtIndex(_index);
-  }
-
-  function isListed(bytes32 _listingHash) public view returns (bool) {
-    return listed.hasValue(_listingHash);
-  }
-
-  function isRequested(bytes32 _listingHash) public view returns (bool) {
-    return requested.hasValue(_listingHash);
+    return listingsIterator.valueAtIndex(_index);
   }
 }
