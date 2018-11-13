@@ -567,4 +567,9 @@ html.html-light,
   .loading--overlay .is-info:hover {
     background-color: pink;
   }
+
+  .blank-state--inner .loader {
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+  }
 }

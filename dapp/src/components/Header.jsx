@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
+import Toggle from 'react-toggle'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { withRouter } from 'react-router'
@@ -23,6 +24,9 @@ import {
   WalletOutline
 } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon } from '@fortawesome/free-solid-svg-icons'
+import { faSun } from '@fortawesome/free-regular-svg-icons'
 import { NetworkInfo } from '~/components/NetworkInfo'
 import * as routes from '~/../config/routes'
 
@@ -132,9 +136,17 @@ export const Header = ReactTimeout(
                       <div className="navbar-end">
                         <div className="navbar-item">
                           <span className="navbar-item">
-                            <button onClick={this.props.toggleTheme} className="has-text-transparent-white">
-                              {this.props.isLight === 'true' ? '.' : ' '}
-                            </button>
+                            <label>
+
+                              <Toggle
+                                defaultChecked={!this.props.isLight}
+                                icons={{
+                                  checked: <FontAwesomeIcon icon={faMoon} className="icon--react-toggle" />,
+                                  unchecked: <FontAwesomeIcon icon={faSun} className="icon--react-toggle" />
+                                }}
+                                onChange={this.props.toggleTheme}
+                              />
+                            </label>
                           </span>
                         </div>
 
