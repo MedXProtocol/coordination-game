@@ -554,4 +554,17 @@ html.html-light,
   .is-attention-grabby:not(.is-active) {
     animation: attention-grabby--light 4s infinite ease-in;
   }
+
+  .loading--overlay {
+    background-color: $accent-color-1--light;
+  }
+
+  .loading--overlay .is-info {
+    color: pink;
+    border-color: pink;
+  }
+
+  .loading--overlay .is-info:hover {
+    background-color: pink;
+  }
 }

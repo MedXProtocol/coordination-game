@@ -22,7 +22,6 @@ import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTa
 import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
 import { LoadingButton } from '~/components/LoadingButton'
-import { LoadingLines } from '~/components/LoadingLines'
 import { Modal } from '~/components/Modal'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
@@ -78,6 +77,17 @@ function mapStateToProps(state) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
 function* applicantApplySaga({
   workTokenAddress,
   coordinationGameAddress,
@@ -101,7 +111,7 @@ function* applicantApplySaga({
   }
 }
 
-export const ApplicantApplyContainer = connect(mapStateToProps)(
+export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(applicantApplySaga)(
     withSend(
       class _ApplicantApplyContainer extends Component {
@@ -205,6 +215,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.workTokenApproveTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ workTokenApproveHandler: null })
                 toastr.transactionError(error)
@@ -214,6 +226,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Approval for contract to spend TILW tokens confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -225,6 +239,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.coordinationGameStartTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ coordinationGameStartHandler: null })
                 toastr.transactionError(error)
@@ -234,6 +250,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Application submission confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Application submitted successfully - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -245,6 +263,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.coordinationGameSelectVerifierTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ coordinationGameSelectVerifierHandler: null })
                 toastr.transactionError(error)
@@ -254,6 +274,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Verification request confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Verification request sent successfully - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -303,6 +325,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             workTokenApproveHandler: new TransactionStateHandler(),
             workTokenApproveTxId
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSubmit = (e) => {
@@ -350,6 +374,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             coordinationGameStartTxId,
             random
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSubmitSelectVerifier = (e) => {
@@ -367,6 +393,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             coordinationGameSelectVerifierHandler: new TransactionStateHandler(),
             coordinationGameSelectVerifierTxId
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSecretChange = (e) => {
@@ -452,19 +480,12 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                             </div>
                           </div>
 
-                          <button
-                            type="submit"
-                            className="button is-outlined is-primary"
-                            disabled={this.state.workTokenApproveHandler}
-                          >
-                            Approve
-                          </button>
-
-                          <LoadingLines
-                            visible={this.state.workTokenApproveHandler}
+                          <LoadingButton
+                            initialText='Approve'
+                            loadingText='Approving'
+                            isLoading={this.state.workTokenApproveHandler}
                           />
                         </form>
-
                       )
                     }
                   </React.Fragment>
@@ -563,6 +584,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                                     loadingText='Submitting'
                                     isLoading={this.state.coordinationGameStartHandler}
                                   />
+
                                   <br />
                                   <p className="help has-text-grey">
                                     <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
@@ -628,16 +650,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               </div>
                             </div>
 
-                            <button
-                              type="submit"
-                              className="button is-outlined is-primary"
-                              disabled={this.state.coordinationGameSelectVerifierHandler}
-                            >
-                              Request Verification
-                            </button>
-
-                            <LoadingLines
-                              visible={this.state.coordinationGameSelectVerifierHandler}
+                            <LoadingButton
+                              initialText='Request Verification'
+                              loadingText='Requesting'
+                              isLoading={this.state.coordinationGameSelectVerifierHandler}
                             />
                           </form>
                         )
@@ -650,7 +666,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 }
               </div>
 
-              <hr />
+              <br />
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">

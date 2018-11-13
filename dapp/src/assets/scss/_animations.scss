@@ -19,6 +19,7 @@ $super-slow: 2s;
 
 .fade-in {
   opacity: 0;
+  transition: all $quick linear;
 
   &.anim-fade-in {
     opacity: 1;
