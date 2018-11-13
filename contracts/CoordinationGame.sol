@@ -373,7 +373,7 @@ contract CoordinationGame is Ownable {
     returnVerifierJobStake(_applicationId);
 
     tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
-    tilRegistry.requestNewListing(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
+    tilRegistry.newListingChallenge(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
 
     losses[msg.sender] += 1;
 

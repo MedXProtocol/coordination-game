@@ -31,6 +31,9 @@ library IndexedBytes32Array {
   }
 
   function valueAtIndex(Data storage self, uint256 _index) internal returns (bytes32) {
+    if (_index >= self.values.length) {
+      return bytes32(0);
+    }
     return self.values[_index];
   }
 
