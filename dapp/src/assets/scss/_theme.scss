@@ -190,7 +190,7 @@ html.html-light,
   }
 
   .list--container {
-    background: $light-gray--light;
+    background: lighten($light-gray--light, 15%);
     border-color: transparent;
   }
 
@@ -569,7 +569,7 @@ html.html-light,
   }
 
   .blank-state--inner .loader {
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    border-left: 2px solid #ddd;
+    border-bottom: 2px solid #ddd;
   }
 }
