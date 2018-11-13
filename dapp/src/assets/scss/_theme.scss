@@ -190,7 +190,7 @@ html.html-light,
   }
 
   .list--container {
-    background: $light-gray--light;
+    background: lighten($light-gray--light, 15%);
     border-color: transparent;
   }
 
@@ -553,5 +553,29 @@ html.html-light,
 
   .is-attention-grabby:not(.is-active) {
     animation: attention-grabby--light 4s infinite ease-in;
+  }
+
+  .loading--overlay {
+    background-color: $accent-color-1--light;
+    color: white;
+  }
+
+  .loading--overlay .is-info {
+    color: pink;
+    border-color: pink;
+    border-width: 2px;
+  }
+
+  .loading--overlay .is-info:hover {
+    background-color: pink;
+  }
+
+  .blank-state--inner .loader {
+    border-left: 2px solid #ddd;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .has-text-warning {
+    color: #ec9d0d !important;
   }
 }

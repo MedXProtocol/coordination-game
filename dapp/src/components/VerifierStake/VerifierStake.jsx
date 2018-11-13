@@ -161,7 +161,7 @@ export const VerifierStake = connect(mapStateToProps)(
                             may withdraw your stake to give up your Verifying rights.
                           </li>
                         </ul>
-                        </div>
+                      </div>
                     </React.Fragment>
                   )
                 : (
@@ -182,7 +182,7 @@ export const VerifierStake = connect(mapStateToProps)(
                   )
               }
 
-              <hr />
+              <br />
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">

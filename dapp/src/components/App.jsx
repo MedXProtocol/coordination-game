@@ -22,6 +22,7 @@ import { GetTILW } from '~/components/GetTILW'
 import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
+import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
@@ -113,8 +114,6 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       toggleTheme = (e) => {
-        e.preventDefault()
-
         this.setState({
           isLight: !this.state.isLight
         }, () => {
@@ -134,7 +133,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}
-          isLight={this.state.isLight.toString()}
+          isLight={this.state.isLight}
         />
 
         if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
@@ -165,6 +164,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               {faqModal}
               <GetWallet />
               <LoginToMetaMask />
+              <Loading />
               <ReduxToastr
                 timeOut={7000}
                 newestOnTop={true}

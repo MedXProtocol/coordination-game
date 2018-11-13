@@ -1,3 +1,4 @@
+
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -211,7 +212,6 @@ contract CoordinationGame is Ownable {
 
     address previousVerifier = verifiers[_applicationId];
 
-    // TODO: How are we converting the blockhash to a random number?
     uint256 randomNum = uint256(blockhash(randomBlockNumbers[_applicationId]));
 
     address selectedVerifier = selectVerifier(msg.sender, randomNum);

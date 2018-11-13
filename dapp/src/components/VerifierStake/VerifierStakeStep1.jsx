@@ -7,7 +7,7 @@ import {
   TransactionStateHandler,
   withSend
 } from 'saga-genesis'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
 function mapStateToProps(state) {
@@ -15,7 +15,18 @@ function mapStateToProps(state) {
   }
 }
 
-export const VerifierStakeStep1 = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
+export const VerifierStakeStep1 = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
     class _VerifierStakeStep1 extends Component {
 
@@ -45,6 +56,8 @@ export const VerifierStakeStep1 = connect(mapStateToProps)(
           workTokenApproveHandler: new TransactionStateHandler(),
           workTokenApproveTxId
         })
+
+        this.props.dispatchShowLoadingStatus()
       }
 
       registerWorkTokenApproveHandlers = (nextProps) => {
@@ -53,6 +66,8 @@ export const VerifierStakeStep1 = connect(mapStateToProps)(
             nextProps.transactions[this.state.workTokenApproveTxId]
           )
             .onError((error) => {
+              this.props.dispatchHideLoadingStatus()
+
               console.log(error)
               this.setState({ workTokenApproveHandler: null })
               toastr.transactionError(error)
@@ -62,6 +77,8 @@ export const VerifierStakeStep1 = connect(mapStateToProps)(
               toastr.success('Approval for contract to spend TILW tokens confirmed.')
             })
             .onTxHash(() => {
+              this.props.dispatchHideLoadingStatus()
+
               toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
             })
         }
@@ -91,11 +108,10 @@ export const VerifierStakeStep1 = connect(mapStateToProps)(
               </div>
 
               <form onSubmit={this.handleSubmitApproval}>
-                <button type="submit" className="button is-primary is-outlined">
-                  Approve
-                </button>
-                <LoadingLines
-                  visible={this.state.workTokenApproveHandler}
+                <LoadingButton
+                  initialText='Approve'
+                  loadingText='Approving'
+                  isLoading={this.state.workTokenApproveHandler}
                 />
               </form>
             </React.Fragment>

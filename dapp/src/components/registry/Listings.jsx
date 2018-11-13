@@ -81,7 +81,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
       <React.Fragment>
         <div className="is-clearfix">
           <h6 className="is-size-6">
-            List
+            Current List
           </h6>
         </div>
 

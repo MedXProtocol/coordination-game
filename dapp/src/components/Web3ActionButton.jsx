@@ -17,7 +17,18 @@ function mapStateToProps(state) {
   }
 }
 
-export const Web3ActionButton = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
+export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
     class _Web3ActionButton extends Component {
 
@@ -26,9 +37,10 @@ export const Web3ActionButton = connect(mapStateToProps)(
         method: PropTypes.string.isRequired,
         args: PropTypes.array.isRequired,
         buttonText: PropTypes.string.isRequired,
-        loadingText: PropTypes.string,
-        confirmationMessage: PropTypes.string,
-        txHashMessage: PropTypes.string
+        loadingText: PropTypes.string.isRequired,
+        confirmationMessage: PropTypes.string.isRequired,
+        txHashMessage: PropTypes.string.isRequired,
+        isSmall: PropTypes.bool
       }
 
       constructor(props) {
@@ -49,6 +61,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
             nextProps.transactions[this.state.txId]
           )
             .onError((error) => {
+              this.props.dispatchHideLoadingStatus()
               this.setState({ txHandler: null })
               toastr.transactionError(error)
             })
@@ -57,6 +70,7 @@ export const Web3ActionButton = connect(mapStateToProps)(
               toastr.success(nextProps.confirmationMessage)
             })
             .onTxHash(() => {
+              this.props.dispatchHideLoadingStatus()
               toastr.success(nextProps.txHashMessage)
             })
         }
@@ -81,6 +95,8 @@ export const Web3ActionButton = connect(mapStateToProps)(
           txHandler: new TransactionStateHandler(),
           txId
         })
+
+        this.props.dispatchShowLoadingStatus()
       }
 
       render() {

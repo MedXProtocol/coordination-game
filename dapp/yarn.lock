@@ -8922,6 +8922,13 @@ react-timeout@^1.1.2:
     hoist-non-react-statics "^2.3.1"
     object-assign "^4.0.1"
 
+react-toggle@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-toggle/-/react-toggle-4.0.2.tgz#77f487860efb87fafd197672a2db8c885be1440f"
+  integrity sha512-EPTWnN7gQHgEAUEmjheanZXNzY5TPnQeyyHfEs3YshaiWZf5WNjfYDrglO5F1Hl/dNveX18i4l0grTEsYH2Ccw==
+  dependencies:
+    classnames "^2.2.5"
+
 react-tooltip@^3.9.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-3.9.0.tgz#d874df922c3b34b2e547ec62ff8b2eef42017b51"
@@ -9393,7 +9400,7 @@ safe-regex@^1.1.0:
 
 saga-genesis@MedXProtocol/saga-genesis#1.0.0-pre:
   version "0.1.0"
-  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/9d8370a8588881b35ef92e58177dd7f9947dad9b"
+  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/1c61b0c8adc5fd43a67f184a9450eb59006a5f6d"
   dependencies:
     debug "^4.1.0"
     ethjs-abi "^0.2.1"
