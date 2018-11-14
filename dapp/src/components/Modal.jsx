@@ -7,6 +7,7 @@ export const Modal = ({ children, closeModal, modalState }) => {
   return (
     <div className={classnames('modal', { 'is-active': modalState })}>
       <div className="modal-background" onClick={closeModal} />
+
       <CustomScroll>
         <div className="modal-content">
           <div className="modal-content--inner">

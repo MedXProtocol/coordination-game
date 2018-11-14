@@ -5,16 +5,17 @@
 // Use the standard _animation.scss file for animations not related to toasts
 
 .animated {
-  animation-duration: 1s;
+  animation-duration: 1.4s;
   animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.64, -0.57, 0.27, 1.83);
 
   &.bounceIn {
-    animation-duration: .7s;
+    animation-duration: 1.2s;
     animation-name: slideIn;
   }
 
   &.bounceOut {
-    animation-duration: .3s;
+    animation-duration: 1.0s;
     animation-name: slideOut;
   }
 }
@@ -25,7 +26,7 @@
 
 @keyframes slideIn {
   from {
-    transform: translate3d(0, 110%, 0);
+    transform: translate3d(0, 150%, 0);
     visibility: visible;
   }
   to {
@@ -35,7 +36,7 @@
 
 @keyframes bounceInDown {
   from {
-    transform: translate3d(0, -110%, 0);
+    transform: translate3d(0, -150%, 0);
     visibility: visible;
   }
   to {
@@ -49,7 +50,7 @@
   }
   to {
     visibility: hidden;
-    transform: translate3d(0, 110%, 0);
+    transform: translate3d(0, 150%, 0);
   }
 }
 
@@ -59,6 +60,6 @@
   }
   to {
     visibility: hidden;
-    transform: translate3d(0, -110%, 0);
+    transform: translate3d(0, -150%, 0);
   }
 }

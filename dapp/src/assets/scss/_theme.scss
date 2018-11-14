@@ -308,9 +308,9 @@ html.html-light,
 
   .modal-content--inner {
     background-color: lighten($background-color--light, 6%);
-    background: linear-gradient(217deg, rgba(220,250,255, 1), rgba(220,240,255, 0.8) 70%),
-                linear-gradient(127deg, rgba(220,240,240, 1), rgba(220,240,255, 0.8) 70%),
-                linear-gradient(336deg, rgba(220,250,255, 1), rgba(220,250,255, 0.8) 70%);
+    background: linear-gradient(217deg, rgba(240,255,255, 1), rgba(240,248,255, 0.8) 70%),
+                linear-gradient(127deg, rgba(240,245,245, 1), rgba(240,248,255, 0.8) 70%),
+                linear-gradient(336deg, rgba(240,255,255, 1), rgba(240,255,255, 0.8) 70%);
   }
 
   .modal-content {
