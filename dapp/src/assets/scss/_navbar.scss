@@ -229,7 +229,7 @@ a.navbar-item.is-active,
     color: white;
   }
   40% {
-    color: $nav-link-color;
+    color: darken($nav-link-color, 35%);
   }
   70% {
     color: $nav-link-color;

@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
-import { all } from 'redux-saga/effects'
-import { get, range } from 'lodash'
+import { get } from 'lodash'
 import {
-  cacheCall,
   cacheCallValueInt,
   contractByName,
   withSaga
 } from 'saga-genesis'
 import { VerifierApplicationRow } from '~/components/Verifiers/VerifierApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
+import { verifierApplicationsService } from '~/services/verifierApplicationsService'
+import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
 
 function mapStateToProps(state) {
   let applicationIds = []
@@ -23,22 +23,7 @@ function mapStateToProps(state) {
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
 
   if (applicationCount && applicationCount !== 0) {
-    // The -1 logic here is weird, range is exclusive not inclusive:
-    applicationIds = range(applicationCount, -1).reduce((accumulator, index) => {
-      const applicationId = cacheCallValueInt(
-        state,
-        coordinationGameAddress,
-        "verifiersApplicationIndices",
-        address,
-        index
-      )
-
-      if (applicationId) {
-        accumulator.push(applicationId)
-      }
-
-      return accumulator
-    }, [])
+    applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)
   }
 
   return {
@@ -51,29 +36,8 @@ function mapStateToProps(state) {
   }
 }
 
-function* verifierApplicationsTableSaga({
-  coordinationGameAddress,
-  address,
-  applicationCount
-}) {
-  if (!coordinationGameAddress || !address) { return null }
-
-  yield all([
-    cacheCall(coordinationGameAddress, 'getVerifiersApplicationCount')
-  ])
-
-  if (applicationCount && applicationCount !== 0) {
-    const indices = range(applicationCount)
-    yield all(
-      indices.map(function*(index) {
-        yield cacheCall(coordinationGameAddress, "verifiersApplicationIndices", address, index)
-      })
-    )
-  }
-}
-
 export const VerifierApplicationsTable = connect(mapStateToProps)(
-  withSaga(verifierApplicationsTableSaga)(
+  withSaga(verifierApplicationsSaga)(
     class _VerifierApplicationsTable extends Component {
 
       renderApplicationRows(applicationIds) {
