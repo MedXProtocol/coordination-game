@@ -16,7 +16,7 @@ First start a local ZeppelinOS session using the admin account:
 $ zos session --from $SECOND_OWNER_ACCOUNT --expires 10000 --network local
 ```
 
-Now push instances of the contracts to the network
+Now push instances of the contracts to the network specified in the session
 
 ```
 $ zos push
@@ -38,6 +38,12 @@ Once the contracts are compiled and migrated, run bootstrap to mint tokens and f
 
 ```
 $ npm run bootstrap
+```
+
+To close the session:
+
+```
+$ zos session --close
 ```
 
 ## Usage
