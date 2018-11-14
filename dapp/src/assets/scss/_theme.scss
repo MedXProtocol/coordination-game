@@ -9,7 +9,7 @@ $brand-primary--light: $accent-color-2;
 $brand-link--light: $blue;
 $brand-info--light: $cyan;
 $brand-success--light: $brand-primary--light;
-$brand-warning--light: saturate($accent-color-3--light, 20%);
+$brand-warning--light: darken($accent-color-2--light, 10%);
 $brand-danger--light: $red;
 
 $gray--light: #afc3c4;
@@ -51,7 +51,7 @@ html.html-light,
   }
 
   .has-text-grey-lighter {
-    color: lighten($text-color--light, 50%) !important;
+    color: lighten($text-color--light, 40%) !important;
   }
 
   .has-text-transparent-white,
@@ -290,10 +290,10 @@ html.html-light,
   .button.is-warning.is-outlined:hover,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten($accent-color-1--light, 30%);
+    box-shadow: 0 0 5px 0 lighten($accent-color-2--light, 30%);
     background-color: transparent;
-    border-color: $accent-color-1--light;
-    color: $accent-color-1--light;
+    border-color: $accent-color-2--light;
+    color: $accent-color-2--light;
   }
 
   .button.is-light.is-text {
@@ -425,16 +425,16 @@ html.html-light,
 
   @keyframes attention-grabby--light {
     0% {
-      color: $accent-color-1--light;
+      color: $accent-color-3--light;
     }
     40% {
-      color: $nav-link-color--light;
+      color: $accent-color-2--light;
     }
     70% {
-      color: $nav-link-color--light;
+      color: $accent-color-2--light;
     }
     100% {
-      color: $accent-color-1--light;
+      color: $accent-color-3--light;
     }
   }
 

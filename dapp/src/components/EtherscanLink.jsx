@@ -48,7 +48,7 @@ export const EtherscanLink = connect(mapStateToProps)(class _EtherscanLink exten
       }
 
       if (defined(txHash)) {
-        url = `${url}/txHash/${txHash}`
+        url = `${url}/tx/${txHash}`
       } else if (!isBlank(address)) {
         url = `${url}/address/${address}`
       }

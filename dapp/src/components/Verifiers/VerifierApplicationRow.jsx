@@ -7,15 +7,14 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import { get } from 'lodash'
-import { all } from 'redux-saga/effects'
 import {
-  cacheCall,
-  cacheCallValue,
-  cacheCallValueInt,
   contractByName,
   withSaga
 } from 'saga-genesis'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { verifierApplicationService } from '~/services/verifierApplicationService'
+import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
@@ -28,57 +27,18 @@ function mapStateToProps(state, { applicationId }) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
-  const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
-  const verifierSubmittedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierSubmittedAt', applicationId)
-  const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
-
-  const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
-  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
-  const whistleblower = cacheCallValue(state, coordinationGameAddress, 'whistleblowers', applicationId)
-
-  applicationRowObject = {
-    applicationId,
-    createdAt,
-    updatedAt,
-    verifiersSecret,
-    verifierChallengedAt,
-    whistleblower
-  }
-
-  applicationRowObject.applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+  applicationRowObject = verifierApplicationService(state, applicationId, coordinationGameAddress)
 
   return {
     applicationRowObject,
-    applicantsSecret,
     address,
     coordinationGameAddress,
-    latestBlockTimestamp,
-    verifiersSecret
+    latestBlockTimestamp
   }
 }
 
-function* verifierApplicationRowSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
-
-  yield all([
-    cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
-    cacheCall(coordinationGameAddress, 'verifierSubmittedAt', applicationId),
-    cacheCall(coordinationGameAddress, 'createdAt', applicationId),
-    cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
-    cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
-    cacheCall(coordinationGameAddress, 'whistleblowers', applicationId)
-  ])
-}
-
 export const VerifierApplicationRow = connect(mapStateToProps)(
-  withSaga(verifierApplicationRowSaga)(
+  withSaga(verifierApplicationSaga)(
     class _VerifierApplicationRow extends Component {
 
       static propTypes = {
@@ -90,18 +50,18 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const {
           applicationRowObject,
-          applicantsSecret,
-          latestBlockTimestamp,
-          verifiersSecret
+          latestBlockTimestamp
         } = this.props
 
         let {
           applicantRevealExpiresAt,
           applicationId,
+          applicantsSecret,
           verifierChallengedAt,
           createdAt,
           verifierSubmitSecretExpiresAt,
           updatedAt,
+          verifiersSecret,
           whistleblower
         } = applicationRowObject
 
@@ -123,7 +83,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           verifyAction = (
             <Link
               to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
-              className="button is-small is-primary has-text-warning is-outlined is-pulled-right"
+              className="button is-small is-warning is-outlined is-pulled-right"
             >
               Verify
             </Link>

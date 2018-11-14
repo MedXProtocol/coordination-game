@@ -24,6 +24,7 @@ import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
 import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
@@ -163,6 +164,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               {betaFaucetModal}
               {faqModal}
               <GetWallet />
+              <NetworkCheckModal />
               <LoginToMetaMask />
               <Loading />
               <ReduxToastr
@@ -179,7 +181,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
               <section className='section'>
                 <div className='container is-fluid'>
                   <div className='columns'>
-                    <div className='column is-8-widescreen is-offset-2-widescreen'>
+                    <div className='column is-10-widescreen is-offset-1-widescreen'>
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />

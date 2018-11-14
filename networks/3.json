@@ -1,37 +1,37 @@
 [
   {
     "contractName": "TILRoles",
-    "address": "0x95a4d9e59a01a579e098eb851006559564ed1fb3",
-    "transactionHash": "0x336d54e3b91c69a608ed5ff53ca795b39dfcfa7f3bf4e059ee0ed02e61b812ec"
+    "address": "0xd5d1953219427a91314d130dd66e3a873d55f32f",
+    "transactionHash": "0xb5559a82ea6ff60777f90963b0b989c580161d62e6cf51c0cb6dd70eedc137e0"
   },
   {
     "contractName": "WorkToken",
-    "address": "0x073e8f89ed745df59d12dc25e3976f4b3070a6db",
-    "transactionHash": "0x00d658a25699d7e6457a48c77833d62b2e2945b63404a0f17f0c239fb7f9a374"
+    "address": "0x2b5ff018de4650b1582761b71c93f646f772ad54",
+    "transactionHash": "0xfbdde3881faa4f04f32d0e868a80661582b8b9690457f7aa42c96ef89ce62719"
   },
   {
     "contractName": "Work",
-    "address": "0x1de8c16c8844739de0f3692d60a929e8318ab70c",
-    "transactionHash": "0xf71377e7b04ad8aa900e3d7b893e6135bf152cfe0106f1c44f138a99763fe5a5"
+    "address": "0x699afe50489638ed4521f5babd12b4be599877e2",
+    "transactionHash": "0x743418f688a71428c62c4e56d80662550f85f6cc2b8f4c7113123d9c875efd00"
   },
   {
     "contractName": "EtherPriceFeed",
-    "address": "0xed959a196efa1347bd62e8881294eccf4abc6e94",
-    "transactionHash": "0xde0217d61a568ae56d0f0939e8b573865a3f3b863f12fa57da5c1ddc404aba78"
+    "address": "0x5e2544787c03b416f6b78916bc45d84c16d9695e",
+    "transactionHash": "0x10f0bfb3aebf5a67be9bf55be9893030a3a3515e4f5e2ec94c8824910ac75547"
   },
   {
     "contractName": "TILRegistry",
-    "address": "0xe7f4a513425e570eeda673da971a0350d1372a66",
-    "transactionHash": "0x3d92c29ca1db22e8f4287094b8fd02c08be479ad88d6904b8836329146edbffe"
+    "address": "0xf016c1b2fc3ad3ec5d394059116373b97b3639f0",
+    "transactionHash": "0xb56ef758fa45128fcd6020dff2d7e93e94f8e320655ca87a5f7db018a3c4cb13"
   },
   {
     "contractName": "BetaFaucet",
-    "address": "0xd65b714cd89d56811b6ea4e74504f4dbd0b97019",
-    "transactionHash": "0xff2ba13cdd7b16307129be865ee833c67ab9e716e1ddbbea34f6bd47cde0ddc3"
+    "address": "0x0c15625d4afbd07b4997f062c7d7ecd97136d2a8",
+    "transactionHash": "0x2e8fe30690991ed75953b23396913db7555d8d4dbba8879783057ac08bb61e31"
   },
   {
     "contractName": "CoordinationGame",
-    "address": "0x32ea56ca26296c87ce5553dcf7abd89a301c008d",
-    "transactionHash": "0x74d7617a07823af1f2229b210f5d7fe1dba295055d9125d07c833653ab2db188"
+    "address": "0xef282b910791b4142225c4a602467830beb076f6",
+    "transactionHash": "0x7635398f3a169eafdd615fb2391cddcf12395055f7f4004269826f650c0b83a3"
   }
 ]

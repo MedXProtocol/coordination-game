@@ -131,10 +131,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
 
             const { send, coordinationGameAddress, applicationId } = this.props
 
-            const padLeft = getWeb3().utils.padLeft
-            const toHex = getWeb3().utils.toHex
-
-            const secretAsHex = padLeft(toHex(this.state.secret), 32)
+            const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', this.state.secret.toString())
 
             const verifierSubmitSecretTxId = send(
               coordinationGameAddress,

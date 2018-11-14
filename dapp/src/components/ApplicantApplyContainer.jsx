@@ -334,17 +334,14 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           e.preventDefault()
 
           const { send, coordinationGameAddress } = this.props
-          const padLeft = getWeb3().utils.padLeft
-          const toHex = getWeb3().utils.toHex
+          const web3 = getWeb3()
 
           // needs to be BN ?
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
-          // const random = new BN('1587875817')
-
-          const secretAsHex = padLeft(toHex(this.state.secret), 32)
+          const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret)
 
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
@@ -355,7 +352,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           )
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
-          const hint = padLeft(toHex(hintString), 32)
+          const hint = web3.utils.utf8ToHex(hintString)
 
           window.web31 = getWeb3()
           window.bnn = BN

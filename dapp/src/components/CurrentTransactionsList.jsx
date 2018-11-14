@@ -85,9 +85,8 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key = tx[0]
-          const { call, options, error, confirmed, gasUsed, address } = tx[1]
+          const { call, txHash, options, error, confirmed, gasUsed, address } = tx[1]
           const name = call.method
-          const txHash = call.hash
 
           if (error) {
             if (gasUsed)
