@@ -84,7 +84,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
           <React.Fragment>
             <div className="is-clearfix">
               <h6 className="is-size-6">
-                Your Applications to Verify:
+                Token submissions pending your review:
               </h6>
             </div>
 

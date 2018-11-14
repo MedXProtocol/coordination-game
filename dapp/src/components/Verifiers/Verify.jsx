@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
+import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { VerifierApplicationsTable } from '~/components/Verifiers/VerifierApplicationsTable'
+import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
-import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
+import { VerifierStake } from '~/components/Verifiers/VerifierStake'
 
 function mapStateToProps(state) {
   const applicationId = get(state, 'verifier.applicationId')
@@ -34,8 +36,13 @@ export const Verify = connect(mapStateToProps)(
           <PageTitle title='verify' />
 
           <h1 className="is-size-1">
-            Applicants
+            Verify Token Submissions
           </h1>
+
+          <VerifierStake />
+
+          <br />
+          <br />
 
           {verifyApplicationsTable}
           {verifyApplication}
@@ -46,11 +53,22 @@ export const Verify = connect(mapStateToProps)(
 
           <div className="is-clearfix">
             <h6 className="is-size-6">
-              All Applications
+              All Token Submissions
             </h6>
           </div>
 
           <ApplicationsList />
+
+          <br />
+          <br />
+          <br />
+
+          <div className="is-clearfix">
+            <h6 className="is-size-6">
+              Active Verifiers:
+            </h6>
+          </div>
+          <VerifiersTable />
         </div>
       )
     }

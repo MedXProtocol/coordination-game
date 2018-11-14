@@ -25,7 +25,6 @@ import { Home } from '~/components/Home'
 import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
-import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
@@ -186,7 +185,6 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
                         <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
-                        <Route path={routes.STAKE} component={VerifierStake} />
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
@@ -231,7 +229,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                       <div className="level-item has-text-centered">
                         <div>
                           <p className="title">
-                            <Link to={routes.STAKE} className="is-size-7">
+                            <Link to={routes.VERIFY} className="is-size-7">
                               Stake to become a Verifier
                             </Link>
                           </p>

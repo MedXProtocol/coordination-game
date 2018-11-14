@@ -16,7 +16,6 @@ import { GetTILWLink } from '~/components/GetTILWLink'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
 import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep1'
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
@@ -121,27 +120,6 @@ export const VerifierStake = connect(mapStateToProps)(
 
           return (
             <div>
-              <ScrollToTop />
-              <PageTitle title='stake' />
-
-              <h1 className="is-size-1">
-                Stake TILW to become a Verifier
-              </h1>
-
-              <Progress
-                disabled={needsTILWMessage}
-                labels={['Send Approval', 'Deposit Stake', 'Done!']}
-                progressState={{
-                  step1Active: !this.approvalComplete() && this.canApprove(),
-                  step2Active: this.approvalComplete() && this.canStake(),
-                  step3Active: false,
-
-                  step1Complete: this.canStake() || this.stakeComplete(),
-                  step2Complete: this.stakeComplete(),
-                  step3Complete: this.stakeComplete()
-                }}
-              />
-
               {this.stakeComplete()
                 ?
                   (
@@ -166,6 +144,24 @@ export const VerifierStake = connect(mapStateToProps)(
                   )
                 : (
                     <React.Fragment>
+                      <p>
+                        Stake TEX to begin receiving submissions (minimum 1000 TEX)
+                      </p>
+                      
+                      <Progress
+                        disabled={needsTILWMessage}
+                        labels={['Send Approval', 'Deposit Stake', 'Done!']}
+                        progressState={{
+                          step1Active: !this.approvalComplete() && this.canApprove(),
+                          step2Active: this.approvalComplete() && this.canStake(),
+                          step3Active: false,
+
+                          step1Complete: this.canStake() || this.stakeComplete(),
+                          step2Complete: this.stakeComplete(),
+                          step3Complete: this.stakeComplete()
+                        }}
+                      />
+
                       <VerifierStakeStep1
                         {...this.props}
                         approvalComplete={this.approvalComplete}
@@ -181,15 +177,6 @@ export const VerifierStake = connect(mapStateToProps)(
                     </React.Fragment>
                   )
               }
-
-              <br />
-
-              <div className="is-clearfix">
-                <h6 className="is-size-6">
-                  Active Verifiers:
-                </h6>
-              </div>
-              <VerifiersTable />
             </div>
           )
         }

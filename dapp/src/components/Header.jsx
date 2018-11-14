@@ -244,17 +244,6 @@ export const Header = ReactTimeout(
                         <div className="navbar-item">
                           <NavLink
                             activeClassName="is-active"
-                            to={routes.STAKE}
-                            className="navbar-item"
-                            onClick={this.toggleMobileMenu}
-                          >
-                            <AntdIcon type={GoldOutline} className="antd-icon" />&nbsp;
-                            Stake
-                          </NavLink>
-                        </div>
-                        <div className="navbar-item">
-                          <NavLink
-                            activeClassName="is-active"
                             to={routes.VERIFY}
                             className={classnames(
                               'navbar-item',
