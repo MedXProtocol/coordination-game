@@ -199,7 +199,8 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                     </div>
                   </div>
 
-                  <hr />
+                  <br />
+                  <br />
                   <br />
 
                   <div className="level--container">

@@ -224,7 +224,8 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                   />
                 </form>
 
-                <hr />
+                <br />
+                <br />
 
                 <h6 className="has-text-centered is-size-6 has-text-grey">
                   <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}

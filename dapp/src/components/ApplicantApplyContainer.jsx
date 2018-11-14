@@ -119,14 +119,16 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
         constructor(props) {
           super(props)
           this.state = {
-            hintLeft: '',
-            hintRight: '',
+            tokenTicker: '',
+            tokenName: '',
             hint: '...',
             secret: '',
             stepManual: 0,
             applicationCreated: false,
             beforeUnloadTriggered: false
           }
+
+          this.tokenNameRef = React.createRef()
         }
 
         // everything stepManual is for testing animations and can safely be removed
@@ -304,9 +306,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
 
         formReady = () => {
           return (
-            this.state.hintRight !== ''
-            && this.state.hintLeft !== ''
-            && this.state.secret !== ''
+            this.state.tokenName !== ''
+            && this.state.tokenTicker !== ''
+            && this.state.secret.length === 42
           )
         }
 
@@ -337,7 +339,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           const web3 = getWeb3()
 
           // needs to be BN ?
-          // scrap leading 0's in hintLeft, hintRight, hint, secret!
+          // scrap leading 0's in tokenTicker, tokenName, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
@@ -351,7 +353,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
             { type: 'uint256', value: random.toString() }
           )
 
-          const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
+          const hintString = `${this.state.tokenTicker} + ${this.state.tokenName}`
           const hint = web3.utils.utf8ToHex(hintString)
 
           window.web31 = getWeb3()
@@ -401,29 +403,41 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           })
         }
 
-        handleHintChange = (e) => {
-          let val = parseInt(e.target.value, 10) || 0
+        handleAddonClick = (e) => {
+          e.preventDefault()
 
-          if (val < 10000) {
-            this.setState({
-              [e.target.name]: val
-            }, this.updateFinalHint)
-          }
+          this.tokenNameRef.current.focus()
+        }
+
+        handleHintChange = (e) => {
+          // let val = parseInt(e.target.value, 10) || 0
+          //
+          // if (val < 10000) {
+          //   this.setState({
+          //     [e.target.name]: val
+          //   }, this.updateFinalHint)
+          // }
+
+          let val = e.target.value
+
+          this.setState({
+            [e.target.name]: val
+          }, this.updateFinalHint)
         }
 
         updateFinalHint = () => {
           this.setState({
-            hint: this.state.hintLeft + this.state.hintRight
+            hint: `${this.state.tokenName} + ${this.state.tokenTicker}`
           })
         }
 
         render() {
           return (
-            <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.applicationCount}`}>
+            <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
               <PageTitle title='apply' />
               <ScrollToTop />
 
-              <h1>
+              <h1 className="is-size-1">
                 Apply to be on the TIL
               </h1>
 
@@ -505,9 +519,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                               &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
                             </React.Fragment>
                           ) : (
-                            null
+                            <span className="help has-text-grey-dark">We're using ERC20 tokens as an example but you could use anything you'd like to verify <br className="is-hidden-touch" />(eg. if someone is a Doctor, etc.)</span>
                           )
                         }
+
                       </h6>
 
 
@@ -519,54 +534,66 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                           <div className="multistep-form--step-child">
                             <form onSubmit={this.handleSubmit}>
                               <h6 className="is-size-6">
-                                a. Provide a hint for the verifier:
+                                a. Provide the name of an ERC20 token <span className="has-text-grey-dark">(Hint):</span>
                               </h6>
-                              <input
-                                type="text"
-                                name="hintLeft"
-                                className="text-input text-input--large"
-                                placeholder="345"
-                                onChange={this.handleHintChange}
-                                value={this.state.hintLeft}
-                              />
-                              <span className="text-operator">+</span>
 
                               <input
+                                maxLength="40"
                                 type="text"
-                                name="hintRight"
-                                className="text-input text-input--large"
-                                placeholder="223"
+                                name="tokenName"
+                                className="text-input text-input--large text-input--extended"
+                                placeholder="Decentraland"
                                 onChange={this.handleHintChange}
-                                value={this.state.hintRight}
+                                value={this.state.tokenName}
                               />
-                              <span className="text-operator">=</span>
 
-                              <span
-                                className="readonly text-input text-input--large"
-                              >
-                                {this.state.hint}
-                              </span>
+                              <h6 className="is-size-6">
+                                b. Provide an ERC20 ticker symbol <span className="has-text-grey-dark">(Hint):</span>
+                              </h6>
 
-                              <br />
-                              {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                              <div className="field has-addons">
+                                <p className="control">
+                                  <button
+                                    className="button is-static"
+                                    tabIndex={-1}
+                                    onClick={this.handleAddonClick}
+                                  >
+                                    $
+                                  </button>
+                                </p>
+                                <p className="control">
+                                  <input
+                                    ref={this.tokenNameRef}
+                                    maxLength="5"
+                                    type="text"
+                                    name="tokenTicker"
+                                    className="text-input text-input--large"
+                                    placeholder="MANA"
+                                    onChange={this.handleHintChange}
+                                    value={this.state.tokenTicker}
+                                  />
+                                </p>
+                              </div>
+
+                              {this.state.tokenTicker !== '' && this.state.tokenName !== '' ?
                                   (
-                                    <Flipped flipId="coolDiv">
+                                    <Flipped flipId="wat">
                                       <React.Fragment>
                                         <h6 className="is-size-6">
-                                          b. Provide a secret:
+                                          c. Provide the token's contract address <span className="has-text-grey-dark">(Secret):</span>
                                         </h6>
                                         <div className="field">
                                           <div className="control">
                                             <input
+                                              name="tokenContractAddress"
                                               type="text"
-                                              className="text-input text-input--large is-marginless"
-                                              pattern="[0-9]*"
+                                              maxLength="42"
+                                              placeholder="0x..."
+                                              className="text-input text-input--large is-marginless text-input--extended-extra"
+                                              pattern="^(0x)?[0-9a-f]{40}$"
                                               onChange={this.handleSecretChange}
                                             />
                                           </div>
-                                          <p className="help has-text-grey">
-                                            This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                                          </p>
                                         </div>
                                       </React.Fragment>
                                     </Flipped>
@@ -602,8 +629,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                   )
                 }
               </div>
-
-
 
               <div className="multistep-form--step-container">
                 {
@@ -665,6 +690,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
               </div>
 
               <br />
+              <br />
+              <br />
+
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">

@@ -105,13 +105,22 @@
 
   // max
   @media screen and (max-width: 1088px) {
-    top: 70px;
+    top: 44px;
+
+    a.navbar-item:hover,
+    a.navbar-item.is-active,
+    .navbar-link:hover,
+    .navbar-link.is-active {
+      transform: none;
+    }
   }
+
+
 }
 
 .navbar-menu.is-active {
   @media screen and (max-width: 1088px) {
-    background-color: darken($background-color, 3%);
+    background-color: lighten($background-color, 3%);
   }
 }
 

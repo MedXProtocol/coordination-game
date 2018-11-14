@@ -124,7 +124,7 @@ export const VerifierStake = connect(mapStateToProps)(
               <ScrollToTop />
               <PageTitle title='stake' />
 
-              <h1>
+              <h1 className="is-size-1">
                 Stake TILW to become a Verifier
               </h1>
 

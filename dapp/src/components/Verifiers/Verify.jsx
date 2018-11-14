@@ -33,12 +33,16 @@ export const Verify = connect(mapStateToProps)(
           <ScrollToTop />
           <PageTitle title='verify' />
 
-          <h1>
+          <h1 className="is-size-1">
             Applicants
           </h1>
 
           {verifyApplicationsTable}
           {verifyApplication}
+
+          <br />
+          <br />
+          <br />
 
           <div className="is-clearfix">
             <h6 className="is-size-6">
