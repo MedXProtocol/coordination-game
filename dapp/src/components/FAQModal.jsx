@@ -58,7 +58,6 @@ function* faqModalSaga({ workTokenAddress, betaFaucetAddress, address }) {
 
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
-    cacheCall(workTokenAddress, 'owner'),
     cacheCall(betaFaucetAddress, 'sentEtherAddresses', address)
   ])
 }

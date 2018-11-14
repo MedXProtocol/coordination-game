@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
-import "zeppelin/math/SafeMath.sol";
+import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "zos-lib/contracts/Initializable.sol";
 
@@ -23,16 +23,16 @@ contract BetaFaucet is Initializable, Ownable {
   using SafeMath for uint256;
 
   // `fallback` function called when eth is sent to this contract
-  function () payable {
+  function () public payable {
   }
 
   /**
    * @dev - Creates a new BetaFaucet contract with the given parameters
    * @param _workToken - the address of the previously deployed Work token contract
    */
-  function init(IERC20 _workToken) public initializer {
+  function initialize(IERC20 _workToken, address _owner) public initializer {
     require(_workToken != address(0), 'work token is defined');
-    Ownable.initialize(msg.sender);
+    Ownable.initialize(_owner);
     workToken = _workToken;
   }
 

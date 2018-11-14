@@ -25,12 +25,12 @@ library IndexedAddressArray {
     self.addresses.length--;
   }
 
-  function hasAddress(Data storage self, address _value) internal returns (bool) {
+  function hasAddress(Data storage self, address _value) internal view returns (bool) {
     return self.indices[_value] != 0 ||
            (self.addresses.length > 0 && self.addresses[0] == _value);
   }
 
-  function addressAtIndex(Data storage self, uint256 _index) internal returns (address) {
+  function addressAtIndex(Data storage self, uint256 _index) internal view returns (address) {
     if (_index >= self.addresses.length) {
       return address(0);
     }

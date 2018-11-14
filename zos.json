@@ -3,14 +3,13 @@
   "name": "coordination-game",
   "version": "0.1.0",
   "contracts": {
-    "AttributeStore": "AttributeStore",
-    "DLL": "DLL",
-    "Parameterizer": "Parameterizer",
     "WorkToken": "WorkToken",
+    "BetaFaucet": "BetaFaucet",
+    "EtherPriceFeed": "EtherPriceFeed",
+    "TILRoles": "TILRoles",
     "Work": "Work",
     "CoordinationGame": "CoordinationGame",
-    "BetaFaucet": "BetaFaucet",
-    "Test": "Test"
+    "TILRegistry": "TILRegistry"
   },
   "dependencies": {}
 }

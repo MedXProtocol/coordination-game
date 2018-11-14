@@ -8,7 +8,7 @@ const debug = require('debug')('Work.test.js')
 const expectThrow = require('./helpers/expectThrow')
 
 contract('Work', (accounts) => {
-  let [staker, staker2, jobManager] = accounts
+  let [owner, admin, staker, staker2, jobManager] = accounts
 
   let token,
     work,
@@ -26,7 +26,8 @@ contract('Work', (accounts) => {
   })
 
   beforeEach(async () => {
-    work = await Work.new(token.address, requiredStake, jobStake, roles.address)
+    work = await Work.new()
+    await work.init(staker, token.address, requiredStake, jobStake, roles.address)
 
     await token.mint(jobManager, jobManagerBalance)
     await token.approve(work.address, jobManagerBalance, { from: jobManager })
@@ -172,7 +173,7 @@ contract('Work', (accounts) => {
       assert.equal(await work.requiredStake(), requiredStake)
       assert.equal(await work.jobStake(), jobStake)
 
-      await work.updateSettings(newRequiredStake, newJobStake)
+      await work.updateSettings(newRequiredStake, newJobStake, { from: staker })
 
       assert.equal(await work.requiredStake(), newRequiredStake)
       assert.equal(await work.jobStake(), newJobStake)

@@ -8,7 +8,7 @@
     "compile": "$(npm bin)/truffle compile && apply-registry build/contracts",
     "migrate": "$(npm bin)/truffle migrate && apply-registry build/contracts",
     "staging-build": "./scripts/build.sh",
-    "test": "npm run compile && $(npm bin)/truffle test",
+    "test": "NODE_ENV=test $(npm bin)/truffle test --migrations_directory .migrations_null",
     "start": "./scripts/ganache.sh",
     "lambda": "cd lambda && ./lambda-serve.sh",
     "bootstrap": "truffle exec scripts/bootstrap-faucet.js",
@@ -18,15 +18,16 @@
   "license": "ISC",
   "devDependencies": {
     "ganache-cli": "^6.1.8",
-    "zos": "^2.0.1",
-    "truffle-hdwallet-provider": "^0.0.6"
+    "truffle-hdwallet-provider": "^0.0.6",
+    "zos": "^2.0.1"
   },
   "dependencies": {
     "abi-decoder": "^1.2.0",
     "debug": "^4.1.0",
     "ethereumjs-abi": "^0.6.5",
     "openzeppelin-eth": "^2.0.2",
-    "zos-lib": "^2.0.1",
-    "react-router-named-routes": "^0.0.23"
+    "react-router-named-routes": "^0.0.23",
+    "shelljs": "^0.8.3",
+    "zos-lib": "^2.0.1"
   }
 }

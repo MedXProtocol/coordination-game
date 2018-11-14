@@ -9,8 +9,6 @@
     "ethereum",
     "contracts"
   ],
-  "dependencies": {
-    "tcr": "^1.1.0"
-  },
+  "dependencies": {},
   "license": "MIT"
 }

@@ -1,12 +1,8 @@
-/* global artifacts */
+const execAdmin = require('./support/execAdmin')
+const ownerAccount = require('./support/ownerAccount')
 
-const TILRoles = artifacts.require('TILRoles.sol')
-const tdr = require('truffle-deploy-registry')
-
-module.exports = function(deployer, networkName) {
-  return deployer.deploy(TILRoles).then(instance => {
-    if (!tdr.isDryRunNetworkName(networkName)) {
-      tdr.appendInstance(instance)
-    }
+module.exports = function(deployer, networkName, accounts) {
+  deployer.then(async () => {
+    execAdmin(`zos create TILRoles --init init --args ${ownerAccount(accounts)}`, networkName, accounts)
   })
 };

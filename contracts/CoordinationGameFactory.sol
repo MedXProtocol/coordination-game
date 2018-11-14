@@ -18,14 +18,15 @@ contract CoordinationGameFactory {
     external
     returns (address)
   {
-    CoordinationGame coordinationGame = new CoordinationGame(
+    CoordinationGame coordinationGame = new CoordinationGame();
+    coordinationGame.init(
+      _owner,
       _etherPriceFeed,
       _work,
       _tilRegistry,
       _applicationStakeAmount,
       _baseApplicationFeeUsdWei
     );
-    coordinationGame.transferOwnership(_owner);
 
     emit CoordinationGameCreated(msg.sender, address(coordinationGame));
 

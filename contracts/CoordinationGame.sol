@@ -2,11 +2,9 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
-import "tcr/Parameterizer.sol";
 import "./EtherPriceFeed.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
-import "zos-lib/contracts/Initializable.sol";
 
 /**
 @title CoordinationGame
@@ -14,7 +12,7 @@ import "zos-lib/contracts/Initializable.sol";
 @notice This contract stores work tokens in a pool which are applicantTokenDeposits
         as well as Ether balances in applicationBalancesInWei
 **/
-contract CoordinationGame is Initializable, Ownable {
+contract CoordinationGame is Ownable {
   using SafeMath for uint256;
 
   EtherPriceFeed etherPriceFeed;
@@ -148,7 +146,8 @@ contract CoordinationGame is Initializable, Ownable {
          to add applicants to
   @param _applicationStakeAmount how much an applicant has to stake when applying
   */
-  constructor (
+  function init (
+    address _owner,
     EtherPriceFeed _etherPriceFeed,
     Work _work,
     TILRegistry _tilRegistry,
@@ -157,9 +156,8 @@ contract CoordinationGame is Initializable, Ownable {
   ) public initializer {
     require(_tilRegistry != address(0));
     require(_work != address(0));
-    Ownable.initialize(msg.sender);
+    Ownable.initialize(_owner);
     etherPriceFeed = _etherPriceFeed;
->>>>>>> master
     work = _work;
     tilRegistry = _tilRegistry;
     applicationStakeAmount = _applicationStakeAmount;
@@ -253,7 +251,7 @@ contract CoordinationGame is Initializable, Ownable {
         'transferred old verifiers deposit to applicant'
       );
 
-      VerifierSubmissionTimedOut(_applicationId, previousVerifier);
+      emit VerifierSubmissionTimedOut(_applicationId, previousVerifier);
 
       // If we chose this verifier last time let's choose a different one
       if (selectedVerifier == previousVerifier) {
@@ -444,7 +442,7 @@ contract CoordinationGame is Initializable, Ownable {
   @notice Converts an application id into a listing hash key
   @param _applicationId the application id
   */
-  function getListingHash(uint256 _applicationId) public view returns (bytes32) {
+  function getListingHash(uint256 _applicationId) public pure returns (bytes32) {
     return bytes32(_applicationId);
   }
 
@@ -482,7 +480,7 @@ contract CoordinationGame is Initializable, Ownable {
     return (block.timestamp - verifierSubmittedAt[_applicationId]) > applicantRevealTimeoutInSeconds;
   }
 
-  function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
+  function verifierSubmittedSecret(uint256 _applicationId) internal view returns (bool) {
     return verifierSecrets[_applicationId] != 0;
   }
 

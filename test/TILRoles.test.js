@@ -8,6 +8,7 @@ contract('TILRoles', (addresses) => {
 
   beforeEach(async () => {
     roles = await TILRoles.new()
+    await roles.init(owner)
   })
 
   describe('hasRole', () => {

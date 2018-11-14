@@ -69,7 +69,6 @@ function* betaFaucetModalSaga({ workTokenAddress, betaFaucetAddress, address }) 
 
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
-    cacheCall(workTokenAddress, 'owner'),
     cacheCall(betaFaucetAddress, 'sentEtherAddresses', address),
     cacheCall(betaFaucetAddress, 'sentTILWAddresses', address)
   ])

@@ -4,7 +4,35 @@ $ npm i && truffle install
 
 These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
 
-# Setup
+# Local Setup
+
+This project uses ZeppelinOS.  It's important to remember that the accounts that create the contracts are not able to interact with them.  The account that creates the contracts is called the **admin**.
+
+It's best to use the *second* account in the Coordination Game owner mnemonic, because truffle likes to use the first account by default.
+
+First start a local ZeppelinOS session using the admin account:
+
+```
+$ zos session --from $SECOND_OWNER_ACCOUNT --expires 10000 --network local
+```
+
+Now push instances of the contracts to the network
+
+```
+$ zos push
+```
+
+Now you'll want to make sure all of your migrations are up-to-date
+
+```
+$ truffle migrate
+```
+
+Next, run the tests to make sure everything works
+
+```
+npm test
+```
 
 Once the contracts are compiled and migrated, run bootstrap to mint tokens and fill the faucet:
 

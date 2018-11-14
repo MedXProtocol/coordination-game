@@ -25,19 +25,19 @@ library IndexedBytes32Array {
     self.values.length--;
   }
 
-  function hasValue(Data storage self, bytes32 _value) internal returns (bool) {
+  function hasValue(Data storage self, bytes32 _value) internal view returns (bool) {
     return self.indices[_value] != 0 ||
            (self.values.length > 0 && self.values[0] == _value);
   }
 
-  function valueAtIndex(Data storage self, uint256 _index) internal returns (bytes32) {
+  function valueAtIndex(Data storage self, uint256 _index) internal view returns (bytes32) {
     if (_index >= self.values.length) {
       return bytes32(0);
     }
     return self.values[_index];
   }
 
-  function length(Data storage self) internal returns (uint256) {
+  function length(Data storage self) internal view returns (uint256) {
     return self.values.length;
   }
 }
