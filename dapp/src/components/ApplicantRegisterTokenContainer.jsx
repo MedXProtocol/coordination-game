@@ -88,7 +88,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* applicantApplySaga({
+function* applicantRegisterTokenSaga({
   workTokenAddress,
   coordinationGameAddress,
   address,
@@ -111,10 +111,10 @@ function* applicantApplySaga({
   }
 }
 
-export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(applicantApplySaga)(
+export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(applicantRegisterTokenSaga)(
     withSend(
-      class _ApplicantApplyContainer extends Component {
+      class _ApplicantRegisterTokenContainer extends Component {
 
         constructor(props) {
           super(props)
@@ -434,15 +434,19 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
         render() {
           return (
             <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
-              <PageTitle title='apply' />
+              <PageTitle title='registerToken' />
               <ScrollToTop />
 
               <h1 className="is-size-1">
-                Apply to be on the TIL
+                Submit Token Details
               </h1>
 
+              <p>
+                <strong>Information you need:</strong> Token Name, Symbol and Contract owner address. <br className="is-hidden-touch" />Register a token in less than a minute.
+              </p>
+
               <Progress
-                labels={['Send Approval', 'Submit Secret', 'Request Verification', 'Await Verification']}
+                labels={['Send Approval', 'Enter Token Details', 'Request Verification', 'Await Verification']}
                 progressState={{
                   step1Active: !this.step1Completed(),
                   step2Active: this.step1Completed() && !this.step2Completed(),
@@ -479,7 +483,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                     {
                       weiToEther(this.props.tilwBalance) < 1 ? (
                         <p>
-                          You need TILW before you can apply
+                          You will need TEX to register a token
                           <br /><br /><GetTILWLink />
                         </p>
                       ) : (
@@ -487,7 +491,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                           <div className='columns'>
                             <div className='column is-8'>
                               <p>
-                                The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TILW</strong> to apply. If your application is successful, half of this amount will be returned to you.
+                                The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token. If your application is successful, half of this amount will be returned to you.
                               </p>
                             </div>
                           </div>
@@ -534,7 +538,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                           <div className="multistep-form--step-child">
                             <form onSubmit={this.handleSubmit}>
                               <h6 className="is-size-6">
-                                a. Provide the name of an ERC20 token <span className="has-text-grey-dark">(Hint):</span>
+                                a. Token Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
                               </h6>
 
                               <input
@@ -548,7 +552,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                               />
 
                               <h6 className="is-size-6">
-                                b. Provide an ERC20 ticker symbol <span className="has-text-grey-dark">(Hint):</span>
+                                b. Token Symbol:
                               </h6>
 
                               <div className="field has-addons">
@@ -580,7 +584,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                                     <Flipped flipId="wat">
                                       <React.Fragment>
                                         <h6 className="is-size-6">
-                                          c. Provide the token's contract address <span className="has-text-grey-dark">(Secret):</span>
+                                          c. Token's Contract Address:
                                         </h6>
                                         <div className="field">
                                           <div className="control">

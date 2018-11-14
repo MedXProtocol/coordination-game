@@ -12,7 +12,7 @@ import {
   withSaga
 } from 'saga-genesis'
 import { Admin } from '~/components/Admin/Admin'
-import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
+import { ApplicantRegisterTokenContainer } from '~/components/ApplicantRegisterTokenContainer'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { BodyClass } from '~/components/BodyClass'
 import { DebugLog } from '~/components/DebugLog'
@@ -185,12 +185,12 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
-                        <Route path={routes.APPLY} component={ApplicantApplyContainer} />
+                        <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                         <Route path={routes.STAKE} component={VerifierStake} />
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
-                        <Route path={routes.LISTINGS} component={Home} />
+                        <Route path={routes.REGISTRY} component={Home} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />
@@ -221,7 +221,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                       <div className="level-item has-text-centered">
                         <div>
                           <p className="title">
-                            <Link to={routes.APPLY} className="is-size-7">
+                            <Link to={routes.REGISTER_TOKEN} className="is-size-7">
                               Apply to be on the Registry
                             </Link>
                           </p>

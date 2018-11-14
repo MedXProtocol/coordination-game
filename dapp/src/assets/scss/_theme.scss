@@ -1,7 +1,7 @@
 // LIGHT THEME COLOURS
 $text-color--light: #333;
 $background-color--light: #f4f4f4;
-$accent-color-1--light: #51a5d1; // blue
+$accent-color-1--light: #0893ea; // blue
 $accent-color-2--light: #f8aa2f; // orange
 $accent-color-3--light: #13e99b; // green
 
@@ -30,7 +30,7 @@ html.html-light,
   }
 
   ::placeholder {
-    color: lighten($accent-color-1--light, 30%);
+    color: lighten($accent-color-1--light, 45%);
   }
 
   hr {
@@ -577,5 +577,14 @@ html.html-light,
 
   .has-text-warning {
     color: #ec9d0d !important;
+  }
+
+  .button.is-static {
+    background: darken($background-color--light, 10%);
+    border-color: white;
+  }
+
+  .button.is-static:hover {
+    color: white;
   }
 }
