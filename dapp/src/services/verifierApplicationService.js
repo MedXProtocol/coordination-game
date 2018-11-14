@@ -11,6 +11,7 @@ export const verifierApplicationService = function(state, applicationId, coordin
 
   const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
   const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
+  const whistleblower = cacheCallValue(state, coordinationGameAddress, 'whistleblowers', applicationId)
 
   const applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
   const verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
@@ -24,6 +25,7 @@ export const verifierApplicationService = function(state, applicationId, coordin
     verifiersSecret,
     verifierChallengedAt,
     verifierSubmittedAt,
-    verifierSubmitSecretExpiresAt
+    verifierSubmitSecretExpiresAt,
+    whistleblower
   }
 }

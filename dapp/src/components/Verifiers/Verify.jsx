@@ -5,6 +5,7 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { VerifierApplicationsTable } from '~/components/Verifiers/VerifierApplicationsTable'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
+import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
 
 function mapStateToProps(state) {
   const applicationId = get(state, 'verifier.applicationId')
@@ -33,11 +34,19 @@ export const Verify = connect(mapStateToProps)(
           <PageTitle title='verify' />
 
           <h1>
-            Verify Applicants
+            Applicants
           </h1>
 
           {verifyApplicationsTable}
           {verifyApplication}
+
+          <div className="is-clearfix">
+            <h6 className="is-size-6">
+              All Applications
+            </h6>
+          </div>
+
+          <ApplicationsList />
         </div>
       )
     }

@@ -28,7 +28,6 @@ contract CoordinationGame is Ownable {
 
   uint256 public applicationCount;
 
-
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (address => uint256[]) public verifiersApplicationIndices;
 
@@ -55,6 +54,8 @@ contract CoordinationGame is Ownable {
 
   mapping (address => uint256) wins;
   mapping (address => uint256) losses;
+
+  mapping (uint256 => address) public whistleblowers;
 
   event NewApplication(
     uint256 indexed applicationId,
@@ -103,6 +104,12 @@ contract CoordinationGame is Ownable {
     uint256 applicantRevealTimeoutInSeconds
   );
 
+  event Whistleblown(
+    address whistleblower,
+    uint256 applicationId,
+    uint256 randomNumber
+  );
+
   modifier onlyApplicant(uint256 _applicationId) {
     require(applicants[_applicationId] == msg.sender, 'sender must be applicant');
     _;
@@ -115,6 +122,21 @@ contract CoordinationGame is Ownable {
 
   modifier randomBlockWasMined(uint256 _applicationId) {
     require(block.number >= randomBlockNumbers[_applicationId], 'enough blocks have been mined');
+    _;
+  }
+
+  modifier applicationStarted(uint256 _applicationId) {
+    require(secretAndRandomHashes[_applicationId] != bytes32(0), 'secretAndRandomHash is defined');
+    _;
+  }
+
+  modifier secretNotRevealed(uint256 _applicationId) {
+    require(applicantSecrets[_applicationId] == bytes32(0), 'secret has not been revealed');
+    _;
+  }
+
+  modifier notWhistleblown(uint256 _applicationId) {
+    require(whistleblowers[_applicationId] == address(0), 'no whistleblower');
     _;
   }
 
@@ -181,7 +203,7 @@ contract CoordinationGame is Ownable {
 
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationId] = block.number + 1;
-    applicantTokenDeposits[applicationId] = minDeposit();
+    applicantTokenDeposits[applicationId] = work.jobStake();
 
     createdAt[applicationId] = block.timestamp;
     updatedAt[applicationId] = block.timestamp;
@@ -205,9 +227,8 @@ contract CoordinationGame is Ownable {
     external
     onlyApplicant(_applicationId)
     randomBlockWasMined(_applicationId)
+    notWhistleblown(_applicationId)
   {
-    // change from minDeposit to jobStake
-    require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
 
     address previousVerifier = verifiers[_applicationId];
@@ -274,7 +295,7 @@ contract CoordinationGame is Ownable {
   @param _applicationId The application that the verifier is submitting for
   @param _secret The secret that the verifier is guessing
   */
-  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) {
+  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
     require(applicationCount >= _applicationId, 'application has been initialized');
     require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
@@ -295,6 +316,36 @@ contract CoordinationGame is Ownable {
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
+  function whistleblow(
+    uint256 _applicationId,
+    uint256 _randomNumber
+  )
+    public
+    applicationStarted(_applicationId)
+    secretNotRevealed(_applicationId)
+    notWhistleblown(_applicationId)
+  {
+    require(keccak256(abi.encodePacked(_randomNumber)) == randomHashes[_applicationId], 'random number matches');
+
+    // if a verifier was selected, refund
+    if (verifiers[_applicationId] != address(0)) {
+      returnVerifierJobStake(_applicationId);
+    }
+
+    /// Transfer applicant's deposit to the whistleblower
+    tilRegistry.token().transfer(
+      msg.sender,
+      applicantTokenDeposits[_applicationId]
+    );
+
+    whistleblowers[_applicationId] = msg.sender;
+
+    emit Whistleblown(msg.sender, _applicationId, _randomNumber);
+
+    /// Transfer applicant's deposit to the whistleblower
+    msg.sender.transfer(applicationBalancesInWei[_applicationId]);
+  }
+
   /**
   @notice Allows the applicant to reveal their secret
   @param _secret The applicant's secret
@@ -304,7 +355,7 @@ contract CoordinationGame is Ownable {
     uint256 _applicationId,
     bytes32 _secret,
     uint256 _randomNumber
-  ) public onlyApplicant(_applicationId) {
+  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) {
     require(!applicantRevealExpired(_applicationId), 'applicant can still reveal their secret');
     require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
 
@@ -328,7 +379,7 @@ contract CoordinationGame is Ownable {
   @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
   @param _applicationId The application that the verifier is challenging
   */
-  function verifierChallenge(uint256 _applicationId) public onlyVerifier(_applicationId) {
+  function verifierChallenge(uint256 _applicationId) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
     require(
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
@@ -341,8 +392,7 @@ contract CoordinationGame is Ownable {
     updatedAt[_applicationId] = block.timestamp;
 
     /// Transfer the verifier's deposit back to them
-    work.token().approve(address(work), work.jobStake());
-    work.depositJobStake(msg.sender);
+    returnVerifierJobStake(_applicationId);
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(
@@ -381,7 +431,7 @@ contract CoordinationGame is Ownable {
   }
 
   function returnVerifierJobStake(uint256 _applicationId) internal {
-    tilRegistry.token().approve(address(work), applicantTokenDeposits[_applicationId]);
+    tilRegistry.token().approve(address(work), work.jobStake());
     work.depositJobStake(verifiers[_applicationId]);
   }
 
@@ -429,11 +479,6 @@ contract CoordinationGame is Ownable {
 
   function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
     return verifierSecrets[_applicationId] != 0;
-  }
-
-  // the 3rd-party TCR Registry contract uses this var:
-  function minDeposit() public view returns (uint256) {
-    return work.jobStake();
   }
 
   function updateSettings(
@@ -484,5 +529,4 @@ contract CoordinationGame is Ownable {
   function usdWeiPerEther() public view returns (uint256) {
     return uint256(etherPriceFeed.read());
   }
-
 }
