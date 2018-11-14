@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
+import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 import {
   cacheCall,
   cacheCallValue,
@@ -15,8 +16,8 @@ import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import { weiToEther } from '~/utils/weiToEther'
-import AInBox from '~/assets/img/a-in-box-5.svg'
-import GuyFrame1 from '~/assets/img/guy-frame-1.svg'
+import AInBox from '~/assets/img/a-in-box-6.svg'
+import GuyFrame1 from '~/assets/img/guy-frame-1--2.svg'
 import QSpeechBubble from '~/assets/img/q-speech-bubble--2.svg'
 
 function mapStateToProps(state) {
@@ -126,10 +127,47 @@ export const IntroModal =
             modalState={this.state.modalState}
             title="Intro Modal"
           >
-            <div className='has-text-centered'>
-              <QSpeechBubble width="416" height="155" />
-              <AInBox width="300" height="163" />
-              <GuyFrame1 width="400" height="400" />
+            <div className='intro-modal has-text-centered'>
+
+
+              <div className='columns is-mobile'>
+                <div className='column is-6 has-text-right is-gapless is-paddingless'>
+                  <CSSTransitionGroup
+                    transitionName="slide-up"
+                    transitionAppear={true}
+                    transitionAppearTimeout={2100}
+                    transitionEnterTimeout={300}
+                    transitionLeaveTimeout={3000}
+                  >
+                    <QSpeechBubble key='1' width="416" height="155" className="q-speech-bubble"  style={{"transitionDelay": `.4s` }} />
+                    <br  key='2' />
+                    <br key='3' />
+                    <AInBox key='4' width="300" height="163" className="a-in-box" style={{"transitionDelay": `.2s` }} />
+                  </CSSTransitionGroup>
+                </div>
+
+                <div className='column is-6 has-text-left is-gapless is-paddingless'>
+                  <CSSTransitionGroup
+                    transitionName="slide-up"
+                    transitionAppear={true}
+                    transitionAppearTimeout={0}
+                    transitionEnterTimeout={0}
+                    transitionLeaveTimeout={0}
+                  >
+                    <GuyFrame1 width="400" height="400" className="guy-frame-1" />
+                  </CSSTransitionGroup>
+                </div>
+              </div>
+
+              <p>
+                Welcome to <strong>The Coordination Game</strong>! This is a demo of a trustless incentivized list (TIL for short).
+                <br />
+                <br />
+              </p>
+
+              <p>
+                The game starts off with one party creating both a <strong>Hint</strong> (or Q for Question) and a <strong>Secret</strong> (or A for Answer).
+              </p>
 
               <p>
                 <br />
@@ -137,7 +175,7 @@ export const IntroModal =
                   onClick={this.handleCloseModal}
                   className="button is-primary is-outlined"
                 >
-                  Cool, thanks! I'd like to play
+                  Ok, thanks! I'd like to play
                 </button>
               </p>
               <br />
