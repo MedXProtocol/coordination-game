@@ -15,6 +15,7 @@ export const verifierApplicationSaga = function*({
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'whistleblowers', applicationId)
   ])
 }

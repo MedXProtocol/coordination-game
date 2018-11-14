@@ -17,7 +17,6 @@ import { verifierApplicationService } from '~/services/verifierApplicationServic
 import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { ApplicationStatus } from './ApplicationStatus'
 
 function mapStateToProps(state, { applicationId }) {
