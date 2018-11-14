@@ -485,26 +485,19 @@ header {
   pointer-events: none;
 }
 
-.rcs-custom-scroll {
+.rcs-custom-scroll,
+.redux-toastr .toastr-status
+ {
   position: relative;
-  // width: 100px;
-  // height: 100px;
-  // background-color: gray;
-  // display: block;
 }
 
-.rcs-custom-scroll {
-  // position: absolute;
-  // top: -30px;
-  // left: -30px;
-
-}
-.rcs-custom-scroll:before {
+.rcs-custom-scroll:before,
+.redux-toastr .toastr-status:before {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
-  top: -40px;
+  top: -20px;
   width: 100%;
   background-image: linear-gradient(90deg, $brand-link 0%, $brand-link 2%, $brand-info 20%, $accent-color-3 70%, $accent-color-1 90%, $brand-link 100%);
   background-position: 0 0;
@@ -513,6 +506,11 @@ header {
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   background-size: 200% 200%;
+}
+
+.rcs-custom-scroll:before {
+  height: 10px;
+  top: -10px;
 }
 
 @keyframes animateBorder {
