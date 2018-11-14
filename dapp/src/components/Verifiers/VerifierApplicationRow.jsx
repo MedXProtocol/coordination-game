@@ -17,6 +17,7 @@ import { verifierApplicationService } from '~/services/verifierApplicationServic
 import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { ApplicationStatus } from './ApplicationStatus'
 
 function mapStateToProps(state, { applicationId }) {
   let applicationRowObject = {}
@@ -44,8 +45,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
       }
 
       render () {
-        let expirationMessage,
-          verifyAction
+        let verifyAction
 
         const {
           applicationRowObject,
@@ -59,8 +59,9 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           verifierChallengedAt,
           createdAt,
           verifierSubmitSecretExpiresAt,
+          updatedAt,
           verifiersSecret,
-          updatedAt
+          whistleblower
         } = applicationRowObject
 
         const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
@@ -71,25 +72,13 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const applicantRevealedSecret = !isBlank(applicantsSecret)
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
-        const applicantWon = (applicantsSecret === verifiersSecret)
 
-        if (applicantRevealedSecret) {
-          expirationMessage = (
-            <React.Fragment>
-              Application Complete
-              <br /><strong>{applicantWon ? `Applicant Won!` : `Applicant Lost`}</strong>
-            </React.Fragment>
-          )
-        } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = <span className="has-text-grey">You missed the deadline to verify this</span>
-        } else if (!verifierSubmittedSecret) {
-          expirationMessage = (
-            <React.Fragment>
-              <span className="has-text-grey">Verification required before:</span>
-              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
-            </React.Fragment>
-          )
-
+        if (
+          isBlank(whistleblower) &&
+          !applicantRevealedSecret &&
+          !verifierSubmittedSecret &&
+          (latestBlockTimestamp <= verifierSubmitSecretExpiresAt)
+        ) {
           verifyAction = (
             <Link
               to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
@@ -98,38 +87,21 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               Verify
             </Link>
           )
-        } else if (verifierSubmittedSecret) {
-          if (latestBlockTimestamp > applicantRevealExpiresAt) {
-            if (verifierChallengedAt === 0) {
-              expirationMessage = (
-                <React.Fragment>
-                  <span className="has-text-grey">Applicant failed to reveal secret</span>
-                </React.Fragment>
-              )
-              verifyAction = (
-                <Web3ActionButton
-                  contractAddress={this.props.coordinationGameAddress}
-                  isSmall={true}
-                  method='verifierChallenge'
-                  args={[applicationId]}
-                  buttonText='Challenge'
-                  loadingText='Challenging' />
-              )
-            } else {
-              expirationMessage = (
-                <React.Fragment>
-                  <span className="has-text-grey">You successfully challenged the application</span>
-                </React.Fragment>
-              )
-            }
-          } else {
-            expirationMessage = (
-              <React.Fragment>
-                <span className="has-text-grey">Waiting on applicant to reveal secret before:</span>
-                <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-              </React.Fragment>
-            )
-          }
+        } else if (
+          verifierSubmittedSecret &&
+          isBlank(whistleblower) &&
+          latestBlockTimestamp > applicantRevealExpiresAt &&
+          verifierChallengedAt === 0
+        ) {
+          verifyAction = (
+            <Web3ActionButton
+              contractAddress={this.props.coordinationGameAddress}
+              isSmall={true}
+              method='verifierChallenge'
+              args={[applicationId]}
+              buttonText='Challenge'
+              loadingText='Challenging' />
+          )
         }
 
         // necessary to show the verifier on 1st-time component load
@@ -159,7 +131,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             </span>
 
             <span className='list--item__status'>
-              {expirationMessage}
+              <ApplicationStatus applicationId={applicationId} />
             </span>
 
             <span className="list--item__view">

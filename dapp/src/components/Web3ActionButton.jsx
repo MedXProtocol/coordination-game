@@ -40,7 +40,10 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         loadingText: PropTypes.string.isRequired,
         confirmationMessage: PropTypes.string.isRequired,
         txHashMessage: PropTypes.string.isRequired,
-        isSmall: PropTypes.bool
+        isSmall: PropTypes.bool,
+        onError: PropTypes.func,
+        onConfirmed: PropTypes.func,
+        onTxHash: PropTypes.func
       }
 
       constructor(props) {
@@ -64,14 +67,23 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               this.props.dispatchHideLoadingStatus()
               this.setState({ txHandler: null })
               toastr.transactionError(error)
+              if (this.props.onError) {
+                this.props.onError()
+              }
             })
             .onConfirmed(() => {
               this.setState({ txHandler: null })
               toastr.success(nextProps.confirmationMessage)
+              if (this.props.onConfirmed) {
+                this.props.onConfirmed()
+              }
             })
             .onTxHash(() => {
               this.props.dispatchHideLoadingStatus()
               toastr.success(nextProps.txHashMessage)
+              if (this.props.onTxHash) {
+                this.props.onTxHash()
+              }
             })
         }
       }

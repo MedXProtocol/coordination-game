@@ -24,9 +24,11 @@ contract('CoordinationGame', (accounts) => {
     workStake,
     tilRegistry,
     applicationId,
+    applicationVerifier,
     applicantRevealTimeoutInSeconds,
     verifierTimeoutInSeconds,
-    roles
+    roles,
+    weiPerApplication
 
   const applicant = accounts[0]
   const verifier = accounts[1]
@@ -71,6 +73,8 @@ contract('CoordinationGame', (accounts) => {
       etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
     )
 
+    weiPerApplication = await coordinationGame.weiPerApplication()
+
     await roles.setRole(coordinationGame.address, 1, true)
 
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
@@ -110,18 +114,17 @@ contract('CoordinationGame', (accounts) => {
         from: applicant
       }
     )
+    applicationVerifier = await coordinationGame.verifiers(applicationId)
   }
 
   async function newApplicantStartsGame() {
-    const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
-
     await coordinationGame.start(
       secretRandomHash,
       randomHash,
       hint,
       {
         from: applicant,
-        value: weiPerApplication
+        value: weiPerApplication.toString()
       }
     )
     applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
@@ -195,10 +198,9 @@ contract('CoordinationGame', (accounts) => {
         jobStake.toString()
       )
 
-      const weiPerApplication = (await coordinationGame.weiPerApplication()).toString()
       assert.equal(
         (await coordinationGame.applicationBalancesInWei(1)).toString(),
-        weiPerApplication
+        weiPerApplication.toString()
       )
     })
 
@@ -368,8 +370,7 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() won listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.equal(await tilRegistry.isListed(listingHash), true, 'application is listed')
-        assert.equal(await tilRegistry.isRequested(listingHash), false, 'application is requested')
+        assert.equal(listing[2], 0, 'application is listed')
       })
     })
 
@@ -389,8 +390,7 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed listings(${listingHash})...`)
         const listing = await tilRegistry.listings(listingHash)
 
-        assert.equal(await tilRegistry.isListed(listingHash), false, 'application is not listed')
-        assert.equal(await tilRegistry.isRequested(listingHash), true, 'application is requested')
+        assert.equal(listing[2], 1, 'application is challenged')
       })
     })
 
@@ -511,4 +511,65 @@ contract('CoordinationGame', (accounts) => {
     })
   })
 
+  describe('whistleblow()', () => {
+    beforeEach(async () => {
+      await newApplicantStartsGame()
+    })
+
+    it('should give applicant ether and tokens to the whistleblower', async () => {
+      const blowerTokenBalance = await workToken.balanceOf(verifier2)
+      const blowerEtherBalance = await web3.eth.getBalance(verifier2)
+
+      debug(`whistleblow() ${typeof applicationId}, ${typeof random}`)
+
+      await coordinationGame.whistleblow(
+        applicationId.toString(), random.toString(),
+        { from: verifier2 }
+      )
+
+      const blowerNewTokenBalance = await workToken.balanceOf(verifier2)
+      const blowerNewEtherBalance = await web3.eth.getBalance(verifier2)
+      assert.equal(
+        blowerNewTokenBalance.toString(), blowerTokenBalance.plus(applicationStakeAmount).toString(),
+        'token balances match'
+      )
+      assert.ok(
+        blowerNewEtherBalance.sub(blowerEtherBalance).gt(weiPerApplication.mul(0.98)),
+        'ether balances match'
+      )
+      assert.equal(
+        await coordinationGame.whistleblowers(applicationId), verifier2,
+        'whistleblower has been set'
+      )
+    })
+
+    context('when called after a verifier has been selected', () => {
+      beforeEach(async () => {
+        await applicantRandomlySelectsAVerifier()
+      })
+
+      it('should return the verifiers job stake', async () => {
+        const verifierTokenBalance = await work.balances(applicationVerifier)
+        const verifierEtherBalance = await web3.eth.getBalance(applicationVerifier)
+
+        debug(`verifier: ${applicationVerifier}`)
+        debug(`verifierTokenBalance: ${verifierTokenBalance.toString()}`)
+
+        await coordinationGame.whistleblow(
+          applicationId.toString(), random.toString(),
+          { from: verifier2 }
+        )
+
+        const verifierNewTokenBalance = await work.balances(applicationVerifier)
+        const verifierNewEtherBalance = await web3.eth.getBalance(applicationVerifier)
+
+        debug(`verifierNewTokenBalance: ${verifierNewTokenBalance.toString()}`)
+
+        assert.equal(
+          verifierNewTokenBalance.toString(), verifierTokenBalance.plus(jobStake).toString(),
+          'token balances match'
+        )
+      })
+    })
+  })
 })
