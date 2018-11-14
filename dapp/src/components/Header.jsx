@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
-import { connect } from 'react-redux'
+import Toggle from 'react-toggle'
 import { all } from 'redux-saga/effects'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Link, NavLink } from 'react-router-dom'
 import { get } from 'lodash'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import {
-  cacheCall,
   cacheCallValueInt,
   contractByName,
   withSaga
@@ -17,35 +17,68 @@ import {
   AuditOutline,
   BarsOutline,
   CheckCircleOutline,
-  IssuesCloseOutline,
   GoldOutline,
+  IssuesCloseOutline,
+  SettingOutline,
   WalletOutline
 } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon } from '@fortawesome/free-solid-svg-icons'
+import { faSun } from '@fortawesome/free-regular-svg-icons'
 import { NetworkInfo } from '~/components/NetworkInfo'
+import { verifierApplicationsService } from '~/services/verifierApplicationsService'
+import { verifierApplicationService } from '~/services/verifierApplicationService'
+import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
+import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
+  let applicationsToVerify = 0
+  let applicationIds = []
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+
+  if (applicationCount && applicationCount !== 0) {
+    applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)
+  }
+
+  for (let i = 0; i < applicationIds.length; i++) {
+    const applicationId = applicationIds[i]
+
+    const application = verifierApplicationService(state, applicationId, coordinationGameAddress)
+    const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
+
+    if (!verifierSubmittedSecret && (latestBlockTimestamp < application.verifierSubmitSecretExpiresAt)) {
+      applicationsToVerify += 1
+    }
+  }
 
   return {
     address,
+    applicationsToVerify,
     applicationCount,
+    applicationIds,
     coordinationGameAddress
   }
 }
 
-function* headerSaga({
-  coordinationGameAddress,
-  address
-}) {
-  if (!coordinationGameAddress || !address) { return null }
+function* headerSaga({ address, applicationCount, applicationIds, coordinationGameAddress }) {
+  if (!coordinationGameAddress || !address) { return }
 
-  yield all([
-    cacheCall(coordinationGameAddress, 'getVerifiersApplicationCount')
-  ])
+  yield verifierApplicationsSaga(coordinationGameAddress, address, applicationCount)
+
+  if (applicationIds && applicationIds.length !== 0) {
+    yield all(
+      applicationIds.map(function* (applicationId) {
+        yield verifierApplicationSaga(coordinationGameAddress, applicationId)
+      })
+    )
+  }
 }
 
 export const Header = ReactTimeout(
@@ -58,7 +91,8 @@ export const Header = ReactTimeout(
             super(props)
             this.state = {
               oneVisible: false,
-              twoVisible: false
+              twoVisible: false,
+              mobileMenuActive: false
             }
           }
 
@@ -76,8 +110,16 @@ export const Header = ReactTimeout(
             }, 600)
           }
 
+          toggleMobileMenu = (e) => {
+            const mobileMenuActive = !this.state.mobileMenuActive
+
+            this.setState({
+              mobileMenuActive
+            })
+          }
+
           render () {
-            const { applicationCount } = this.props
+            const { applicationsToVerify } = this.props
 
             return (
               <React.Fragment>
@@ -95,9 +137,25 @@ export const Header = ReactTimeout(
                       <div className="navbar-item">
                         <Link to={routes.HOME} className="navbar-item">
                           The Coordination Game
-                          &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                          <span className='is-hidden-touch'>
+                            &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                          </span>
                         </Link>
                       </div>
+
+                      <button
+                        className={classnames(
+                          'navbar-burger',
+                          'burger',
+                          { 'is-active': this.state.mobileMenuActive }
+                        )}
+                        data-target="navbar-menu"
+                        onClick={this.toggleMobileMenu}
+                      >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </button>
                     </div>
 
                     <CurrentTransactionsList />
@@ -106,9 +164,17 @@ export const Header = ReactTimeout(
                       <div className="navbar-end">
                         <div className="navbar-item">
                           <span className="navbar-item">
-                            <button onClick={this.props.toggleTheme} className="has-text-transparent-white">
-                              {this.props.isLight === 'true' ? '.' : ' '}
-                            </button>
+                            <label>
+
+                              <Toggle
+                                defaultChecked={!this.props.isLight}
+                                icons={{
+                                  checked: <FontAwesomeIcon icon={faMoon} className="icon--react-toggle" />,
+                                  unchecked: <FontAwesomeIcon icon={faSun} className="icon--react-toggle" />
+                                }}
+                                onChange={this.props.toggleTheme}
+                              />
+                            </label>
                           </span>
                         </div>
 
@@ -128,7 +194,10 @@ export const Header = ReactTimeout(
                   )
                 }>
                   <div className="container is-fluid">
-                    <div className="navbar-menu">
+                    <div id="navbar-menu" className={classnames(
+                      'navbar-menu',
+                      { 'is-active': this.state.mobileMenuActive }
+                    )}>
                       {
                         this.props.isOwner ? (
                           <div className="navbar-start">
@@ -137,7 +206,9 @@ export const Header = ReactTimeout(
                                 activeClassName="is-active"
                                 to={routes.ADMIN}
                                 className="navbar-item"
+                                onClick={this.toggleMobileMenu}
                               >
+                                <AntdIcon type={SettingOutline} className="antd-icon" />&nbsp;
                                 Admin
                               </NavLink>
                             </div>
@@ -153,9 +224,10 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.HOME}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
-                            View Registry
+                            List
                           </NavLink>
                         </div>
                         <div className="navbar-item">
@@ -163,6 +235,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.APPLY}
                             className='navbar-item'
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={AuditOutline} className="antd-icon " />&nbsp;
                             Apply
@@ -173,6 +246,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.STAKE}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={GoldOutline} className="antd-icon" />&nbsp;
                             Stake
@@ -185,15 +259,16 @@ export const Header = ReactTimeout(
                             className={classnames(
                               'navbar-item',
                               {
-                                'is-attention-grabby': applicationCount > 0
+                                'is-attention-grabby': applicationsToVerify > 0
                               }
                             )}
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon
-                              type={applicationCount > 0 ? IssuesCloseOutline : CheckCircleOutline}
+                              type={applicationsToVerify > 0 ? IssuesCloseOutline : CheckCircleOutline}
                               className="antd-icon"
                             />
-                            &nbsp;{applicationCount > 0 ? applicationCount : ''} Verify
+                            &nbsp;{applicationsToVerify > 0 ? applicationsToVerify : ''} Verify
                           </NavLink>
                         </div>
                         <div className="navbar-item">
@@ -201,6 +276,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.WALLET}
                             className="navbar-item"
+                            onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={WalletOutline} className="antd-icon" />&nbsp;
                             Wallet

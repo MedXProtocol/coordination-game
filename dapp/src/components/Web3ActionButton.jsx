@@ -7,7 +7,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { toastr } from '~/toastr'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 
 function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
@@ -17,7 +17,18 @@ function mapStateToProps(state) {
   }
 }
 
-export const Web3ActionButton = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
+export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
     class _Web3ActionButton extends Component {
 
@@ -25,7 +36,14 @@ export const Web3ActionButton = connect(mapStateToProps)(
         contractAddress: PropTypes.string.isRequired,
         method: PropTypes.string.isRequired,
         args: PropTypes.array.isRequired,
-        buttonText: PropTypes.string.isRequired
+        buttonText: PropTypes.string.isRequired,
+        loadingText: PropTypes.string.isRequired,
+        confirmationMessage: PropTypes.string.isRequired,
+        txHashMessage: PropTypes.string.isRequired,
+        isSmall: PropTypes.bool,
+        onError: PropTypes.func,
+        onConfirmed: PropTypes.func,
+        onTxHash: PropTypes.func
       }
 
       constructor(props) {
@@ -46,15 +64,26 @@ export const Web3ActionButton = connect(mapStateToProps)(
             nextProps.transactions[this.state.txId]
           )
             .onError((error) => {
+              this.props.dispatchHideLoadingStatus()
               this.setState({ txHandler: null })
               toastr.transactionError(error)
+              if (this.props.onError) {
+                this.props.onError()
+              }
             })
             .onConfirmed(() => {
               this.setState({ txHandler: null })
               toastr.success(nextProps.confirmationMessage)
+              if (this.props.onConfirmed) {
+                this.props.onConfirmed()
+              }
             })
             .onTxHash(() => {
+              this.props.dispatchHideLoadingStatus()
               toastr.success(nextProps.txHashMessage)
+              if (this.props.onTxHash) {
+                this.props.onTxHash()
+              }
             })
         }
       }
@@ -71,30 +100,29 @@ export const Web3ActionButton = connect(mapStateToProps)(
           ...args
         )()
         console.log(`Making call to ${contractAddress}#${method} with args`, args)
-        console.log('txid is: ', txId)
+        // console.log('txid is: ', txId)
 
 
         this.setState({
           txHandler: new TransactionStateHandler(),
           txId
         })
+
+        this.props.dispatchShowLoadingStatus()
       }
 
       render() {
-        const { buttonText, contractAddress } = this.props
+        const { buttonText, contractAddress, loadingText, isSmall } = this.props
 
         return (
           <form onSubmit={this.handleSend}>
-            <button
+            <LoadingButton
+              initialText={buttonText}
+              loadingText={loadingText}
+              isLoading={this.state.txHandler}
+              isSmall={isSmall}
               disabled={!contractAddress || this.state.txHandler}
-              type="submit"
-              className="button is-outlined is-primary is-small"
-            >
-              {buttonText}
-            </button>&nbsp;
-
-            <LoadingLines
-              visible={this.state.txHandler}
+              className={this.props.className}
             />
           </form>
         )

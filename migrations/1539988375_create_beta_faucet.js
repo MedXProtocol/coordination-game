@@ -3,12 +3,12 @@ const WorkToken = artifacts.require("./WorkToken.sol")
 const tdr = require('truffle-deploy-registry')
 
 module.exports = function(deployer, networkName) {
-  deployer.deploy(BetaFaucet).then(async (betaFaucetInstance) => {
+  deployer.then(async () => {
     const workToken = await WorkToken.deployed()
-    betaFaucetInstance.init(workToken.address)
-
-    if (!tdr.isDryRunNetworkName(networkName)) {
-      await tdr.appendInstance(betaFaucetInstance)
-    }
+    await deployer.deploy(BetaFaucet, workToken.address).then(async (betaFaucetInstance) => {
+      if (!tdr.isDryRunNetworkName(networkName)) {
+        await tdr.appendInstance(betaFaucetInstance)
+      }
+    })
   })
 }

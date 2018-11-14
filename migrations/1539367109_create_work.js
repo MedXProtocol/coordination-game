@@ -1,6 +1,7 @@
 const Work = artifacts.require('Work.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
 const Parameterizer = artifacts.require('Parameterizer')
+const TILRoles = artifacts.require('TILRoles')
 const tdr = require('truffle-deploy-registry')
 
 module.exports = function(deployer, networkName) {
@@ -9,12 +10,14 @@ module.exports = function(deployer, networkName) {
     const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
 
     await WorkToken.deployed()
+    await TILRoles.deployed()
 
     return deployer.deploy(
       Work,
       WorkToken.address,
       requiredStake,
-      jobStake
+      jobStake,
+      TILRoles.address
     ).then(instance => {
       if (!tdr.isDryRunNetworkName(networkName)) {
         tdr.appendInstance(instance)

@@ -10,7 +10,9 @@
     "staging-build": "./scripts/build.sh",
     "test": "npm run compile && $(npm bin)/truffle test",
     "start": "./scripts/ganache.sh",
-    "lambda": "cd lambda && ./lambda-serve.sh"
+    "lambda": "cd lambda && ./lambda-serve.sh",
+    "bootstrap": "truffle exec scripts/bootstrap-faucet.js",
+    "bootstrap-verifiers": "truffle exec scripts/bootstrap-verifiers.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +26,7 @@
     "debug": "^4.1.0",
     "ethereumjs-abi": "^0.6.5",
     "openzeppelin-eth": "^2.0.2",
-    "zos-lib": "^2.0.1"
+    "zos-lib": "^2.0.1",
+    "react-router-named-routes": "^0.0.23"
   }
 }

@@ -1,0 +1,44 @@
+.loading--overlay {
+  background-color: $accent-color-2;
+  content: '';
+  display: block;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+}
+
+.loading--overlay.anim-fade-in {
+  opacity: 0.92;
+}
+
+.loading {
+  position: fixed;
+  height: 24rem;
+  margin: auto;
+  padding: 9rem 0 2rem 0;
+  pointer-events: none;
+  top: -200px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  z-index: 9999;
+}
+
+.loading p {
+  color: white;
+  margin-top: 10px;
+}
+
+.loading .small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading--overlay.visible,
+.loading--overlay.visible .loading {
+  pointer-events: initial;
+}

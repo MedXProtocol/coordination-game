@@ -83,7 +83,7 @@ export const VerifiersTable = connect(mapStateToProps)(
                 #{index + 1}
               </span>
 
-              <span className="list--item__eth-address">
+              <span className="list--item__status">
                 <EthAddress address={verifierAddress} />
                 &nbsp;&nbsp;
                 <EtherscanLink address={verifierAddress}>
@@ -105,7 +105,7 @@ export const VerifiersTable = connect(mapStateToProps)(
         if (loading) {
           loadingLines = (
             <div className="blank-state">
-              <div className="blank-state--inner text-gray">
+              <div className="blank-state--inner has-text-grey">
                 <LoadingLines visible={true} />
               </div>
             </div>
@@ -113,7 +113,7 @@ export const VerifiersTable = connect(mapStateToProps)(
         } else if (verifierCount === 0) {
           noApplications = (
             <div className="blank-state">
-              <div className="blank-state--inner text-gray">
+              <div className="blank-state--inner has-text-grey">
                 <span className="is-size-6">Currently no verifiers.</span>
               </div>
             </div>

@@ -1,7 +1,8 @@
 /* eslint-env mocha */
 /* global assert contract artifacts */
-const Work = artifacts.require('Work.sol');
-const WorkToken = artifacts.require('WorkToken.sol');
+const Work = artifacts.require('Work.sol')
+const WorkToken = artifacts.require('WorkToken.sol')
+const TILRoles = artifacts.require('TILRoles.sol')
 const BN = require('bn.js')
 const debug = require('debug')('Work.test.js')
 const expectThrow = require('./helpers/expectThrow')
@@ -10,22 +11,22 @@ contract('Work', (accounts) => {
   let [staker, staker2, jobManager] = accounts
 
   let token,
-    ownerAddress,
     work,
+    roles,
     initialStakerBalance
 
   const requiredStake = web3.toWei('20', 'ether')
   const jobStake = web3.toWei('10', 'ether')
-
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
-  beforeEach(async () => {
+  before(async () => {
     token = await WorkToken.deployed()
-    work = await Work.new(token.address, requiredStake, jobStake)
-    ownerAddress = await work.owner.call()
+    roles = await TILRoles.deployed()
+    await roles.setRole(jobManager, 1, true)
+  })
 
-    // this is typically supposed to be the coordinationGameAddress:
-    await work.setJobManager(jobManager)
+  beforeEach(async () => {
+    work = await Work.new(token.address, requiredStake, jobStake, roles.address)
 
     await token.mint(jobManager, jobManagerBalance)
     await token.approve(work.address, jobManagerBalance, { from: jobManager })

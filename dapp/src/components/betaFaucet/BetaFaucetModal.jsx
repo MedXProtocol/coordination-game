@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 // import ReactCSSTransitionReplace from 'react-css-transition-replace'
-import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValue,
@@ -30,8 +30,8 @@ function mapStateToProps (state) {
   const betaFaucetAddress = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentEtherAddresses', address)
 
-  const sendEtherTx = externalTransactionFinders.sendEther(state)
-  const sendTILWTx = externalTransactionFinders.sendTILW(state)
+  const sendEtherTx = transactionFinders.findByMethodName(state, 'sendEther')
+  const sendTILWTx = transactionFinders.findByMethodName(state, 'sendTILW')
 
   const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
   const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
@@ -64,7 +64,7 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ workTokenAddress, betaFaucetAddress, address }) {
+function* betaFaucetModalSaga({ workTokenAddress, betaFaucetAddress, address }) {
   if (!workTokenAddress || !betaFaucetAddress || !address) { return }
 
   yield all([
@@ -80,20 +80,20 @@ function mapDispatchToProps(dispatch) {
     dispatchHideModal: () => {
       dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
     },
-    dispatchAddExternalTransaction: (transactionId, txType, txHash, call) => {
-      dispatch({ type: 'ADD_EXTERNAL_TRANSACTION', transactionId, txType, txHash, call })
-    },
-    dispatchSagaGenesisTransaction: (transactionId, txType, txHash, call) => {
-      dispatch({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
-    },
     dispatchSetBetaFaucetModalStep: (step) => {
       dispatch({ type: 'SET_BETA_FAUCET_MODAL_STEP', step })
+    },
+    dispatchSagaGenesisStartTx: (transactionId, txType, call) => {
+      dispatch({ type: 'SG_START_TRANSACTION', transactionId, txType, call })
+    },
+    dispatchSagaGenesisTxHash: (transactionId, txHash) => {
+      dispatch({ type: 'SG_TRANSACTION_HASH', transactionId, txHash })
     }
   }
 }
 
 export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga)(
+  withSaga(betaFaucetModalSaga)(
     class _BetaFaucetModal extends Component {
 
       componentWillReceiveProps(nextProps) {
@@ -123,11 +123,17 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         return step
       }
 
-      addExternalTransaction = (txType, txHash) => {
-        const id = nextId()
-        const call = { method: txType, address: '0x0444d61FE60A855d6f40C21f167B643fD5F17aF3' } // junk address for cache invalidator to be happy
-        this.props.dispatchAddExternalTransaction(id, txType, txHash, call)
-        this.props.dispatchSagaGenesisTransaction(id, txType, txHash, call)
+      sendExternalTransaction = (txType) => {
+        const txId = nextId()
+
+        const call = {
+          method: txType,
+          address: '0x0444d61FE60A855d6f40C21f167B643fD5F17aF3' // junk address for cache invalidator to be happy
+        }
+
+        this.props.dispatchSagaGenesisStartTx(txId, txType, call)
+
+        return txId
       }
 
       closeModal = (e) => {
@@ -166,16 +172,18 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             key="ethFaucet"
             address={address}
             ethBalance={ethBalance}
-            addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep}
+            sendExternalTransaction={this.sendExternalTransaction}
+            dispatchSagaGenesisTxHash={this.props.dispatchSagaGenesisTxHash}
           />
         } else if (step === 2) {
           content = <TILWFaucetApi
             key='tilwFaucet'
             address={address}
             tilwBalance={tilwBalance}
-            addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep}
+            sendExternalTransaction={this.sendExternalTransaction}
+            dispatchSagaGenesisTxHash={this.props.dispatchSagaGenesisTxHash}
           />
         }
 

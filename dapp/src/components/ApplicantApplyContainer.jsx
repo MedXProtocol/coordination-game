@@ -6,6 +6,8 @@ import BN from 'bn.js'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { toastr } from '~/toastr'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValue,
@@ -16,11 +18,11 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { toastr } from '~/toastr'
-import { transactionFinders } from '~/finders/transactionFinders'
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
+import { EtherFlip } from '~/components/EtherFlip'
 import { GetTILWLink } from '~/components/GetTILWLink'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
+import { Modal } from '~/components/Modal'
 import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -45,11 +47,12 @@ function mapStateToProps(state) {
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
   const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
-  const approveTx = transactionFinders.approve(state)
+  const approveTx = transactionFinders.findByMethodName(state, 'approve')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
   const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
   const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
     verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
@@ -69,7 +72,19 @@ function mapStateToProps(state) {
     tilwBalance,
     transactions,
     verifier,
+    weiPerApplication,
     workTokenAddress
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
   }
 }
 
@@ -87,6 +102,7 @@ function* applicantApplySaga({
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
     cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
+    cacheCall(coordinationGameAddress, 'weiPerApplication')
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
@@ -95,7 +111,7 @@ function* applicantApplySaga({
   }
 }
 
-export const ApplicantApplyContainer = connect(mapStateToProps)(
+export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(applicantApplySaga)(
     withSend(
       class _ApplicantApplyContainer extends Component {
@@ -107,8 +123,9 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             hintRight: '',
             hint: '...',
             secret: '',
+            stepManual: 0,
             applicationCreated: false,
-            stepManual: 0
+            beforeUnloadTriggered: false
           }
         }
 
@@ -132,7 +149,25 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           }
         }
 
-        componentWillMount(){
+        componentDidMount () {
+          if (window) {
+            window.onbeforeunload = this.handleBeforeUnload
+          }
+        }
+
+        handleBeforeUnload = () => {
+          if (this.step2Completed() && !this.step3Completed()) {
+            this.setState({
+              beforeUnloadTriggered: true
+            })
+
+            window.onbeforeunload = null
+
+            return true
+          }
+        }
+
+        componentWillMount () {
           document.addEventListener("keydown", this._handleKeyDown.bind(this));
         }
 
@@ -147,6 +182,18 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           this.registerWorkTokenApproveHandlers(nextProps)
           this.registerCoordinationGameStartHandler(nextProps)
           this.registerCoordinationGameSelectVerifierHandler(nextProps)
+        }
+
+        componentWillUnmount () {
+          if (window) {
+            window.onbeforeunload = null
+          }
+        }
+
+        handleCloseModal = () => {
+          this.setState({
+            beforeUnloadTriggered: false
+          })
         }
 
         newApplication = (nextProps) => {
@@ -168,6 +215,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.workTokenApproveTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ workTokenApproveHandler: null })
                 toastr.transactionError(error)
@@ -177,6 +226,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Approval for contract to spend TILW tokens confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -188,6 +239,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.coordinationGameStartTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ coordinationGameStartHandler: null })
                 toastr.transactionError(error)
@@ -197,6 +250,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Application submission confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Application submitted successfully - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -208,6 +263,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
               nextProps.transactions[this.state.coordinationGameSelectVerifierTxId]
             )
               .onError((error) => {
+                this.props.dispatchHideLoadingStatus()
+
                 console.log(error)
                 this.setState({ coordinationGameSelectVerifierHandler: null })
                 toastr.transactionError(error)
@@ -217,6 +274,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 toastr.success('Verification request confirmed.')
               })
               .onTxHash(() => {
+                this.props.dispatchHideLoadingStatus()
+
                 toastr.success('Verification request sent successfully - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
@@ -227,6 +286,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
 
           const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
           const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
+          // console.log(valuesDefined, valuesAreEqual)
 
           return (this.state.stepManual > 0) ||
             (this.step2Completed() || (valuesDefined && valuesAreEqual))
@@ -266,21 +326,22 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             workTokenApproveHandler: new TransactionStateHandler(),
             workTokenApproveTxId
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSubmit = (e) => {
           e.preventDefault()
 
           const { send, coordinationGameAddress } = this.props
-          const padLeft = getWeb3().utils.padLeft
-          const toHex = getWeb3().utils.toHex
+          const web3 = getWeb3()
 
           // needs to be BN ?
           // scrap leading 0's in hintLeft, hintRight, hint, secret!
           // somehow make 100% sure we're not choosing a verifier that is the applicant!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
-          const secretAsHex = padLeft(toHex(new BN(this.state.secret)), 32)
+          const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret)
 
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
@@ -291,7 +352,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
           )
 
           const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
-          const hint = padLeft(toHex(hintString), 32)
+          const hint = web3.utils.utf8ToHex(hintString)
+
+          window.web31 = getWeb3()
+          window.bnn = BN
 
           const coordinationGameStartTxId = send(
             coordinationGameAddress,
@@ -299,13 +363,17 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             secretRandomHash,
             randomHash,
             hint
-          )()
+          )({
+            value: this.props.weiPerApplication
+          })
 
           this.setState({
             coordinationGameStartHandler: new TransactionStateHandler(),
             coordinationGameStartTxId,
             random
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSubmitSelectVerifier = (e) => {
@@ -323,6 +391,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
             coordinationGameSelectVerifierHandler: new TransactionStateHandler(),
             coordinationGameSelectVerifierTxId
           })
+
+          this.props.dispatchShowLoadingStatus()
         }
 
         handleSecretChange = (e) => {
@@ -408,19 +478,12 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                             </div>
                           </div>
 
-                          <button
-                            type="submit"
-                            className="button is-outlined is-primary"
-                            disabled={this.state.workTokenApproveHandler}
-                          >
-                            Approve
-                          </button>
-
-                          <LoadingLines
-                            visible={this.state.workTokenApproveHandler}
+                          <LoadingButton
+                            initialText='Approve'
+                            loadingText='Approving'
+                            isLoading={this.state.workTokenApproveHandler}
                           />
                         </form>
-
                       )
                     }
                   </React.Fragment>
@@ -514,17 +577,17 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               <Flipped flipId="coolDiv">
                                 <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
                                   <br />
-                                  <button
-                                    type="submit"
-                                    className="button is-outlined is-primary"
-                                    disabled={this.state.coordinationGameStartHandler}
-                                  >
-                                    Submit Hint &amp; Secret
-                                  </button>
-
-                                  <LoadingLines
-                                    visible={this.state.coordinationGameStartHandler}
+                                  <LoadingButton
+                                    initialText='Submit Hint &amp; Secret'
+                                    loadingText='Submitting'
+                                    isLoading={this.state.coordinationGameStartHandler}
                                   />
+
+                                  <br />
+                                  <p className="help has-text-grey">
+                                    <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
+                                  </p>
+
                                 </div>
                               </Flipped>
 
@@ -585,16 +648,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                               </div>
                             </div>
 
-                            <button
-                              type="submit"
-                              className="button is-outlined is-primary"
-                              disabled={this.state.coordinationGameSelectVerifierHandler}
-                            >
-                              Request Verification
-                            </button>
-
-                            <LoadingLines
-                              visible={this.state.coordinationGameSelectVerifierHandler}
+                            <LoadingButton
+                              initialText='Request Verification'
+                              loadingText='Requesting'
+                              isLoading={this.state.coordinationGameSelectVerifierHandler}
                             />
                           </form>
                         )
@@ -607,7 +664,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 }
               </div>
 
-              <hr />
+              <br />
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">
@@ -615,6 +672,40 @@ export const ApplicantApplyContainer = connect(mapStateToProps)(
                 </h6>
               </div>
               <ApplicantApplicationsTable />
+
+              <Modal
+                closeModal={this.handleCloseModal}
+                modalState={this.state.beforeUnloadTriggered}
+                title="Unload warning modal"
+              >
+                <div className='has-text-centered'>
+                  <h3 className="is-size-3">
+                    You're leaving?
+                  </h3>
+
+                  <p>
+                    You haven't finished your application yet!
+                  </p>
+                  <p>
+                    Once you have finished the <strong>'Request Verification'</strong> step your application will be complete.
+                  </p>
+                  <br />
+
+                  <p>
+                    <br />
+                    <button
+                      onClick={this.handleCloseModal}
+                      className="button is-primary is-outlined"
+                    >
+                      Whoops, thanks for the reminder! I'll finish it up.
+                    </button>
+                  </p>
+                  <br />
+                  <p>
+                    We'll only warn you once, so feel free to leave if you would like!
+                  </p>
+                </div>
+              </Modal>
 
             </Flipper>
           )

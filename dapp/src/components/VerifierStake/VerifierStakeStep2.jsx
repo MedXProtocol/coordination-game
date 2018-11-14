@@ -7,7 +7,7 @@ import {
   TransactionStateHandler,
   withSend
 } from 'saga-genesis'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
 function mapStateToProps(state) {
@@ -15,7 +15,18 @@ function mapStateToProps(state) {
   }
 }
 
-export const VerifierStakeStep2 = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
+export const VerifierStakeStep2 = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
     class _VerifierStakeStep2 extends Component {
 
@@ -43,6 +54,8 @@ export const VerifierStakeStep2 = connect(mapStateToProps)(
           workStakeHandler: new TransactionStateHandler(),
           workStakeTxId
         })
+
+        this.props.dispatchShowLoadingStatus()
       }
 
       registerWorkStakeHandlers = (nextProps) => {
@@ -51,6 +64,8 @@ export const VerifierStakeStep2 = connect(mapStateToProps)(
             nextProps.transactions[this.state.workStakeTxId]
           )
             .onError((error) => {
+              this.props.dispatchHideLoadingStatus()
+
               console.log(error)
               this.setState({ workStakeHandler: null })
               toastr.transactionError(error)
@@ -60,6 +75,8 @@ export const VerifierStakeStep2 = connect(mapStateToProps)(
               toastr.success('TILW Stake confirmed.')
             })
             .onTxHash(() => {
+              this.props.dispatchHideLoadingStatus()
+
               toastr.success('TILW stake sent - it will take a few minutes to confirm on the Ethereum network.')
             })
         }
@@ -96,11 +113,10 @@ export const VerifierStakeStep2 = connect(mapStateToProps)(
             </div>
 
             <form onSubmit={this.handleSubmitStake}>
-              <button type="submit" className="button is-primary is-outlined">
-                Stake
-              </button>
-              <LoadingLines
-                visible={this.state.workStakeHandler}
+              <LoadingButton
+                initialText='Stake'
+                loadingText='Staking'
+                isLoading={this.state.workStakeHandler}
               />
             </form>
           </React.Fragment>

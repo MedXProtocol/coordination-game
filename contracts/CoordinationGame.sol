@@ -1,7 +1,9 @@
+
 pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "tcr/Parameterizer.sol";
+import "./EtherPriceFeed.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
 import "zos-lib/contracts/Initializable.sol";
@@ -9,25 +11,30 @@ import "zos-lib/contracts/Initializable.sol";
 /**
 @title CoordinationGame
 @author Brendan Asselstine, Chuck Bergeron
-@notice This contract stores work tokens in a pool which are applicant applicantDeposits
+@notice This contract stores work tokens in a pool which are applicantTokenDeposits
+        as well as Ether balances in applicationBalancesInWei
 **/
 contract CoordinationGame is Initializable, Ownable {
   using SafeMath for uint256;
+
+  EtherPriceFeed etherPriceFeed;
   Work work;
   TILRegistry tilRegistry;
 
-  uint256 public secondsInADay;
-  uint256 public verifierTimeoutInDays;
-  uint256 public applicantRevealTimeoutInDays;
+  uint256 public verifierTimeoutInSeconds;
+  uint256 public applicantRevealTimeoutInSeconds;
 
   uint256 public applicationStakeAmount;
+  uint256 public baseApplicationFeeUsdWei;
 
   uint256 public applicationCount;
 
   mapping (address => uint256[]) public applicantsApplicationIndices;
   mapping (address => uint256[]) public verifiersApplicationIndices;
 
-  mapping (uint256 => uint256) public applicantDeposits;
+  mapping (uint256 => uint256) public applicationBalancesInWei;
+  mapping (uint256 => uint256) public applicantTokenDeposits;
+
   mapping (uint256 => address) public applicants;
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
@@ -48,6 +55,8 @@ contract CoordinationGame is Initializable, Ownable {
 
   mapping (address => uint256) wins;
   mapping (address => uint256) losses;
+
+  mapping (uint256 => address) public whistleblowers;
 
   event NewApplication(
     uint256 indexed applicationId,
@@ -90,7 +99,16 @@ contract CoordinationGame is Initializable, Ownable {
   );
 
   event SettingsUpdated(
-    uint256 applicationStakeAmount
+    uint256 applicationStakeAmount,
+    uint256 baseApplicationFeeUsdWei,
+    uint256 verifierTimeoutInSeconds,
+    uint256 applicantRevealTimeoutInSeconds
+  );
+
+  event Whistleblown(
+    address whistleblower,
+    uint256 applicationId,
+    uint256 randomNumber
   );
 
   modifier onlyApplicant(uint256 _applicationId) {
@@ -108,6 +126,21 @@ contract CoordinationGame is Initializable, Ownable {
     _;
   }
 
+  modifier applicationStarted(uint256 _applicationId) {
+    require(secretAndRandomHashes[_applicationId] != bytes32(0), 'secretAndRandomHash is defined');
+    _;
+  }
+
+  modifier secretNotRevealed(uint256 _applicationId) {
+    require(applicantSecrets[_applicationId] == bytes32(0), 'secret has not been revealed');
+    _;
+  }
+
+  modifier notWhistleblown(uint256 _applicationId) {
+    require(whistleblowers[_applicationId] == address(0), 'no whistleblower');
+    _;
+  }
+
   /**
   @notice Creates a new CoordinationGame
   @param _work the Work contract to select verifiers
@@ -115,21 +148,25 @@ contract CoordinationGame is Initializable, Ownable {
          to add applicants to
   @param _applicationStakeAmount how much an applicant has to stake when applying
   */
-  function init(
+  constructor (
+    EtherPriceFeed _etherPriceFeed,
     Work _work,
     TILRegistry _tilRegistry,
-    uint256 _applicationStakeAmount
+    uint256 _applicationStakeAmount,
+    uint256 _baseApplicationFeeUsdWei
   ) public initializer {
     require(_tilRegistry != address(0));
     require(_work != address(0));
     Ownable.initialize(msg.sender);
+    etherPriceFeed = _etherPriceFeed;
+>>>>>>> master
     work = _work;
     tilRegistry = _tilRegistry;
     applicationStakeAmount = _applicationStakeAmount;
+    baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
 
-    secondsInADay = 86400;
-    verifierTimeoutInDays = 4;
-    applicantRevealTimeoutInDays = 3;
+    verifierTimeoutInSeconds = 345600; // 4 * 86400
+    applicantRevealTimeoutInSeconds = 259200; // 3 * 86400
   }
 
   function setApplicationStakeAmount(uint256 _applicationStakeAmount)
@@ -149,28 +186,36 @@ contract CoordinationGame is Initializable, Ownable {
   @param _hint The hint for the verifier to determine the secret
   */
   function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
-    public
+    external
+    payable
   {
     // make this configurable if we want to lock down 1 application per Eth address
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
 
+    uint256 depositWei = weiPerApplication();
+    require(msg.value >= depositWei, 'not enough ether');
+
     applicationCount += 1;
     uint256 applicationId = applicationCount;
+
+    applicationBalancesInWei[applicationId] = msg.value;
+
     applicantsApplicationIndices[msg.sender].push(applicationId);
     applicants[applicationId] = msg.sender;
     secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
     randomHashes[applicationId] = _keccakOfRandom;
     hints[applicationId] = _hint;
+
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationId] = block.number + 1;
-    applicantDeposits[applicationId] = minDeposit();
+    applicantTokenDeposits[applicationId] = work.jobStake();
 
     createdAt[applicationId] = block.timestamp;
     updatedAt[applicationId] = block.timestamp;
 
     // Transfer a deposit of work tokens from the Applicant to this contract
     require(
-      tilRegistry.token().transferFrom(msg.sender, address(this), applicantDeposits[applicationId]),
+      tilRegistry.token().transferFrom(msg.sender, address(this), applicantTokenDeposits[applicationId]),
       '2nd token transfer succeeded'
     );
 
@@ -187,14 +232,12 @@ contract CoordinationGame is Initializable, Ownable {
     external
     onlyApplicant(_applicationId)
     randomBlockWasMined(_applicationId)
+    notWhistleblown(_applicationId)
   {
-    // change from minDeposit to jobStake
-    require(work.jobStake() == minDeposit(), 'job stake is the same size as the minDeposit');
     require(!verifierSubmittedSecret(_applicationId), "verifier has not submitted their secret");
 
     address previousVerifier = verifiers[_applicationId];
 
-    // TODO: How are we converting the blockhash to a random number?
     uint256 randomNum = uint256(blockhash(randomBlockNumbers[_applicationId]));
 
     address selectedVerifier = selectVerifier(msg.sender, randomNum);
@@ -206,7 +249,7 @@ contract CoordinationGame is Initializable, Ownable {
       );
 
       require(
-        work.token().transfer(applicants[_applicationId], applicantDeposits[_applicationId]),
+        work.token().transfer(applicants[_applicationId], applicantTokenDeposits[_applicationId]),
         'transferred old verifiers deposit to applicant'
       );
 
@@ -257,7 +300,7 @@ contract CoordinationGame is Initializable, Ownable {
   @param _applicationId The application that the verifier is submitting for
   @param _secret The secret that the verifier is guessing
   */
-  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) {
+  function verifierSubmitSecret(uint256 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
     require(applicationCount >= _applicationId, 'application has been initialized');
     require(verifierSecrets[_applicationId] == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
@@ -278,6 +321,36 @@ contract CoordinationGame is Initializable, Ownable {
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
+  function whistleblow(
+    uint256 _applicationId,
+    uint256 _randomNumber
+  )
+    public
+    applicationStarted(_applicationId)
+    secretNotRevealed(_applicationId)
+    notWhistleblown(_applicationId)
+  {
+    require(keccak256(abi.encodePacked(_randomNumber)) == randomHashes[_applicationId], 'random number matches');
+
+    // if a verifier was selected, refund
+    if (verifiers[_applicationId] != address(0)) {
+      returnVerifierJobStake(_applicationId);
+    }
+
+    /// Transfer applicant's deposit to the whistleblower
+    tilRegistry.token().transfer(
+      msg.sender,
+      applicantTokenDeposits[_applicationId]
+    );
+
+    whistleblowers[_applicationId] = msg.sender;
+
+    emit Whistleblown(msg.sender, _applicationId, _randomNumber);
+
+    /// Transfer applicant's deposit to the whistleblower
+    msg.sender.transfer(applicationBalancesInWei[_applicationId]);
+  }
+
   /**
   @notice Allows the applicant to reveal their secret
   @param _secret The applicant's secret
@@ -287,7 +360,7 @@ contract CoordinationGame is Initializable, Ownable {
     uint256 _applicationId,
     bytes32 _secret,
     uint256 _randomNumber
-  ) public onlyApplicant(_applicationId) {
+  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) {
     require(!applicantRevealExpired(_applicationId), 'applicant can still reveal their secret');
     require(verifierSecrets[_applicationId] != bytes32(0), 'verifier has submitted their secret');
 
@@ -297,8 +370,6 @@ contract CoordinationGame is Initializable, Ownable {
     require(rHash == randomHashes[_applicationId], 'random hash matches');
 
     applicantSecrets[_applicationId] = _secret;
-
-    applyToRegistry(_applicationId);
 
     updatedAt[_applicationId] = block.timestamp;
 
@@ -313,44 +384,60 @@ contract CoordinationGame is Initializable, Ownable {
   @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
   @param _applicationId The application that the verifier is challenging
   */
-  function verifierChallenge(uint256 _applicationId) public onlyVerifier(_applicationId) {
+  function verifierChallenge(uint256 _applicationId) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
     require(
       applicantRevealExpired(_applicationId),
       'applicant reveal period has expired'
     );
+    require(
+      verifierChallengedAt[_applicationId] == 0,
+      'verifier has not already challenged'
+    );
     verifierChallengedAt[_applicationId] = block.timestamp;
+    updatedAt[_applicationId] = block.timestamp;
 
     /// Transfer the verifier's deposit back to them
-    work.token().approve(address(work), applicantDeposits[_applicationId]);
-    work.depositJobStake(verifiers[_applicationId]);
+    returnVerifierJobStake(_applicationId);
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(
       applicants[_applicationId],
-      applicantDeposits[_applicationId]
+      applicantTokenDeposits[_applicationId]
     );
 
-    updatedAt[_applicationId] = block.timestamp;
-
     emit VerifierChallenged(_applicationId, msg.sender);
+
+    /// Transfer the applicant's application fee to the verifier
+    msg.sender.transfer(applicationBalancesInWei[_applicationId]);
   }
 
   function applicantWon(uint256 _applicationId) internal {
-    wins[msg.sender] += 1;
-    tilRegistry.updateStatus(bytes32(_applicationId));
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
+    tilRegistry.newListing(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
 
-    tilRegistry.token().approve(address(work), applicantDeposits[_applicationId]);
-    work.depositJobStake(verifiers[_applicationId]);
+    wins[msg.sender] += 1;
+
+    /// Return the verifier's job stake
+    returnVerifierJobStake(_applicationId);
 
     emit ApplicantWon(_applicationId);
   }
 
   function applicantLost(uint256 _applicationId) internal {
+    // NOTE: This will change when we deposit the verifier's stake into the registry
+    returnVerifierJobStake(_applicationId);
+
+    tilRegistry.token().approve(address(tilRegistry), applicantTokenDeposits[_applicationId]);
+    tilRegistry.newListingChallenge(applicants[_applicationId], getListingHash(_applicationId), applicantTokenDeposits[_applicationId]);
+
     losses[msg.sender] += 1;
 
-    autoChallenge(_applicationId);
-
     emit ApplicantLost(_applicationId);
+  }
+
+  function returnVerifierJobStake(uint256 _applicationId) internal {
+    tilRegistry.token().approve(address(work), work.jobStake());
+    work.depositJobStake(verifiers[_applicationId]);
   }
 
   /**
@@ -388,54 +475,63 @@ contract CoordinationGame is Initializable, Ownable {
   }
 
   function verifierSubmissionTimedOut(uint256 _applicationId) internal view returns (bool) {
-    return (block.timestamp - verifierSelectedAt[_applicationId])
-      > (verifierTimeoutInDays * secondsInADay);
+    return (block.timestamp - verifierSelectedAt[_applicationId]) > verifierTimeoutInSeconds;
   }
 
   function applicantRevealExpired(uint256 _applicationId) internal view returns (bool) {
-    return (block.timestamp - verifierSubmittedAt[_applicationId])
-      > (applicantRevealTimeoutInDays * secondsInADay);
-  }
-
-  function applyToRegistry(uint256 _applicationId) internal {
-    tilRegistry.token().approve(address(tilRegistry), applicantDeposits[_applicationId]);
-    tilRegistry.apply(applicants[_applicationId], bytes32(_applicationId), applicantDeposits[_applicationId], "");
-  }
-
-  function autoChallenge(uint256 _applicationId) internal {
-    require(
-      tilRegistry.token().balanceOf(address(this)) >= applicantDeposits[_applicationId],
-      'we have enough deposit'
-    );
-    tilRegistry.token().approve(address(tilRegistry), applicantDeposits[_applicationId]);
-    tilRegistry.challenge(bytes32(_applicationId), "");
+    return (block.timestamp - verifierSubmittedAt[_applicationId]) > applicantRevealTimeoutInSeconds;
   }
 
   function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
     return verifierSecrets[_applicationId] != 0;
   }
 
-  // the 3rd-party TCR Registry contract uses this var:
-  function minDeposit() public view returns (uint256) {
-    return tilRegistry.parameterizer().get("minDeposit");
-  }
-
-  function updateSettings(uint256 _applicationStakeAmount) public onlyOwner {
+  function updateSettings(
+    uint256 _applicationStakeAmount,
+    uint256 _baseApplicationFeeUsdWei,
+    uint256 _verifierTimeoutInSeconds,
+    uint256 _applicantRevealTimeoutInSeconds
+  ) public onlyOwner {
     setApplicationStakeAmount(_applicationStakeAmount);
+    setBaseApplicationFeeUsdWei(_baseApplicationFeeUsdWei);
 
-    emit SettingsUpdated(applicationStakeAmount);
+    setVerifierTimeoutInSeconds(_verifierTimeoutInSeconds);
+    setApplicantRevealTimeoutInSeconds(_applicantRevealTimeoutInSeconds);
+
+    emit SettingsUpdated(
+      applicationStakeAmount,
+      baseApplicationFeeUsdWei,
+      verifierTimeoutInSeconds,
+      applicantRevealTimeoutInSeconds
+    );
   }
 
-  function setSecondsInADay(uint256 _secondsInADay) public onlyOwner {
-    secondsInADay = _secondsInADay;
+  function setApplicantRevealTimeoutInSeconds(uint256 _applicantRevealTimeoutInSeconds) public onlyOwner {
+    require(_applicantRevealTimeoutInSeconds > 0);
+
+    applicantRevealTimeoutInSeconds = _applicantRevealTimeoutInSeconds;
   }
 
-  function setApplicantRevealTimeoutInDays(uint256 _applicantRevealTimeoutInDays) public onlyOwner {
-    applicantRevealTimeoutInDays = _applicantRevealTimeoutInDays;
+  function setVerifierTimeoutInSeconds(uint256 _verifierTimeoutInSeconds) public onlyOwner {
+    require(_verifierTimeoutInSeconds > 0);
+
+    verifierTimeoutInSeconds = _verifierTimeoutInSeconds;
   }
 
-  function setVerifierTimeoutInDays(uint256 _verifierTimeoutInDays) public onlyOwner {
-    verifierTimeoutInDays = _verifierTimeoutInDays;
+  function setBaseApplicationFeeUsdWei(uint256 _baseApplicationFeeUsdWei) public onlyOwner {
+    require(_baseApplicationFeeUsdWei > 0);
+
+    baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
   }
 
+  function weiPerApplication() public view returns (uint256) {
+    uint256 usdPerKwei = usdWeiPerEther().div(1000000000000000);
+    uint256 kweiPerApplication = baseApplicationFeeUsdWei.div(usdPerKwei);
+
+    return kweiPerApplication.mul(1000);
+  }
+
+  function usdWeiPerEther() public view returns (uint256) {
+    return uint256(etherPriceFeed.read());
+  }
 }

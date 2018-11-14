@@ -1,6 +1,6 @@
 // LIGHT THEME COLOURS
 $text-color--light: #333;
-$background-color--light: #eff4f7;
+$background-color--light: #f4f4f4;
 $accent-color-1--light: #51a5d1; // blue
 $accent-color-2--light: #f8aa2f; // orange
 $accent-color-3--light: #13e99b; // green
@@ -9,11 +9,11 @@ $brand-primary--light: $accent-color-2;
 $brand-link--light: $blue;
 $brand-info--light: $cyan;
 $brand-success--light: $brand-primary--light;
-$brand-warning--light: saturate($accent-color-3--light, 20%);
+$brand-warning--light: darken($accent-color-2--light, 10%);
 $brand-danger--light: $red;
 
 $gray--light: #afc3c4;
-$dark-gray--light: #dedede;
+$light-gray--light: #dedede;
 
 $nav-link-color--light: darken($accent-color-2--light, 40%);
 // END LIGHT THEME COLOURS
@@ -26,7 +26,7 @@ html.html-light,
 
 .html-light {
   abbr {
-    border-color: black;
+    border-color: darken($background-color, 3%);
   }
 
   ::placeholder {
@@ -34,7 +34,7 @@ html.html-light,
   }
 
   hr {
-    background-color: lighten($dark-gray--light, 20%);
+    background-color: lighten($light-gray--light, 20%);
   }
 
   button {
@@ -48,6 +48,10 @@ html.html-light,
 
   .has-text-grey-light {
     color: lighten($text-color--light, 20%) !important;
+  }
+
+  .has-text-grey-lighter {
+    color: lighten($text-color--light, 40%) !important;
   }
 
   .has-text-transparent-white,
@@ -186,7 +190,7 @@ html.html-light,
   }
 
   .list--container {
-    background: white;
+    background: lighten($light-gray--light, 15%);
     border-color: transparent;
   }
 
@@ -200,8 +204,12 @@ html.html-light,
     color: lighten($text-color--light, 40%);
   }
 
-  .list--item__date {
-    color: $brand-info--light;
+  .list--item:nth-child(even) {
+    background-color: darken(white, 2%);
+  }
+
+  .list--item:hover .list--item__date {
+    color: $brand-info;
   }
 
   .list--item__view {
@@ -209,7 +217,7 @@ html.html-light,
   }
 
   .list--item:hover {
-    background-color: lighten($background-color--light, 3%);
+    background-color: darken(white, 5%);
   }
 
   .list--item:hover .list--item__id,
@@ -220,7 +228,7 @@ html.html-light,
 
   .progress--step:before {
     background-color: white;
-    border: 1px solid white;
+    border-color: white;
   }
 
   .progress--step.is-active {
@@ -238,7 +246,7 @@ html.html-light,
   }
 
   .progress--step.is-complete:before {
-    background: $accent-color-1--light;
+    background: $accent-color-3--light;
     border-color: $background-color--light;
   }
 
@@ -247,7 +255,7 @@ html.html-light,
   }
 
   .progress--track {
-    background-color: lighten($dark-gray--light, 20%);
+    background-color: lighten($light-gray--light, 20%);
   }
 
   .has-text-primary {
@@ -282,10 +290,10 @@ html.html-light,
   .button.is-warning.is-outlined:hover,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten($accent-color-1--light, 30%);
+    box-shadow: 0 0 5px 0 lighten($accent-color-2--light, 30%);
     background-color: transparent;
-    border-color: $accent-color-1--light;
-    color: $accent-color-1--light;
+    border-color: $accent-color-2--light;
+    color: $accent-color-2--light;
   }
 
   .button.is-light.is-text {
@@ -298,12 +306,14 @@ html.html-light,
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .modal-content {
+  .modal-content--inner {
     background-color: lighten($background-color--light, 6%);
-    background: linear-gradient(217deg, rgba(220,250,255, 1), rgba(220,240,255, 0.8) 70%),
-                linear-gradient(127deg, rgba(220,240,240, 1), rgba(220,240,255, 0.8) 70%),
-                linear-gradient(336deg, rgba(220,250,255, 1), rgba(220,250,255, 0.8) 70%);
+    background: linear-gradient(217deg, rgba(240,255,255, 1), rgba(240,248,255, 0.8) 70%),
+                linear-gradient(127deg, rgba(240,245,245, 1), rgba(240,248,255, 0.8) 70%),
+                linear-gradient(336deg, rgba(240,255,255, 1), rgba(240,255,255, 0.8) 70%);
+  }
 
+  .modal-content {
     box-shadow: 0 0 100px 0 rgba(10, 10, 20, 0.6);
   }
 
@@ -337,7 +347,6 @@ html.html-light,
 
   .level--container {
     background-color: lighten($background-color--light, 2%);
-    border: 3px solid lighten($background-color--light, 1%);
   }
 
   .level--header {
@@ -377,7 +386,6 @@ html.html-light,
   .tabs.is-boxed li.is-active button {
     border-color: $accent-color-3--light;
     border-color: transparent;
-    border-bottom-color: rgb(219, 219, 219);
   }
 
   .delete.is-warning:hover,
@@ -417,17 +425,21 @@ html.html-light,
 
   @keyframes attention-grabby--light {
     0% {
-      color: $accent-color-1--light;
+      color: $accent-color-3--light;
     }
     40% {
-      color: $nav-link-color--light;
+      color: $accent-color-2--light;
     }
     70% {
-      color: $nav-link-color--light;
+      color: $accent-color-2--light;
     }
     100% {
-      color: $accent-color-1--light;
+      color: $accent-color-3--light;
     }
+  }
+
+  .navbar-burger:hover {
+    background-color: rgba(200, 240, 255, 0.5);
   }
 
   .navbar-dropdown {
@@ -450,12 +462,20 @@ html.html-light,
   }
 
   .navbar-item a.navbar-item {
-    color: $accent-color-1--light;
+    color: lighten(saturate($accent-color-1--light, 50%), 12%);
+  }
+
+  a.navbar-item:hover,
+  a.navbar-item.is-active,
+  .navbar-link:hover,
+  .navbar-link.is-active {
+    background-color: inherit;
+    color: darken(saturate($accent-color-1--light, 100%), 15%);
   }
 
   .navbar.is-fixed-top.navbar--row-one {
     &:before {
-      background: linear-gradient(183deg, lighten($background-color--light, 5%), $background-color--light 100%);
+      background: linear-gradient(183deg, darken($background-color--light, 5%), darken($background-color--light, 3%) 100%);
       opacity: 1;
     }
     &:after {
@@ -464,26 +484,23 @@ html.html-light,
   }
 
   .navbar.is-fixed-top.navbar--row-two {
-    border-color: darken($background-color--light, 2%);
+    // min
+    @media screen and (min-width: 1088px) {
+      border-color: darken($background-color--light, 2%);
 
-    &:before {
-      background: linear-gradient(177deg, lighten($background-color--light, 2%), lighten($background-color--light, 4%) 100%);
-      opacity: 1;
+      &:after {
+        background: linear-gradient(177deg, lighten($background-color--light, 2%), lighten($background-color--light, 4%) 100%);
+        opacity: 1;
+      }
     }
-    &:after {
-      opacity: 0;
+
+    // max
+    @media screen and (max-width: 1088px) {
+      top: 70px;
     }
   }
 
-  a.navbar-item:hover,
-  a.navbar-item.is-active,
-  .navbar-link:hover,
-  .navbar-link.is-active {
-    background-color: inherit;
-    color: lighten(saturate($accent-color-1--light, 50%), 15%);
-  }
-
-  .navbar-brand a {
+  .navbar-brand a.navbar-item {
     color: rgba(0, 0, 0, 0.9);
   }
 
@@ -526,15 +543,39 @@ html.html-light,
   }
 
   .__react_component_tooltip.type-dark {
-    background-color: black;
+    background-color: darken($background-color, 3%);
     color: #ccc;
   }
 
   .__react_component_tooltip.type-dark.place-top:after {
-    border-top-color: black;
+    border-top-color: darken($background-color, 3%);
   }
 
   .is-attention-grabby:not(.is-active) {
     animation: attention-grabby--light 4s infinite ease-in;
+  }
+
+  .loading--overlay {
+    background-color: $accent-color-1--light;
+    color: white;
+  }
+
+  .loading--overlay .is-info {
+    color: pink;
+    border-color: pink;
+    border-width: 2px;
+  }
+
+  .loading--overlay .is-info:hover {
+    background-color: pink;
+  }
+
+  .blank-state--inner .loader {
+    border-left: 2px solid #ddd;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .has-text-warning {
+    color: #ec9d0d !important;
   }
 }

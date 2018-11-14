@@ -1,4 +1,5 @@
 .navbar {
+  background-color: transparent;
   border: 0;
   flex-wrap: wrap;
   font-family: 'Comfortaa', sans-serif;
@@ -10,7 +11,6 @@
   transition: all 0.5s ease-in-out;
 
   @media screen and (min-width: 1088px) {
-    // max-height: $navbar-height;
     min-height: $navbar-height;
   }
 }
@@ -19,6 +19,16 @@
 .navbar-tabs,
 .navbar > .container {
   min-height: $navbar-height;
+}
+
+.navbar-burger {
+  color: rgba(200, 140, 255, 0.8);
+  transition: all 0.25s ease-in-out;
+}
+
+.navbar-burger:hover {
+  background: rgba(180, 100, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
 }
 
 .navbar-item.has-dropdown .navbar-link {
@@ -76,16 +86,38 @@
 }
 
 .navbar.is-fixed-top.navbar--row-two {
-  border-bottom: 4px solid black;
   top: $navbar-height;
   z-index: 8;
 
   &:before {
     opacity: 0;
   }
-  &:after {
-    background: linear-gradient(177deg, lighten($background-color, 6%), lighten($background-color, 2%) 100%);
-    opacity: 1;
+
+  // min
+  @media screen and (min-width: 1088px) {
+    border-bottom: 3px solid darken($background-color, 3%);
+
+    &:after {
+      background: linear-gradient(177deg, lighten($background-color, 6%), lighten($background-color, 2%) 100%);
+      opacity: 1;
+    }
+  }
+
+  // max
+  @media screen and (max-width: 1088px) {
+    top: 70px;
+  }
+}
+
+.navbar-menu.is-active {
+  @media screen and (max-width: 1088px) {
+    background-color: darken($background-color, 3%);
+  }
+}
+
+.navbar-menu .navbar-item {
+  @media screen and (max-width: 1088px) {
+    padding: 0.5rem 0.75rem;
   }
 }
 
@@ -123,8 +155,12 @@ a.navbar-item.is-active,
   color: white;
 }
 
-.navbar-brand a {
+.navbar-brand a.navbar-item {
   color: rgba(255, 255, 255, 0.9);
+
+  @media screen and (max-width: 1088px) {
+    padding-left: 1rem;
+  }
 }
 
 .navbar-brand a:hover,
@@ -193,7 +229,7 @@ a.navbar-item.is-active,
     color: white;
   }
   40% {
-    color: $nav-link-color;
+    color: darken($nav-link-color, 35%);
   }
   70% {
     color: $nav-link-color;

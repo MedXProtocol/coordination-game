@@ -10,10 +10,14 @@ import { txErrorToCode } from '~/services/txErrorToCode'
 
 const txNames = {
   'approve': 'TILW Approval',
+  'sendEther': 'Sending Ether',
+  'sendTILW': 'Sending TILW',
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
-  'applicantRevealSecret': 'Finalizing Aplpication',
+  'withdrawListing': 'Withdrawing Listing',
+  'applicantRevealSecret': 'Finalizing Application',
   'depositStake': 'Depositing TILW Stake',
+  'setBaseApplicationFeeUsdWei': 'Updating case fee',
   'updateSettings': 'Update Settings',
   'verifierSubmitSecret': 'Submitting Secret'
 }
@@ -34,10 +38,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps (dispatch) {
   return {
     dispatchSend: (transactionId, call, options, address) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
+      dispatch({ type: 'SG_SEND_TRANSACTION', transactionId, call, options, address })
     },
     dispatchRemove: (transactionId) => {
-      dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
+      dispatch({ type: 'SG_REMOVE_TRANSACTION', transactionId })
     }
   }
 }
@@ -73,7 +77,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       if (this.props.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
           <div className="blank-state">
-            <div className="blank-state--inner has-text-centered text-gray">
+            <div className="blank-state--inner has-text-centered has-text-grey">
               Currently no ongoing transactions.
             </div>
           </div>
@@ -81,9 +85,8 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key = tx[0]
-          const { call, options, error, confirmed, gasUsed, address } = tx[1]
+          const { call, txHash, options, error, confirmed, gasUsed, address } = tx[1]
           const name = call.method
-          const txHash = call.hash
 
           if (error) {
             if (gasUsed)
@@ -113,7 +116,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               var removeButton = (
                 <React.Fragment>
                   <button
-                    className="btn-link text-gray"
+                    className="btn-link has-text-grey"
                     onClick={(e) => {
                       e.preventDefault()
                       this.props.dispatchRemove(key)

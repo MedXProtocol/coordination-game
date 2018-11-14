@@ -9,7 +9,7 @@ $purple:       hsl(271, 100%, 71%) !default
 $red:          hsl(348, 100%, 61%) !default
 
 // DARK THEME COLOURS
-$background-color: #0e0b16;
+$background-color: #120e1f;
 $background-color--lighter: lighten(#0e0b16, 10%);
 $accent-color-1: #a239ca; // light purple
 $accent-color-2: #470776; // dark purple
@@ -31,4 +31,15 @@ $nav-link-color: #aaa;
 $screen-sm: 768px;
 $screen-lg: 1200px;
 
-$navbar-height: 50px;
+$navbar-height: 2rem;
+
+// Bulma overrides
+$card-color: #aaa;
+$card-background-color: transparent;
+$pagination-current-background-color: $accent-color-1;
+$pagination-current-border-color: $accent-color-2;
+$pagination-hover-color: #aaa;
+$pagination-hover-border-color: $accent-color-1;
+$pagination-focus-color: #aaa;
+$pagination-focus-border-color: $accent-color-2;
+$pagination-color: #aaa;

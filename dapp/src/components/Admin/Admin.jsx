@@ -5,6 +5,7 @@ import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import {
   cacheCall,
+  cacheCallValueInt,
   cacheCallValueBigNumber,
   contractByName,
   TransactionStateHandler,
@@ -26,6 +27,10 @@ function mapStateToProps(state) {
   const workAddress = contractByName(state, 'Work')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
+  const baseApplicationFeeUsdWei = cacheCallValueBigNumber(state, coordinationGameAddress, 'baseApplicationFeeUsdWei')
+
+  const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
 
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
@@ -33,11 +38,14 @@ function mapStateToProps(state) {
   return {
     address,
     applicationStakeAmount,
+    applicantRevealTimeoutInSeconds,
+    baseApplicationFeeUsdWei,
     coordinationGameAddress,
     networkId,
     jobStake,
     requiredStake,
     transactions,
+    verifierTimeoutInSeconds,
     workAddress
   }
 }
@@ -52,7 +60,10 @@ function* adminSaga({
   yield all([
     cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake'),
-    cacheCall(coordinationGameAddress, 'applicationStakeAmount')
+    cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
+    cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
   ])
 }
 
@@ -117,14 +128,13 @@ export const Admin = connect(mapStateToProps)(
 
           const { send, coordinationGameAddress } = this.props
 
-          const newApplicationStakeAmount = this.state.applicationStakeAmount
-            ? etherToWei(this.state.applicationStakeAmount)
-            : this.props.applicationStakeAmount
-
           const coordinationGameSettingsTxId = send(
             coordinationGameAddress,
             'updateSettings',
-            newApplicationStakeAmount
+            this.newOrCurrentBigNumber('applicationStakeAmount'),
+            this.newOrCurrentBigNumber('baseApplicationFeeUsdWei'),
+            parseFloat(this.newOrCurrentValue('verifierTimeoutInSeconds')) * 86400,
+            parseFloat(this.newOrCurrentValue('applicantRevealTimeoutInSeconds')) * 86400
           )()
 
           this.setState({
@@ -138,18 +148,11 @@ export const Admin = connect(mapStateToProps)(
 
           const { send, workAddress } = this.props
 
-          const newRequiredStake = this.state.requiredStake
-            ? etherToWei(this.state.requiredStake)
-            : this.props.requiredStake
-          const newJobStake = this.state.jobStake
-            ? etherToWei(this.state.jobStake)
-            : this.props.jobStake
-
           const workSettingsTxId = send(
             workAddress,
             'updateSettings',
-            newRequiredStake,
-            newJobStake
+            this.newOrCurrentBigNumber('requiredStake'),
+            this.newOrCurrentBigNumber('jobStake')
           )()
 
           this.setState({
@@ -162,6 +165,18 @@ export const Admin = connect(mapStateToProps)(
           this.setState({
             [e.target.name]: e.target.value
           })
+        }
+
+        newOrCurrentBigNumber = (stateVar) => {
+          return this.state[stateVar]
+            ? etherToWei(this.state[stateVar])
+            : this.props[stateVar]
+        }
+
+        newOrCurrentValue = (stateVar) => {
+          return this.state[stateVar]
+            ? this.state[stateVar]
+            : this.props[stateVar]
         }
 
         render() {
@@ -179,20 +194,77 @@ export const Admin = connect(mapStateToProps)(
               </h4>
 
               <form onSubmit={this.handleSubmitCoordinationGameSettings}>
-                <p className="is-size-7">
-                  <strong>TIL Application Stake Amount</strong>
-                  <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
-                </p>
-                <input
-                  type="text"
-                  name="applicationStakeAmount"
-                  className="text-input is-marginless"
-                  onChange={this.handleTextInputChange}
-                  value={this.state.applicationStakeAmount || ''}
-                />
-                <span className="help has-text-grey">
-                  Currently: {displayWeiToEther(this.props.applicationStakeAmount)}
-                </span>
+                <div className="columns">
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>TIL Application Stake Amount</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="applicationStakeAmount"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.applicationStakeAmount || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.applicationStakeAmount)}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>TIL Application Fee</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in USD)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="baseApplicationFeeUsdWei"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.baseApplicationFeeUsdWei || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.baseApplicationFeeUsdWei)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="columns">
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Verifier Timeout</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in days)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="verifierTimeoutInSeconds"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.verifierTimeoutInSeconds || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.verifierTimeoutInSeconds / 86400}
+                    </span>
+                  </div>
+
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Applicant Reveal Timeout</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in days)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="applicantRevealTimeoutInSeconds"
+                      className="text-input is-marginless"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.applicantRevealTimeoutInSeconds || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.applicantRevealTimeoutInSeconds / 86400}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="is-clearfix">
                   <button

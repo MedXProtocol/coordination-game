@@ -23,16 +23,16 @@ import { defined } from '~/utils/defined'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicantRevealTimeoutInDays,
+  let applicantRevealTimeoutInSeconds,
     applicationRowObject,
     hint,
-    secondsInADay,
-    verifierTimeoutInDays
+    verifierTimeoutInSeconds
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
 
   const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
   const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
@@ -51,6 +51,7 @@ function mapStateToProps(state, { applicationId }) {
     applicantsSecret,
     applicationId,
     createdAt,
+    verifierChallengedAt,
     hint,
     verifier,
     verifiersSecret,
@@ -58,9 +59,8 @@ function mapStateToProps(state, { applicationId }) {
   }
 
   if (!isBlank(verifier)) {
-    secondsInADay = cacheCallValueInt(state, coordinationGameAddress, 'secondsInADay')
-    verifierTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInDays')
-    applicantRevealTimeoutInDays = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInDays')
+    verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+    applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
   }
 
   applicationRowObject = retrieveApplicationDetailsFromLocalStorage(
@@ -70,8 +70,8 @@ function mapStateToProps(state, { applicationId }) {
     createdAt
   )
 
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + (secondsInADay * verifierTimeoutInDays)
-  applicationRowObject.applicantRevealExpiresAt      = updatedAt + (secondsInADay * applicantRevealTimeoutInDays)
+  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+  applicationRowObject.applicantRevealExpiresAt      = updatedAt + applicantRevealTimeoutInSeconds
 
   // If this applicationRowObject has an ongoing blockchain transaction this will update
   // const reversedTransactions = transactions.reverse().filter(transaction => {
@@ -109,25 +109,25 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
+    cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'secondsInADay'),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInDays'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInDays')
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
   ])
 }
 
 function mapDispatchToProps (dispatch) {
   return {
     dispatchSend: (transactionId, call, options, address) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
+      dispatch({ type: 'SG_SEND_TRANSACTION', transactionId, call, options, address })
     },
     dispatchRemove: (transactionId) => {
-      dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
+      dispatch({ type: 'SG_REMOVE_TRANSACTION', transactionId })
     }
   }
 }
@@ -212,7 +212,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
       //   } else {
       //     action = (
       //       <React.Fragment>
-      //         <span className="list--item__view__text">View Application&nbsp;</span>
+      //         <span className="list--item__view__view">View Application&nbsp;</span>
       //         <FontAwesomeIcon
       //           icon={faChevronCircleRight} />
       //       </React.Fragment>
@@ -240,6 +240,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           random,
           secret,
           updatedAt,
+          verifierChallengedAt,
           verifier,
           verifiersSecret,
           verifierSubmitSecretExpiresAt
@@ -259,24 +260,29 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           expirationMessage = (
             <React.Fragment>
               Application Complete
-              <br /><strong>{applicantWon ? `You Won!` : `You Lost`}</strong>
-              <br />{applicantWon ? `(Verifier's secret matched yours)` : `(Verifier's secret did not match yours)`}
+              <br />
+              <strong>
+                <abbr
+                  data-for='expiration-message-tooltip'
+                  data-tip={applicantWon ? `The Verifier's secret matched yours` : `The Verifier's secret did not match yours`}
+                >
+                  {applicantWon ? `You Won!` : `You Lost`}
+                </abbr>
+              </strong>
             </React.Fragment>
           )
         } else if (!isBlank(verifier) && !verifierSubmittedSecret) {
           expirationMessage = (
             <React.Fragment>
-              <span className="has-text-grey">Waiting on Verifier until:</span>
+              <span className="has-text-grey">Waiting on <abbr data-tip={verifier} data-for='expiration-message-tooltip'>Verifier</abbr> until:</span>
               <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
             </React.Fragment>
           )
         } else if (verifierSubmittedSecret && defined(random) && defined(secret)) {
           let secretAsHex
-          const padLeft = getWeb3().utils.padLeft
-          const toHex = getWeb3().utils.toHex
 
           if (secret) {
-            secretAsHex = padLeft(toHex(secret.toString()), 32)
+            secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
           }
 
           expirationMessage = (
@@ -289,6 +295,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                   method='applicantRevealSecret'
                   args={[applicationId, secretAsHex, random.toString()]}
                   buttonText='Reveal Secret'
+                  loadingText='Revealing'
+                  isSmall={true}
                   confirmationMessage='"Reveal Secret" transaction confirmed.'
                   txHashMessage='"Reveal Secret" transaction sent successfully -
                     it will take a few minutes to confirm on the Ethereum network.'/>
@@ -296,10 +304,26 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         }
 
-        if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Verifier Failed to Respond</span>
+        if (verifierChallengedAt !== 0) {
+          expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
         } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
-          expirationMessage = <span className="has-text-warning">Reveal Secret Expired</span>
+          expirationMessage = <span className="has-text-grey">You missed the reveal secret deadline</span>
+        } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
+          expirationMessage = (
+            <React.Fragment>
+              <span className="has-text-warning">Verifier Failed to Respond</span>
+              <Web3ActionButton
+                contractAddress={this.props.coordinationGameAddress}
+                method='applicantRandomlySelectVerifier'
+                args={[applicationId]}
+                isSmall={true}
+                buttonText='Request New Verifier'
+                loadingText='Requesting New Verifier'
+                confirmationMessage='New verifier request confirmed.'
+                txHashMessage='New verifier request sent successfully -
+                  it will take a few minutes to confirm on the Ethereum network.' />
+            </React.Fragment>
+          )
         }
 
         if (hint && secret && random) {
@@ -312,9 +336,12 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         } else {
           hintRandomAndSecret = (
-            <abbr data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
+            <abbr data-for='hint-random-secret-tooltip' data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
           )
         }
+
+        // necessary to show the verifier on 1st-time component load
+        ReactTooltip.rebuild()
 
         return (
           <div className={classnames(
@@ -327,22 +354,24 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__date">
-              <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                   ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                   Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
                 <ReactTooltip
+                  id='date-tooltip'
                   html={true}
                   effect='solid'
                   place={'top'}
                   wrapper='span'
                 />
                 {loadingOrCreatedAtTimestamp}
-              </span>
+              </abbr>
             </span>
 
             <span className="list--item__status">
               {hintRandomAndSecret}
               <ReactTooltip
+                id='hint-random-secret-tooltip'
                 html={true}
                 effect='solid'
                 place={'top'}
@@ -358,12 +387,21 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                       method='applicantRandomlySelectVerifier'
                       args={[applicationId]}
                       buttonText='Request Verification'
+                      loadingText='Requesting'
+                      isSmall={true}
                       confirmationMessage='Verification request confirmed.'
                       txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.'/>
+                        it will take a few minutes to confirm on the Ethereum network.' />
                   )
                 : expirationMessage
               }
+              <ReactTooltip
+                id='expiration-message-tooltip'
+                html={true}
+                effect='solid'
+                place={'top'}
+                wrapper='span'
+              />
             </span>
           </div>
         )

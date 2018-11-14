@@ -17,7 +17,7 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
@@ -58,6 +58,17 @@ function mapStateToProps(state, { match }) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
 function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
@@ -68,7 +79,7 @@ function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   ])
 }
 
-export const VerifyApplication = connect(mapStateToProps)(
+export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(verifyApplicationSaga)(
     withSend(
       withRouter(
@@ -95,6 +106,8 @@ export const VerifyApplication = connect(mapStateToProps)(
                 nextProps.transactions[this.state.verifierSubmitSecretTxId]
               )
                 .onError((error) => {
+                  this.props.dispatchHideLoadingStatus()
+
                   console.log(error)
                   this.setState({ verifierSubmitSecretHandler: null })
                   toastr.transactionError(error)
@@ -104,6 +117,9 @@ export const VerifyApplication = connect(mapStateToProps)(
                   toastr.success(`Verification secret transaction for application #${this.props.applicationId} has been confirmed.`)
                 })
                 .onTxHash(() => {
+                  this.props.dispatchHideLoadingStatus()
+
+                  this.setState({ loading: false })
                   toastr.success('Verification secret sent - it will take a few minutes to confirm on the Ethereum network.')
                   this.props.history.push(routes.VERIFY)
                 })
@@ -115,10 +131,7 @@ export const VerifyApplication = connect(mapStateToProps)(
 
             const { send, coordinationGameAddress, applicationId } = this.props
 
-            const padLeft = getWeb3().utils.padLeft
-            const toHex = getWeb3().utils.toHex
-
-            const secretAsHex = padLeft(toHex(this.state.secret), 32)
+            const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', this.state.secret.toString())
 
             const verifierSubmitSecretTxId = send(
               coordinationGameAddress,
@@ -131,6 +144,8 @@ export const VerifyApplication = connect(mapStateToProps)(
               verifierSubmitSecretHandler: new TransactionStateHandler(),
               verifierSubmitSecretTxId
             })
+
+            this.props.dispatchShowLoadingStatus()
           }
 
           handleCloseClick = (e) => {
@@ -201,16 +216,11 @@ export const VerifyApplication = connect(mapStateToProps)(
 
                   <br />
 
-                  <button
-                    type="submit"
-                    className="button is-outlined is-primary"
+                  <LoadingButton
+                    initialText='Submit Verification'
+                    loadingText='Submitting'
+                    isLoading={this.state.verifierSubmitSecretHandler}
                     disabled={this.state.secret === '' || this.state.verifierSubmitSecretHandler}
-                  >
-                    Submit Verification
-                  </button>
-
-                  <LoadingLines
-                    visible={this.state.verifierSubmitSecretHandler}
                   />
                 </form>
 

@@ -2,27 +2,29 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import ReduxToastr from 'react-redux-toastr'
 import { hot } from 'react-hot-loader'
-import { withRouter, Route, Switch } from 'react-router-dom'
+import { Link, Route, Switch, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { Admin } from '~/components/Admin/Admin'
-import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
-import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
-import { BodyClass } from '~/components/BodyClass'
-import { DebugLog } from '~/components/DebugLog'
-import { FourOhFour } from '~/components/FourOhFour'
-import { LoginToMetaMask } from '~/components/LoginToMetaMask'
-import { GetTILW } from '~/components/GetTILW'
-import { GetWallet } from '~/components/GetWallet'
-import { Header } from '~/components/Header'
-import { Home } from '~/components/Home'
 import {
   cacheCall,
   cacheCallValue,
   contractByName,
   withSaga
 } from 'saga-genesis'
-// import { Web3Route } from '~/components/Web3Route'
+import { Admin } from '~/components/Admin/Admin'
+import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
+import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
+import { BodyClass } from '~/components/BodyClass'
+import { DebugLog } from '~/components/DebugLog'
+import { FAQModal } from '~/components/FAQModal'
+import { FourOhFour } from '~/components/FourOhFour'
+import { GetTILW } from '~/components/GetTILW'
+import { GetWallet } from '~/components/GetWallet'
+import { Header } from '~/components/Header'
+import { Home } from '~/components/Home'
+import { Loading } from '~/components/Loading'
+import { LoginToMetaMask } from '~/components/LoginToMetaMask'
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
@@ -51,7 +53,15 @@ function* appSaga({ workTokenAddress }) {
   yield cacheCall(workTokenAddress, 'owner')
 }
 
-const App = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowFaqModal: () => {
+      dispatch({ type: 'SHOW_FAQ_MODAL' })
+    }
+  }
+}
+
+const App = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(appSaga)(
     class extends Component {
       constructor(props) {
@@ -96,9 +106,15 @@ const App = connect(mapStateToProps)(
         }
       }
 
-      toggleTheme = (e) => {
+      handleShowFaq = (e) => {
         e.preventDefault()
 
+        storeKeyValInLocalStorage('dontShowFaqModal', null)
+
+        this.props.dispatchShowFaqModal()
+      }
+
+      toggleTheme = (e) => {
         this.setState({
           isLight: !this.state.isLight
         }, () => {
@@ -107,16 +123,18 @@ const App = connect(mapStateToProps)(
       }
 
       render() {
-        let betaFaucetModal = null,
-          getTilw = null,
-          header = null
+        let betaFaucetModal,
+          faqModal,
+          getTilw,
+          header
 
-        betaFaucetModal = <BetaFaucetModal  />
-        getTilw = <GetTILW  />
+        betaFaucetModal = <BetaFaucetModal />
+        faqModal = <FAQModal />
+        getTilw = <GetTILW />
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}
-          isLight={this.state.isLight.toString()}
+          isLight={this.state.isLight}
         />
 
         if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
@@ -144,8 +162,11 @@ const App = connect(mapStateToProps)(
             <React.Fragment>
               {getTilw}
               {betaFaucetModal}
+              {faqModal}
               <GetWallet />
+              <NetworkCheckModal />
               <LoginToMetaMask />
+              <Loading />
               <ReduxToastr
                 timeOut={7000}
                 newestOnTop={true}
@@ -160,7 +181,7 @@ const App = connect(mapStateToProps)(
               <section className='section'>
                 <div className='container is-fluid'>
                   <div className='columns'>
-                    <div className='column is-8 is-offset-2'>
+                    <div className='column is-10-widescreen is-offset-1-widescreen'>
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
@@ -169,6 +190,7 @@ const App = connect(mapStateToProps)(
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
+                        <Route path={routes.LISTINGS} component={Home} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />
@@ -176,27 +198,50 @@ const App = connect(mapStateToProps)(
                       <br />
                     </div>
                   </div>
-                </div>
 
-                <br />
-                <br />
-                <br />
+                  <hr />
+                  <br />
 
-                <div className='columns'>
-                  <div className='column is-half-tablet is-offset-one-quarter'>
-                    <div className="has-text-centered">
-                      <h3>
-                        What is this?
-                      </h3>
-                      <p className="has-text-grey-light">
-                        Explain the Coordination Game, demo, what a Trustless Incentivized List is and link to a blog post with more info.
-                      </p>
-                    </div>
+                  <div className="level--container">
+                    <nav className="level level--body">
+                      <div className="level-item has-text-centered">
+                        <div>
+                          <p className="heading is-size-5 has-text-grey-lighter">
+                            What is this?
+                          </p>
+                          <p className="title">
+                            <button onClick={this.handleShowFaq}>Read the FAQ</button>
+                          </p>
+                        </div>
+                      </div>
+                    </nav>
+
+                    <nav className="level level--footer">
+                      <div className="level-item has-text-centered">
+                        <div>
+                          <p className="title">
+                            <Link to={routes.APPLY} className="is-size-7">
+                              Apply to be on the Registry
+                            </Link>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="level-item has-text-centered">
+                        <div>
+                          <p className="title">
+                            <Link to={routes.STAKE} className="is-size-7">
+                              Stake to become a Verifier
+                            </Link>
+                          </p>
+                        </div>
+                      </div>
+                    </nav>
                   </div>
                 </div>
               </section>
 
-              <section className='section'>
+              <section className='section section--footer'>
                 <footer className="footer has-text-centered">
                   <div className='columns'>
                     <div className='column is-half-tablet is-offset-one-quarter'>

@@ -1,122 +1,37 @@
 [
   {
-    "contractName": "DLL",
-    "address": "0xc095d68e3107390c84caaa9d9bcec7378fe6537a",
-    "transactionHash": "0xae6b3d138571df06a7ea849e76f3817c4bea879775672b81ff8c8eb05b2b9be1"
-  },
-  {
-    "contractName": "AttributeStore",
-    "address": "0x3af90a1fd2547a04651307ab635eee7ac0956619",
-    "transactionHash": "0xfe5b933b4f84ac56d0a01df22813b03b107034917ad1a9c3eacb7d4274360031"
-  },
-  {
-    "contractName": "PLCRFactory",
-    "address": "0x558dadcfba46ae846272b14db91c500e4dfe7108",
-    "transactionHash": "0x0f5c5d123fd818347356922c2467b18864f8ae481671c7051b8956a286d2ebae"
-  },
-  {
-    "contractName": "ParameterizerFactory",
-    "address": "0x122e839b6fd711c103ed78b1c0762bfc31d49421",
-    "transactionHash": "0x73d273c3ca41dc0739b52684b5fc7c504a152b51d4d504c7cc8a118b9dc705d3"
+    "contractName": "TILRoles",
+    "address": "0xd5d1953219427a91314d130dd66e3a873d55f32f",
+    "transactionHash": "0xb5559a82ea6ff60777f90963b0b989c580161d62e6cf51c0cb6dd70eedc137e0"
   },
   {
     "contractName": "WorkToken",
-    "address": "0xbc453532f53eab728e5b8993794fa9eb2219d3ae",
-    "transactionHash": "0xf3446aa4f9fcae9fd7a340ed046a3e51eaa4565d9cd5f91bcbddab076c364335"
+    "address": "0x2b5ff018de4650b1582761b71c93f646f772ad54",
+    "transactionHash": "0xfbdde3881faa4f04f32d0e868a80661582b8b9690457f7aa42c96ef89ce62719"
   },
   {
     "contractName": "Work",
-    "address": "0x6622e42b56a19180c4bb1d4f62e42b9d6f55f33a",
-    "transactionHash": "0x1df1776c601aeed6127d4981b4a73806f66a6c0b2ec684cdf0d2114ad2b0981d"
+    "address": "0x699afe50489638ed4521f5babd12b4be599877e2",
+    "transactionHash": "0x743418f688a71428c62c4e56d80662550f85f6cc2b8f4c7113123d9c875efd00"
   },
   {
-    "contractName": "Parameterizer",
-    "address": "0x723ba7f397eb303fae29baf648ca378a48ee8b2d",
-    "transactionHash": "0x7a9e912316635f200971dcd4e5dcf3d0f729b283687ab4aa9ce0dbe789fcc62b"
-  },
-  {
-    "contractName": "CoordinationGameFactory",
-    "address": "0x81977a4e1944aab7809de1a67441be0ae745c910",
-    "transactionHash": "0x702863ae5730f8c7772ccdc33cca7c2a5b79ef95529fa4ad96bf9d5200f53dd7"
-  },
-  {
-    "contractName": "TILRegistryFactory",
-    "address": "0x09548e74e2f26f8f4c4bd65b79f8ca39177aa67c",
-    "transactionHash": "0x687f2415c06c92a7d612e1d4a5585a4208020667e83da5c0ad68d5972502754c"
+    "contractName": "EtherPriceFeed",
+    "address": "0x5e2544787c03b416f6b78916bc45d84c16d9695e",
+    "transactionHash": "0x10f0bfb3aebf5a67be9bf55be9893030a3a3515e4f5e2ec94c8824910ac75547"
   },
   {
     "contractName": "TILRegistry",
-    "address": "0xd67a4a4709a3ba9e9ce4be2b9e759b2b06ec89e3",
-    "transactionHash": "0xddee7e1719b094554514a5a8daa5b51c6835e815fbaee78b13abca20eb0db7ef"
-  },
-  {
-    "contractName": "CoordinationGame",
-    "address": "0x55b038d10c24e870fef1a2f9cf8bc2a59ffee697",
-    "transactionHash": "0xddee7e1719b094554514a5a8daa5b51c6835e815fbaee78b13abca20eb0db7ef"
+    "address": "0xf016c1b2fc3ad3ec5d394059116373b97b3639f0",
+    "transactionHash": "0xb56ef758fa45128fcd6020dff2d7e93e94f8e320655ca87a5f7db018a3c4cb13"
   },
   {
     "contractName": "BetaFaucet",
-    "address": "0x31d2b8d45188e626cfb8aed35c7701c760b0152d",
-    "transactionHash": "0x314d02eb3e5b1bce89a25fb02d7b094e8422c1c56797d343328cf28e40939664"
-  },
-  {
-    "contractName": "AttributeStore",
-    "address": "0xaf37c7c038d604c4dec7439056ba74804ca2bc70",
-    "transactionHash": "0x6650c5dc9b489b2d9c6d6f668e6ddb57a2abe54e9741d5df9eea5c9a72a4674a"
-  },
-  {
-    "contractName": "DLL",
-    "address": "0xf59c16260fe4033a11f89485890bd9f0647f5251",
-    "transactionHash": "0xeeb3b55397cc48ec18333585348653de3406eb42b304f217ac47465ab011401c"
-  },
-  {
-    "contractName": "PLCRFactory",
-    "address": "0x33ad0d64cf04d73fcdfe0d85af0b5b5675ed86c8",
-    "transactionHash": "0x36e60c3db4a326e66bdec8d56bc90478cfbd6516a5972aa080258efc2b13dc53"
-  },
-  {
-    "contractName": "ParameterizerFactory",
-    "address": "0x5e53cd5d38caa55767d084397a32665f71e2cc79",
-    "transactionHash": "0xb83790a0a539409d525ba6df49b7058ccf278b5840b85bff79aee61ff4b084db"
-  },
-  {
-    "contractName": "WorkToken",
-    "address": "0xa5b6dabee39ffb505cc590f265d771598b7cea9e",
-    "transactionHash": "0x066644a78af6a80b8cd5bdc8ceff3dbffb52bd92c735129d6ec7c5a5c1065ada"
-  },
-  {
-    "contractName": "Work",
-    "address": "0xf4775efef57ec95475253e88b860af26237d0d29",
-    "transactionHash": "0x67834080f4867665742cf43730daa8ae8d50f076762c9bac17f30450a13cbfbc"
-  },
-  {
-    "contractName": "Parameterizer",
-    "address": "0xd8bc3120e747cb6e54875a5563f758d2fb9d2ba2",
-    "transactionHash": "0x1625b313fcd4d2b106837142e06dc221b03a12cdb23a9c573d078ee007a7cb1e"
-  },
-  {
-    "contractName": "CoordinationGameFactory",
-    "address": "0x044ff5de6f186c7fd52cc7a31c60ae730e7c5a4d",
-    "transactionHash": "0x9257cfab598fde7286dfc8d539a6ce0d4454da9807b70ee151995e1f0d20565f"
-  },
-  {
-    "contractName": "TILRegistryFactory",
-    "address": "0xad3d21bb7e86562105bbc44cd773909fdb036802",
-    "transactionHash": "0xb1c9dd08663b0cb6f81bc9613983747e446850ad2609174939bae3f14435f60f"
-  },
-  {
-    "contractName": "TILRegistry",
-    "address": "0x980200598238430d2980a03e425c14ff00d70457",
-    "transactionHash": "0xc905d7a63cb056bd175d97abc2cd19e55d048fb99c75b7e504abf471b81da484"
+    "address": "0x0c15625d4afbd07b4997f062c7d7ecd97136d2a8",
+    "transactionHash": "0x2e8fe30690991ed75953b23396913db7555d8d4dbba8879783057ac08bb61e31"
   },
   {
     "contractName": "CoordinationGame",
-    "address": "0x09ec9afacecb5f1b1bf365680f485c706d92d0bc",
-    "transactionHash": "0xc905d7a63cb056bd175d97abc2cd19e55d048fb99c75b7e504abf471b81da484"
-  },
-  {
-    "contractName": "BetaFaucet",
-    "address": "0xdc157bdaf5674faededfc102189c3350ac0153d1",
-    "transactionHash": "0xdc0985e3be412819be370631af7ce9a9ebd0dee5dc8d1977ea5f6808707b54c4"
+    "address": "0xef282b910791b4142225c4a602467830beb076f6",
+    "transactionHash": "0x7635398f3a169eafdd615fb2391cddcf12395055f7f4004269826f650c0b83a3"
   }
 ]
