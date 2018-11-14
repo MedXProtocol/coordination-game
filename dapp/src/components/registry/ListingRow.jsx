@@ -24,7 +24,7 @@ function mapStateToProps(state, { listingHash }) {
   const applicationId = web3.utils.hexToNumber(listingHash)
   const hint = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'hints', applicationId) || '0x')
   const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
-  const secret = web3.utils.hexToNumber(hexSecret || '0x')
+  const secret = web3.utils.hexToNumber(hexSecret || '0x0')
   return {
     TILRegistry,
     CoordinationGame,
