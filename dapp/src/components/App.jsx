@@ -16,7 +16,8 @@ import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { BodyClass } from '~/components/BodyClass'
 import { DebugLog } from '~/components/DebugLog'
-import { FAQModal } from '~/components/FAQModal'
+import { FAQ } from '~/components/FAQ'
+import { IntroModal } from '~/components/IntroModal'
 import { FourOhFour } from '~/components/FourOhFour'
 import { GetTILW } from '~/components/GetTILW'
 import { GetWallet } from '~/components/GetWallet'
@@ -55,8 +56,8 @@ function* appSaga({ workTokenAddress }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchShowFaqModal: () => {
-      dispatch({ type: 'SHOW_FAQ_MODAL' })
+    dispatchShowIntroModal: () => {
+      dispatch({ type: 'SHOW_INTRO_MODAL' })
     }
   }
 }
@@ -106,13 +107,13 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
         }
       }
 
-      handleShowFaq = (e) => {
-        e.preventDefault()
-
-        storeKeyValInLocalStorage('dontShowFaqModal', null)
-
-        this.props.dispatchShowFaqModal()
-      }
+      // handleShowIntro = (e) => {
+      //   e.preventDefault()
+      //
+      //   storeKeyValInLocalStorage('dontShowIntroModal', null)
+      //
+      //   this.props.dispatchShowIntroModal()
+      // }
 
       toggleTheme = (e) => {
         this.setState({
@@ -124,12 +125,12 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
 
       render() {
         let betaFaucetModal,
-          faqModal,
+          introModal,
           getTilw,
           header
 
         betaFaucetModal = <BetaFaucetModal />
-        faqModal = <FAQModal />
+        introModal = <IntroModal />
         getTilw = <GetTILW />
         header = <Header
           isOwner={this.props.isOwner}
@@ -162,7 +163,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
             <React.Fragment>
               {getTilw}
               {betaFaucetModal}
-              {faqModal}
+              {introModal}
               <GetWallet />
               <NetworkCheckModal />
               <LoginToMetaMask />
@@ -191,6 +192,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                         <Route path={routes.ADMIN} component={Admin} />
 
                         <Route path={routes.LISTINGS} component={Home} />
+                        <Route path={routes.FAQ} component={FAQ} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />
@@ -210,7 +212,9 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
                             What is this?
                           </p>
                           <p className="title">
-                            <button onClick={this.handleShowFaq}>Read the FAQ</button>
+                            <Link to={routes.FAQ} className="is-size-7">
+                              Read the FAQ
+                            </Link>
                           </p>
                         </div>
                       </div>
