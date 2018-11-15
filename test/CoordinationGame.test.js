@@ -34,11 +34,9 @@ contract('CoordinationGame', (accounts) => {
   const verifier = accounts[1]
   const verifier2 = accounts[2]
 
-  const tokenTicker = leftPadHexString(web3.toHex("BOGUS"), 32)
-  const tokenName   = leftPadHexString(web3.toHex("Bogus, The Currency"), 32)
-
   const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const random = new BN("4312341235")
+  const hint = web3.toHex("BOGUS")
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
@@ -123,8 +121,7 @@ contract('CoordinationGame', (accounts) => {
     await coordinationGame.start(
       secretRandomHash,
       randomHash,
-      tokenTicker,
-      tokenName,
+      hint,
       {
         from: applicant,
         value: weiPerApplication.toString()
@@ -181,17 +178,13 @@ contract('CoordinationGame', (accounts) => {
 
       await newApplicantStartsGame()
 
-      const storedTokenTicker = await coordinationGame.tokenTickers(applicationId)
-      const storedTokenName = await coordinationGame.tokenNames(applicationId)
-
       const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(applicationId)
       const storedRandomHash = await coordinationGame.randomHashes(applicationId)
-
-      assert.equal(storedTokenTicker, tokenTicker, 'tokenTicker matches')
-      assert.equal(storedTokenName, tokenName, 'tokenName matches')
+      const storedHint = await coordinationGame.hints(applicationId)
 
       assert.equal(storedRandomHash, randomHash, 'random hash matches')
       assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
+      assert.equal(storedHint, hint, 'hint matches')
 
       appCount = await coordinationGame.getApplicantsApplicationCount({
         from: applicant
@@ -216,8 +209,7 @@ contract('CoordinationGame', (accounts) => {
         await coordinationGame.start(
           secretRandomHash,
           randomHash,
-          tokenTicker,
-          tokenName,
+          hint,
           {
             from: applicant,
             value: 1234

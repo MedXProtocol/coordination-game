@@ -10,10 +10,11 @@ import {
   contractByName
 } from 'saga-genesis'
 import { connect } from 'react-redux'
-import { TILW } from '~/components/TILW'
 import { EthAddress } from '~/components/EthAddress'
-import { getWeb3 } from '~/utils/getWeb3'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { TILW } from '~/components/TILW'
+import { getWeb3 } from '~/utils/getWeb3'
+import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 
 function mapStateToProps(state, { listingHash }) {
   const web3 = getWeb3()
@@ -22,11 +23,13 @@ function mapStateToProps(state, { listingHash }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
   const applicationId = web3.utils.hexToNumber(listingHash)
-  const tokenTicker = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'tokenTickers', applicationId) || '0x')
-  const tokenName = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'tokenNames', applicationId) || '0x')
+  const hexHint = cacheCallValue(state, CoordinationGame, 'hints', applicationId)
   const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
   const secret = hexSecret
   // const secret = web3.utils.hexToNumber(hexSecret || '0x0')
+
+  // Parse and convert the generic hint field to our DApp-specific data
+  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
 
   return {
     TILRegistry,
@@ -44,8 +47,7 @@ function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash, applicati
   if (!TILRegistry || !CoordinationGame || !listingHash || !applicationId) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'tokenTickers', applicationId),
-    cacheCall(CoordinationGame, 'tokenNames', applicationId),
+    cacheCall(CoordinationGame, 'hints', applicationId),
     cacheCall(CoordinationGame, 'applicantSecrets', applicationId)
   ])
 }

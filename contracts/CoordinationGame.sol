@@ -37,8 +37,7 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => address) public applicants;
   mapping (uint256 => address) public verifiers;
 
-  mapping (uint256 => bytes32) public tokenTickers;
-  mapping (uint256 => bytes32) public tokenNames;
+  mapping (uint256 => bytes) public hints;
 
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
@@ -66,8 +65,7 @@ contract CoordinationGame is Ownable {
     address indexed applicant,
     bytes32 secretAndRandomHash,
     bytes32 randomHash,
-    bytes32 tokenTicker,
-    bytes32 tokenName
+    bytes hint
   );
 
   event VerifierSelected(
@@ -183,14 +181,12 @@ contract CoordinationGame is Ownable {
           the game for the applicant.
   @param _keccakOfSecretAndRandom The hash of the secret and salt
   @param _keccakOfRandom The hash of the salt
-  @param _tokenTicker The ticker symbol of the token for the verifier to determine the secret
-  @param _tokenName The name of the token for the verifier to determine the secret
+  @param _hint The hint the Applicant provided for the Verifier
   */
   function start(
     bytes32 _keccakOfSecretAndRandom,
     bytes32 _keccakOfRandom,
-    bytes32 _tokenTicker,
-    bytes32 _tokenName
+    bytes _hint
   )
     external
     payable
@@ -212,8 +208,7 @@ contract CoordinationGame is Ownable {
     secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
     randomHashes[applicationId] = _keccakOfRandom;
 
-    tokenTickers[applicationId] = _tokenTicker;
-    tokenNames[applicationId] = _tokenName;
+    hints[applicationId] = _hint;
 
     /// Make sure the next block is used for randomness
     randomBlockNumbers[applicationId] = block.number + 1;
@@ -233,8 +228,7 @@ contract CoordinationGame is Ownable {
       msg.sender,
       _keccakOfSecretAndRandom,
       _keccakOfRandom,
-      _tokenTicker,
-      _tokenName
+      _hint
     );
   }
 

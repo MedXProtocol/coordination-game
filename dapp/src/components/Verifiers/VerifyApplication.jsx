@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
-import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import { toastr } from '~/toastr'
@@ -21,13 +20,12 @@ import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
+import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { match }) {
   let createdAt,
-    updatedAt,
-    tokenTicker,
-    tokenName
+    updatedAt
   let applicationObject = {}
 
   const applicationId = parseInt(match.params.applicationId, 10)
@@ -35,18 +33,13 @@ function mapStateToProps(state, { match }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   if (applicationId) {
+    const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+
+    // Parse and convert the generic hint field to our DApp-specific data
+    const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+
     createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
     updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-
-    tokenTicker = cacheCallValue(state, coordinationGameAddress, 'tokenTickers', applicationId)
-    if (tokenTicker) {
-      tokenTicker = getWeb3().utils.hexToAscii(tokenTicker)
-    }
-
-    tokenName = cacheCallValue(state, coordinationGameAddress, 'tokenNames', applicationId)
-    if (tokenName) {
-      tokenName = getWeb3().utils.hexToAscii(tokenName)
-    }
 
     applicationObject = {
       applicationId,
@@ -80,8 +73,7 @@ function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'tokenTickers', applicationId),
-    cacheCall(coordinationGameAddress, 'tokenNames', applicationId),
+    cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
   ])
@@ -270,7 +262,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                 <br />
                 <br />
 
-                <h7 className="has-text-centered is-size-7 has-text-grey-lighter">
+                <p className="has-text-centered is-size-7 has-text-grey-lighter">
                   <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                       ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                       Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
@@ -282,7 +274,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                     />
                     <strong>Last Updated:</strong> {loadingOrUpdatedAtTimestamp}
                   </span>
-                </h7>
+                </p>
               </div>
             )
           }

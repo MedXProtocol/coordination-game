@@ -17,9 +17,10 @@ import {
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
+import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
-import { defined } from '~/utils/defined'
+import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { applicationId }) {
@@ -41,8 +42,10 @@ function mapStateToProps(state, { applicationId }) {
 
   const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
 
-  const tokenTicker = cacheCallValue(state, coordinationGameAddress, 'tokenTickers', applicationId)
-  const tokenName = cacheCallValue(state, coordinationGameAddress, 'tokenNames', applicationId)
+  const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+
+  // Parse and convert the generic hint field to our DApp-specific data
+  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
 
   applicationRowObject = {
     applicantsSecret,
@@ -54,14 +57,6 @@ function mapStateToProps(state, { applicationId }) {
     verifier,
     verifiersSecret,
     updatedAt
-  }
-
-  if (applicationRowObject.tokenTicker) {
-    applicationRowObject.tokenTicker = getWeb3().utils.hexToAscii(applicationRowObject.tokenTicker)
-  }
-
-  if (applicationRowObject.tokenName) {
-    applicationRowObject.tokenName = getWeb3().utils.hexToAscii(applicationRowObject.tokenName)
   }
 
   if (!isBlank(verifier)) {
@@ -117,8 +112,7 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
   yield all([
     cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
-    cacheCall(coordinationGameAddress, 'tokenTickers', applicationId),
-    cacheCall(coordinationGameAddress, 'tokenNames', applicationId),
+    cacheCall(coordinationGameAddress, 'hints', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),

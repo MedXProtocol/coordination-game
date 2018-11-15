@@ -352,16 +352,16 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             { type: 'uint256', value: random.toString() }
           )
 
-          const tokenTickerAsHex = web3.utils.utf8ToHex(this.state.tokenTicker)
-          const tokenNameAsHex = web3.utils.utf8ToHex(this.state.tokenName)
+          // const tokenTickerAsHex = web3.utils.utf8ToHex(this.state.tokenTicker)
+          // const tokenNameAsHex = web3.utils.utf8ToHex(this.state.tokenName)
+          const hexHint = web3.utils.utf8ToHex(`${this.state.tokenTicker}-${this.state.tokenName}`)
 
           const coordinationGameStartTxId = send(
             coordinationGameAddress,
             'start',
             secretRandomHash,
             randomHash,
-            tokenTickerAsHex,
-            tokenNameAsHex
+            hexHint
           )({
             value: this.props.weiPerApplication
           })
