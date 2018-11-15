@@ -38,9 +38,11 @@ function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const isOwner = address && cacheCallValue(state, workTokenAddress, 'isMinter', address)
+  const isMinter = cacheCallValue(state, workTokenAddress, 'isMinter', address)
+  const isOwner = address && isMinter
 
   return {
+    workTokenAddress,
     address,
     isOwner,
     networkId
