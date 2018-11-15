@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250" height="250" viewBox="0 0 250 250">
+  <defs>
+    <polygon id="tex-coin-2-b" points="125 9 193.183 31.154 235.323 89.154 235.323 160.846 193.183 218.846 125 241 56.817 218.846 14.677 160.846 14.677 89.154 56.817 31.154"/>
+    <filter id="tex-coin-2-a" width="98.6%" height="103.4%" x="1.6%" y="-2.6%" filterUnits="objectBoundingBox">
+      <feOffset dx="2" dy="-2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="1"/>
+      <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0"/>
+    </filter>
+    <path id="tex-coin-2-c" d="M103,99 L103,110.909887 L91.7664234,110.909887 L91.7664234,151 L78.2335766,151 L78.2335766,110.909887 L67,110.909887 L67,99 L103,99 Z M137,139.090113 L137,151 L107,151 L107,99 L137,99 L137,110.909887 L120.318966,110.909887 L120.318966,118.849812 L137,118.849812 L137,130.694618 L120.318966,130.694618 L120.318966,139.090113 L137,139.090113 Z M177,132.256571 L177,151 L163.786372,151 L163.786372,130.694618 L155.278085,130.694618 L155.278085,151 L142,151 L142,131.996245 C142,128.091364 144.707182,125.357947 147.349908,124.902378 L147.349908,124.772215 C144.836096,123.926158 142,121.12766 142,117.222778 L142,99 L155.278085,99 L155.278085,118.849812 L163.786372,118.849812 L163.786372,99 L177,99 L177,117.28786 C177,121.192741 174.421731,123.861076 171.650092,124.707134 L171.650092,124.902378 C174.421731,125.292866 177,128.35169 177,132.256571 Z"/>
+    <filter id="tex-coin-2-d" width="102.7%" height="105.8%" x="-1.4%" y="-2.9%" filterUnits="objectBoundingBox">
+      <feGaussianBlur in="SourceAlpha" result="shadowBlurInner1" stdDeviation="1"/>
+      <feOffset dy="1" in="shadowBlurInner1" result="shadowOffsetInner1"/>
+      <feComposite in="shadowOffsetInner1" in2="SourceAlpha" k2="-1" k3="1" operator="arithmetic" result="shadowInnerInner1"/>
+      <feColorMatrix in="shadowInnerInner1" values="0 0 0 0 0.741176471   0 0 0 0 0.062745098   0 0 0 0 0.878431373  0 0 0 0.5 0"/>
+    </filter>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <g transform="rotate(90 125 125)">
+      <use fill="#000" filter="url(#tex-coin-2-a)" xlink:href="#tex-coin-2-b"/>
+      <path fill="#FFF" stroke="#F4F4F4" stroke-linejoin="square" stroke-width="9" d="M125,13.73158 L59.5980637,34.9819573 L19.1774441,90.6161673 L19.1774441,159.383833 L59.5980637,215.018043 L125,236.26842 L190.401936,215.018043 L230.822556,159.383833 L230.822556,90.6161673 L190.401936,34.9819573 L125,13.73158 Z"/>
+    </g>
+    <polygon fill="#FBFBFB" points="18.5 125 231.5 125 211 187.5 158 226.5 92 226.5 38.5 187.5"/>
+    <use fill="#0066A6" xlink:href="#tex-coin-2-c"/>
+    <use fill="#000" filter="url(#tex-coin-2-d)" xlink:href="#tex-coin-2-c"/>
+  </g>
+</svg>

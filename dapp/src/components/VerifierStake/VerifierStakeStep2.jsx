@@ -72,12 +72,12 @@ export const VerifierStakeStep2 = connect(mapStateToProps, mapDispatchToProps)(
             })
             .onConfirmed(() => {
               this.setState({ workStakeHandler: null })
-              toastr.success('TILW Stake confirmed.')
+              toastr.success('TEX Stake confirmed.')
             })
             .onTxHash(() => {
               this.props.dispatchHideLoadingStatus()
 
-              toastr.success('TILW stake sent - it will take a few minutes to confirm on the Ethereum network.')
+              toastr.success('TEX stake sent - it will take a few minutes to confirm on the Ethereum network.')
             })
         }
       }
@@ -100,13 +100,13 @@ export const VerifierStakeStep2 = connect(mapStateToProps, mapDispatchToProps)(
           <React.Fragment>
             <h6 className="is-size-6">
               <span className="multistep-form--step-number">2.</span>
-              Stake TILW {stakeCheckmark}
+              Stake TEX {stakeCheckmark}
             </h6>
 
             <div className="columns">
               <div className="column is-8">
                 <p>
-                  You've successfully approved at least <strong>{displayWeiToEther(requiredStake)} TILW</strong>!
+                  You've successfully approved at least <strong>{displayWeiToEther(requiredStake)} TEX</strong>!
                   You can now stake that amount to become a Verifier.
                 </p>
               </div>

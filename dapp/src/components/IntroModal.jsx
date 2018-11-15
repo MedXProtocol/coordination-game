@@ -30,21 +30,21 @@ function mapStateToProps(state) {
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
 
   const betaFaucetAddress = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentEtherAddresses', address)
   const needsEth = (weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
-  const needsTILW = (weiToEther(tilwBalance) < 100)
+  const needsTEX = (weiToEther(texBalance) < 100)
 
   const betaFaucetVisible =
     !betaFaucetModalDismissed &&
     (
       defined(workTokenAddress) && defined(betaFaucetAddress) &&
-      defined(ethBalance) && defined(tilwBalance)
+      defined(ethBalance) && defined(texBalance)
     ) &&
-    (needsEth || needsTILW)
+    (needsEth || needsTEX)
   // END beta faucet specific
 
   return {
@@ -88,14 +88,6 @@ export const IntroModal =
         }
       }
 
-      handleCloseModal = () => {
-        this.setState({
-          modalState: false
-        })
-
-        this.props.dispatchHideIntroModal()
-      }
-
       componentDidMount() {
         this.determineModalState(this.props)
       }
@@ -110,6 +102,15 @@ export const IntroModal =
             modalState: true
           })
         }
+      }
+
+      handleCloseModal = () => {
+        this.setState({
+          modalState: false
+        })
+
+        storeKeyValInLocalStorage('dontShowIntroModal', 'true')
+        this.props.dispatchHideIntroModal()
       }
 
       handleDontShow = (e) => {
@@ -159,7 +160,7 @@ export const IntroModal =
               </div>
 
               <p>
-                Welcome to <strong>The Coordination Game</strong>! This is a demo of a trustless incentivized list (TIL for short).
+                Welcome to <strong>The Token Registry</strong>! This is a demo of a trustless incentivized list (TIL for short).
                 <br />
                 <br />
               </p>
@@ -174,7 +175,7 @@ export const IntroModal =
                   onClick={this.handleCloseModal}
                   className="button is-primary is-outlined"
                 >
-                  Ok, thanks! I'd like to play
+                  Ok, thanks! I'd like to try it out
                 </button>
               </p>
               <br />

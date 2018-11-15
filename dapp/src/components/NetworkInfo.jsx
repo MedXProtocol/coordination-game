@@ -20,14 +20,14 @@ function mapStateToProps(state, ownProps) {
   const workTokenAddress = contractByName(state, 'WorkToken')
 
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   return {
     address,
     ethBalance,
     networkId,
     networkName,
-    tilwBalance,
+    texBalance,
     workTokenAddress
   }
 }
@@ -40,7 +40,7 @@ function* networkInfoSaga ({ address, workTokenAddress }) {
 
 export const NetworkInfo = withSaga(networkInfoSaga)(
   connect(mapStateToProps)(
-    function({ address, ethBalance, networkName, tilwBalance }) {
+    function({ address, ethBalance, networkName, texBalance }) {
       return (
         <React.Fragment>
           <div className="navbar-item has-text-transparent-white">
@@ -52,7 +52,7 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
           </div>
           <div className="navbar-item">
             <span className="navbar-item has-text-transparent-white">
-              <Odometer value={displayWeiToEther(tilwBalance)} />&nbsp;TILW
+              <Odometer value={displayWeiToEther(texBalance)} />&nbsp;TEX
             </span>
           </div>
           <div className="navbar-item">

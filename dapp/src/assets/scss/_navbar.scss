@@ -35,6 +35,10 @@
   padding-top: 0.25rem;
 }
 
+.navbar-item path {
+  fill: white;
+}
+
 .navbar-item.has-dropdown:hover .navbar-dropdown {
   transition: all 0.5s ease-in-out;
 
@@ -105,8 +109,6 @@
 
   // max
   @media screen and (max-width: 1088px) {
-    top: 44px;
-
     a.navbar-item:hover,
     a.navbar-item.is-active,
     .navbar-link:hover,
@@ -114,8 +116,6 @@
       transform: none;
     }
   }
-
-
 }
 
 .navbar-menu.is-active {

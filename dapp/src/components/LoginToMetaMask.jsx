@@ -142,7 +142,7 @@ export const LoginToMetaMask =
                   <div className="text-center">
                     <br />
                     <button className="button is-light is-primary is-outlined" onClick={this.enableEthereum}>
-                      Authorize The Coordination Game
+                      Authorize The Token Registry DApp
                     </button>
                     <br />
                     <br />
@@ -150,7 +150,7 @@ export const LoginToMetaMask =
                     {this.state.error ?
                       (
                         <p>
-                          Please authorize read-only access to your MetaMask accounts use the Coordination Game.
+                          Please authorize read-only access to your MetaMask accounts use The Token Registry.
                           <br />
                           <span className="has-text-grey-lighter">You will still need to manually sign transactions yourself.</span>
                           {/*There was an error: {this.state.error}*/}

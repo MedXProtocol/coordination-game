@@ -12,14 +12,14 @@ import {
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
-import TILWLogoImg from '~/assets/img/tilw-logo-white.svg'
+import TEXLogoImg from '~/assets/img/tex-logo-white.svg'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const transactions = get(state, 'sagaGenesis.transactions')
   const workAddress = contractByName(state, 'Work')
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const allowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, workAddress)
   const staked = cacheCallValueBigNumber(state, workAddress, 'balances', address)
@@ -34,7 +34,7 @@ function mapStateToProps(state) {
     requiredStake,
     staked,
     transactions,
-    tilwBalance,
+    texBalance,
     workAddress,
     workTokenAddress
   }
@@ -66,7 +66,7 @@ export const Wallet = connect(mapStateToProps)(
               <nav className="level level--header">
                 <p className="level-item has-text-centered">
                   <span className="title">
-                    <TILWLogoImg width="100" height="50" />
+                    <TEXLogoImg width="100" height="50" />
                   </span>
                 </p>
               </nav>
@@ -77,7 +77,7 @@ export const Wallet = connect(mapStateToProps)(
                       Balance
                     </span>
                     <span className="title">
-                      <Odometer value={displayWeiToEther(this.props.tilwBalance)} />
+                      <Odometer value={displayWeiToEther(this.props.texBalance)} />
                     </span>
                   </div>
                 </div>

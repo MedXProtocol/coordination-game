@@ -6,9 +6,9 @@ import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "zos-lib/contracts/Initializable.sol";
 
 contract BetaFaucet is Initializable, Ownable {
-  // Keep track of which Ethereum addresses we've sent Ether and our TILW ERC20 token to
+  // Keep track of which Ethereum addresses we've sent Ether and our TEX ERC20 token to
   mapping (address => bool) public sentEtherAddresses;
-  mapping (address => bool) public sentTILWAddresses;
+  mapping (address => bool) public sentTEXAddresses;
 
   // Amount of gas we want to account for when doing require() checks
   uint256 public constant gasAmount = 1000000;
@@ -53,14 +53,14 @@ contract BetaFaucet is Initializable, Ownable {
     _recipient.transfer(_amount);
   }
 
-  function sendTILW(address _recipient, uint256 _amount) public onlyOwner {
+  function sendTEX(address _recipient, uint256 _amount) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
-    require(!sentTILWAddresses[_recipient], "recipient has already received TILW");
+    require(!sentTEXAddresses[_recipient], "recipient has already received TEX");
     require(_amount > 0, "amount must be positive");
     require(_amount <= 1500 ether, "amount must be below the upper limit");
-    require(workToken.balanceOf(address(this)) >= _amount, "contract is out of TILW!");
+    require(workToken.balanceOf(address(this)) >= _amount, "contract is out of TEX!");
 
-    sentTILWAddresses[_recipient] = true;
+    sentTEXAddresses[_recipient] = true;
     emit WorkTokenSent(_recipient, _amount);
 
     workToken.transfer(_recipient, _amount);

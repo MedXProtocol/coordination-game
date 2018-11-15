@@ -31,6 +31,7 @@ import { verifierApplicationService } from '~/services/verifierApplicationServic
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
 import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
 import { isBlank } from '~/utils/isBlank'
+import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
@@ -135,9 +136,9 @@ export const Header = ReactTimeout(
                     <div className="navbar-brand">
                       <div className="navbar-item">
                         <Link to={routes.HOME} className="navbar-item">
-                          The Coordination Game
+                          <TokenRegistryLogo width="220" height="39" style={{ 'marginTop': -1 }} />
                           <span className='is-hidden-touch'>
-                            &nbsp; <span className="has-text-transparent-white">Trustless Incentivized List Demo</span>
+                            &nbsp; <span className="has-text-transparent-white">The decentralized ERC-20 tokens registry</span>
                           </span>
                         </Link>
                       </div>

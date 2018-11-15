@@ -20,7 +20,7 @@ import {
 } from 'saga-genesis'
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
 import { EtherFlip } from '~/components/EtherFlip'
-import { GetTILWLink } from '~/components/GetTILWLink'
+import { GetTEXLink } from '~/components/GetTEXLink'
 import { LoadingButton } from '~/components/LoadingButton'
 import { Modal } from '~/components/Modal'
 import { PageTitle } from '~/components/PageTitle'
@@ -45,7 +45,7 @@ function mapStateToProps(state) {
   const workTokenAddress = contractByName(state, 'WorkToken')
 
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const approveTx = transactionFinders.findByMethodName(state, 'approve')
 
@@ -69,7 +69,7 @@ function mapStateToProps(state) {
     coordinationGameAddress,
     coordinationGameAllowance,
     networkId,
-    tilwBalance,
+    texBalance,
     transactions,
     verifier,
     weiPerApplication,
@@ -224,12 +224,12 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
               })
               .onConfirmed(() => {
                 this.setState({ workTokenApproveHandler: null })
-                toastr.success('Approval for contract to spend TILW tokens confirmed.')
+                toastr.success('Approval for contract to spend TEX tokens confirmed.')
               })
               .onTxHash(() => {
                 this.props.dispatchHideLoadingStatus()
 
-                toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
+                toastr.success('Approval for contract to spend TEX tokens sent - it will take a few minutes to confirm on the Ethereum network.')
               })
           }
         }
@@ -447,7 +447,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
               <h6 className="is-size-6">
                 <span className="multistep-form--step-number">1.</span>
-                Approve TILW
+                Approve TEX
                 {
                   this.step1Completed()
                   ? (
@@ -466,12 +466,12 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                 ) : (
                   <React.Fragment>
                     {
-                      weiToEther(this.props.tilwBalance) < 1 ? (
+                      weiToEther(this.props.texBalance) < 1 ? (
                         <p>
                           You will need TEX to register a token
                           <br />
                           <br />
-                          <GetTILWLink />
+                          <GetTEXLink />
                           <br />
                           <br />
                         </p>

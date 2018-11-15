@@ -19,7 +19,7 @@ import { DebugLog } from '~/components/DebugLog'
 import { FAQ } from '~/components/FAQ'
 import { IntroModal } from '~/components/IntroModal'
 import { FourOhFour } from '~/components/FourOhFour'
-import { GetTILW } from '~/components/GetTILW'
+import { GetTEX } from '~/components/GetTEX'
 import { GetWallet } from '~/components/GetWallet'
 import { Header } from '~/components/Header'
 import { Home } from '~/components/Home'
@@ -111,12 +111,12 @@ const App = connect(mapStateToProps)(
       render() {
         let betaFaucetModal,
           introModal,
-          getTilw,
+          getTEX,
           header
 
         betaFaucetModal = <BetaFaucetModal />
         introModal = <IntroModal />
-        getTilw = <GetTILW />
+        getTEX = <GetTEX />
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}
@@ -146,7 +146,7 @@ const App = connect(mapStateToProps)(
         return (
           <BodyClass isLight={this.state.isLight}>
             <React.Fragment>
-              {getTilw}
+              {getTEX}
               {betaFaucetModal}
               {introModal}
               <GetWallet />
@@ -167,7 +167,7 @@ const App = connect(mapStateToProps)(
               <section className='section'>
                 <div className='container is-fluid'>
                   <div className='columns'>
-                    <div className='column is-10-widescreen is-offset-1-widescreen'>
+                    <div className='column  is-12-tablet  is-10-widescreen is-offset-1-widescreen'>
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />

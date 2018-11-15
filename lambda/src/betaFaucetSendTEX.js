@@ -25,12 +25,12 @@ exports.handler = function (event, context, callback) {
       }
     }
 
-    console.log('Sending TILW to ', ethAddress)
+    console.log('Sending TEX to ', ethAddress)
 
     if (!Eth.isAddress(ethAddress)) {
       callback(`ethAddress is not a valid address: ${ethAddress}`)
     } else {
-      faucetClient.sendTILW(ethAddress)
+      faucetClient.sendTEX(ethAddress)
         .then((transactionHash) => {
           console.log('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {
