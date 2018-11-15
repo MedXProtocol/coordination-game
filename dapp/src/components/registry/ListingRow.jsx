@@ -22,15 +22,19 @@ function mapStateToProps(state, { listingHash }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
   const applicationId = web3.utils.hexToNumber(listingHash)
-  const hint = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'hints', applicationId) || '0x')
+  const tokenTicker = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'tokenTickers', applicationId) || '0x')
+  const tokenName = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'tokenNames', applicationId) || '0x')
   const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
-  const secret = web3.utils.hexToNumber(hexSecret || '0x0')
+  const secret = hexSecret
+  // const secret = web3.utils.hexToNumber(hexSecret || '0x0')
+
   return {
     TILRegistry,
     CoordinationGame,
     listing,
     applicationId,
-    hint,
+    tokenTicker,
+    tokenName,
     address,
     secret
   }
@@ -40,7 +44,8 @@ function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash, applicati
   if (!TILRegistry || !CoordinationGame || !listingHash || !applicationId) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'hints', applicationId),
+    cacheCall(CoordinationGame, 'tokenTickers', applicationId),
+    cacheCall(CoordinationGame, 'tokenNames', applicationId),
     cacheCall(CoordinationGame, 'applicantSecrets', applicationId)
   ])
 }
@@ -85,8 +90,11 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className='list--item__status'>
-              <strong>Hint:</strong> {this.props.hint}
-              <br /><strong>Secret:</strong> {this.props.secret}
+              <strong>Token Ticker:</strong> {this.props.tokenTicker}
+              <br />
+              <strong>Token Name:</strong> {this.props.tokenName}
+              <br />
+              <strong>Contract Address:</strong> {this.props.secret}
             </span>
 
             <span className="list--item__view">

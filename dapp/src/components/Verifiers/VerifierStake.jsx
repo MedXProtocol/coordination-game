@@ -13,9 +13,7 @@ import {
   withSend
 } from 'saga-genesis'
 import { GetTILWLink } from '~/components/GetTILWLink'
-import { PageTitle } from '~/components/PageTitle'
 import { Progress } from '~/components/Progress'
-import { ScrollToTop } from '~/components/ScrollToTop'
 import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep1'
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
@@ -147,7 +145,7 @@ export const VerifierStake = connect(mapStateToProps)(
                       <p>
                         Stake TEX to begin receiving submissions (minimum 1000 TEX)
                       </p>
-                      
+
                       <Progress
                         disabled={needsTILWMessage}
                         labels={['Send Approval', 'Deposit Stake', 'Done!']}

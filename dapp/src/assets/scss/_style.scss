@@ -192,6 +192,25 @@ header {
   padding: 16px 16px 16px 60px;
 }
 
+.field {
+  flex-wrap: wrap;
+}
+
+.field > .control-with-addons {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 100%;
+}
+
+.field > .help {
+  flex-basis: 100%;
+}
+
+.field,
+.field:not(:last-child) {
+  margin-bottom: 2rem;
+}
+
 .field:hover .button.is-static,
 .field:hover .text-input {
   border-color: white;
@@ -244,10 +263,6 @@ header {
   padding: 0.5rem 1rem;
 
   transition: all 0.1s ease-in-out;
-}
-
-.field:not(:last-child) {
-  margin-bottom: 0;
 }
 
 .text-input--large {
@@ -917,4 +932,8 @@ header {
 
 .faq-h6 {
   margin-top: 1.5rem;
+}
+
+.form--submit-token {
+  min-height: 620px;
 }

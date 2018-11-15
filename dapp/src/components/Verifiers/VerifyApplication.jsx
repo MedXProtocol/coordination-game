@@ -26,7 +26,8 @@ import * as routes from '~/../config/routes'
 function mapStateToProps(state, { match }) {
   let createdAt,
     updatedAt,
-    hint
+    tokenTicker,
+    tokenName
   let applicationObject = {}
 
   const applicationId = parseInt(match.params.applicationId, 10)
@@ -37,16 +38,22 @@ function mapStateToProps(state, { match }) {
     createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
     updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
 
-    hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-    if (hint) {
-      hint = getWeb3().utils.hexToAscii(hint)
+    tokenTicker = cacheCallValue(state, coordinationGameAddress, 'tokenTickers', applicationId)
+    if (tokenTicker) {
+      tokenTicker = getWeb3().utils.hexToAscii(tokenTicker)
+    }
+
+    tokenName = cacheCallValue(state, coordinationGameAddress, 'tokenNames', applicationId)
+    if (tokenName) {
+      tokenName = getWeb3().utils.hexToAscii(tokenName)
     }
 
     applicationObject = {
       applicationId,
       createdAt,
       updatedAt,
-      hint
+      tokenTicker,
+      tokenName
     }
   }
 
@@ -73,7 +80,8 @@ function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'hints', applicationId),
+    cacheCall(coordinationGameAddress, 'tokenTickers', applicationId),
+    cacheCall(coordinationGameAddress, 'tokenNames', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
   ])
@@ -160,6 +168,10 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
             })
           }
 
+          secretValid = () => {
+            return this.state.secret.length === 42 && this.state.secret.match(/^(0x)?[0-9a-fA-F]{40}$/)
+          }
+
           render () {
             const { applicationObject } = this.props
 
@@ -167,10 +179,11 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
               applicationId,
               createdAt,
               updatedAt,
-              hint
+              tokenTicker,
+              tokenName
             } = applicationObject
 
-            const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
+            const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={`@`} />
 
             const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
             const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
@@ -178,8 +191,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
             const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
             return (
-              <div className={classnames(
-              )}>
+              <div className='column is-8-widescreen is-offset-2-widescreen'>
                 <ScrollToTop />
 
                 <div className="has-text-right">
@@ -191,43 +203,74 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                   </button>
                 </div>
 
-                <h5 className="is-size-5 has-text-grey">
-                  Application #{applicationId}
+                <h5 className="is-size-5 has-text-grey-dark">
+                  Token Submission #{applicationId}
                 </h5>
 
-                <h3 className="is-size-3 has-text-grey-light">
-                  Hint: {hint}
-                </h3>
+                <br />
+
+                <div className="columns">
+                  <div className="column is-6">
+                    <h3 className="is-size-3 has-text-grey">
+                      Token Name:
+                      <br />
+                      <span className="has-text-grey-light">{tokenName}</span>
+                    </h3>
+                  </div>
+
+                  <div className="column is-6">
+                    <h3 className="is-size-3 has-text-grey">
+                      Token Ticker:
+                      <br />
+                      <span className="has-text-grey-light">${tokenTicker}</span>
+                    </h3>
+                  </div>
+                </div>
 
                 <br />
 
                 <form onSubmit={this.handleVerifierSecretSubmit}>
                   <h6 className="is-size-6">
-                    Provide your secret as verification:
+                    Enter this token's contract address to verify:
                   </h6>
-                  <input
-                    type="text"
-                    name="secret"
-                    className="text-input text-input--large"
-                    placeholder=""
-                    onChange={this.handleTextInputChange}
-                    value={this.state.secret}
-                  />
 
-                  <br />
+                  <div className="field">
+                    <div className="control">
+                      <input
+                        type="text"
+                        name="secret"
+                        className="text-input text-input--large text-input--extended-extra is-marginless"
+                        placeholder="0x..."
+                        maxLength="42"
+                        pattern="^(0x)?[0-9a-fA-F]{40}$"
+                        onChange={this.handleTextInputChange}
+                        value={this.state.secret}
+                      />
+                    </div>
+                    {(this.state.secret.length === 42 && !this.secretValid()) ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
+                  </div>
 
-                  <LoadingButton
-                    initialText='Submit Verification'
-                    loadingText='Submitting'
-                    isLoading={this.state.verifierSubmitSecretHandler}
-                    disabled={this.state.secret === '' || this.state.verifierSubmitSecretHandler}
-                  />
+                  {
+                    this.secretValid()
+                      ? (
+                        <LoadingButton
+                          initialText='Submit Verification'
+                          loadingText='Submitting'
+                          isLoading={this.state.verifierSubmitSecretHandler}
+                          disabled={this.state.verifierSubmitSecretHandler}
+                        />
+                      )
+                      : (
+                        null
+                      )
+                  }
                 </form>
 
+
                 <br />
                 <br />
 
-                <h6 className="has-text-centered is-size-6 has-text-grey">
+                <h7 className="has-text-centered is-size-7 has-text-grey-lighter">
                   <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
                       ${ReactDOMServer.renderToStaticMarkup(<br/>)}
                       Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
@@ -237,9 +280,9 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                       place={'top'}
                       wrapper='span'
                     />
-                    {loadingOrUpdatedAtTimestamp}
+                    <strong>Last Updated:</strong> {loadingOrUpdatedAtTimestamp}
                   </span>
-                </h6>
+                </h7>
               </div>
             )
           }

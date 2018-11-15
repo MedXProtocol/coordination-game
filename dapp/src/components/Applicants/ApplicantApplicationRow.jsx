@@ -25,7 +25,6 @@ import { get } from 'lodash'
 function mapStateToProps(state, { applicationId }) {
   let applicantRevealTimeoutInSeconds,
     applicationRowObject,
-    hint,
     verifierTimeoutInSeconds
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -42,20 +41,27 @@ function mapStateToProps(state, { applicationId }) {
 
   const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
 
-  hint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-  if (hint) {
-    hint = getWeb3().utils.hexToAscii(hint)
-  }
+  const tokenTicker = cacheCallValue(state, coordinationGameAddress, 'tokenTickers', applicationId)
+  const tokenName = cacheCallValue(state, coordinationGameAddress, 'tokenNames', applicationId)
 
   applicationRowObject = {
     applicantsSecret,
     applicationId,
     createdAt,
     verifierChallengedAt,
-    hint,
+    tokenTicker,
+    tokenName,
     verifier,
     verifiersSecret,
     updatedAt
+  }
+
+  if (applicationRowObject.tokenTicker) {
+    applicationRowObject.tokenTicker = getWeb3().utils.hexToAscii(applicationRowObject.tokenTicker)
+  }
+
+  if (applicationRowObject.tokenName) {
+    applicationRowObject.tokenName = getWeb3().utils.hexToAscii(applicationRowObject.tokenName)
   }
 
   if (!isBlank(verifier)) {
@@ -111,7 +117,8 @@ function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }
   yield all([
     cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifiers', applicationId),
-    cacheCall(coordinationGameAddress, 'hints', applicationId),
+    cacheCall(coordinationGameAddress, 'tokenTickers', applicationId),
+    cacheCall(coordinationGameAddress, 'tokenNames', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
     cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
     cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
@@ -236,7 +243,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           applicantsSecret,
           applicationId,
           createdAt,
-          hint,
+          tokenTicker,
+          tokenName,
           random,
           secret,
           updatedAt,
@@ -259,14 +267,14 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         if (applicantRevealedSecret) {
           expirationMessage = (
             <React.Fragment>
-              Application Complete
+              Submission Complete
               <br />
               <strong>
                 <abbr
                   data-for='expiration-message-tooltip'
-                  data-tip={applicantWon ? `The Verifier's secret matched yours` : `The Verifier's secret did not match yours`}
+                  data-tip={applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
                 >
-                  {applicantWon ? `You Won!` : `You Lost`}
+                  {applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
                 </abbr>
               </strong>
             </React.Fragment>
@@ -326,12 +334,16 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         }
 
-        if (hint && secret && random) {
+        if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
             <React.Fragment>
-              <strong>Hint:</strong> {hint}
-              <br /><strong>Secret:</strong> {secret}
-              <br /><strong>Random:</strong> {random.toString()}
+              <strong>Token Name:</strong> {tokenName}
+              <br />
+              <strong>Token Ticker:</strong> {tokenTicker}
+              <br />
+              <strong>Secret:</strong> {secret}
+              <br />
+              <strong>Random:</strong> {random.toString()}
             </React.Fragment>
           )
         } else {
@@ -380,7 +392,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__view">
-              {isBlank(verifier) && hint && secret && random
+              {isBlank(verifier) && tokenTicker && tokenName && secret && random
                 ? (
                     <Web3ActionButton
                       contractAddress={this.props.coordinationGameAddress}

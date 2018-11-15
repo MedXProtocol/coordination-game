@@ -17,7 +17,6 @@ import {
   AuditOutline,
   BarsOutline,
   CheckCircleOutline,
-  GoldOutline,
   IssuesCloseOutline,
   SettingOutline,
   WalletOutline
