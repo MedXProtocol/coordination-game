@@ -591,13 +591,6 @@ header {
   }
 }
 
-.modal-content svg {
-  @media screen and (max-width: 768px) {
-    height: 100px;
-    width: 100px;
-  }
-}
-
 .modal-content,
 .modal-card {
   @media screen and (min-width: 769px) {
