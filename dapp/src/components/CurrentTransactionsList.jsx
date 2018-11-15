@@ -19,7 +19,8 @@ const txNames = {
   'depositStake': 'Depositing TILW Stake',
   'setBaseApplicationFeeUsdWei': 'Updating case fee',
   'updateSettings': 'Update Settings',
-  'verifierSubmitSecret': 'Submitting Secret'
+  'verifierSubmitSecret': 'Submitting Secret',
+  'verifierChallenge': 'Challenging Application'
 }
 
 function mapStateToProps(state) {

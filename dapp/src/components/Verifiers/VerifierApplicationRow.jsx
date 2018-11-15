@@ -100,7 +100,10 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               method='verifierChallenge'
               args={[applicationId]}
               buttonText='Challenge'
-              loadingText='Challenging' />
+              loadingText='Challenging'
+              confirmationMessage='Challenge transaction confirmed.'
+              txHashMessage='"Challenge" transaction sent successfully -
+                it will take a few minutes to confirm on the Ethereum network.' />
           )
         }
 
