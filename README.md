@@ -68,6 +68,26 @@ Otherwise, if you're wanting to merge ropsten then run:
 $ npm run merge-ropsten
 ```
 
+# Deploying to Ropsten
+
+First make sure all of the ropsten contracts are up-to-date:
+
+```
+$ npm run push-ropsten
+```
+
+Next, ensure that the ropsten proxy addresses are merged into the build artifacts
+
+```
+$ npm run merge-ropsten
+```
+
+Now run the migrations against ropsten:
+
+```
+$ truffle migrate --network ropsten
+```
+
 ## Usage
 
 1. The Applicant creates a secret, a hint, and generates a random number.  The hash of the secret + random number is stored on-chain.  The hash of the random number is also stored on-chain. The hint is stored on-chain. They pay an Application Fee (Reward) in DAI, and a Deposit (in Tokens?).
