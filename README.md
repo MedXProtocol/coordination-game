@@ -13,7 +13,7 @@ It's best to use the *second* account in the Coordination Game owner mnemonic, b
 First start a local ZeppelinOS session using the admin account:
 
 ```
-$ zos session --from $SECOND_OWNER_ACCOUNT --expires 10000 --network local
+$ zos session --from $ADMIN_ACCOUNT --expires 10000 --network local
 ```
 
 Now push instances of the contracts to the network specified in the session

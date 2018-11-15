@@ -1,7 +1,7 @@
 #! /bin/sh
 
 truffle install && \
-  npm run push && \
+  $(npm bin)/zos push --network $1 --from $ADMIN_ACCOUNT && \
   cd lambda && \
   ./lambda-build.sh && \
   cd .. && \
