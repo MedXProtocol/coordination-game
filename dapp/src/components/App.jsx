@@ -54,15 +54,7 @@ function* appSaga({ workTokenAddress }) {
   yield cacheCall(workTokenAddress, 'owner')
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatchShowIntroModal: () => {
-      dispatch({ type: 'SHOW_INTRO_MODAL' })
-    }
-  }
-}
-
-const App = connect(mapStateToProps, mapDispatchToProps)(
+const App = connect(mapStateToProps)(
   withSaga(appSaga)(
     class extends Component {
       constructor(props) {
@@ -106,14 +98,6 @@ const App = connect(mapStateToProps, mapDispatchToProps)(
           window.location.reload(true)
         }
       }
-
-      // handleShowIntro = (e) => {
-      //   e.preventDefault()
-      //
-      //   storeKeyValInLocalStorage('dontShowIntroModal', null)
-      //
-      //   this.props.dispatchShowIntroModal()
-      // }
 
       toggleTheme = (e) => {
         this.setState({
