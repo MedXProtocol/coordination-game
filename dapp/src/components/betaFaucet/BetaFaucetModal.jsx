@@ -33,8 +33,8 @@ function mapStateToProps (state) {
   const sendEtherTx = transactionFinders.findByMethodName(state, 'sendEther')
   const sendTEXTx = transactionFinders.findByMethodName(state, 'sendTEX')
 
-  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
-  const texWasMinted = sendTEXTx && (sendTEXTx.inFlight || sendTEXTx.success)
+  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.confirmed)
+  const texWasMinted = sendTEXTx && (sendTEXTx.inFlight || sendTEXTx.confirmed)
 
   const needsEth = (weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
   const needsTEX = (weiToEther(texBalance) < 100)

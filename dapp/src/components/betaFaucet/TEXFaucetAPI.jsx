@@ -98,7 +98,7 @@ export const TEXFaucetAPI = ReactTimeout(
             You're low on TEX
             <br />
             <span className="is-size-7 has-text-grey-light">
-              TEX is necessary for staking a deposit to play the Coordination Game. We can send some to you now:
+              TEX is necessary for staking a deposit and submitting tokens. We can send some to you now:
             </span>
           </p>
 

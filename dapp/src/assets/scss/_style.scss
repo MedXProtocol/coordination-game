@@ -464,14 +464,14 @@ header {
 .button.button--getTEX {
   background: none;
   bottom: 20px;
-  height: 100px;
+  height: 150px;
   opacity: 0.8;
   position: fixed;
   right: 20px;
-  width: 100px;
+  width: 150px;
 
   animation-name: shake;
-  animation-duration: 6s;
+  animation-duration: 9s;
   animation-timing-function: cubic-bezier(0.36, 0.07, 0.19, 0.97);
   animation-iteration-count: infinite;
   backface-visibility: hidden;
@@ -518,23 +518,23 @@ header {
 }
 
 @keyframes shake {
-  2%, 18% {
+  2%, 16% {
     transform: translate3d(-1px, 0, 0);
   }
 
-  4%, 15% {
+  4%, 12% {
     transform: translate3d(2px, 0, 0);
   }
 
-  6%, 10%, 13% {
+  6%, 8%, 11% {
     transform: translate3d(-4px, 0, 0);
   }
 
-  8%, 12% {
+  6%, 10% {
     transform: translate3d(4px, 0, 0);
   }
 
-  20% {
+  17% {
     transform: translate3d(0, 0, 0);
   }
 

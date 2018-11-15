@@ -3,6 +3,7 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { get } from 'lodash'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValueBigNumber,
@@ -20,10 +21,14 @@ function mapStateToProps (state) {
 
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
 
+  const sendTEXTx = transactionFinders.findByMethodName(state, 'sendTEX')
+  const texInFlight = sendTEXTx && !sendTEXTx.confirmed
+
   return {
     address,
     betaFaucetModalDismissed,
     workTokenAddress,
+    texInFlight,
     texBalance
   }
 }
@@ -51,6 +56,7 @@ export const GetTEX = connect(mapStateToProps, mapDispatchToProps)(
       render() {
         const visible = (
           this.props.workTokenAddress &&
+          !this.props.texInFlight &&
           (this.props.texBalance !== undefined) &&
           (this.props.texBalance < 25) &&
           this.props.betaFaucetModalDismissed
@@ -70,7 +76,6 @@ export const GetTEX = connect(mapStateToProps, mapDispatchToProps)(
             <img
               src={GetTEXCoinImg}
               alt="Get More TEX Token"
-              width="100"
               srcSet={`${GetTEXCoinImg} 1x, ${GetTEXCoinImg2x} 2x`}
             />
           </button>
