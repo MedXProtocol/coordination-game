@@ -11,7 +11,9 @@
     "start": "./scripts/ganache.sh",
     "lambda": "cd lambda && ./lambda-serve.sh",
     "bootstrap": "truffle exec scripts/bootstrap-faucet.js",
-    "bootstrap-verifiers": "truffle exec scripts/bootstrap-verifiers.js"
+    "bootstrap-verifiers": "truffle exec scripts/bootstrap-verifiers.js",
+    "merge-local": "./scripts/zosMerge.js -n 1234 zos.dev-1234.json",
+    "merge-ropsten": "./scripts/zosMerge.js -n 3 zos.ropsten.json"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +24,7 @@
   },
   "dependencies": {
     "abi-decoder": "^1.2.0",
+    "commander": "^2.19.0",
     "debug": "^4.1.0",
     "ethereumjs-abi": "^0.6.5",
     "openzeppelin-eth": "^2.0.2",

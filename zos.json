@@ -9,7 +9,8 @@
     "TILRoles": "TILRoles",
     "Work": "Work",
     "CoordinationGame": "CoordinationGame",
-    "TILRegistry": "TILRegistry"
+    "TILRegistry": "TILRegistry",
+    "Migrations": "Migrations"
   },
   "dependencies": {}
 }

@@ -46,6 +46,28 @@ To close the session:
 $ zos session --close
 ```
 
+## Replacing the Build Artifacts
+
+**Note:** If you delete the contract artifacts in the `build` directory they will no longer contain the proxy addresses.
+
+You will need to first compile the contracts:
+
+```
+$ truffle compile
+```
+
+Then merge the latest Zos proxy addresses.  If its for the local network you can run:
+
+```
+$ npm run merge-local
+```
+
+Otherwise, if you're wanting to merge ropsten then run:
+
+```
+$ npm run merge-ropsten
+```
+
 ## Usage
 
 1. The Applicant creates a secret, a hint, and generates a random number.  The hash of the secret + random number is stored on-chain.  The hash of the random number is also stored on-chain. The hint is stored on-chain. They pay an Application Fee (Reward) in DAI, and a Deposit (in Tokens?).
