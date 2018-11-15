@@ -18,11 +18,6 @@ async function setup() {
   await w.depositStake({ from: address })
   debug(`Staked ${address}`)
 
-  var address = '0x8a23c3556fa6a8fd38c86597acfd0151ac62861c'
-  await wt.approve(w.address, 1000000000000000000000, { from: address })
-  await w.depositStake({ from: address })
-  debug(`Staked ${address}`)
-
   var address = '0x5de6eb9f504dc50d33357b61364660db064b623d'
   await wt.approve(w.address, 1000000000000000000000, { from: address })
   await w.depositStake({ from: address })
