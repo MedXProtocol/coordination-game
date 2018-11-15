@@ -10,10 +10,11 @@ import {
   contractByName
 } from 'saga-genesis'
 import { connect } from 'react-redux'
-import { TILW } from '~/components/TILW'
 import { EthAddress } from '~/components/EthAddress'
-import { getWeb3 } from '~/utils/getWeb3'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { TILW } from '~/components/TILW'
+import { getWeb3 } from '~/utils/getWeb3'
+import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 
 function mapStateToProps(state, { listingHash }) {
   const web3 = getWeb3()
@@ -22,15 +23,21 @@ function mapStateToProps(state, { listingHash }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
   const applicationId = web3.utils.hexToNumber(listingHash)
-  const hint = web3.utils.hexToUtf8(cacheCallValue(state, CoordinationGame, 'hints', applicationId) || '0x')
+  const hexHint = cacheCallValue(state, CoordinationGame, 'hints', applicationId)
   const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
-  const secret = web3.utils.hexToNumber(hexSecret || '0x0')
+  const secret = hexSecret
+  // const secret = web3.utils.hexToNumber(hexSecret || '0x0')
+
+  // Parse and convert the generic hint field to our DApp-specific data
+  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+
   return {
     TILRegistry,
     CoordinationGame,
     listing,
     applicationId,
-    hint,
+    tokenTicker,
+    tokenName,
     address,
     secret
   }
@@ -85,8 +92,11 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className='list--item__status'>
-              <strong>Hint:</strong> {this.props.hint}
-              <br /><strong>Secret:</strong> {this.props.secret}
+              <strong>Token Ticker:</strong> {this.props.tokenTicker}
+              <br />
+              <strong>Token Name:</strong> {this.props.tokenName}
+              <br />
+              <strong>Contract Address:</strong> {this.props.secret}
             </span>
 
             <span className="list--item__view">

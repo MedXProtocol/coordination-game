@@ -1,3 +1,6 @@
+// hexString: The string in ASCII/UTF8 you want to hexify
+// bytes: an int representing how many bytes you want to resulting hex to be
+
 module.exports = function (hexString, bytes) {
   let result = hexString
 

@@ -36,7 +36,7 @@ contract('CoordinationGame', (accounts) => {
 
   const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const random = new BN("4312341235")
-  const hint = web3.toHex("Totally bogus hint")
+  const hint = web3.toHex("BOGUS")
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens

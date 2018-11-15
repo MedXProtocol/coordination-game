@@ -1,7 +1,7 @@
 // LIGHT THEME COLOURS
 $text-color--light: #333;
 $background-color--light: #f4f4f4;
-$accent-color-1--light: #51a5d1; // blue
+$accent-color-1--light: #0893ea; // blue
 $accent-color-2--light: #f8aa2f; // orange
 $accent-color-3--light: #13e99b; // green
 
@@ -30,7 +30,7 @@ html.html-light,
   }
 
   ::placeholder {
-    color: lighten($accent-color-1--light, 30%);
+    color: lighten($accent-color-1--light, 45%);
   }
 
   hr {
@@ -226,6 +226,10 @@ html.html-light,
     color: $text-color--light;
   }
 
+  .progress--step {
+    color: lighten($text-color--light, 40%);
+  }
+
   .progress--step:before {
     background-color: white;
     border-color: white;
@@ -291,7 +295,7 @@ html.html-light,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
     box-shadow: 0 0 5px 0 lighten($accent-color-2--light, 30%);
-    background-color: transparent;
+    background-color: white;
     border-color: $accent-color-2--light;
     color: $accent-color-2--light;
   }
@@ -388,10 +392,16 @@ html.html-light,
     border-color: transparent;
   }
 
+  .delete.is-warning,
+  .modal-close.is-warning {
+    background-color: white;
+  }
+
   .delete.is-warning:hover,
   .modal-close.is-warning:hover,
   .delete.is-warning:focus,
   .modal-close.is-warning:focus {
+    background-color: white !important;
     color: $text-color--light;
   }
 
@@ -402,9 +412,15 @@ html.html-light,
     background-color: $brand-warning--light;
   }
 
-  .is-warning.is-outlined,
-  .is-warning.is-outlined,
+  .delete.is-warning.is-outlined:hover::before,
+  .modal-close.is-warning.is-outlined:hover::before,
+  .delete.is-warning.is-outlined:hover::after,
+  .modal-close.is-warning.is-outlined:hover::after {
+    background-color: $brand-warning--light;
+  }
+
   .is-warning.is-outlined {
+    background-color: white;
     border-color: $brand-warning--light;
     color: $brand-warning--light;
   }
@@ -413,14 +429,6 @@ html.html-light,
   .is-warning.is-outlined:active,
   .is-warning.is-outlined:focus {
     box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
-    background-color: transparent;
-  }
-
-  .delete.is-warning.is-outlined:hover::before,
-  .modal-close.is-warning.is-outlined:hover::before,
-  .delete.is-warning.is-outlined:hover::after,
-  .modal-close.is-warning.is-outlined:hover::after {
-    background-color: $text-color--light;
   }
 
   @keyframes attention-grabby--light {
@@ -577,5 +585,14 @@ html.html-light,
 
   .has-text-warning {
     color: #ec9d0d !important;
+  }
+
+  .button.is-static {
+    background: darken($background-color--light, 10%);
+    border-color: white;
+  }
+
+  .button.is-static:hover {
+    color: white;
   }
 }

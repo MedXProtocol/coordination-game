@@ -1,7 +1,7 @@
 import React from 'react'
 import { format } from 'date-fns'
 
-function formatCreatedAt(time) {
+function formatTimestamp(time) {
   const date = new Date(0)
   date.setUTCSeconds(time)
 
@@ -15,9 +15,9 @@ function formatCreatedAt(time) {
 export const RecordTimestampDisplay = ({ timeInUtcSecondsSinceEpoch, delimiter }) => {
   if (!timeInUtcSecondsSinceEpoch || (timeInUtcSecondsSinceEpoch < 1)) { return null }
 
-  const formattedCreatedAt = formatCreatedAt(timeInUtcSecondsSinceEpoch)
+  const formattedTimestamp = formatTimestamp(timeInUtcSecondsSinceEpoch)
 
-  const entries = `${formattedCreatedAt.date} ${delimiter ? delimiter : `-`} ${formattedCreatedAt.time}`
+  const entries = `${formattedTimestamp.date} ${delimiter ? delimiter : ``} ${formattedTimestamp.time}`
 
   return (
     <span dangerouslySetInnerHTML={{__html: entries}} />

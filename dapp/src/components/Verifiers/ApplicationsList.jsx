@@ -52,7 +52,7 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
           <Pagination
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
-            formatPageRoute={(number) => formatRoute(routes.LISTINGS, { currentPage: number })}
+            formatPageRoute={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
             />
         </div>
       )

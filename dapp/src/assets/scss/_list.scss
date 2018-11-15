@@ -29,7 +29,7 @@
   font-weight: 700;
   min-height: 160px;
   list-style-type: none;
-  line-height: 24px;
+  line-height: 28px;
   padding: 10px 0;
   position: relative;
   margin: 0;
@@ -74,7 +74,7 @@
 }
 
 .list--item__date {
-  grid-column: span 4;
+  grid-column: span 2;
   text-align: center;
 
   @media screen and (max-width: 1200px) {
@@ -88,7 +88,7 @@
 }
 
 .list--item__status {
-  grid-column: span 3;
+  grid-column: span 6;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 6;
@@ -100,7 +100,7 @@
 }
 
 .list--item__view {
-  grid-column: span 4;
+  grid-column: span 3;
   text-align: right;
 
   @media screen and (max-width: 1200px) {

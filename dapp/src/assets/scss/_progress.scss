@@ -13,6 +13,7 @@
 }
 
 .progress--step {
+  color: rgba(255, 255, 255, 0.2);
   font-family: 'Comfortaa', sans-serif;
   position: relative;
   width: 100%;
@@ -60,7 +61,7 @@
   }
 
   &.is-complete {
-    color: $accent-color-3;
+    color: rgba(0, 230, 200, 0.5);
 
     &:before {
       color: transparent;

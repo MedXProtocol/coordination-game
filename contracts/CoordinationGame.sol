@@ -35,10 +35,13 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => uint256) public applicantTokenDeposits;
 
   mapping (uint256 => address) public applicants;
+  mapping (uint256 => address) public verifiers;
+
+  mapping (uint256 => bytes) public hints;
+
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
-  mapping (uint256 => bytes) public hints;
-  mapping (uint256 => address) public verifiers;
+
   mapping (uint256 => bytes32) public verifierSecrets;
   mapping (uint256 => bytes32) public applicantSecrets;
 
@@ -178,9 +181,13 @@ contract CoordinationGame is Ownable {
           the game for the applicant.
   @param _keccakOfSecretAndRandom The hash of the secret and salt
   @param _keccakOfRandom The hash of the salt
-  @param _hint The hint for the verifier to determine the secret
+  @param _hint The hint the Applicant provided for the Verifier
   */
-  function start(bytes32 _keccakOfSecretAndRandom, bytes32 _keccakOfRandom, bytes _hint)
+  function start(
+    bytes32 _keccakOfSecretAndRandom,
+    bytes32 _keccakOfRandom,
+    bytes _hint
+  )
     external
     payable
   {
@@ -197,8 +204,10 @@ contract CoordinationGame is Ownable {
 
     applicantsApplicationIndices[msg.sender].push(applicationId);
     applicants[applicationId] = msg.sender;
+
     secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
     randomHashes[applicationId] = _keccakOfRandom;
+
     hints[applicationId] = _hint;
 
     /// Make sure the next block is used for randomness
@@ -259,8 +268,8 @@ contract CoordinationGame is Ownable {
     }
 
     require(selectedVerifier != msg.sender, 'verifier is not the applicant');
-
     require(selectedVerifier != address(0), 'verifier is not 0');
+
     verifiers[_applicationId] = selectedVerifier;
     verifierSelectedAt[_applicationId] = block.timestamp;
 

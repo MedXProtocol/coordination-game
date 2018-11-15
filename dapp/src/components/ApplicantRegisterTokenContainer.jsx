@@ -88,7 +88,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* applicantApplySaga({
+function* applicantRegisterTokenSaga({
   workTokenAddress,
   coordinationGameAddress,
   address,
@@ -111,22 +111,23 @@ function* applicantApplySaga({
   }
 }
 
-export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(applicantApplySaga)(
+export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(applicantRegisterTokenSaga)(
     withSend(
-      class _ApplicantApplyContainer extends Component {
+      class _ApplicantRegisterTokenContainer extends Component {
 
         constructor(props) {
           super(props)
           this.state = {
-            hintLeft: '',
-            hintRight: '',
-            hint: '...',
+            tokenTicker: '',
+            tokenName: '',
             secret: '',
             stepManual: 0,
             applicationCreated: false,
             beforeUnloadTriggered: false
           }
+
+          this.tokenNameRef = React.createRef()
         }
 
         // everything stepManual is for testing animations and can safely be removed
@@ -304,9 +305,11 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
 
         formReady = () => {
           return (
-            this.state.hintRight !== ''
-            && this.state.hintLeft !== ''
-            && this.state.secret !== ''
+            this.state.tokenName !== ''
+            && this.tokenTickerValid()
+            && this.state.tokenTicker !== ''
+            && this.secretValid()
+            && this.state.secret.length === 42
           )
         }
 
@@ -336,9 +339,7 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           const { send, coordinationGameAddress } = this.props
           const web3 = getWeb3()
 
-          // needs to be BN ?
-          // scrap leading 0's in hintLeft, hintRight, hint, secret!
-          // somehow make 100% sure we're not choosing a verifier that is the applicant!
+          // scrap leading 0's in tokenTicker, tokenName and secret!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
           const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret)
@@ -351,18 +352,16 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
             { type: 'uint256', value: random.toString() }
           )
 
-          const hintString = `${this.state.hintLeft} + ${this.state.hintRight}`
-          const hint = web3.utils.utf8ToHex(hintString)
-
-          window.web31 = getWeb3()
-          window.bnn = BN
+          // const tokenTickerAsHex = web3.utils.utf8ToHex(this.state.tokenTicker)
+          // const tokenNameAsHex = web3.utils.utf8ToHex(this.state.tokenName)
+          const hexHint = web3.utils.utf8ToHex(`${this.state.tokenTicker}-${this.state.tokenName}`)
 
           const coordinationGameStartTxId = send(
             coordinationGameAddress,
             'start',
             secretRandomHash,
             randomHash,
-            hint
+            hexHint
           )({
             value: this.props.weiPerApplication
           })
@@ -395,40 +394,44 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
           this.props.dispatchShowLoadingStatus()
         }
 
-        handleSecretChange = (e) => {
+        handleAddonClick = (e) => {
+          e.preventDefault()
+
+          this.tokenNameRef.current.focus()
+        }
+
+        handleTextInputChange = (e) => {
+          let val = e.target.value.trim()
+
           this.setState({
-            secret: e.target.value
+            [e.target.name]: val
           })
         }
 
-        handleHintChange = (e) => {
-          let val = parseInt(e.target.value, 10) || 0
-
-          if (val < 10000) {
-            this.setState({
-              [e.target.name]: val
-            }, this.updateFinalHint)
-          }
+        tokenTickerValid = () => {
+          return this.state.tokenTicker.match(/^[a-zA-Z0-9]+$/)
         }
 
-        updateFinalHint = () => {
-          this.setState({
-            hint: this.state.hintLeft + this.state.hintRight
-          })
+        secretValid = () => {
+          return this.state.secret.match(/^(0x)?[0-9a-fA-F]{40}$/)
         }
 
         render() {
           return (
-            <Flipper flipKey={`${this.state.hintRight}-${this.state.hintLeft}-${this.state.secret}-${this.state.applicationCount}`}>
-              <PageTitle title='apply' />
+            <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
+              <PageTitle title='registerToken' />
               <ScrollToTop />
 
-              <h1>
-                Apply to be on the TIL
+              <h1 className="is-size-1">
+                Submit Token Details
               </h1>
 
+              <p>
+                <strong>Information you need:</strong> Token Name, Symbol and Contract owner address. <br className="is-hidden-touch" />Register a token in less than a minute.
+              </p>
+
               <Progress
-                labels={['Send Approval', 'Submit Secret', 'Request Verification', 'Await Verification']}
+                labels={['Send Approval', 'Enter Token Details', 'Request Verification', 'Await Verification']}
                 progressState={{
                   step1Active: !this.step1Completed(),
                   step2Active: this.step1Completed() && !this.step2Completed(),
@@ -465,15 +468,19 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                     {
                       weiToEther(this.props.tilwBalance) < 1 ? (
                         <p>
-                          You need TILW before you can apply
-                          <br /><br /><GetTILWLink />
+                          You will need TEX to register a token
+                          <br />
+                          <br />
+                          <GetTILWLink />
+                          <br />
+                          <br />
                         </p>
                       ) : (
                         <form onSubmit={this.handleSubmitApproval}>
                           <div className='columns'>
                             <div className='column is-8'>
                               <p>
-                                The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TILW</strong> to apply. If your application is successful, half of this amount will be returned to you.
+                                The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token. If your application is successful, half of this amount will be returned to you.
                               </p>
                             </div>
                           </div>
@@ -483,6 +490,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                             loadingText='Approving'
                             isLoading={this.state.workTokenApproveHandler}
                           />
+                          <br />
+                          <br />
                         </form>
                       )
                     }
@@ -505,9 +514,10 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                               &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
                             </React.Fragment>
                           ) : (
-                            null
+                            <span className="help has-text-grey-dark">We're using ERC20 tokens as an example but you could use anything you'd like to verify <br className="is-hidden-touch" />(eg. if someone is a Doctor, etc.)</span>
                           )
                         }
+
                       </h6>
 
 
@@ -517,56 +527,77 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                           null
                         ) : (
                           <div className="multistep-form--step-child">
-                            <form onSubmit={this.handleSubmit}>
+                            <form onSubmit={this.handleSubmit} className="form--submit-token">
                               <h6 className="is-size-6">
-                                a. Provide a hint for the verifier:
+                                a. Token Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
                               </h6>
-                              <input
-                                type="text"
-                                name="hintLeft"
-                                className="text-input text-input--large"
-                                placeholder="345"
-                                onChange={this.handleHintChange}
-                                value={this.state.hintLeft}
-                              />
-                              <span className="text-operator">+</span>
 
-                              <input
-                                type="text"
-                                name="hintRight"
-                                className="text-input text-input--large"
-                                placeholder="223"
-                                onChange={this.handleHintChange}
-                                value={this.state.hintRight}
-                              />
-                              <span className="text-operator">=</span>
+                              <div className="field">
+                                <p className="control">
+                                  <input
+                                    maxLength="40"
+                                    type="text"
+                                    name="tokenName"
+                                    className="text-input text-input--large text-input--extended is-marginless"
+                                    placeholder="Decentraland"
+                                    onChange={this.handleTextInputChange}
+                                    value={this.state.tokenName}
+                                  />
+                                </p>
+                              </div>
 
-                              <span
-                                className="readonly text-input text-input--large"
-                              >
-                                {this.state.hint}
-                              </span>
+                              <h6 className="is-size-6">
+                                b. Token Symbol:
+                              </h6>
 
-                              <br />
-                              {this.state.hintLeft !== '' && this.state.hintRight !== '' ?
+                              <div className="field has-addons">
+                                <div className="control-with-addons">
+                                  <p className="control">
+                                    <button
+                                      className="button is-static"
+                                      tabIndex={-1}
+                                      onClick={this.handleAddonClick}
+                                    >
+                                      $
+                                    </button>
+                                  </p>
+                                  <p className="control">
+                                    <input
+                                      ref={this.tokenNameRef}
+                                      maxLength="5"
+                                      type="text"
+                                      name="tokenTicker"
+                                      pattern="^[a-zA-Z0-9]+$"
+                                      className="text-input text-input--large is-marginless"
+                                      placeholder="MANA"
+                                      onChange={this.handleTextInputChange}
+                                      value={this.state.tokenTicker}
+                                    />
+                                  </p>
+                                </div>
+                                {(!this.tokenTickerValid() && this.state.tokenTicker !== '') ? <span className="help has-text-grey">Please enter only alphanumeric characters</span> : null }
+                              </div>
+
+                              {(this.tokenTickerValid() && this.state.tokenTicker !== '' && this.state.tokenName !== '') ?
                                   (
-                                    <Flipped flipId="coolDiv">
+                                    <Flipped flipId="wat">
                                       <React.Fragment>
                                         <h6 className="is-size-6">
-                                          b. Provide a secret:
+                                          c. Token's Contract Address:
                                         </h6>
                                         <div className="field">
                                           <div className="control">
                                             <input
+                                              name="secret"
                                               type="text"
-                                              className="text-input text-input--large is-marginless"
-                                              pattern="[0-9]*"
-                                              onChange={this.handleSecretChange}
+                                              maxLength="42"
+                                              placeholder="0x..."
+                                              className="text-input text-input--large text-input--extended-extra is-marginless"
+                                              pattern="^(0x)?[0-9a-fA-F]{40}$"
+                                              onChange={this.handleTextInputChange}
                                             />
                                           </div>
-                                          <p className="help has-text-grey">
-                                            This could be {this.state.hint} (typical use case) or any other number up to 20000 (nefarious use case)
-                                          </p>
+                                          {(!this.secretValid() && this.state.secret !== '') ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
                                         </div>
                                       </React.Fragment>
                                     </Flipped>
@@ -576,7 +607,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
 
                               <Flipped flipId="coolDiv">
                                 <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
-                                  <br />
                                   <LoadingButton
                                     initialText='Submit Hint &amp; Secret'
                                     loadingText='Submitting'
@@ -587,7 +617,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                                   <p className="help has-text-grey">
                                     <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
                                   </p>
-
                                 </div>
                               </Flipped>
 
@@ -602,8 +631,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                   )
                 }
               </div>
-
-
 
               <div className="multistep-form--step-container">
                 {
@@ -636,6 +663,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                                 reviewer will attempt to verify the accuracy of your application,
                                 after which you will need to come back and reveal your secret.
                               </p>
+                              <br />
+                              <br />
                             </div>
                           </div>
                         ) : (
@@ -653,6 +682,8 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                               loadingText='Requesting'
                               isLoading={this.state.coordinationGameSelectVerifierHandler}
                             />
+                            <br />
+                            <br />
                           </form>
                         )
                       }
@@ -664,7 +695,6 @@ export const ApplicantApplyContainer = connect(mapStateToProps, mapDispatchToPro
                 }
               </div>
 
-              <br />
 
               <div className="is-clearfix">
                 <h6 className="is-size-6">

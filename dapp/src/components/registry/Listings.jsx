@@ -81,7 +81,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
       <React.Fragment>
         <div className="is-clearfix">
           <h6 className="is-size-6">
-            Current List
+            Registry Listings
           </h6>
         </div>
 
@@ -97,7 +97,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         <Pagination
           currentPage={parseInt(this.props.currentPage, 10)}
           totalPages={totalPages}
-          formatPageRoute={(number) => formatRoute(routes.LISTINGS, { currentPage: number })}
+          formatPageRoute={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
           />
       </React.Fragment>
     )

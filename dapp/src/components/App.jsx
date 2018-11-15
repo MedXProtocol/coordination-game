@@ -12,7 +12,7 @@ import {
   withSaga
 } from 'saga-genesis'
 import { Admin } from '~/components/Admin/Admin'
-import { ApplicantApplyContainer } from '~/components/ApplicantApplyContainer'
+import { ApplicantRegisterTokenContainer } from '~/components/ApplicantRegisterTokenContainer'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { BodyClass } from '~/components/BodyClass'
 import { DebugLog } from '~/components/DebugLog'
@@ -26,7 +26,6 @@ import { Home } from '~/components/Home'
 import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
-import { VerifierStake } from '~/components/VerifierStake/VerifierStake'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
@@ -170,13 +169,12 @@ const App = connect(mapStateToProps)(
                       <Switch>
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
-                        <Route path={routes.APPLY} component={ApplicantApplyContainer} />
-                        <Route path={routes.STAKE} component={VerifierStake} />
+                        <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                         <Route path={routes.WALLET} component={Wallet} />
                         <Route path={routes.ADMIN} component={Admin} />
 
-                        <Route path={routes.LISTINGS} component={Home} />
                         <Route path={routes.FAQ} component={FAQ} />
+                        <Route path={routes.REGISTRY} component={Home} />
                         <Route path={routes.HOME} component={Home} />
 
                         <Route component={FourOhFour} />
@@ -185,7 +183,8 @@ const App = connect(mapStateToProps)(
                     </div>
                   </div>
 
-                  <hr />
+                  <br />
+                  <br />
                   <br />
 
                   <div className="level--container">
@@ -208,7 +207,7 @@ const App = connect(mapStateToProps)(
                       <div className="level-item has-text-centered">
                         <div>
                           <p className="title">
-                            <Link to={routes.APPLY} className="is-size-7">
+                            <Link to={routes.REGISTER_TOKEN} className="is-size-7">
                               Apply to be on the Registry
                             </Link>
                           </p>
@@ -218,7 +217,7 @@ const App = connect(mapStateToProps)(
                       <div className="level-item has-text-centered">
                         <div>
                           <p className="title">
-                            <Link to={routes.STAKE} className="is-size-7">
+                            <Link to={routes.VERIFY} className="is-size-7">
                               Stake to become a Verifier
                             </Link>
                           </p>

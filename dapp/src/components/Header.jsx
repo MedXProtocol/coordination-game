@@ -17,7 +17,6 @@ import {
   AuditOutline,
   BarsOutline,
   CheckCircleOutline,
-  GoldOutline,
   IssuesCloseOutline,
   SettingOutline,
   WalletOutline
@@ -227,29 +226,18 @@ export const Header = ReactTimeout(
                             onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
-                            List
+                            Registry
                           </NavLink>
                         </div>
                         <div className="navbar-item">
                           <NavLink
                             activeClassName="is-active"
-                            to={routes.APPLY}
+                            to={routes.REGISTER_TOKEN}
                             className='navbar-item'
                             onClick={this.toggleMobileMenu}
                           >
                             <AntdIcon type={AuditOutline} className="antd-icon " />&nbsp;
-                            Apply
-                          </NavLink>
-                        </div>
-                        <div className="navbar-item">
-                          <NavLink
-                            activeClassName="is-active"
-                            to={routes.STAKE}
-                            className="navbar-item"
-                            onClick={this.toggleMobileMenu}
-                          >
-                            <AntdIcon type={GoldOutline} className="antd-icon" />&nbsp;
-                            Stake
+                            Register Token
                           </NavLink>
                         </div>
                         <div className="navbar-item">

@@ -91,7 +91,7 @@ export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationSt
         expirationMessage = (
           <React.Fragment>
             Application Complete
-            <br /><strong>{applicantWon ? `Applicant Won!` : `Applicant Lost`}</strong>
+            <br /><strong>{applicantWon ? `Contract addresses matched` : `Contract addresses did not match`}</strong>
           </React.Fragment>
         )
       } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
