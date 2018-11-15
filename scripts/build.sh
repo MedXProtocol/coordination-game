@@ -1,7 +1,8 @@
 #! /bin/sh
 
 truffle install && \
-  $(npm bin)/zos push --network $1 --from $ADMIN_ACCOUNT && \
+  truffle compile && \
+  npm run merge-ropsten && \
   cd lambda && \
   ./lambda-build.sh && \
   cd .. && \

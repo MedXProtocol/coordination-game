@@ -19,7 +19,6 @@ contract('CoordinationGame', (accounts) => {
     etherPriceFeed,
     workToken,
     work,
-    workStake,
     tilRegistry,
     applicationId,
     applicationVerifier,
@@ -36,6 +35,8 @@ contract('CoordinationGame', (accounts) => {
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
+  const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
+  const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -50,17 +51,18 @@ contract('CoordinationGame', (accounts) => {
 
   before(async () => {
     etherPriceFeed = await EtherPriceFeed.deployed()
-    work = await Work.deployed()
     workToken = await WorkToken.deployed()
-    workStake = await work.requiredStake()
-    jobStake = await work.jobStake()
     roles = await TILRoles.deployed()
-
-    await registerWorker(verifier)
-    await registerWorker(verifier2)
   })
 
   beforeEach(async () => {
+    work = await Work.new()
+    await work.init(
+      owner, workToken.address, requiredStake.toString(), jobStake.toString(), roles.address
+    )
+    await registerWorker(verifier)
+    await registerWorker(verifier2)
+
     tilRegistry = await TILRegistry.new()
     debug(`Created new TILRegistry at ${tilRegistry.address}`)
     debug(`Initializing... ${owner} ${workToken.address} ${roles.address} ${work.address}`)
@@ -93,19 +95,19 @@ contract('CoordinationGame', (accounts) => {
     verifierTimeoutInSeconds = new BN(verifierTimeoutInSeconds.toString()).add(new BN(1))
     debug(`verifierTimeoutInSeconds is ${verifierTimeoutInSeconds.toString()}`)
 
-    debug(`Minting Deposit to Applicant ${workStake.toString()}...`)
-    await workToken.mint(applicant, workStake)
+    debug(`Minting Deposit to Applicant ${requiredStake.toString()}...`)
+    await workToken.mint(applicant, requiredStake)
 
-    debug(`Approving CoordinationGame to spend ${workStake.toString()} for applicant...`)
-    await workToken.approve(coordinationGame.address, workStake, { from: applicant })
+    debug(`Approving CoordinationGame to spend ${requiredStake.toString()} for applicant...`)
+    await workToken.approve(coordinationGame.address, requiredStake, { from: applicant })
   })
 
   async function registerWorker(address) {
     debug(`Minting worktoken ${workToken.address} Stake to ${address}...`)
-    await workToken.mint(address, workStake)
+    await workToken.mint(address, requiredStake)
 
-    debug(`Approving workStake ${workStake.toString()} to ${work.address} for ${address}...`)
-    await workToken.approve(work.address, workStake, { from: address })
+    debug(`Approving requiredStake ${requiredStake.toString()} to ${work.address} for ${address}...`)
+    await workToken.approve(work.address, requiredStake, { from: address })
     debug(`work token address: ${await work.token()}`)
     await work.depositStake({ from: address })
   }
@@ -417,19 +419,19 @@ contract('CoordinationGame', (accounts) => {
         })
         await increaseTime(applicantRevealTimeoutInSeconds)
 
-        const verifierStartingBalance = (await work.balances(selectedVerifier)).toNumber()
-        const applicantStartingBalance = (await workToken.balanceOf(applicant)).toNumber()
-        const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
-        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId)).toNumber()
+        const verifierStartingBalance = (await work.balances(selectedVerifier))
+        const applicantStartingBalance = (await workToken.balanceOf(applicant))
+        const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier))
+        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId))
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
         assert.equal(jobStake.toString(), applicationStakeAmount.toString())
         await verifierChallenges(selectedVerifier)
 
-        const verifierFinishingBalance = (await work.balances(selectedVerifier)).toNumber()
-        const verifierEtherFinishingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
-        const applicantFinishingBalance = (await workToken.balanceOf(applicant)).toNumber()
+        const verifierFinishingBalance = (await work.balances(selectedVerifier))
+        const verifierEtherFinishingBalance = (await web3.eth.getBalance(selectedVerifier))
+        const applicantFinishingBalance = (await workToken.balanceOf(applicant))
 
         debug(`verifier finishing balance: ${verifierFinishingBalance}`)
         debug(`applicant finishing balance: ${applicantFinishingBalance}`)
@@ -438,12 +440,21 @@ contract('CoordinationGame', (accounts) => {
           verifierEtherFinishingBalance - verifierEtherStartingBalance > (applicantEtherDeposit * 0.98), // minus gas
           'verifier was paid in ether'
         )
+
+        const approxJobStake = new BN(jobStake).mul(new BN(90)).div(new BN(100))
+        const verifierBalanceDelta = verifierFinishingBalance.sub(verifierStartingBalance)
+        const applicantBalanceDelta = applicantFinishingBalance.sub(applicantStartingBalance)
+
+        debug(`approxJobStake: ${approxJobStake.toString()}`)
+        debug(`verifierBalanceDelta: ${verifierBalanceDelta.toString()}`)
+        debug(`applicantBalanceDelta: ${applicantBalanceDelta.toString()}`)
+
         assert.ok(
-          verifierFinishingBalance - verifierStartingBalance > (jobStake.toNumber() * 0.98),
+          verifierBalanceDelta.gt(approxJobStake),
           'verifier deposit was returned'
         )
         assert.ok(
-          applicantFinishingBalance - applicantStartingBalance > (jobStake.toNumber() * 0.98),
+          applicantBalanceDelta.gt(approxJobStake),
           'applicant deposit was returned'
         )
 

@@ -46,7 +46,7 @@ To close the session:
 $ zos session --close
 ```
 
-## Replacing the Build Artifacts
+## Starting from a Fresh Compile
 
 **Note:** If you delete the contract artifacts in the `build` directory they will no longer contain the proxy addresses.
 
@@ -56,7 +56,7 @@ You will need to first compile the contracts:
 $ truffle compile
 ```
 
-Then merge the latest Zos proxy addresses.  If its for the local network you can run:
+Then merge the latest ZOS proxy addresses.  If its for the local network you can run:
 
 ```
 $ npm run merge-local
