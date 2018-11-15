@@ -105,8 +105,6 @@
 
   // max
   @media screen and (max-width: 1088px) {
-    top: 44px;
-
     a.navbar-item:hover,
     a.navbar-item.is-active,
     .navbar-link:hover,
@@ -114,8 +112,6 @@
       transform: none;
     }
   }
-
-
 }
 
 .navbar-menu.is-active {

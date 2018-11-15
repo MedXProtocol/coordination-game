@@ -12,7 +12,7 @@ import {
 import { connect } from 'react-redux'
 import { EthAddress } from '~/components/EthAddress'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { TILW } from '~/components/TILW'
+import { TEX } from '~/components/TEX'
 import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 
@@ -88,7 +88,7 @@ export const ListingRow = connect(mapStateToProps)(
             </span>
 
             <span className="list--item__date">
-              <TILW wei={unstakedDeposit} />
+              <TEX wei={unstakedDeposit} />
             </span>
 
             <span className='list--item__status'>

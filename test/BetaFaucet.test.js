@@ -63,24 +63,24 @@ contract('BetaFaucet', function (accounts) {
     })
   })
 
-  describe('sendTILW()', () => {
+  describe('sendTEX()', () => {
     it('should work', async () => {
       workTokenInstance.mint(betaFaucetInstance.address, 3000000)
-      const betaFaucetDelegateTILWBalance = await workTokenInstance.balanceOf(betaFaucetInstance.address)
-      assert.equal(betaFaucetDelegateTILWBalance, 3000000)
+      const betaFaucetDelegateTEXBalance = await workTokenInstance.balanceOf(betaFaucetInstance.address)
+      assert.equal(betaFaucetDelegateTEXBalance, 3000000)
 
-      const recipientsTILWBalance = await workTokenInstance.balanceOf(recipient)
-      assert.equal(recipientsTILWBalance, 0)
+      const recipientsTEXBalance = await workTokenInstance.balanceOf(recipient)
+      assert.equal(recipientsTEXBalance, 0)
 
-      await betaFaucetInstance.sendTILW(recipient, 15)
-      const recipientsNewTILWBalance = await workTokenInstance.balanceOf(recipient)
-      assert.equal(recipientsNewTILWBalance, 15)
+      await betaFaucetInstance.sendTEX(recipient, 15)
+      const recipientsNewTEXBalance = await workTokenInstance.balanceOf(recipient)
+      assert.equal(recipientsNewTEXBalance, 15)
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucetInstance.sendTILW(recipient2, 15)
+      await betaFaucetInstance.sendTEX(recipient2, 15)
       expectThrow(async () => {
-        await betaFaucetInstance.sendTILW(recipient2, 15)
+        await betaFaucetInstance.sendTEX(recipient2, 15)
       })
     })
   })

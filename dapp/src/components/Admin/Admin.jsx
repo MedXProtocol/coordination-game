@@ -198,7 +198,7 @@ export const Admin = connect(mapStateToProps)(
                   <div className="column is-6">
                     <p className="is-size-7">
                       <strong>TIL Application Stake Amount</strong>
-                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                      <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
                     </p>
                     <input
                       type="text"
@@ -296,7 +296,7 @@ export const Admin = connect(mapStateToProps)(
                   <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Verification Job Stake Amount</strong>
-                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                      <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
                     </p>
                     <input
                       type="text"
@@ -313,7 +313,7 @@ export const Admin = connect(mapStateToProps)(
                   <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Required Stake Amount</strong>
-                      <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
+                      <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
                     </p>
                     <input
                       type="text"

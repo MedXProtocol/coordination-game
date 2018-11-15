@@ -86,14 +86,14 @@ export class FaucetClient {
     return this.sendTransaction(tx)
   }
 
-  sendTILW (ethAddress) {
-    const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendTILW')
+  sendTEX (ethAddress) {
+    const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendTEX')
 
     // Eth.toWei() with 'ether' as second argument simply returns a number
     var data = abi.encodeMethod(method, [ethAddress, Eth.toWei('1500', 'ether')])
     const tx = this.buildTransaction(data)
 
-    console.info('sendTILW tx: ', tx)
+    console.info('sendTEX tx: ', tx)
 
     return this.sendTransaction(tx)
   }

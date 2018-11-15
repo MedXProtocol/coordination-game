@@ -176,7 +176,7 @@
         {
           "contract": "BetaFaucet",
           "path": "contracts/BetaFaucet.sol",
-          "label": "sentTILWAddresses",
+          "label": "sentTEXAddresses",
           "astId": 17,
           "type": "t_mapping<t_bool>",
           "src": "441:50:0"

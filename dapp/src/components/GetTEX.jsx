@@ -9,14 +9,14 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import GetTILWCoinImg from '~/assets/img/get-tilw-coin.png'
-import GetTILWCoinImg2x from '~/assets/img/get-tilw-coin@2x.png'
+import GetTEXCoinImg from '~/assets/img/get-tex-coin.png'
+import GetTEXCoinImg2x from '~/assets/img/get-tex-coin@2x.png'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
 
@@ -24,11 +24,11 @@ function mapStateToProps (state) {
     address,
     betaFaucetModalDismissed,
     workTokenAddress,
-    tilwBalance
+    texBalance
   }
 }
 
-function* getTILWSaga({ workTokenAddress, address }) {
+function* getTEXSaga({ workTokenAddress, address }) {
   if (!workTokenAddress || !address) { return }
 
   yield all([
@@ -44,15 +44,15 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(getTILWSaga)(
-    class _GetTILW extends Component {
+export const GetTEX = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(getTEXSaga)(
+    class _GetTEX extends Component {
 
       render() {
         const visible = (
           this.props.workTokenAddress &&
-          (this.props.tilwBalance !== undefined) &&
-          (this.props.tilwBalance < 25) &&
+          (this.props.texBalance !== undefined) &&
+          (this.props.texBalance < 25) &&
           this.props.betaFaucetModalDismissed
         )
 
@@ -61,17 +61,17 @@ export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
             onClick={this.props.dispatchShowBetaFaucetModal}
             className={classnames(
               'button',
-              'button--getTilw',
+              'button--getTEX',
               {
                 'is-hidden': !visible
               }
             )}
           >
             <img
-              src={GetTILWCoinImg}
-              alt="Get More TILW Token"
+              src={GetTEXCoinImg}
+              alt="Get More TEX Token"
               width="100"
-              srcSet={`${GetTILWCoinImg} 1x, ${GetTILWCoinImg2x} 2x`}
+              srcSet={`${GetTEXCoinImg} 1x, ${GetTEXCoinImg2x} 2x`}
             />
           </button>
         )

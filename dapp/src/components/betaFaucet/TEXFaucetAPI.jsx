@@ -3,15 +3,15 @@ import ReactTimeout from 'react-timeout'
 import PropTypes from 'prop-types'
 import { toastr } from '~/toastr'
 import { EthAddress } from '~/components/EthAddress'
-import { TILW } from '~/components/TILW'
+import { TEX } from '~/components/TEX'
 import { LoadingButton } from '~/components/LoadingButton'
 import { axiosInstance } from '~/../config/axiosConfig'
-import TILWCoinImg from '~/assets/img/tilw-coin.svg'
+import TEXCoinImg from '~/assets/img/tex-coin.svg'
 
-export const TILWFaucetApi = ReactTimeout(
-  class _TILWFaucetApi extends Component {
+export const TEXFaucetAPI = ReactTimeout(
+  class _TEXFaucetAPI extends Component {
 
-    faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendTILW`
+    faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendTEX`
 
     constructor(props) {
       super(props)
@@ -21,11 +21,11 @@ export const TILWFaucetApi = ReactTimeout(
       }
     }
 
-    handleMintTILW = (event) => {
+    handleMintTEX = (event) => {
       event.preventDefault()
       this.setState({
         isSending: true
-      }, this.doMintTILW)
+      }, this.doMintTEX)
     }
 
     englishErrorMessage = (message) => {
@@ -41,18 +41,18 @@ export const TILWFaucetApi = ReactTimeout(
       )
     }
 
-    doMintTILW = async () => {
+    doMintTEX = async () => {
       try {
         const response = await axiosInstance.get(`${this.faucetLambdaURI}?ethAddress=${this.props.address}`)
 
-        const txId = this.props.sendExternalTransaction('sendTILW')
+        const txId = this.props.sendExternalTransaction('sendTEX')
 
         if (response.status === 200) {
           this.setState({
             txHash: response.data.txHash
           })
 
-          toastr.success("We're sending you TILW. It will take a few moments to arrive.")
+          toastr.success("We're sending you TEX. It will take a few moments to arrive.")
 
           this.props.dispatchSagaGenesisTxHash(txId, response.data.txHash)
 
@@ -84,9 +84,9 @@ export const TILWFaucetApi = ReactTimeout(
 
       return (
         <div>
-          <TILWCoinImg width="100" height="100" />
+          <TEXCoinImg width="100" height="100" />
           <h5 className="is-size-5">
-            Current Balance: <TILW wei={this.props.tilwBalance} />
+            Current Balance: <TEX wei={this.props.texBalance} />
           </h5>
           <p className="small">
             <span className="eth-address has-text-grey-light">For address:&nbsp;
@@ -95,10 +95,10 @@ export const TILWFaucetApi = ReactTimeout(
           </p>
           <br />
           <p className="is-size-5">
-            You're low on TILW
+            You're low on TEX
             <br />
             <span className="is-size-7 has-text-grey-light">
-              TILW is necessary for staking a deposit to play the Coordination Game. We can send some to you now:
+              TEX is necessary for staking a deposit to play the Coordination Game. We can send some to you now:
             </span>
           </p>
 
@@ -106,8 +106,8 @@ export const TILWFaucetApi = ReactTimeout(
             <br />
 
             <LoadingButton
-              handleClick={this.handleMintTILW}
-              initialText='Send Me TILW'
+              handleClick={this.handleMintTEX}
+              initialText='Send Me TEX'
               loadingText='Sending'
               isLoading={isSending}
             />
@@ -125,7 +125,7 @@ export const TILWFaucetApi = ReactTimeout(
   }
 )
 
-TILWFaucetApi.propTypes = {
-  tilwBalance: PropTypes.object,
+TEXFaucetAPI.propTypes = {
+  texBalance: PropTypes.object,
   address: PropTypes.string
 }

@@ -461,7 +461,7 @@ header {
   text-decoration: underline;
 }
 
-.button.button--getTilw {
+.button.button--getTEX {
   background: none;
   bottom: 20px;
   height: 100px;
@@ -480,14 +480,14 @@ header {
   z-index: 500;
 }
 
-.button.button--getTilw:hover,
-.button.button--getTilw:focus,
-.button.button--getTilw:active {
+.button.button--getTEX:hover,
+.button.button--getTEX:focus,
+.button.button--getTEX:active {
   border: 0;
   opacity: 1;
 }
 
-.button.button--getTilw.is-hidden {
+.button.button--getTEX.is-hidden {
   display: block !important;
   opacity: 0;
   pointer-events: none;
