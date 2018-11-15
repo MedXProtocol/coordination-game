@@ -4,12 +4,88 @@ $ npm i && truffle install
 
 These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
 
-# Setup
+# Local Setup
+
+This project uses ZeppelinOS.  It's important to remember that the accounts that create the contracts are not able to interact with them.  The account that creates the contracts is called the **admin**.
+
+It's best to use the *second* account in the Coordination Game owner mnemonic, because truffle likes to use the first account by default.
+
+First start a local ZeppelinOS session using the admin account:
+
+```
+$ zos session --from $ADMIN_ACCOUNT --expires 10000 --network local
+```
+
+Now push instances of the contracts to the network specified in the session
+
+```
+$ zos push
+```
+
+Ensure your artifacts have the latest addresses (if you've previously deployed):
+
+```
+$ npm run merge-local
+```
+
+Now you'll want to make sure all of your migrations are up-to-date
+
+```
+$ truffle migrate
+```
+
+Next, run the tests to make sure everything works
+
+```
+npm test
+```
 
 Once the contracts are compiled and migrated, run bootstrap to mint tokens and fill the faucet:
 
 ```
 $ npm run bootstrap
+```
+
+To close the session:
+
+```
+$ zos session --close
+```
+
+## Starting from a Fresh Compile
+
+**Note:** If you delete the contract artifacts in the `build` directory they will no longer contain the proxy addresses.
+
+You will need to first compile the contracts:
+
+```
+$ truffle compile
+```
+
+Then merge the latest ZOS proxy addresses.  If its for the local network you can run:
+
+```
+$ npm run merge
+```
+
+# Deploying to Ropsten
+
+First make sure all of the ropsten contracts are up-to-date:
+
+```
+$ npm run push-ropsten
+```
+
+Next, ensure that the ropsten proxy addresses are merged into the build artifacts
+
+```
+$ npm run merge-ropsten
+```
+
+Now run the migrations against ropsten:
+
+```
+$ truffle migrate --network ropsten
 ```
 
 ## Usage

@@ -1,7 +1,8 @@
 #! /bin/sh
 
 truffle install && \
-  npm run compile && \
+  truffle compile && \
+  npm run merge-ropsten && \
   cd lambda && \
   ./lambda-build.sh && \
   cd .. && \

@@ -1,0 +1,16 @@
+{
+  "zosversion": "2",
+  "name": "coordination-game",
+  "version": "0.1.0",
+  "contracts": {
+    "WorkToken": "WorkToken",
+    "BetaFaucet": "BetaFaucet",
+    "EtherPriceFeed": "EtherPriceFeed",
+    "TILRoles": "TILRoles",
+    "Work": "Work",
+    "CoordinationGame": "CoordinationGame",
+    "TILRegistry": "TILRegistry",
+    "Migrations": "Migrations"
+  },
+  "dependencies": {}
+}

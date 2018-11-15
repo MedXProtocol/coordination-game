@@ -38,7 +38,7 @@ function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const isOwner = address && (cacheCallValue(state, workTokenAddress, 'owner') === address)
+  const isOwner = address && cacheCallValue(state, workTokenAddress, 'isMinter', address)
 
   return {
     address,
@@ -47,10 +47,10 @@ function mapStateToProps (state) {
   }
 }
 
-function* appSaga({ workTokenAddress }) {
+function* appSaga({ workTokenAddress, address }) {
   if (!workTokenAddress) { return }
 
-  yield cacheCall(workTokenAddress, 'owner')
+  yield cacheCall(workTokenAddress, 'isMinter', address)
 }
 
 const App = connect(mapStateToProps)(

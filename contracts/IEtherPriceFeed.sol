@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 /**
 Designed to be compatible with the MakerDAO feed contract: https://makerdao.com/feeds/

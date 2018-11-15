@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-import 'zeppelin/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-import './IndexedAddressArray.sol';
+import "openzeppelin-eth/contracts/math/SafeMath.sol";
+import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+import "./IndexedAddressArray.sol";
 import "./TILRoles.sol";
 
 // TODO: This contract needs events!
@@ -12,7 +12,7 @@ contract Work is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
   using SafeMath for uint256;
 
-  ERC20 public token;
+  IERC20 public token;
   TILRoles public roles;
 
   IndexedAddressArray.Data stakers;
@@ -43,17 +43,18 @@ contract Work is Ownable {
     _;
   }
 
-  constructor (
-    ERC20 _token,
+  function init (
+    address _owner,
+    IERC20 _token,
     uint256 _requiredStake,
     uint256 _jobStake,
     TILRoles _roles
-  ) public {
+  ) public initializer {
     require(_token != address(0), '_token is defined');
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
     require(_roles != address(0), '_roles is defined');
-
+    Ownable.initialize(_owner);
     token = _token;
     requiredStake = _requiredStake;
     jobStake = _jobStake;

@@ -1,8 +1,7 @@
 
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "tcr/Parameterizer.sol";
+import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "./EtherPriceFeed.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
@@ -150,13 +149,17 @@ contract CoordinationGame is Ownable {
          to add applicants to
   @param _applicationStakeAmount how much an applicant has to stake when applying
   */
-  constructor (
+  function init (
+    address _owner,
     EtherPriceFeed _etherPriceFeed,
     Work _work,
     TILRegistry _tilRegistry,
     uint256 _applicationStakeAmount,
     uint256 _baseApplicationFeeUsdWei
-  ) public {
+  ) public initializer {
+    require(_tilRegistry != address(0));
+    require(_work != address(0));
+    Ownable.initialize(_owner);
     etherPriceFeed = _etherPriceFeed;
     work = _work;
     tilRegistry = _tilRegistry;
@@ -257,7 +260,7 @@ contract CoordinationGame is Ownable {
         'transferred old verifiers deposit to applicant'
       );
 
-      VerifierSubmissionTimedOut(_applicationId, previousVerifier);
+      emit VerifierSubmissionTimedOut(_applicationId, previousVerifier);
 
       // If we chose this verifier last time let's choose a different one
       if (selectedVerifier == previousVerifier) {
@@ -448,7 +451,7 @@ contract CoordinationGame is Ownable {
   @notice Converts an application id into a listing hash key
   @param _applicationId the application id
   */
-  function getListingHash(uint256 _applicationId) public view returns (bytes32) {
+  function getListingHash(uint256 _applicationId) public pure returns (bytes32) {
     return bytes32(_applicationId);
   }
 
@@ -486,7 +489,7 @@ contract CoordinationGame is Ownable {
     return (block.timestamp - verifierSubmittedAt[_applicationId]) > applicantRevealTimeoutInSeconds;
   }
 
-  function verifierSubmittedSecret(uint256 _applicationId) internal returns (bool) {
+  function verifierSubmittedSecret(uint256 _applicationId) internal view returns (bool) {
     return verifierSecrets[_applicationId] != 0;
   }
 

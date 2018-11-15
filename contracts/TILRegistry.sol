@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "./IndexedBytes32Array.sol";
 import "./Work.sol";
 import "./TILRoles.sol";
+import "zos-lib/contracts/Initializable.sol";
 
-contract TILRegistry is Ownable {
+contract TILRegistry is Initializable {
   using IndexedBytes32Array for IndexedBytes32Array.Data;
 
   enum ListingState {
@@ -26,7 +26,7 @@ contract TILRegistry is Ownable {
 
   mapping(bytes32 => Listing) public listings;
   IndexedBytes32Array.Data listingsIterator;
-  ERC20 public token;
+  IERC20 public token;
   TILRoles roles;
   Work work;
 
@@ -35,13 +35,13 @@ contract TILRegistry is Ownable {
     _;
   }
 
-  constructor(ERC20 _token, TILRoles _roles, Work _work) public {
+  function initialize(address _token, address _roles, address _work) public initializer {
     require(_token != address(0), 'token is defined');
     require(_roles != address(0), 'roles is defined');
     require(_work != address(0), 'work is defined');
-    roles = _roles;
-    token = _token;
-    work = _work;
+    roles = TILRoles(_roles);
+    token = IERC20(_token);
+    work = Work(_work);
   }
 
   function newListing(address _applicant, bytes32 _listingHash, uint256 _deposit) external onlyJobManager {

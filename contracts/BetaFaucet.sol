@@ -1,9 +1,11 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./WorkToken.sol";
+import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+import "openzeppelin-eth/contracts/math/SafeMath.sol";
+import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "zos-lib/contracts/Initializable.sol";
 
-contract BetaFaucet is Ownable {
+contract BetaFaucet is Initializable, Ownable {
   // Keep track of which Ethereum addresses we've sent Ether and our TILW ERC20 token to
   mapping (address => bool) public sentEtherAddresses;
   mapping (address => bool) public sentTILWAddresses;
@@ -15,28 +17,27 @@ contract BetaFaucet is Ownable {
   event WorkTokenSent(address indexed recipient, uint256 value);
 
   // A reference to your deployed token contract
-  WorkToken public workToken;
+  IERC20 public workToken;
 
   // Provides a better way to do calculations via .add(), .sub(), etc.
   using SafeMath for uint256;
 
-  // Constructor which allows us to fund contract on creation
-  constructor(WorkToken _workToken) public payable {
-    require(workToken == address(0));
-    owner = msg.sender;
-    workToken = _workToken;
-  }
-
   // `fallback` function called when eth is sent to this contract
-  function () payable {
+  function () public payable {
   }
 
-  function setWorkToken(WorkToken _workToken) external onlyOwner {
+  /**
+   * @dev - Creates a new BetaFaucet contract with the given parameters
+   * @param _workToken - the address of the previously deployed Work token contract
+   */
+  function initialize(IERC20 _workToken, address _owner) public initializer {
+    require(_workToken != address(0), 'work token is defined');
+    Ownable.initialize(_owner);
     workToken = _workToken;
   }
 
   function withdrawEther() external onlyOwner {
-    owner.transfer(address(this).balance.sub(gasAmount));
+    owner().transfer(address(this).balance.sub(gasAmount));
   }
 
   function sendEther(address _recipient, uint256 _amount) public onlyOwner {

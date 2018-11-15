@@ -1,18 +1,21 @@
-
+const createProject = require('./helpers/createProject')
 const expectThrow = require('./helpers/expectThrow')
 const WorkToken = artifacts.require("./WorkToken.sol")
-const BetaFaucetArtifact = artifacts.require('./BetaFaucet.sol')
+const BetaFaucet = artifacts.require('./BetaFaucet.sol')
 
 contract('BetaFaucet', function (accounts) {
-  let recipient = accounts[1]
-  let recipient2 = accounts[2]
-  let recipient3 = accounts[3]
+  const [owner, admin, recipient, recipient2, recipient3] = accounts
 
   let workTokenInstance, betaFaucetInstance
 
+  let project
+
   before(async () => {
+    // project = await createProject(accounts)
     workTokenInstance = await WorkToken.new()
-    betaFaucetInstance = await BetaFaucetArtifact.new(workTokenInstance.address)
+    await workTokenInstance.initialize(owner) //project.createProxy(WorkToken, { initArgs: [owner] })
+    betaFaucetInstance = await BetaFaucet.new()
+    await betaFaucetInstance.initialize(workTokenInstance.address, owner) //project.createProxy(BetaFaucet, { initArgs: [workTokenInstance.address, owner] })
   })
 
   describe('withdrawEther()', () => {

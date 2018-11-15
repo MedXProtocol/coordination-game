@@ -6,7 +6,6 @@ const Work = artifacts.require('Work.sol')
 const abi = require('ethereumjs-abi')
 const BN = require('bn.js')
 const debug = require('debug')('TILRegistry.test.js')
-const tdr = require('truffle-deploy-registry')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
@@ -27,11 +26,13 @@ contract('TILRegistry', (accounts) => {
     work = await Work.deployed()
     workToken = await WorkToken.deployed()
     roles = await TILRoles.new()
+    await roles.init(owner)
     await roles.setRole(owner, 1, true) // owner is the job manager
   })
 
   beforeEach(async () => {
-    registry = await TILRegistry.new(workToken.address, roles.address, work.address)
+    registry = await TILRegistry.new()
+    await registry.initialize(workToken.address, roles.address, work.address)
     await workToken.mint(owner, listingStake)
     await workToken.approve(registry.address, listingStake)
   })

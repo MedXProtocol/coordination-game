@@ -8,8 +8,6 @@ const WorkToken = artifacts.require('WorkToken.sol')
 const abi = require('ethereumjs-abi')
 const BN = require('bn.js')
 const debug = require('debug')('CoordinationGame.test.js')
-const tdr = require('truffle-deploy-registry')
-const createCoordinationGame = require('../migrations/support/createCoordinationGame')
 const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
@@ -21,7 +19,6 @@ contract('CoordinationGame', (accounts) => {
     etherPriceFeed,
     workToken,
     work,
-    workStake,
     tilRegistry,
     applicationId,
     applicationVerifier,
@@ -30,9 +27,7 @@ contract('CoordinationGame', (accounts) => {
     roles,
     weiPerApplication
 
-  const applicant = accounts[0]
-  const verifier = accounts[1]
-  const verifier2 = accounts[2]
+  const [owner, admin, applicant, verifier, verifier2] = accounts
 
   const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const random = new BN("4312341235")
@@ -40,6 +35,8 @@ contract('CoordinationGame', (accounts) => {
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
+  const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
+  const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -54,31 +51,39 @@ contract('CoordinationGame', (accounts) => {
 
   before(async () => {
     etherPriceFeed = await EtherPriceFeed.deployed()
-    work = await Work.deployed()
     workToken = await WorkToken.deployed()
-    workStake = await work.requiredStake()
-    jobStake = await work.jobStake()
     roles = await TILRoles.deployed()
-
-    await registerWorker(verifier)
-    await registerWorker(verifier2)
   })
 
   beforeEach(async () => {
-    tilRegistry = await TILRegistry.new(workToken.address, roles.address, work.address)
-    assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
-    assert.equal(await tilRegistry.owner.call(), applicant, 'tilRegistry owner is first account')
-
-    coordinationGame = await CoordinationGame.new(
-      etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
+    work = await Work.new()
+    await work.init(
+      owner, workToken.address, requiredStake.toString(), jobStake.toString(), roles.address
     )
+    await registerWorker(verifier)
+    await registerWorker(verifier2)
+
+    tilRegistry = await TILRegistry.new()
+    debug(`Created new TILRegistry at ${tilRegistry.address}`)
+    debug(`Initializing... ${owner} ${workToken.address} ${roles.address} ${work.address}`)
+    debug(tilRegistry.initialize)
+    await tilRegistry.initialize(workToken.address, roles.address, work.address)
+    debug(`Initialized TILRegistry`)
+    assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
+
+    coordinationGame = await CoordinationGame.new()
+    debug(`Created new CoordinationGame at ${coordinationGame.address}`)
+    await coordinationGame.init(
+      owner, etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
+    )
+    debug(`Initialized CoordinationGame`)
 
     weiPerApplication = await coordinationGame.weiPerApplication()
 
     await roles.setRole(coordinationGame.address, 1, true)
 
     coordinationGameOwnerAddress = await coordinationGame.owner.call()
-    assert.equal(coordinationGameOwnerAddress, applicant, 'coord game owner is first account')
+    assert.equal(coordinationGameOwnerAddress, owner, 'coord game owner is first account')
 
     // Add one to the timeouts so that we can use them to increaseTime and timeout
     applicantRevealTimeoutInSeconds = await coordinationGame.applicantRevealTimeoutInSeconds()
@@ -90,19 +95,20 @@ contract('CoordinationGame', (accounts) => {
     verifierTimeoutInSeconds = new BN(verifierTimeoutInSeconds.toString()).add(new BN(1))
     debug(`verifierTimeoutInSeconds is ${verifierTimeoutInSeconds.toString()}`)
 
-    debug(`Minting Deposit to Applicant ${workStake.toString()}...`)
-    await workToken.mint(applicant, workStake)
+    debug(`Minting Deposit to Applicant ${requiredStake.toString()}...`)
+    await workToken.mint(applicant, requiredStake)
 
-    debug(`Approving CoordinationGame to spend ${workStake.toString()} for applicant...`)
-    await workToken.approve(coordinationGame.address, workStake, { from: applicant })
+    debug(`Approving CoordinationGame to spend ${requiredStake.toString()} for applicant...`)
+    await workToken.approve(coordinationGame.address, requiredStake, { from: applicant })
   })
 
   async function registerWorker(address) {
-    debug(`Minting Stake to ${address}...`)
-    await workToken.mint(address, workStake)
+    debug(`Minting worktoken ${workToken.address} Stake to ${address}...`)
+    await workToken.mint(address, requiredStake)
 
-    debug(`Approving workStake ${workStake.toString()} to ${work.address} for ${address}...`)
-    await workToken.approve(work.address, workStake, { from: address })
+    debug(`Approving requiredStake ${requiredStake.toString()} to ${work.address} for ${address}...`)
+    await workToken.approve(work.address, requiredStake, { from: address })
+    debug(`work token address: ${await work.token()}`)
     await work.depositStake({ from: address })
   }
 
@@ -413,19 +419,19 @@ contract('CoordinationGame', (accounts) => {
         })
         await increaseTime(applicantRevealTimeoutInSeconds)
 
-        const verifierStartingBalance = (await work.balances(selectedVerifier)).toNumber()
-        const applicantStartingBalance = (await workToken.balanceOf(applicant)).toNumber()
-        const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
-        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId)).toNumber()
+        const verifierStartingBalance = (await work.balances(selectedVerifier))
+        const applicantStartingBalance = (await workToken.balanceOf(applicant))
+        const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier))
+        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId))
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
         assert.equal(jobStake.toString(), applicationStakeAmount.toString())
         await verifierChallenges(selectedVerifier)
 
-        const verifierFinishingBalance = (await work.balances(selectedVerifier)).toNumber()
-        const verifierEtherFinishingBalance = (await web3.eth.getBalance(selectedVerifier)).toNumber()
-        const applicantFinishingBalance = (await workToken.balanceOf(applicant)).toNumber()
+        const verifierFinishingBalance = (await work.balances(selectedVerifier))
+        const verifierEtherFinishingBalance = (await web3.eth.getBalance(selectedVerifier))
+        const applicantFinishingBalance = (await workToken.balanceOf(applicant))
 
         debug(`verifier finishing balance: ${verifierFinishingBalance}`)
         debug(`applicant finishing balance: ${applicantFinishingBalance}`)
@@ -434,8 +440,23 @@ contract('CoordinationGame', (accounts) => {
           verifierEtherFinishingBalance - verifierEtherStartingBalance > (applicantEtherDeposit * 0.98), // minus gas
           'verifier was paid in ether'
         )
-        assert.equal(verifierFinishingBalance, verifierStartingBalance + jobStake.toNumber(), 'verifier deposit was returned')
-        assert.equal(applicantFinishingBalance, applicantStartingBalance + jobStake.toNumber(), 'applicant deposit was returned')
+
+        const approxJobStake = new BN(jobStake).mul(new BN(90)).div(new BN(100))
+        const verifierBalanceDelta = verifierFinishingBalance.sub(verifierStartingBalance)
+        const applicantBalanceDelta = applicantFinishingBalance.sub(applicantStartingBalance)
+
+        debug(`approxJobStake: ${approxJobStake.toString()}`)
+        debug(`verifierBalanceDelta: ${verifierBalanceDelta.toString()}`)
+        debug(`applicantBalanceDelta: ${applicantBalanceDelta.toString()}`)
+
+        assert.ok(
+          verifierBalanceDelta.gt(approxJobStake),
+          'verifier deposit was returned'
+        )
+        assert.ok(
+          applicantBalanceDelta.gt(approxJobStake),
+          'applicant deposit was returned'
+        )
 
         debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
         const listingHash = await coordinationGame.getListingHash(applicationId)
