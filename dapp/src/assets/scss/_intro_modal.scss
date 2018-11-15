@@ -1,0 +1,89 @@
+.intro-modal {
+  @media screen and (max-width: 1088px) {
+    .q-speech-bubble {
+      height: 180px;
+      width: 280px;
+    }
+
+    .a-in-box {
+      height: 140px;
+      width: 240px;
+    }
+
+    .guy-frame-1 {
+      margin-top: 60px;
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .q-speech-bubble {
+      height: 90px;
+      width: 140px;
+    }
+
+    .a-in-box {
+      height: 70px;
+      width: 120px;
+    }
+
+    .guy-frame-1 {
+      margin-top: 40px;
+      width: 150px;
+      height: 150px;
+    }
+  }
+}
+
+.fade-enter {
+  opacity: 0.01;
+  transform: translateY(50px);
+}
+//
+// .fade-enter.fade-enter-active {
+//   transition: opacity 250ms ease-in;
+//   opacity: 1;
+// }
+//
+// .fade-appear { opacity: 0.01; }
+// .fade-appear.fade-appear-active { opacity: 1; transition: opacity 250ms ease-in; }
+//
+// .fade-leave {
+//   opacity: 1;
+// }
+//
+// .fade-leave.fade-leave-active {
+//   opacity: 0.01;
+//   transition: opacity 100ms ease-in;
+// }
+
+.fadeIn-enter {
+  opacity: 0;
+  transition: 0.3s ease-in-out all;
+}
+
+.fadeIn-enter.fadeIn-enter-active {
+  opacity: 1;
+}
+
+.list-item {
+    background-color: #eee;
+    padding: 10px;
+    margin: 5px;
+    width: 200px;
+    height: 200px;
+    display: inline-block;
+}
+
+/* Transition */
+.slide-up-appear {
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 1s ease;
+
+    &.slide-up-appear-active {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}

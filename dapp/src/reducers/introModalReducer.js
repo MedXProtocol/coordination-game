@@ -1,22 +1,22 @@
-export const faqModal = function (state, { type }) {
+export const introModal = function (state, { type }) {
   if (typeof state === 'undefined') {
     state = {
-      showFaqModal: true
+      showIntroModal: true
     }
   }
 
   switch(type) {
-    case 'HIDE_FAQ_MODAL':
+    case 'HIDE_INTRO_MODAL':
       state = {
         ...state,
-        showFaqModal: false
+        showIntroModal: false
       }
       break
 
-    case 'SHOW_FAQ_MODAL':
+    case 'SHOW_INTRO_MODAL':
       state = {
         ...state,
-        showFaqModal: true
+        showIntroModal: true
       }
       break
 
