@@ -6,7 +6,8 @@ import { EthAddress } from '~/components/EthAddress'
 import { TEX } from '~/components/TEX'
 import { LoadingButton } from '~/components/LoadingButton'
 import { axiosInstance } from '~/../config/axiosConfig'
-import TEXCoinImg from '~/assets/img/tex-coin.svg'
+import TEXCoinImg from '~/assets/img/tex-coin.png'
+import TEXCoinImg2x from '~/assets/img/tex-coin.png'
 
 export const TEXFaucetAPI = ReactTimeout(
   class _TEXFaucetAPI extends Component {
@@ -84,7 +85,12 @@ export const TEXFaucetAPI = ReactTimeout(
 
       return (
         <div>
-          <TEXCoinImg width="100" height="100" />
+          <img
+            src={TEXCoinImg}
+            alt="TEX Token Icon"
+            srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
+          />
+
           <h5 className="is-size-5">
             Current Balance: <TEX wei={this.props.texBalance} />
           </h5>

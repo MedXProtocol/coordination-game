@@ -10,8 +10,7 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import GetTEXCoinImg from '~/assets/img/get-tex-coin.png'
-import GetTEXCoinImg2x from '~/assets/img/get-tex-coin@2x.png'
+import GetTEXCoin from '~/assets/img/get-tex-coin.svg'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -73,11 +72,7 @@ export const GetTEX = connect(mapStateToProps, mapDispatchToProps)(
               }
             )}
           >
-            <img
-              src={GetTEXCoinImg}
-              alt="Get More TEX Token"
-              srcSet={`${GetTEXCoinImg} 1x, ${GetTEXCoinImg2x} 2x`}
-            />
+            <GetTEXCoin />
           </button>
         )
       }
