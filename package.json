@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dapp": "cd dapp && npm run start",
-    "compile": "$(npm bin)/truffle compile && apply-registry build/contracts",
-    "migrate": "$(npm bin)/truffle migrate && apply-registry build/contracts",
+    "push": "$(npm bin)/zos push",
+    "migrate": "$(npm bin)/truffle migrate",
     "staging-build": "./scripts/build.sh",
     "test": "NODE_ENV=test $(npm bin)/truffle test --migrations_directory .migrations_null",
     "start": "./scripts/ganache.sh",
