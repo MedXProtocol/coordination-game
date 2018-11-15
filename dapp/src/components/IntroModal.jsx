@@ -88,14 +88,6 @@ export const IntroModal =
         }
       }
 
-      handleCloseModal = () => {
-        this.setState({
-          modalState: false
-        })
-
-        this.props.dispatchHideIntroModal()
-      }
-
       componentDidMount() {
         this.determineModalState(this.props)
       }
@@ -110,6 +102,15 @@ export const IntroModal =
             modalState: true
           })
         }
+      }
+
+      handleCloseModal = () => {
+        this.setState({
+          modalState: false
+        })
+
+        storeKeyValInLocalStorage('dontShowIntroModal', 'true')
+        this.props.dispatchHideIntroModal()
       }
 
       handleDontShow = (e) => {
@@ -174,7 +175,7 @@ export const IntroModal =
                   onClick={this.handleCloseModal}
                   className="button is-primary is-outlined"
                 >
-                  Ok, thanks! I'd like to play
+                  Ok, thanks! I'd like to try it out
                 </button>
               </p>
               <br />

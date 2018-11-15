@@ -504,7 +504,11 @@ html.html-light,
 
     // max
     @media screen and (max-width: 1088px) {
-      top: 70px;
+      top: 44px;
+
+      .navbar-menu.is-active {
+        background-color: white;
+      }
     }
   }
 

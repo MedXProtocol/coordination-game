@@ -195,7 +195,7 @@ export const Admin = connect(mapStateToProps)(
 
               <form onSubmit={this.handleSubmitCoordinationGameSettings}>
                 <div className="columns">
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>TIL Application Stake Amount</strong>
                       <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
@@ -203,7 +203,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="applicationStakeAmount"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.applicationStakeAmount || ''}
                     />
@@ -212,7 +212,7 @@ export const Admin = connect(mapStateToProps)(
                     </span>
                   </div>
 
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>TIL Application Fee</strong>
                       <span className="is-size-7 is-block has-text-grey">(in USD)</span>
@@ -220,7 +220,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="baseApplicationFeeUsdWei"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.baseApplicationFeeUsdWei || ''}
                     />
@@ -231,7 +231,7 @@ export const Admin = connect(mapStateToProps)(
                 </div>
 
                 <div className="columns">
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Verifier Timeout</strong>
                       <span className="is-size-7 is-block has-text-grey">(in days)</span>
@@ -239,7 +239,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="verifierTimeoutInSeconds"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.verifierTimeoutInSeconds || ''}
                     />
@@ -248,7 +248,7 @@ export const Admin = connect(mapStateToProps)(
                     </span>
                   </div>
 
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Applicant Reveal Timeout</strong>
                       <span className="is-size-7 is-block has-text-grey">(in days)</span>
@@ -256,7 +256,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="applicantRevealTimeoutInSeconds"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.applicantRevealTimeoutInSeconds || ''}
                     />
@@ -293,7 +293,7 @@ export const Admin = connect(mapStateToProps)(
                 </h4>
 
                 <div className="columns">
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Verification Job Stake Amount</strong>
                       <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
@@ -301,7 +301,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="jobStake"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.jobStake || ''}
                     />
@@ -310,7 +310,7 @@ export const Admin = connect(mapStateToProps)(
                     </span>
                   </div>
 
-                  <div className="column is-4">
+                  <div className="column is-6">
                     <p className="is-size-7">
                       <strong>Required Stake Amount</strong>
                       <span className="is-size-7 is-block has-text-grey">(in TILW)</span>
@@ -318,7 +318,7 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="requiredStake"
-                      className="text-input is-marginless"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
                       onChange={this.handleTextInputChange}
                       value={this.state.requiredStake || ''}
                     />
