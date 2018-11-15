@@ -12,6 +12,7 @@
     "lambda": "cd lambda && ./lambda-serve.sh",
     "bootstrap": "truffle exec scripts/bootstrap-faucet.js",
     "bootstrap-verifiers": "truffle exec scripts/bootstrap-verifiers.js",
+    "merge": "npm run merge-local && npm run merge-ropsten",
     "merge-local": "./scripts/zosMerge.js -n 1234 zos.dev-1234.json",
     "merge-ropsten": "./scripts/zosMerge.js -n 3 zos.ropsten.json",
     "push-ropsten": "$(npm bin)/zos push --network ropstenAdmin"

@@ -22,6 +22,12 @@ Now push instances of the contracts to the network specified in the session
 $ zos push
 ```
 
+Ensure your artifacts have the latest addresses (if you've previously deployed):
+
+```
+$ npm run merge-local
+```
+
 Now you'll want to make sure all of your migrations are up-to-date
 
 ```
@@ -59,13 +65,7 @@ $ truffle compile
 Then merge the latest ZOS proxy addresses.  If its for the local network you can run:
 
 ```
-$ npm run merge-local
-```
-
-Otherwise, if you're wanting to merge ropsten then run:
-
-```
-$ npm run merge-ropsten
+$ npm run merge
 ```
 
 # Deploying to Ropsten
