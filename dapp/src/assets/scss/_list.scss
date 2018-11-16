@@ -27,7 +27,7 @@
   box-sizing: border-box;
   font-size: 0.75rem;
   font-weight: 700;
-  min-height: 160px;
+  min-height: 130px;
   list-style-type: none;
   line-height: 28px;
   padding: 10px 0;
@@ -47,7 +47,6 @@
     box-shadow: none;
     margin: 0 0 3px;
     min-height: 270px;
-    padding: 0;
     transition: none;
   }
 }
@@ -64,7 +63,7 @@
   grid-column: span 1;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 6;
+    grid-column: span 8;
     text-align: left;
   }
 
@@ -78,8 +77,8 @@
   text-align: center;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 6;
-    text-align: left;
+    grid-column: span 4;
+    text-align: right;
   }
 
   @media screen and (max-width: 768px) {
@@ -89,6 +88,7 @@
 
 .list--item__status {
   grid-column: span 6;
+  word-break: break-all;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 6;
@@ -105,11 +105,12 @@
 
   @media screen and (max-width: 1200px) {
     grid-column: span 6;
-    text-align: left;
+    text-align: right;
   }
 
   @media screen and (max-width: 768px) {
     grid-column: span 12;
+    text-align: left;
   }
 }
 
@@ -118,10 +119,10 @@
 .list--item__date,
 .list--item__status,
 .list--item__view {
-  margin: 20px 40px;
+  margin: 0.25rem 1rem;
 
   @media (max-width: 768px) {
-    margin: 20px 40px 0;
+    margin: 0.25rem 1rem 0;
   }
 }
 
@@ -184,7 +185,6 @@
   color: darken($gray, 35%);
   font-weight: 700;
   transition: color 200ms ease-in;
-  margin-right: 30px;
 }
 
 .list--item__view svg {
@@ -223,4 +223,32 @@
 
 .list--item form {
   margin: 4px 0 0;
+}
+
+.list--action-container {
+  text-align: right;
+
+  @media (max-width: 768px) {
+    text-align: left;
+  }
+}
+
+.list--action {
+  margin: 0 0 8px 0;
+  padding: 0 0 18px 0;
+
+  @media (max-width: 768px) {
+    float: none;
+    margin-bottom: 30px;
+  }
+}
+
+.list--title {
+  margin: 0 0 10px 0;
+  padding: 0 0 20px 0;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+    padding-bottom: 10px;
+  }
 }

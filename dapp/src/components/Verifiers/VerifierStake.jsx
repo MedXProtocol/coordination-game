@@ -14,7 +14,7 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { GetTILWLink } from '~/components/GetTILWLink'
+import { GetTEXLink } from '~/components/GetTEXLink'
 import { Progress } from '~/components/Progress'
 import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep1'
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
@@ -28,7 +28,7 @@ function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
   const workAddress = contractByName(state, 'Work')
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const allowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, workAddress)
   const staked = cacheCallValueBigNumber(state, workAddress, 'balances', address)
@@ -46,7 +46,7 @@ function mapStateToProps(state) {
     requiredStake,
     staked,
     transactions,
-    tilwBalance,
+    texBalance,
     workAddress,
     workTokenAddress
   }
@@ -72,15 +72,15 @@ export const VerifierStake = connect(mapStateToProps)(
 
         /*
           TODO: this is actually more complicated: we need to check that they have
-          less than 1000 staked, and that their TILW balance is 1000 or more
+          less than 1000 staked, and that their TEX balance is 1000 or more
           OR that they have 1000 or more approved
         */
         canApprove = () => {
-          const { tilwBalance, requiredStake } = this.props
+          const { texBalance, requiredStake } = this.props
 
-          return defined(tilwBalance)
+          return defined(texBalance)
             && defined(requiredStake)
-            && tilwBalance.gte(requiredStake)
+            && texBalance.gte(requiredStake)
         }
 
         approvalComplete = () => {
@@ -93,7 +93,7 @@ export const VerifierStake = connect(mapStateToProps)(
 
         /*
           TODO: this is actually more complicated: we need to check that they have
-          less than 1000 staked, and that their TILW balance is 1000 or more
+          less than 1000 staked, and that their TEX balance is 1000 or more
           OR that they have 1000 or more approved
         */
         canStake = () => {
@@ -109,15 +109,15 @@ export const VerifierStake = connect(mapStateToProps)(
         }
 
         render() {
-          let needsTILWMessage
+          let needsTEXMessage
           const { requiredStake, staked, isActive } = this.props
           const hasBalance = staked && staked.gt(new BN(0))
 
           if (!this.canApprove() && !isActive) {
-            needsTILWMessage = (
+            needsTEXMessage = (
               <p>
-                You need at least <strong>{displayWeiToEther(requiredStake)} TILW</strong> before you can become a verifier.
-                <br /><br /><GetTILWLink />
+                You need at least <strong>{displayWeiToEther(requiredStake)} TEX</strong> before you can become a verifier.
+                <br /><br /><GetTEXLink />
               </p>
             )
           }
@@ -140,7 +140,7 @@ export const VerifierStake = connect(mapStateToProps)(
                     <React.Fragment>
                       <p>
                         <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />&nbsp;
-                        You have successfully staked <strong>{displayWeiToEther(staked)} TILW</strong> and are now a Verifier.
+                        You have successfully staked <strong>{displayWeiToEther(staked)} TEX</strong> and are now a Verifier.
                       </p>
                       {hasBalance &&
                         <React.Fragment>
@@ -180,7 +180,7 @@ export const VerifierStake = connect(mapStateToProps)(
                         </React.Fragment>
                       }
                       <Progress
-                        disabled={needsTILWMessage}
+                        disabled={needsTEXMessage}
                         labels={['Send Approval', 'Deposit Stake', 'Done!']}
                         progressState={{
                           step1Active: !this.approvalComplete() && this.canApprove(),
@@ -198,7 +198,7 @@ export const VerifierStake = connect(mapStateToProps)(
                         approvalComplete={this.approvalComplete}
                         canApprove={this.canApprove}
                       />
-                      {needsTILWMessage}
+                      {needsTEXMessage}
 
                       <VerifierStakeStep2
                         {...this.props}

@@ -9,15 +9,15 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const GetTILWLink = connect(null, mapDispatchToProps)(
-  class _GetTILWLink extends Component {
+export const GetTEXLink = connect(null, mapDispatchToProps)(
+  class _GetTEXLink extends Component {
     render() {
       return (
         <button
           onClick={this.props.dispatchShowBetaFaucetModal}
           className="button is-outlined is-primary"
         >
-          Get TILW
+          Get TEX
         </button>
       )
     }

@@ -63,6 +63,10 @@ html.html-light,
     color: rgba(0, 0, 0, 0.3);
   }
 
+  .navbar-item path {
+    fill: lighten($text-color--light, 25%);
+  }
+
   a,
   button {
     color: darken($accent-color-1--light, 5%);
@@ -266,7 +270,7 @@ html.html-light,
     color: darken($accent-color-3--light, 5%) !important;
   }
 
-  .button.button--getTilw {
+  .button.button--getTEX {
     border: 0;
   }
 
@@ -504,7 +508,9 @@ html.html-light,
 
     // max
     @media screen and (max-width: 1088px) {
-      top: 70px;
+      .navbar-menu.is-active {
+        background-color: white;
+      }
     }
   }
 

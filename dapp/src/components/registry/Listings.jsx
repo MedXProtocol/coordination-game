@@ -4,6 +4,7 @@ import React, {
 import PropTypes from 'prop-types'
 import { formatRoute } from 'react-router-named-routes'
 import { LoadingLines } from '~/components/LoadingLines'
+import { Link } from 'react-router-dom'
 import {
   withSaga,
   cacheCall,
@@ -80,9 +81,19 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
     return (
       <React.Fragment>
         <div className="is-clearfix">
-          <h6 className="is-size-6">
-            Registry Listings
-          </h6>
+          <div className="columns">
+            <div className="column is-6">
+              <h6 className="is-size-10 list--title">
+                Registry Listings
+              </h6>
+            </div>
+
+            <div className="column is-6 list--action-container">
+              <Link to={routes.REGISTER_TOKEN} className="button is-outlined is-primary is-small list--action">
+                Register a Token
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className='list--container'>

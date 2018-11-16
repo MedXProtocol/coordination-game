@@ -9,18 +9,19 @@ import { txErrorMessage } from '~/services/txErrorMessage'
 import { txErrorToCode } from '~/services/txErrorToCode'
 
 const txNames = {
-  'approve': 'TILW Approval',
+  'approve': 'TEX Approval',
   'sendEther': 'Sending Ether',
-  'sendTILW': 'Sending TILW',
+  'sendTEX': 'Sending TEX',
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
   'withdrawListing': 'Withdrawing Listing',
   'withdraw': 'Withdrawing Stake',
   'applicantRevealSecret': 'Finalizing Application',
-  'depositStake': 'Depositing TILW Stake',
+  'depositStake': 'Depositing TEX Stake',
   'setBaseApplicationFeeUsdWei': 'Updating case fee',
   'updateSettings': 'Update Settings',
-  'verifierSubmitSecret': 'Submitting Secret'
+  'verifierSubmitSecret': 'Submitting Secret',
+  'verifierChallenge': 'Challenging Application'
 }
 
 function mapStateToProps(state) {

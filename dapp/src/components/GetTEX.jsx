@@ -3,32 +3,36 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { get } from 'lodash'
+import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
   cacheCallValueBigNumber,
   contractByName,
   withSaga
 } from 'saga-genesis'
-import GetTILWCoinImg from '~/assets/img/get-tilw-coin.png'
-import GetTILWCoinImg2x from '~/assets/img/get-tilw-coin@2x.png'
+import GetTEXCoin from '~/assets/img/get-tex-coin.svg'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
 
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
+
+  const sendTEXTx = transactionFinders.findByMethodName(state, 'sendTEX')
+  const texInFlight = sendTEXTx && !sendTEXTx.confirmed
 
   return {
     address,
     betaFaucetModalDismissed,
     workTokenAddress,
-    tilwBalance
+    texInFlight,
+    texBalance
   }
 }
 
-function* getTILWSaga({ workTokenAddress, address }) {
+function* getTEXSaga({ workTokenAddress, address }) {
   if (!workTokenAddress || !address) { return }
 
   yield all([
@@ -44,15 +48,16 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(getTILWSaga)(
-    class _GetTILW extends Component {
+export const GetTEX = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(getTEXSaga)(
+    class _GetTEX extends Component {
 
       render() {
         const visible = (
           this.props.workTokenAddress &&
-          (this.props.tilwBalance !== undefined) &&
-          (this.props.tilwBalance < 25) &&
+          !this.props.texInFlight &&
+          (this.props.texBalance !== undefined) &&
+          (this.props.texBalance < 25) &&
           this.props.betaFaucetModalDismissed
         )
 
@@ -61,18 +66,13 @@ export const GetTILW = connect(mapStateToProps, mapDispatchToProps)(
             onClick={this.props.dispatchShowBetaFaucetModal}
             className={classnames(
               'button',
-              'button--getTilw',
+              'button--getTEX',
               {
                 'is-hidden': !visible
               }
             )}
           >
-            <img
-              src={GetTILWCoinImg}
-              alt="Get More TILW Token"
-              width="100"
-              srcSet={`${GetTILWCoinImg} 1x, ${GetTILWCoinImg2x} 2x`}
-            />
+            <GetTEXCoin />
           </button>
         )
       }

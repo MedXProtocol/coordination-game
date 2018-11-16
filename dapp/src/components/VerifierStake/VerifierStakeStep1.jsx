@@ -74,12 +74,12 @@ export const VerifierStakeStep1 = connect(mapStateToProps, mapDispatchToProps)(
             })
             .onConfirmed(() => {
               this.setState({ workTokenApproveHandler: null })
-              toastr.success('Approval for contract to spend TILW tokens confirmed.')
+              toastr.success('Approval for contract to spend TEX tokens confirmed.')
             })
             .onTxHash(() => {
               this.props.dispatchHideLoadingStatus()
 
-              toastr.success('Approval for contract to spend TILW tokens sent - it will take a few minutes to confirm on the Ethereum network.')
+              toastr.success('Approval for contract to spend TEX tokens sent - it will take a few minutes to confirm on the Ethereum network.')
             })
         }
       }
@@ -102,7 +102,7 @@ export const VerifierStakeStep1 = connect(mapStateToProps, mapDispatchToProps)(
               <div className="columns">
                 <div className="column is-8">
                   <p>
-                    The Trustless Incentivized List contract needs your permission to stake <strong>{displayWeiToEther(requiredStake)} TILW</strong> to become a verifier.
+                    The Trustless Incentivized List contract needs your permission to stake <strong>{displayWeiToEther(requiredStake)} TEX</strong> to become a verifier.
                   </p>
                 </div>
               </div>
@@ -122,7 +122,7 @@ export const VerifierStakeStep1 = connect(mapStateToProps, mapDispatchToProps)(
           <React.Fragment>
             <h6 className="is-size-6">
               <span className="multistep-form--step-number">1.</span>
-              Approve TILW {approvalCheckmark}
+              Approve TEX {approvalCheckmark}
             </h6>
 
             {step1}

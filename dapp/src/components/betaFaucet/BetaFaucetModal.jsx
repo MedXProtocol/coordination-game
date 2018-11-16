@@ -13,7 +13,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { Modal } from '~/components/Modal'
-import { TILWFaucetApi } from '~/components/betaFaucet/TILWFaucetApi'
+import { TEXFaucetAPI } from '~/components/betaFaucet/TEXFaucetAPI'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
@@ -22,7 +22,7 @@ function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const workTokenAddress = contractByName(state, 'WorkToken')
-  const tilwBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
+  const texBalance = cacheCallValueBigNumber(state, workTokenAddress, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const step = get(state, 'betaFaucet.step')
@@ -31,21 +31,21 @@ function mapStateToProps (state) {
   const hasBeenSentEther = cacheCallValue(state, betaFaucetAddress, 'sentEtherAddresses', address)
 
   const sendEtherTx = transactionFinders.findByMethodName(state, 'sendEther')
-  const sendTILWTx = transactionFinders.findByMethodName(state, 'sendTILW')
+  const sendTEXTx = transactionFinders.findByMethodName(state, 'sendTEX')
 
-  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
-  const tilwWasMinted = sendTILWTx && (sendTILWTx.inFlight || sendTILWTx.success)
+  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.confirmed)
+  const texWasMinted = sendTEXTx && (sendTEXTx.inFlight || sendTEXTx.confirmed)
 
   const needsEth = (weiToEther(ethBalance) < 0.1 && !hasBeenSentEther)
-  const needsTILW = (weiToEther(tilwBalance) < 100)
+  const needsTEX = (weiToEther(texBalance) < 100)
 
   const showBetaFaucetModal =
     !betaFaucetModalDismissed &&
     (
       defined(workTokenAddress) && defined(betaFaucetAddress) &&
-      defined(ethBalance) && defined(tilwBalance)
+      defined(ethBalance) && defined(texBalance)
     ) &&
-    (needsEth || needsTILW || manuallyOpened)
+    (needsEth || needsTEX || manuallyOpened)
 
   return {
     address,
@@ -53,13 +53,13 @@ function mapStateToProps (state) {
     step,
     showBetaFaucetModal,
     needsEth,
-    needsTILW,
+    needsTEX,
     ethBalance,
     workTokenAddress,
-    tilwBalance,
+    texBalance,
     hasBeenSentEther,
     etherWasDripped,
-    tilwWasMinted,
+    texWasMinted,
     manuallyOpened
   }
 }
@@ -70,7 +70,7 @@ function* betaFaucetModalSaga({ workTokenAddress, betaFaucetAddress, address }) 
   yield all([
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(betaFaucetAddress, 'sentEtherAddresses', address),
-    cacheCall(betaFaucetAddress, 'sentTILWAddresses', address)
+    cacheCall(betaFaucetAddress, 'sentTEXAddresses', address)
   ])
 }
 
@@ -111,7 +111,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           step = 2
         }
 
-        if (step === 2 && (!props.needsTILW)) {
+        if (step === 2 && (!props.needsTEX)) {
           step = -1
         }
 
@@ -161,7 +161,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
         const {
           ethBalance,
-          tilwBalance,
+          texBalance,
           address,
           step
         } = this.props
@@ -176,10 +176,10 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             dispatchSagaGenesisTxHash={this.props.dispatchSagaGenesisTxHash}
           />
         } else if (step === 2) {
-          content = <TILWFaucetApi
-            key='tilwFaucet'
+          content = <TEXFaucetAPI
+            key='texFaucet'
             address={address}
-            tilwBalance={tilwBalance}
+            texBalance={texBalance}
             handleMoveToNextStep={this.handleMoveToNextStep}
             sendExternalTransaction={this.sendExternalTransaction}
             dispatchSagaGenesisTxHash={this.props.dispatchSagaGenesisTxHash}
