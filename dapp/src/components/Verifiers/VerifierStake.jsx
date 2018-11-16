@@ -20,7 +20,7 @@ import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { VerifierStakeWithdraw } from '~/components/VerifierStake/VerifierStakeWithdraw'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
@@ -122,47 +122,37 @@ export const VerifierStake = connect(mapStateToProps)(
             )
           }
 
-          var withdrawButton =
-            <Web3ActionButton
-              contractAddress={this.props.workAddress}
-              method='withdrawStake'
-              buttonText='Withdraw'
-              loadingText='Withdrawing...'
-              confirmationMessage='"Withdraw" transaction confirmed.'
-              txHashMessage='"Withdraw" transaction sent successfully -
-                it will take a few minutes to confirm on the Ethereum network.' />
-
           return (
             <div>
               {isActive
                 ?
                   (
                     <React.Fragment>
-                      <p>
-                        <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />&nbsp;
-                        You have successfully staked <strong>{displayWeiToEther(staked)} TEX</strong> and are now a Verifier.
-                      </p>
-                      {hasBalance &&
-                        <React.Fragment>
+                      <div className='columns'>
+                        <div className='column'>
                           <p>
-                            If you wish to withdraw your stake and cease being a verifier you may do so.
-                            <br />
+                            <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />&nbsp;
+                            You have successfully staked <strong>{displayWeiToEther(staked)} TEX</strong> and are now a Verifier.
                           </p>
-                          {withdrawButton}
-                        </React.Fragment>
-                      }
-                      <div className="content">
-                        <ul>
-                          <li>
-                            You will be assigned applications to verify which will
-                            appear on the <Link to={routes.VERIFY}>Verify</Link> page.
-                          </li>
-                          <li>
-                            On the <Link to={routes.WALLET}>Wallet</Link> page you
-                            may withdraw your stake to give up your Verifying rights.
-                          </li>
-                        </ul>
+                          <div className="content">
+                            <ul>
+                              <li>
+                                You will be assigned applications to verify which will
+                                appear on the <Link to={routes.VERIFY}>Verify</Link> page.
+                              </li>
+                              <li>
+                                On the <Link to={routes.WALLET}>Wallet</Link> page you
+                                may withdraw your stake to give up your Verifying rights.
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
+                      {hasBalance &&
+                        <VerifierStakeWithdraw
+                          workContractAddress={this.props.workAddress}
+                          message="If you wish to withdraw your stake and cease being a verifier you may do so." />
+                      }
                     </React.Fragment>
                   )
                 : (
@@ -170,15 +160,6 @@ export const VerifierStake = connect(mapStateToProps)(
                       <p>
                         Stake TEX to begin receiving submissions (minimum 1000 TEX)
                       </p>
-                      {hasBalance &&
-                        <React.Fragment>
-                          <p>
-                            You have some balance remaining: if you like you can withdraw it.
-                            <br />
-                          </p>
-                          {withdrawButton}
-                        </React.Fragment>
-                      }
                       <Progress
                         disabled={needsTEXMessage}
                         labels={['Send Approval', 'Deposit Stake', 'Done!']}
@@ -205,6 +186,12 @@ export const VerifierStake = connect(mapStateToProps)(
                         isActive={isActive}
                         canStake={this.canStake}
                       />
+
+                      {hasBalance &&
+                        <VerifierStakeWithdraw
+                          workContractAddress={this.props.workAddress}
+                          message="You have some balance remaining: if you like you can withdraw it." />
+                      }
                     </React.Fragment>
                   )
               }
