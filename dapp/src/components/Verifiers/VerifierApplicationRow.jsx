@@ -14,7 +14,6 @@ import {
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
-import { applicationSaga } from '~/sagas/applicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 import { ApplicationStatus } from './ApplicationStatus'

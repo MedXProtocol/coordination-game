@@ -239,14 +239,20 @@ html.html-light,
   .list--item:hover .button.is-primary,
   .list--item:hover .button.is-warning {
     background-color: white;
-    color: $brand-info;
   }
 
   .list--item:hover .button.is-primary:hover,
   .list--item:hover .button.is-warning:hover {
-    // background-color: white;
+    background-color: white;
     box-shadow: 0 0 2px 0 white;
-    border-color: white;
+  }
+
+  .list--item:hover .button.is-primary:hover {
+    color: $brand-info--light;
+  }
+
+  .list--item:hover .button.is-warning:hover {
+    color: $brand-danger--light;
   }
 
   .progress--step {

@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import { formatRoute } from 'react-router-named-routes'
 import { Link } from 'react-router-dom'
-import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
@@ -390,7 +389,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__view">
-              <button>View</button>
+              <button className="button is-primary is-small is-outlined">View</button>
               <ReactTooltip
                 id='expiration-message-tooltip'
                 html={true}

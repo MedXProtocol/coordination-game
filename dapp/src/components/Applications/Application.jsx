@@ -4,39 +4,24 @@ import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
-import { all } from 'redux-saga/effects'
-import { toastr } from '~/toastr'
-import { get } from 'lodash'
 import {
-  cacheCallValue,
-  cacheCallValueInt,
   contractByName,
-  cacheCall,
-  TransactionStateHandler,
   withSaga,
   withSend
 } from 'saga-genesis'
-import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
-import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { match }) {
-  let createdAt,
-    updatedAt
   let applicationObject = {}
 
   const applicationId = parseInt(match.params.applicationId, 10)
-  const transactions = get(state, 'sagaGenesis.transactions')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-
-  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const address = get(state, 'sagaGenesis.accounts[0]')
 
   applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
@@ -50,7 +35,7 @@ function mapStateToProps(state, { match }) {
 function* viewApplicationSaga({ coordinationGameAddress, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
-  yield applicationSaga(coordinationGameAddress, applicationId)
+  yield applicationSaga({ coordinationGameAddress, applicationId })
 }
 
 export const Application = connect(mapStateToProps)(
