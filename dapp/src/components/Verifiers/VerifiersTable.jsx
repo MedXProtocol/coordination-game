@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
@@ -71,7 +71,7 @@ function* verifiersTableSaga({
 
 export const VerifiersTable = connect(mapStateToProps)(
   withSaga(verifiersTableSaga)(
-    class _VerifiersTable extends Component {
+    class _VerifiersTable extends PureComponent {
 
       renderApplicationRows(verifierAddresses) {
         let applicationRows = verifierAddresses.map((verifierAddress, index) => {

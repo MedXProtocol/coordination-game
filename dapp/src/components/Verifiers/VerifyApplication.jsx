@@ -1,5 +1,5 @@
 import ReactDOMServer from 'react-dom/server'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
@@ -77,7 +77,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(verifyApplicationSaga)(
     withSend(
       withRouter(
-        class _VerifyApplication extends Component {
+        class _VerifyApplication extends PureComponent {
 
           constructor(props) {
             super(props)

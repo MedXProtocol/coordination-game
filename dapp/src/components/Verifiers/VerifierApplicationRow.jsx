@@ -1,5 +1,5 @@
 import ReactDOMServer from 'react-dom/server'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
@@ -13,6 +13,7 @@ import {
 } from 'saga-genesis'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { applicationSaga } from '~/sagas/applicationSaga'
 import { applicationService } from '~/services/applicationService'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
@@ -36,8 +37,8 @@ function mapStateToProps(state, { applicationId }) {
 }
 
 export const VerifierApplicationRow = connect(mapStateToProps)(
-  withSaga()(
-    class _VerifierApplicationRow extends Component {
+  withSaga(applicationSaga)(
+    class _VerifierApplicationRow extends PureComponent {
 
       static propTypes = {
         applicationId: PropTypes.number

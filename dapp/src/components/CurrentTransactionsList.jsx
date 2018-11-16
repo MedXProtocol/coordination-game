@@ -15,6 +15,7 @@ const txNames = {
   'start': 'Application Started',
   'applicantRandomlySelectVerifier': 'Requesting Verification',
   'withdrawListing': 'Withdrawing Listing',
+  'withdraw': 'Withdrawing Stake',
   'applicantRevealSecret': 'Finalizing Application',
   'depositStake': 'Depositing TEX Stake',
   'setBaseApplicationFeeUsdWei': 'Updating case fee',

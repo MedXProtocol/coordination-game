@@ -34,6 +34,7 @@ function mapStateToProps(state) {
 
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
+  const minimumBalanceToWork = cacheCallValueBigNumber(state, workAddress, 'minimumBalanceToWork')
 
   return {
     address,
@@ -44,6 +45,7 @@ function mapStateToProps(state) {
     networkId,
     jobStake,
     requiredStake,
+    minimumBalanceToWork,
     transactions,
     verifierTimeoutInSeconds,
     workAddress
@@ -60,6 +62,7 @@ function* adminSaga({
   yield all([
     cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake'),
+    cacheCall(workAddress, 'minimumBalanceToWork'),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei'),
     cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
@@ -152,7 +155,8 @@ export const Admin = connect(mapStateToProps)(
             workAddress,
             'updateSettings',
             this.newOrCurrentBigNumber('requiredStake'),
-            this.newOrCurrentBigNumber('jobStake')
+            this.newOrCurrentBigNumber('jobStake'),
+            this.newOrCurrentBigNumber('minimumBalanceToWork')
           )()
 
           this.setState({
@@ -182,7 +186,7 @@ export const Admin = connect(mapStateToProps)(
         render() {
           return (
             <div>
-              <PageTitle title='apply' />
+              <PageTitle title='admin' />
               <ScrollToTop />
 
               <h1 className="is-size-1">
@@ -293,7 +297,7 @@ export const Admin = connect(mapStateToProps)(
                 </h4>
 
                 <div className="columns">
-                  <div className="column is-6">
+                  <div className="column is-4">
                     <p className="is-size-7">
                       <strong>Verification Job Stake Amount</strong>
                       <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
@@ -310,7 +314,7 @@ export const Admin = connect(mapStateToProps)(
                     </span>
                   </div>
 
-                  <div className="column is-6">
+                  <div className="column is-4">
                     <p className="is-size-7">
                       <strong>Required Stake Amount</strong>
                       <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
@@ -326,8 +330,24 @@ export const Admin = connect(mapStateToProps)(
                       Currently: {displayWeiToEther(this.props.requiredStake)}
                     </span>
                   </div>
-                </div>
 
+                  <div className="column is-4">
+                    <p className="is-size-7">
+                      <strong>Minimum Balance</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in TEX)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="minimumBalanceToWork"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.minimumBalanceToWork || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {displayWeiToEther(this.props.minimumBalanceToWork)}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="is-clearfix">
                   <button
