@@ -21,7 +21,6 @@ export const Verify = connect(mapStateToProps)(
   class _Verify extends Component {
 
     render() {
-      console.log('verify render')
       let verifyApplication,
         verifyApplicationsTable
 
