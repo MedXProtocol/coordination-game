@@ -17,6 +17,17 @@ export const applicationService = function(state, applicationId, coordinationGam
 
   const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
 
+  const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+
+  // Parse and convert the generic hint field to our DApp-specific data
+  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+
+  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
+
+  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
+  const whistleblower = cacheCallValue(state, coordinationGameAddress, 'whistleblowers', applicationId)
+
   if (!isBlank(verifier)) {
     const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
     const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
@@ -29,17 +40,6 @@ export const applicationService = function(state, applicationId, coordinationGam
 
     verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
   }
-
-  const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-
-  // Parse and convert the generic hint field to our DApp-specific data
-  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
-
-  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-
-  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
-  const whistleblower = cacheCallValue(state, coordinationGameAddress, 'whistleblowers', applicationId)
 
   applicationObject = {
     applicationId,
@@ -57,7 +57,6 @@ export const applicationService = function(state, applicationId, coordinationGam
     whistleblower
   }
 
-  console.log(applicationObject, networkId, address, createdAt)
   applicationObject = retrieveApplicationDetailsFromLocalStorage(
     applicationObject,
     networkId,

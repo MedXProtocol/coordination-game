@@ -24,6 +24,7 @@ function mapStateToProps(state, { match }) {
   let applicationObject = {}
 
   const applicationId = parseInt(match.params.applicationId, 10)
+
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 

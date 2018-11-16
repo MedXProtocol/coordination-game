@@ -6,13 +6,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { formatRoute } from 'react-router-named-routes'
 import { Link } from 'react-router-dom'
-import { all } from 'redux-saga/effects'
 import {
   withSaga,
-  cacheCallValue,
-  cacheCallValueInt,
-  contractByName,
-  cacheCall
+  contractByName
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -20,21 +16,16 @@ import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
-import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
-import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicantRevealTimeoutInSeconds,
-    applicationObject,
-    verifierTimeoutInSeconds
-
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
-  applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  console.log(applicationObject)
 
   return {
     applicationObject,
@@ -141,11 +132,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
         const ofInterest = waitingOnVerifier || applicantMissedRevealDeadline
         const needsAttention = needsAVerifier || needsApplicantReveal || verifierHasChallenged || needsNewVerifier
-
-        if (this.props.applicationId === 5) {
-          console.log('Why is this false here but true on the show page?')
-          console.log('isBlank(verifier)', isBlank(verifier))
-        }
 
         return (
           <Link
