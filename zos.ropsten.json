@@ -737,157 +737,6 @@
         "uninitializedBaseContracts": []
       }
     },
-    "WorkToken": {
-      "address": "0xe8715a3c4d9f1b29c66989f9c62c3fba06f7284f",
-      "constructorCode": "608060405234801561001057600080fd5b506119f8806100206000396000f300",
-      "bodyBytecodeHash": "d505dacf434ae044c857e3c0b1e6df64be59bd7b3b9634cb3514efef8344966f",
-      "localBytecodeHash": "5ae64d6193630dde85b5040a98b90c9910a0357bb1578ebca23bce7a5312609d",
-      "deployedBytecodeHash": "5ae64d6193630dde85b5040a98b90c9910a0357bb1578ebca23bce7a5312609d",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_mapping<t_uint256>": {
-          "id": "t_mapping<t_uint256>",
-          "valueType": "t_uint256",
-          "label": "mapping(key => uint256)",
-          "kind": "mapping"
-        },
-        "t_struct<Roles.Role>": {
-          "id": "t_struct<Roles.Role>",
-          "kind": "struct",
-          "label": "Roles.Role",
-          "members": [
-            {
-              "label": "bearer",
-              "astId": 3074,
-              "type": "t_mapping<t_bool>",
-              "src": "146:32:11"
-            }
-          ]
-        },
-        "t_mapping<t_bool>": {
-          "id": "t_mapping<t_bool>",
-          "valueType": "t_bool",
-          "label": "mapping(key => bool)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 4080,
-          "type": "t_bool",
-          "src": "749:24:18"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 4082,
-          "type": "t_bool",
-          "src": "868:25:18"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 4131,
-          "type": "t_array:50<t_uint256>",
-          "src": "1883:29:18"
-        },
-        {
-          "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
-          "label": "_balances",
-          "astId": 3523,
-          "type": "t_mapping<t_uint256>",
-          "src": "491:46:15"
-        },
-        {
-          "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
-          "label": "_allowed",
-          "astId": 3529,
-          "type": "t_mapping<t_uint256>",
-          "src": "542:66:15"
-        },
-        {
-          "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
-          "label": "_totalSupply",
-          "astId": 3531,
-          "type": "t_uint256",
-          "src": "613:28:15"
-        },
-        {
-          "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
-          "label": "______gap",
-          "astId": 3957,
-          "type": "t_array:50<t_uint256>",
-          "src": "7048:29:15"
-        },
-        {
-          "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-          "label": "minters",
-          "astId": 3166,
-          "type": "t_struct<Roles.Role>",
-          "src": "264:26:12"
-        },
-        {
-          "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-          "label": "______gap",
-          "astId": 3265,
-          "type": "t_array:50<t_uint256>",
-          "src": "990:29:12"
-        },
-        {
-          "contract": "ERC20Mintable",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
-          "label": "______gap",
-          "astId": 4006,
-          "type": "t_array:50<t_uint256>",
-          "src": "742:29:16"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [
-          {
-            "contract": "MinterRole",
-            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-            "label": "minters",
-            "astId": 3166,
-            "type": "t_struct<Roles.Role>",
-            "src": "264:26:12"
-          }
-        ],
-        "storageDiff": []
-      }
-    },
     "CoordinationGame": {
       "address": "0x583da060cf65a7676e584844ab54946372fcd8e8",
       "constructorCode": "608060405234801561001057600080fd5b50615552806100206000396000f300",
@@ -1238,6 +1087,146 @@
         "hasInitialValuesInDeclarations": false,
         "uninitializedBaseContracts": []
       }
+    },
+    "WorkToken": {
+      "address": "0xf17ab0daed5c69db52d4a526359d8d65585ea022",
+      "constructorCode": "608060405234801561001057600080fd5b506119f8806100206000396000f300",
+      "bodyBytecodeHash": "d505dacf434ae044c857e3c0b1e6df64be59bd7b3b9634cb3514efef8344966f",
+      "localBytecodeHash": "5ae64d6193630dde85b5040a98b90c9910a0357bb1578ebca23bce7a5312609d",
+      "deployedBytecodeHash": "5ae64d6193630dde85b5040a98b90c9910a0357bb1578ebca23bce7a5312609d",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        },
+        "t_struct<Roles.Role>": {
+          "id": "t_struct<Roles.Role>",
+          "kind": "struct",
+          "label": "Roles.Role",
+          "members": [
+            {
+              "label": "bearer",
+              "astId": 3080,
+              "type": "t_mapping<t_bool>",
+              "src": "146:32:12"
+            }
+          ]
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 4105,
+          "type": "t_bool",
+          "src": "749:24:20"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 4107,
+          "type": "t_bool",
+          "src": "868:25:20"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 4156,
+          "type": "t_array:50<t_uint256>",
+          "src": "1883:29:20"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_balances",
+          "astId": 3529,
+          "type": "t_mapping<t_uint256>",
+          "src": "491:46:16"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_allowed",
+          "astId": 3535,
+          "type": "t_mapping<t_uint256>",
+          "src": "542:66:16"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_totalSupply",
+          "astId": 3537,
+          "type": "t_uint256",
+          "src": "613:28:16"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "______gap",
+          "astId": 3963,
+          "type": "t_array:50<t_uint256>",
+          "src": "7048:29:16"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "minters",
+          "astId": 3172,
+          "type": "t_struct<Roles.Role>",
+          "src": "264:26:13"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "______gap",
+          "astId": 3271,
+          "type": "t_array:50<t_uint256>",
+          "src": "990:29:13"
+        },
+        {
+          "contract": "ERC20Mintable",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
+          "label": "______gap",
+          "astId": 4012,
+          "type": "t_array:50<t_uint256>",
+          "src": "742:29:17"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
     }
   },
   "solidityLibs": {},
@@ -1260,7 +1249,7 @@
       {
         "address": "0xd5d9f52a8bfe5a5333a0ddce65f429273d477318",
         "version": "0.1.0",
-        "implementation": "0xf61e4049c7afc841dc61559733e186481371caae"
+        "implementation": "0xf17ab0daed5c69db52d4a526359d8d65585ea022"
       }
     ],
     "coordination-game/Work": [
@@ -1288,7 +1277,7 @@
       {
         "address": "0x969a894b83cae8db8681790df6d99a2546db4a52",
         "version": "0.1.0",
-        "implementation": "0xc0816527f2c26567d90372a6996f8130d5582436"
+        "implementation": "0x4f01120f8415dc0d47984377f40d227b4eef3b86"
       }
     ],
     "coordination-game/CoordinationGame": [
