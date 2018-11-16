@@ -23,6 +23,7 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 
+  border-left: 8px solid $dark-gray;
   box-sizing: border-box;
   font-size: 0.75rem;
   font-weight: 700;
@@ -51,6 +52,14 @@
   }
 }
 
+.list--item.is-info {
+  border-color: $brand-info;
+}
+
+.list--item.is-warning {
+  border-color: $brand-danger;
+}
+
 .list--item:nth-child(even) {
   background-color: lighten(#070709, 4%);
 }
@@ -61,12 +70,33 @@
   // box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.2);
 }
 
+.list--icon {
+  color: rgba(255, 255, 255, .1);
+  font-size: 3rem;
+  position: absolute;
+  top: 0;
+  left: 40%;
+  width: 75%;
+  height: 100%;
+
+  transition: all .4s ease-in-out;
+}
+
+.list--item:hover .list--icon {
+  color: rgba(255, 255, 255, .2);
+  font-size: 5rem;
+  transform: rotate(90deg);
+}
+
 .list--item__id {
-  grid-column: span 1;
-  text-align: center;
+  grid-column: span 2;
+  position: relative;
+  padding-top: 45px;
+  font-size: 1.75rem;
+  text-align: left;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 8;
+    grid-column: span 2;
     text-align: left;
   }
 
@@ -78,6 +108,7 @@
 .list--item__date {
   grid-column: span 2;
   text-align: center;
+  padding-top: 30px;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 4;
@@ -103,16 +134,16 @@
 }
 
 .list--item__view {
-  grid-column: span 3;
+  grid-column: span 2;
   text-align: right;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 6;
+    grid-column: span 2;
     text-align: right;
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 12;
+    grid-column: span 2;
     text-align: left;
   }
 }
@@ -152,10 +183,6 @@
 .list--item:hover .list--item__status,
 .list--item:hover .list--item__view {
   color: lighten($gray, 20%);
-}
-
-.list--item:hover .list--item__id {
-  font-size: 1.25rem;
 }
 
 .list--item .button {

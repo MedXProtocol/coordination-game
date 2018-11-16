@@ -365,6 +365,26 @@ html.html-light,
     fill: $text-color--light;
   }
 
+  .list--icon {
+    color: rgba(220, 220, 220, 0.4);
+  }
+
+  .list--item {
+    border-color: $light-gray--light;
+  }
+
+  .list--item.is-info {
+    border-color: $accent-color-1--light;
+  }
+
+  .list--item:hover.is-info {
+    border-color: white;
+  }
+
+  .list--item.is-warning {
+    border-color: $accent-color-2--light;
+  }
+
   .icon-circle {
     background: transparent;
   }

@@ -1,10 +1,11 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import classnames from 'classnames'
 import ReactTooltip from 'react-tooltip'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { formatRoute } from 'react-router-named-routes'
 import { Link } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
   withSaga,
@@ -13,8 +14,14 @@ import {
   contractByName,
   cacheCall
 } from 'saga-genesis'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
+import {
+  SelectOutline,
+} from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
+
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
@@ -351,14 +358,23 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         // necessary to show the verifier on 1st-time component load
         // ReactTooltip.rebuild()
 
-        console.log(formatRoute(routes.APPLICATION, this.props.applicationId))
+        var random_boolean = Math.random() >= 0.5;
+        const needsAttention = random_boolean
+        const canTakeAction = Math.random() >= 0.5 ? !random_boolean : false
 
         return (
           <Link
             to={formatRoute(routes.APPLICATION, { applicationId: this.props.applicationId } )}
-            className="list--item"
+            className={classnames(
+              'list--item',
+              {
+                'is-warning': needsAttention,
+                'is-info': canTakeAction
+              }
+            )}
           >
             <span className="list--item__id">
+              <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
               #{applicationId}
             </span>
 
