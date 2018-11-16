@@ -1,5 +1,5 @@
 import ReactDOMServer from 'react-dom/server'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
@@ -38,7 +38,7 @@ function mapStateToProps(state, { applicationId }) {
 
 export const VerifierApplicationRow = connect(mapStateToProps)(
   withSaga(verifierApplicationSaga)(
-    class _VerifierApplicationRow extends Component {
+    class _VerifierApplicationRow extends PureComponent {
 
       static propTypes = {
         applicationId: PropTypes.number

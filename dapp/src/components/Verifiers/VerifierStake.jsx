@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
@@ -61,7 +61,7 @@ function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
 export const VerifierStake = connect(mapStateToProps)(
   withSend(
     withSaga(verifierStakeSaga)(
-      class _VerifierStake extends Component {
+      class _VerifierStake extends PureComponent {
 
         /*
           TODO: this is actually more complicated: we need to check that they have

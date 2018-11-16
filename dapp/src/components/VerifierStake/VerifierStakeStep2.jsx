@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from '~/toastr'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch) {
 
 export const VerifierStakeStep2 = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
-    class _VerifierStakeStep2 extends Component {
+    class _VerifierStakeStep2 extends PureComponent {
 
       constructor(props) {
         super(props)
