@@ -40,6 +40,7 @@ contract('CoordinationGame', (accounts) => {
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
   const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
   const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
+  const minimumBalanceToWork = web3.toWei('500', 'ether') // verifiers stake held during a verification
 
   debug(`using secret ${secret} and random ${random}`)
 
@@ -64,7 +65,7 @@ contract('CoordinationGame', (accounts) => {
   beforeEach(async () => {
     work = await Work.new()
     await work.init(
-      owner, workToken.address, requiredStake.toString(), jobStake.toString(), roles.address
+      owner, workToken.address, requiredStake.toString(), jobStake.toString(), minimumBalanceToWork.toString(), roles.address
     )
     await registerWorker(verifier)
     await registerWorker(verifier2)

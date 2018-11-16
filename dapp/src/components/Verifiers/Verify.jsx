@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
@@ -18,10 +18,9 @@ function mapStateToProps(state) {
 }
 
 export const Verify = connect(mapStateToProps)(
-  class _Verify extends Component {
+  class _Verify extends PureComponent {
 
     render() {
-      console.log('verify render')
       let verifyApplication,
         verifyApplicationsTable
 

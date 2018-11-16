@@ -1,5 +1,5 @@
 import React, {
-  Component
+  PureComponent
 } from 'react'
 import {
   withSaga,
@@ -46,7 +46,7 @@ function* applicationsListSaga({ CoordinationGame, startIndex, endIndex }) {
 }
 
 export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsListSaga)(
-  class _ApplicationsList extends Component {
+  class _ApplicationsList extends PureComponent {
     render () {
       const totalPages = this.props.applicationCount / this.props.pageSize
 

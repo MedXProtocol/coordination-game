@@ -25,7 +25,6 @@ function mapStateToProps(state, { applicationId }) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
   const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
-  console.log(applicationObject)
 
   return {
     applicationObject,

@@ -1,5 +1,5 @@
 import React, {
-  Component
+  PureComponent
 } from 'react'
 import {
   contractByName
@@ -17,7 +17,7 @@ function mapStateToProps(state) {
 }
 
 export const WhistleblowButton = connect(mapStateToProps)(
-  class _WhistleblowButton extends Component {
+  class _WhistleblowButton extends PureComponent {
     constructor(props) {
       super(props)
       this.state = {

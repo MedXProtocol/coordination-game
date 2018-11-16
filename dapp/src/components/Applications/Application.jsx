@@ -107,7 +107,6 @@ export const Application = connect(mapStateToProps)(
             // START DUPLICATE CODE! (put in service?)
             const success = applicantRevealedSecret
             const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
-            console.log('waitingOnVerifier', waitingOnVerifier)
             const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
 
             const verifierHasChallenged = (verifierChallengedAt !== 0)
@@ -116,7 +115,6 @@ export const Application = connect(mapStateToProps)(
             )
 
             const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
-            console.log('isBlank(verifier)', isBlank(verifier))
             const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
             // END DUPLICATE CODE
 
