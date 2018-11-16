@@ -98,7 +98,9 @@ contract Work is Ownable {
     /// If the new stake amount is below the job amount, suspend them
     if (balances[_worker] < minimumBalanceToWork) {
       stakers.removeAddress(_worker);
-      suspendedStakers.pushAddress(_worker);
+      if (!suspendedStakers.hasAddress(_worker)) {
+        suspendedStakers.pushAddress(_worker);
+      }
     }
 
     return true;
@@ -110,7 +112,9 @@ contract Work is Ownable {
     if (balances[_worker] >= minimumBalanceToWork) {
       if (suspendedStakers.hasAddress(_worker)) {
         suspendedStakers.removeAddress(_worker);
-        stakers.pushAddress(_worker);
+        if (!stakers.hasAddress(_worker)) {
+          stakers.pushAddress(_worker);
+        }
       }
     }
   }
