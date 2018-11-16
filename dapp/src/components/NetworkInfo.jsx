@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import classnames from 'classnames'
-import Odometer from 'react-odometerjs'
 import {
   contractByName,
   cacheCallValueBigNumber,
@@ -10,6 +9,7 @@ import {
   withSaga
 } from 'saga-genesis'
 import { EthAddress } from '~/components/EthAddress'
+import { TILOdometer } from '~/components/TILOdometer'
 import { networkIdToName } from '~/utils/networkIdToName'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
@@ -52,12 +52,12 @@ export const NetworkInfo = withSaga(networkInfoSaga)(
           </div>
           <div className="navbar-item">
             <span className="navbar-item has-text-transparent-white">
-              <Odometer value={displayWeiToEther(texBalance)} />&nbsp;TEX
+              <TILOdometer delay={3000} value={displayWeiToEther(texBalance)} />&nbsp;TEX
             </span>
           </div>
           <div className="navbar-item">
             <span className="navbar-item has-text-transparent-white">
-              <Odometer value={displayWeiToEther(ethBalance)} />&nbsp;Ξ
+              <TILOdometer delay={4500} value={displayWeiToEther(ethBalance)} />&nbsp;Ξ
             </span>
           </div>
           <div className="navbar-item">

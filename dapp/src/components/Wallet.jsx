@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
-import Odometer from 'react-odometerjs'
+import TILOdometer from 'react-odometerjs'
 import {
   cacheCall,
   cacheCallValueBigNumber,
@@ -77,7 +77,7 @@ export const Wallet = connect(mapStateToProps)(
                       Balance
                     </span>
                     <span className="title">
-                      <Odometer value={displayWeiToEther(this.props.texBalance)} />
+                      <TILOdometer value={displayWeiToEther(this.props.texBalance)} />
                     </span>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ export const Wallet = connect(mapStateToProps)(
                       Approved:
                     </span>
                     <span className="title">
-                      <Odometer value={displayWeiToEther(this.props.allowance)} />
+                      <TILOdometer value={displayWeiToEther(this.props.allowance)} />
                     </span>
                   </div>
                 </div>
@@ -102,8 +102,8 @@ export const Wallet = connect(mapStateToProps)(
                     <span className="title">
                       {
                         this.props.staked > 0
-                          ? <Odometer value={displayWeiToEther(this.props.staked)} />
-                          : <Odometer value={displayWeiToEther(this.props.requiredStake)} />
+                          ? <TILOdometer value={displayWeiToEther(this.props.staked)} />
+                          : <TILOdometer value={displayWeiToEther(this.props.requiredStake)} />
                       }
                     </span>
                   </div>

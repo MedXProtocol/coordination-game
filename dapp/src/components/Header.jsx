@@ -70,12 +70,12 @@ function mapStateToProps(state) {
 function* headerSaga({ address, applicationCount, applicationIds, coordinationGameAddress }) {
   if (!coordinationGameAddress || !address) { return }
 
-  yield verifierApplicationsSaga(coordinationGameAddress, address, applicationCount)
+  yield verifierApplicationsSaga({ coordinationGameAddress, address, applicationCount })
 
   if (applicationIds && applicationIds.length !== 0) {
     yield all(
       applicationIds.map(function* (applicationId) {
-        yield verifierApplicationSaga(coordinationGameAddress, applicationId)
+        yield verifierApplicationSaga({ coordinationGameAddress, applicationId })
       })
     )
   }
