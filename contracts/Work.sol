@@ -23,6 +23,8 @@ contract Work is Ownable {
 
   mapping (address => uint256) public balances;
 
+  uint256 public minimumBalanceToWork;
+
   modifier onlyJobManager() {
     require(roles.hasRole(msg.sender, uint(TILRoles.All.JOB_MANAGER)), "sender is job manager");
     _;
@@ -30,7 +32,8 @@ contract Work is Ownable {
 
   event SettingsUpdated(
     uint256 applicationStakeAmount,
-    uint256 jobStake
+    uint256 jobStake,
+    uint256 minimumBalanceToWork
   );
 
   modifier hasNotStaked(address _staker) {
@@ -48,26 +51,35 @@ contract Work is Ownable {
     IERC20 _token,
     uint256 _requiredStake,
     uint256 _jobStake,
+    uint256 _minimumBalanceToWork,
     TILRoles _roles
   ) public initializer {
     require(_token != address(0), '_token is defined');
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
     require(_roles != address(0), '_roles is defined');
+    require(_minimumBalanceToWork > 0, '_minimumBalanceToWork is greater than zero');
     Ownable.initialize(_owner);
     token = _token;
     requiredStake = _requiredStake;
     jobStake = _jobStake;
+    minimumBalanceToWork = _minimumBalanceToWork;
     roles = _roles;
   }
 
   function depositStake() public {
     require(token.allowance(msg.sender, address(this)) >= requiredStake, 'allowance is sufficient');
     token.transferFrom(msg.sender, address(this), requiredStake);
-    deposit(msg.sender, requiredStake);
+    balances[msg.sender] = balances[msg.sender].add(requiredStake);
+    if (!stakers.hasAddress(msg.sender)) {
+      stakers.pushAddress(msg.sender);
+    }
+    if (suspendedStakers.hasAddress(msg.sender)) {
+      suspendedStakers.removeAddress(msg.sender);
+    }
   }
 
-  function withdrawStake() public hasStaked(msg.sender) {
+  function withdrawStake() public {
     if (stakers.hasAddress(msg.sender)) {
       stakers.removeAddress(msg.sender);
     }
@@ -75,7 +87,7 @@ contract Work is Ownable {
       suspendedStakers.removeAddress(msg.sender);
     }
     uint256 amount = balances[msg.sender];
-    delete balances[msg.sender];
+    balances[msg.sender] = 0;
     token.transfer(msg.sender, amount);
   }
 
@@ -84,9 +96,11 @@ contract Work is Ownable {
     balances[_worker] = balances[_worker].sub(jobStake);
     token.transfer(msg.sender, jobStake);
     /// If the new stake amount is below the job amount, suspend them
-    if (balances[_worker] < jobStake) {
+    if (balances[_worker] < minimumBalanceToWork) {
       stakers.removeAddress(_worker);
-      suspendedStakers.pushAddress(_worker);
+      if (!suspendedStakers.hasAddress(_worker)) {
+        suspendedStakers.pushAddress(_worker);
+      }
     }
 
     return true;
@@ -94,7 +108,15 @@ contract Work is Ownable {
 
   function depositJobStake(address _worker) external onlyJobManager {
     token.transferFrom(msg.sender, address(this), jobStake);
-    deposit(_worker, jobStake);
+    balances[_worker] = balances[_worker].add(jobStake);
+    if (balances[_worker] >= minimumBalanceToWork) {
+      if (suspendedStakers.hasAddress(_worker)) {
+        suspendedStakers.removeAddress(_worker);
+        if (!stakers.hasAddress(_worker)) {
+          stakers.pushAddress(_worker);
+        }
+      }
+    }
   }
 
   function selectWorker(uint256 randomValue) public view returns (address) {
@@ -103,33 +125,27 @@ contract Work is Ownable {
   }
 
   function isStaker(address _staker) public view returns (bool) {
-    return stakers.hasAddress(_staker) || suspendedStakers.hasAddress(_staker);
+    return isActive(_staker) || isSuspended(_staker);
+  }
+
+  function isActive(address _staker) public view returns (bool) {
+    return stakers.hasAddress(_staker);
   }
 
   function isSuspended(address _staker) public view returns (bool) {
     return suspendedStakers.hasAddress(_staker);
   }
 
-  function deposit(address _worker, uint256 _amount) internal {
-    balances[_worker] = balances[_worker].add(_amount);
-    if (balances[_worker] >= jobStake) {
-      if (suspendedStakers.hasAddress(_worker)) {
-        suspendedStakers.removeAddress(_worker);
-      }
-      if (!stakers.hasAddress(_worker)) {
-        stakers.pushAddress(_worker);
-      }
-    }
-  }
-
-  function updateSettings(uint256 _requiredStake, uint256 _jobStake) public onlyOwner {
+  function updateSettings(uint256 _requiredStake, uint256 _jobStake, uint256 _minimumBalanceToWork) public onlyOwner {
     require(_requiredStake > 0, '_requiredStake is greater than zero');
     require(_jobStake > 0, '_jobStake is greater than zero');
+    require(_minimumBalanceToWork > 0, '_minimumBalanceToWork is greater than zero');
 
     requiredStake = _requiredStake;
     jobStake = _jobStake;
+    minimumBalanceToWork = _minimumBalanceToWork;
 
-    emit SettingsUpdated(requiredStake, jobStake);
+    emit SettingsUpdated(requiredStake, jobStake, minimumBalanceToWork);
   }
 
   function getVerifiersCount() external view returns (uint256 verifiersCount) {

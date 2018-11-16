@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch) {
 
 export const VerifierStakeStep1 = connect(mapStateToProps, mapDispatchToProps)(
   withSend(
-    class _VerifierStakeStep1 extends Component {
+    class _VerifierStakeStep1 extends PureComponent {
 
       constructor(props) {
         super(props)

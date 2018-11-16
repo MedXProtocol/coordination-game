@@ -1,5 +1,5 @@
 import React, {
-  Component
+  PureComponent
 } from 'react'
 import {
   all
@@ -58,7 +58,7 @@ function* applicationStatusSaga({ CoordinationGame, applicationId }) {
 }
 
 export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationStatusSaga)(
-  class _ApplicationStatus extends Component {
+  class _ApplicationStatus extends PureComponent {
     render () {
       const {
         latestBlockTimestamp,

@@ -35,7 +35,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
       static propTypes = {
         contractAddress: PropTypes.string.isRequired,
         method: PropTypes.string.isRequired,
-        args: PropTypes.array.isRequired,
+        args: PropTypes.array,
         buttonText: PropTypes.string.isRequired,
         loadingText: PropTypes.string.isRequired,
         confirmationMessage: PropTypes.string.isRequired,
@@ -44,6 +44,10 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         onError: PropTypes.func,
         onConfirmed: PropTypes.func,
         onTxHash: PropTypes.func
+      }
+
+      static defaultProps = {
+        args: []
       }
 
       constructor(props) {
