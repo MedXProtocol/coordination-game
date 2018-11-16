@@ -23,7 +23,7 @@ import * as routes from '~/../config/routes'
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
 
-  const applicationId = parseInt(match.params.applicationId, 10)
+  const applicationId = match.params.applicationId
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
@@ -39,7 +39,7 @@ function mapStateToProps(state, { match }) {
 }
 
 function* viewApplicationSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
+  if (!coordinationGameAddress || isBlank(applicationId)) { return }
 
   yield applicationSaga({ coordinationGameAddress, applicationId })
 }
@@ -51,7 +51,7 @@ export const Application = connect(mapStateToProps)(
         class _Application extends Component {
 
           static propTypes = {
-            applicationId: PropTypes.number
+            applicationId: PropTypes.string
           }
 
           componentWillReceiveProps (nextProps) {

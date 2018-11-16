@@ -36,7 +36,7 @@ function mapStateToProps(state, { applicationId }) {
 }
 
 function* applicationRowSaga({ CoordinationGame, applicationId }) {
-  if (!CoordinationGame || !applicationId) { return }
+  if (!CoordinationGame || isBlank(applicationId)) { return }
   yield cacheCall(CoordinationGame, 'games', applicationId)
 }
 

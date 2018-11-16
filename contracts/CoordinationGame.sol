@@ -577,4 +577,8 @@ contract CoordinationGame is Ownable {
   function applicationCount() public view returns (uint256) {
     return gamesIterator.length();
   }
+
+  function applicationAt(uint256 _index) public view returns (bytes32) {
+    return gamesIterator.valueAtIndex(_index);
+  }
 }

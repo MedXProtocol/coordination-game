@@ -11,6 +11,7 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
+import { isBlank } from '~/utils/isBlank'
 import { ExportOutline } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
 import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
@@ -31,7 +32,7 @@ function mapStateToProps(state) {
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
     applicationObjects = range(applicationCount, -1).reduce((accumulator, index) => {
-      const applicationId = cacheCallValueInt(
+      const applicationId = cacheCallValue(
         state,
         coordinationGameAddress,
         "applicantsApplicationIndices",
@@ -41,7 +42,7 @@ function mapStateToProps(state) {
       const game = cacheCallValue(state, coordinationGameAddress, 'games', applicationId)
       const { createdAt } = game
 
-      if (applicationId && createdAt) {
+      if (!isBlank(applicationId) && createdAt) {
         accumulator.push({ applicationId, createdAt })
       }
 
@@ -76,7 +77,7 @@ function* applicantApplicationsTableSaga({
       indices.map(function*(index) {
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
 
-        if (applicationId) {
+        if (!isBlank(applicationId)) {
           yield cacheCall(coordinationGameAddress, 'games', applicationId)
         }
       })
