@@ -19,6 +19,7 @@ import { defined } from '~/utils/defined'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
@@ -222,7 +223,7 @@ export const Application = connect(mapStateToProps)(
                 </div>
 
                 <h6 className="is-size-6 has-text-grey">
-                  Token Submission #{applicationId}
+                  <AppId applicationId={applicationId} />
                 </h6>
 
                 <br />

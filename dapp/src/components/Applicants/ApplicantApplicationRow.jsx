@@ -19,6 +19,7 @@ import { applicationSaga } from '~/sagas/applicationSaga'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -49,7 +50,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
     class _ApplicantApplicationRow extends Component {
 
       static propTypes = {
-        applicationId: PropTypes.number
+        applicationId: PropTypes.string
       }
 
       render () {
@@ -134,7 +135,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           >
             <span className="list--item__id">
               <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
-              #{applicationId}
+              <AppId applicationId={applicationId} />
             </span>
 
             <span className="list--item__date">

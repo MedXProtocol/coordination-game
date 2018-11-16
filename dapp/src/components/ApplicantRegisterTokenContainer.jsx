@@ -52,11 +52,11 @@ function mapStateToProps(state) {
   const approveTx = transactionFinders.findByMethodName(state, 'approve')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
-  const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
-  const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
+  const applicantsLastApplicationId = cacheCallValue(state, coordinationGameAddress, 'getApplicantsLastApplicationID', address)
   const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
-  if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
+  if (!isBlank(applicantsLastApplicationId)) {
     const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
     verifier = verification.verifier
     const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicantsLastApplicationId))
@@ -104,8 +104,8 @@ function* applicantRegisterTokenSaga({
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address),
+    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID', address),
     cacheCall(coordinationGameAddress, 'weiPerApplication')
   ])
 

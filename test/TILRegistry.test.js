@@ -24,6 +24,7 @@ contract('TILRegistry', (accounts) => {
 
   const requiredStake = web3.toWei('20', 'ether')
   const jobStake = web3.toWei('10', 'ether')
+  const minimumBalanceToWork = web3.toWei('15', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   before(async () => {
@@ -38,6 +39,7 @@ contract('TILRegistry', (accounts) => {
       workToken.address,
       requiredStake,
       jobStake,
+      minimumBalanceToWork,
       roles.address
     )
   })

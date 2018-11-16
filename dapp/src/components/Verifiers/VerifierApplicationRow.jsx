@@ -18,6 +18,7 @@ import { applicationService } from '~/services/applicationService'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 import { ApplicationStatus } from './ApplicationStatus'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   let applicationRowObject = {}
@@ -41,7 +42,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
     class _VerifierApplicationRow extends PureComponent {
 
       static propTypes = {
-        applicationId: PropTypes.number
+        applicationId: PropTypes.string
       }
 
       render () {
@@ -115,7 +116,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             'list--item',
           )}>
             <span className="list--item__id">
-              #{applicationId}
+              <AppId applicationId={applicationId} />
             </span>
 
             <span className="list--item__date">

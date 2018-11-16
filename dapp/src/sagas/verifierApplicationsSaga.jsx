@@ -4,12 +4,11 @@ import { cacheCall } from 'saga-genesis'
 
 export const verifierApplicationsSaga = function*({
   coordinationGameAddress,
-  address,
-  applicationCount
+  address
 }) {
   if (!coordinationGameAddress || !address) { return null }
 
-  yield cacheCall(coordinationGameAddress, 'getVerifiersApplicationCount')
+  const applicationCount = yield cacheCall(coordinationGameAddress, 'getVerifiersApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
     const indices = range(applicationCount)

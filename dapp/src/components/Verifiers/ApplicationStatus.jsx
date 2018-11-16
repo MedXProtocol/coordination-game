@@ -33,7 +33,7 @@ function mapStateToProps(state, { applicationId }) {
   const verifiersSecret = verification.verifierSecret
   const applicantsSecret = verification.applicantSecret
 
-  const updatedAt = game.createdAt
+  const updatedAt = game.updatedAt
   const whistleblower = game.whistleblower
 
   return {
@@ -79,7 +79,7 @@ export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationSt
       const verifierSubmittedSecret = !isBlank(verifiersSecret)
       const applicantWon = (applicantsSecret === verifiersSecret)
       const applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
-      const verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+      const verifierSubmitSecretExpiresAt = parseInt(updatedAt, 10) + verifierTimeoutInSeconds
 
       var expirationMessage
 

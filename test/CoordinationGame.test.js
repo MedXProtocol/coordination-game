@@ -141,7 +141,7 @@ contract('CoordinationGame', (accounts) => {
         value: weiPerApplication.toString()
       }
     )
-    applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+    applicationId = await coordinationGame.getApplicantsLastApplicationID(applicant)
     game = mapToGame(await coordinationGame.games(applicationId))
   }
 
@@ -183,9 +183,7 @@ contract('CoordinationGame', (accounts) => {
     it('should allow a user to start the game', async () => {
       let applicantsApplicationCount
 
-      var appCount = await coordinationGame.getApplicantsApplicationCount({
-        from: applicant
-      })
+      var appCount = await coordinationGame.getApplicantsApplicationCount(applicant)
 
       applicantsApplicationCount = new BN(appCount.toString())
       assert.equal(applicantsApplicationCount.toString(), new BN(0).toString(), "Applicant's Application Count was 0")
@@ -198,9 +196,7 @@ contract('CoordinationGame', (accounts) => {
       assert.equal(storedGame.secretAndRandomHash, secretRandomHash, 'secret and random hash matches')
       assert.equal(storedGame.hint, hint, 'hint matches')
 
-      appCount = await coordinationGame.getApplicantsApplicationCount({
-        from: applicant
-      })
+      appCount = await coordinationGame.getApplicantsApplicationCount(applicant)
 
       applicantsApplicationCount = new BN(appCount.toString())
       assert.equal(applicantsApplicationCount.toString(), new BN(1).toString(), "Applicant's Application Count increased")
@@ -258,9 +254,7 @@ contract('CoordinationGame', (accounts) => {
       it('should set the verifier', async () => {
         assert([verifier, verifier2].includes(verification.verifier), '1st verifier matches')
 
-        const verifiersApplicationCount = new BN((await coordinationGame.getVerifiersApplicationCount({
-          from: selectedVerifier
-        })).toString())
+        const verifiersApplicationCount = new BN((await coordinationGame.getVerifiersApplicationCount(selectedVerifier)).toString())
         assert.equal(verifiersApplicationCount.toString(), new BN(1).toString(), "Verifier's Application Count increased")
       })
 

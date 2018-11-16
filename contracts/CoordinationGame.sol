@@ -207,7 +207,8 @@ contract CoordinationGame is Ownable {
     uint256 depositWei = weiPerApplication();
     require(msg.value >= depositWei, 'not enough ether');
 
-    bytes32 applicationId = bytes32(gamesIterator.length());
+    uint256 index = gamesIterator.length();
+    bytes32 applicationId = bytes32(index + 1);
     games[applicationId] = Game(
       applicationId,
       msg.sender, // applicant
@@ -487,27 +488,27 @@ contract CoordinationGame is Ownable {
     work.depositJobStake(verifications[_applicationId].verifier);
   }
 
-  function getApplicantsApplicationCount() external view returns (uint256) {
-    return applicantsApplicationIndices[msg.sender].length;
+  function getApplicantsApplicationCount(address _applicant) external view returns (uint256) {
+    return applicantsApplicationIndices[_applicant].length;
   }
 
-  function getApplicantsLastApplicationID() external view returns (bytes32) {
-    if (applicantsApplicationIndices[msg.sender].length > 0) {
-      uint256 index = applicantsApplicationIndices[msg.sender].length.sub(1);
-      return applicantsApplicationIndices[msg.sender][index];
+  function getApplicantsLastApplicationID(address _applicant) external view returns (bytes32) {
+    if (applicantsApplicationIndices[_applicant].length > 0) {
+      uint256 index = applicantsApplicationIndices[_applicant].length.sub(1);
+      return applicantsApplicationIndices[_applicant][index];
     } else {
       return 0;
     }
   }
 
-  function getVerifiersApplicationCount() external view returns (uint256) {
-    return verifiersApplicationIndices[msg.sender].length;
+  function getVerifiersApplicationCount(address _verifier) external view returns (uint256) {
+    return verifiersApplicationIndices[_verifier].length;
   }
 
-  function getVerifiersLastApplicationID() external view returns (bytes32) {
-    if (verifiersApplicationIndices[msg.sender].length > 0) {
-      uint256 index = verifiersApplicationIndices[msg.sender].length.sub(1);
-      return verifiersApplicationIndices[msg.sender][index];
+  function getVerifiersLastApplicationID(address _verifier) external view returns (bytes32) {
+    if (verifiersApplicationIndices[_verifier].length > 0) {
+      uint256 index = verifiersApplicationIndices[_verifier].length.sub(1);
+      return verifiersApplicationIndices[_verifier][index];
     } else {
       return 0;
     }

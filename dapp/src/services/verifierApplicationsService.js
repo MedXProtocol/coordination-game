@@ -15,9 +15,7 @@ export const verifierApplicationsService = function(state, applicationCount, coo
       index
     )
 
-    if (!isBlank(applicationId)) {
-      accumulator.push(applicationId)
-    }
+    accumulator.push(applicationId)
 
     return accumulator
   }, [])

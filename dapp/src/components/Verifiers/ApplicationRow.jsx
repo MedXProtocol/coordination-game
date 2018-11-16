@@ -15,6 +15,7 @@ import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { WhistleblowButton } from './WhistleblowButton'
 import { get } from 'lodash'
 import { mapToGame } from '~/services/mapToGame'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
@@ -65,7 +66,7 @@ export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSa
       return (
         <div className='list--item'>
           <span className="list--item__id">
-            #{applicationId}
+            <AppId applicationId={applicationId} />
           </span>
 
           <span className="list--item__date">

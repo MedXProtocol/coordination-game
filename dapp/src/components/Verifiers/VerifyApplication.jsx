@@ -21,6 +21,7 @@ import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import * as routes from '~/../config/routes'
 import { mapToGame } from '~/services/mapToGame'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
@@ -87,7 +88,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
           }
 
           static propTypes = {
-            applicationId: PropTypes.number
+            applicationId: PropTypes.string
           }
 
           componentWillReceiveProps (nextProps) {
@@ -190,7 +191,7 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
                 </div>
 
                 <h5 className="is-size-5 has-text-grey-dark">
-                  Token Submission #{applicationId}
+                  Token Submission <AppId applicationId={applicationId} />
                 </h5>
 
                 <br />

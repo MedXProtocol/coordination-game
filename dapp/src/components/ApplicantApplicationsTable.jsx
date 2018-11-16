@@ -17,6 +17,7 @@ import AntdIcon from '@ant-design/icons-react'
 import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
+import { mapToGame } from '~/services/mapToGame'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 
 function mapStateToProps(state) {
@@ -27,7 +28,7 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
-  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
+  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
@@ -39,7 +40,7 @@ function mapStateToProps(state) {
         address,
         index
       )
-      const game = cacheCallValue(state, coordinationGameAddress, 'games', applicationId)
+      const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
       const { createdAt } = game
 
       if (!isBlank(applicationId) && createdAt) {
@@ -68,7 +69,7 @@ function* applicantApplicationsTableSaga({
   if (!coordinationGameAddress || !address) { return null }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount')
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address)
   ])
 
   if (applicationCount && applicationCount !== 0) {
