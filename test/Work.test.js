@@ -15,8 +15,9 @@ contract('Work', (accounts) => {
     roles,
     initialStakerBalance
 
-  const requiredStake = web3.toWei('20', 'ether')
+  const requiredStake = web3.toWei('30', 'ether')
   const jobStake = web3.toWei('10', 'ether')
+  const minimumBalanceToWork = web3.toWei('20', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   before(async () => {
@@ -27,7 +28,7 @@ contract('Work', (accounts) => {
 
   beforeEach(async () => {
     work = await Work.new()
-    await work.init(staker, token.address, requiredStake, jobStake, roles.address)
+    await work.init(staker, token.address, requiredStake, jobStake, minimumBalanceToWork, roles.address)
 
     await token.mint(jobManager, jobManagerBalance)
     await token.approve(work.address, jobManagerBalance, { from: jobManager })
@@ -190,20 +191,22 @@ contract('Work', (accounts) => {
   describe('when updating settings', () => {
     const newRequiredStake = web3.toWei('30', 'ether')
     const newJobStake = web3.toWei('3', 'ether')
+    const newMinimumBalance = web3.toWei('10', 'ether')
 
     it('should work for the contract owner', async () => {
       assert.equal(await work.requiredStake(), requiredStake)
       assert.equal(await work.jobStake(), jobStake)
 
-      await work.updateSettings(newRequiredStake, newJobStake, { from: staker })
+      await work.updateSettings(newRequiredStake, newJobStake, newMinimumBalance, { from: staker })
 
       assert.equal(await work.requiredStake(), newRequiredStake)
       assert.equal(await work.jobStake(), newJobStake)
+      assert.equal(await work.minimumBalanceToWork(), newMinimumBalance)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
-        await work.updateSettings(newRequiredStake, newJobStake, {
+        await work.updateSettings(newRequiredStake, newJobStake, newMinimumBalance, {
           from: staker2
         })
       })
