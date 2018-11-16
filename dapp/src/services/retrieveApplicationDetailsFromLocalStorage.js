@@ -22,7 +22,7 @@ export const retrieveApplicationDetailsFromLocalStorage = (
 
       return applicationRowObject
     } else {
-      // console.warn(`Value not found for key ${key} in localStorage`)
+      console.warn(`Value not found for key ${key} in localStorage`)
       return applicationRowObject
     }
   } else {
