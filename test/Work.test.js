@@ -20,8 +20,10 @@ contract('Work', (accounts) => {
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   before(async () => {
-    token = await WorkToken.deployed()
-    roles = await TILRoles.deployed()
+    token = await WorkToken.new()
+    await token.init(owner)
+    roles = await TILRoles.new()
+    await roles.init(owner)
     await roles.setRole(jobManager, 1, true)
   })
 

@@ -12,6 +12,8 @@ const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
 const leftPadHexString = require('./helpers/leftPadHexString')
+const mapToGame = require('./helpers/mapToGame')
+const mapToVerification = require('./helpers/mapToVerification')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
@@ -21,6 +23,7 @@ contract('CoordinationGame', (accounts) => {
     work,
     tilRegistry,
     applicationId,
+    game,
     applicationVerifier,
     applicantRevealTimeoutInSeconds,
     verifierTimeoutInSeconds,
@@ -50,9 +53,12 @@ contract('CoordinationGame', (accounts) => {
   ).toString('hex')
 
   before(async () => {
-    etherPriceFeed = await EtherPriceFeed.deployed()
-    workToken = await WorkToken.deployed()
-    roles = await TILRoles.deployed()
+    etherPriceFeed = await EtherPriceFeed.new()
+    await etherPriceFeed.init(owner, web3.toWei('210.83', 'ether'))
+    workToken = await WorkToken.new()
+    workToken.init(owner)
+    roles = await TILRoles.new()
+    await roles.init(owner)
   })
 
   beforeEach(async () => {
@@ -120,7 +126,8 @@ contract('CoordinationGame', (accounts) => {
         from: applicant
       }
     )
-    applicationVerifier = await coordinationGame.verifiers(applicationId)
+    verification = mapToVerification(await coordinationGame.verifications(applicationId))
+    selectedVerifier = verification.verifier
   }
 
   async function newApplicantStartsGame() {
@@ -134,6 +141,7 @@ contract('CoordinationGame', (accounts) => {
       }
     )
     applicationId = await coordinationGame.getApplicantsLastApplicationID({ from: applicant })
+    game = mapToGame(await coordinationGame.games(applicationId))
   }
 
   async function applicantRevealsTheirSecret() {
@@ -151,9 +159,8 @@ contract('CoordinationGame', (accounts) => {
   async function verifierSubmitSecret(_secret) {
     if (!_secret) { _secret = secret }
     debug(`verifierSubmitSecret`)
-    let selectedVerifier = await coordinationGame.verifiers(applicationId)
     await coordinationGame.verifierSubmitSecret(applicationId, _secret, {
-      from: selectedVerifier
+      from: verification.verifier
     })
   }
 
@@ -184,13 +191,11 @@ contract('CoordinationGame', (accounts) => {
 
       await newApplicantStartsGame()
 
-      const storedSecretRandomHash = await coordinationGame.secretAndRandomHashes(applicationId)
-      const storedRandomHash = await coordinationGame.randomHashes(applicationId)
-      const storedHint = await coordinationGame.hints(applicationId)
+      const storedGame = mapToGame(await coordinationGame.games(applicationId))
 
-      assert.equal(storedRandomHash, randomHash, 'random hash matches')
-      assert.equal(storedSecretRandomHash, secretRandomHash, 'secret and random hash matches')
-      assert.equal(storedHint, hint, 'hint matches')
+      assert.equal(storedGame.randomHash, randomHash, 'random hash matches')
+      assert.equal(storedGame.secretAndRandomHash, secretRandomHash, 'secret and random hash matches')
+      assert.equal(storedGame.hint, hint, 'hint matches')
 
       appCount = await coordinationGame.getApplicantsApplicationCount({
         from: applicant
@@ -200,12 +205,12 @@ contract('CoordinationGame', (accounts) => {
       assert.equal(applicantsApplicationCount.toString(), new BN(1).toString(), "Applicant's Application Count increased")
 
       assert.equal(
-        (await coordinationGame.applicantTokenDeposits(1)).toString(),
+        storedGame.applicantTokenDeposit.toString(),
         jobStake.toString()
       )
 
       assert.equal(
-        (await coordinationGame.applicationBalancesInWei(1)).toString(),
+        storedGame.applicationBalanceInWei.toString(),
         weiPerApplication.toString()
       )
     })
@@ -250,8 +255,7 @@ contract('CoordinationGame', (accounts) => {
       })
 
       it('should set the verifier', async () => {
-        const selectedVerifier = await coordinationGame.verifiers(applicationId)
-        assert([verifier, verifier2].includes(selectedVerifier), '1st verifier matches')
+        assert([verifier, verifier2].includes(verification.verifier), '1st verifier matches')
 
         const verifiersApplicationCount = new BN((await coordinationGame.getVerifiersApplicationCount({
           from: selectedVerifier
@@ -299,11 +303,11 @@ contract('CoordinationGame', (accounts) => {
         })
 
         it('should allow the applicant to select another verifier', async () => {
-          const firstVerifier = await coordinationGame.verifiers(applicationId)
+          const firstVerifier = verification.verifier
 
           await applicantRandomlySelectsAVerifier()
 
-          const newVerifier = await coordinationGame.verifiers(applicationId)
+          const newVerifier = verification.verifier
           assert([verifier, verifier2].includes(newVerifier), 'new verifier matches')
           assert.notEqual(newVerifier, firstVerifier, 'new verifier is not first verifier')
         })
@@ -324,8 +328,8 @@ contract('CoordinationGame', (accounts) => {
 
       it('should set the verifier secret', async () => {
         debug('verifierSubmitSecret() verifierSubmitSecret')
-        const storedVerifierSecret = await coordinationGame.verifierSecrets(applicationId)
-        assert.equal(secret, storedVerifierSecret)
+        const verification = mapToVerification(await coordinationGame.verifications(applicationId))
+        assert.equal(verification.verifierSecret, secret)
       })
 
       it('should not be called again', async () => {
@@ -366,15 +370,13 @@ contract('CoordinationGame', (accounts) => {
       it('should add applicant to registry (and pay out verifier)', async () => {
         await applicantRevealsTheirSecret()
 
+        game = mapToGame(await coordinationGame.games(applicationId))
+
         debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
-        const storedSecret = await coordinationGame.applicantSecrets(applicationId)
-        assert.equal(storedSecret, secret)
+        assert.equal(game.applicantSecret, secret)
 
-        debug(`applicantRevealSecret() won getListingHash(${applicationId})...`)
-        const listingHash = await coordinationGame.getListingHash(applicationId)
-
-        debug(`applicantRevealSecret() won listings(${listingHash})...`)
-        const listing = await tilRegistry.listings(listingHash)
+        debug(`applicantRevealSecret() won listings(${applicationId})...`)
+        const listing = await tilRegistry.listings(applicationId)
 
         assert.equal(listing[2], 0, 'application is listed')
       })
@@ -390,11 +392,8 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
         await applicantRevealsTheirSecret()
 
-        debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
-        const listingHash = await coordinationGame.getListingHash(applicationId)
-
-        debug(`applicantRevealSecret() failed listings(${listingHash})...`)
-        const listing = await tilRegistry.listings(listingHash)
+        debug(`applicantRevealSecret() failed listings(${applicationId})...`)
+        const listing = await tilRegistry.listings(applicationId)
 
         assert.equal(listing[2], 1, 'application is challenged')
       })
@@ -411,7 +410,8 @@ contract('CoordinationGame', (accounts) => {
       })
 
       it('should allow the verifier to challenge', async () => {
-        const selectedVerifier = await coordinationGame.verifiers(applicationId)
+        verification = mapToVerification(await coordinationGame.verifications(applicationId))
+        const selectedVerifier = verification.verifier
 
         await verifierSubmitSecret()
         await expectThrow(async () => {
@@ -422,7 +422,10 @@ contract('CoordinationGame', (accounts) => {
         const verifierStartingBalance = (await work.balances(selectedVerifier))
         const applicantStartingBalance = (await workToken.balanceOf(applicant))
         const verifierEtherStartingBalance = (await web3.eth.getBalance(selectedVerifier))
-        const applicantEtherDeposit = (await coordinationGame.applicationBalancesInWei(applicationId))
+
+        game = mapToGame(await coordinationGame.games(applicationId))
+
+        const applicantEtherDeposit = game.applicationBalanceInWei
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
@@ -458,11 +461,8 @@ contract('CoordinationGame', (accounts) => {
           'applicant deposit was returned'
         )
 
-        debug(`applicantRevealSecret() failed getListingHash(${applicationId})...`)
-        const listingHash = await coordinationGame.getListingHash(applicationId)
-
-        debug(`applicantRevealSecret() failed listings(${listingHash})...`)
-        const listing = await tilRegistry.listings(listingHash)
+        debug(`applicantRevealSecret() failed listings(${applicationId})...`)
+        const listing = await tilRegistry.listings(applicationId)
 
         /// These assertions essentially make sure there is no listing
         assert.equal(listing[0].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
@@ -548,6 +548,8 @@ contract('CoordinationGame', (accounts) => {
         { from: verifier2 }
       )
 
+      game = mapToGame(await coordinationGame.games(applicationId))
+
       const blowerNewTokenBalance = await workToken.balanceOf(verifier2)
       const blowerNewEtherBalance = await web3.eth.getBalance(verifier2)
       assert.equal(
@@ -559,7 +561,7 @@ contract('CoordinationGame', (accounts) => {
         'ether balances match'
       )
       assert.equal(
-        await coordinationGame.whistleblowers(applicationId), verifier2,
+        game.whistleblower, verifier2,
         'whistleblower has been set'
       )
     })
@@ -570,19 +572,21 @@ contract('CoordinationGame', (accounts) => {
       })
 
       it('should return the verifiers job stake', async () => {
-        const verifierTokenBalance = await work.balances(applicationVerifier)
-        const verifierEtherBalance = await web3.eth.getBalance(applicationVerifier)
+        const verifierTokenBalance = await work.balances(selectedVerifier)
+        const verifierEtherBalance = await web3.eth.getBalance(selectedVerifier)
 
-        debug(`verifier: ${applicationVerifier}`)
+        debug(`verifier: ${selectedVerifier}`)
         debug(`verifierTokenBalance: ${verifierTokenBalance.toString()}`)
+
+        debug(`${applicationId.toString()} ${random.toString()}`)
 
         await coordinationGame.whistleblow(
           applicationId.toString(), random.toString(),
           { from: verifier2 }
         )
 
-        const verifierNewTokenBalance = await work.balances(applicationVerifier)
-        const verifierNewEtherBalance = await web3.eth.getBalance(applicationVerifier)
+        const verifierNewTokenBalance = await work.balances(selectedVerifier)
+        const verifierNewEtherBalance = await web3.eth.getBalance(selectedVerifier)
 
         debug(`verifierNewTokenBalance: ${verifierNewTokenBalance.toString()}`)
 

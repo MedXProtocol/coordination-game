@@ -6,6 +6,6 @@ const ownerAccount = require('./support/ownerAccount')
 module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
     const workToken = await WorkToken.deployed()
-    execAdmin(`zos create BetaFaucet --init initialize --args ${workToken.address},${ownerAccount(accounts)}`, networkName, accounts)
+    execAdmin(`zos create BetaFaucet --init init --args ${workToken.address},${ownerAccount(accounts)}`, networkName, accounts)
   })
 }

@@ -22,12 +22,24 @@ contract('TILRegistry', (accounts) => {
       work,
       roles
 
+  const requiredStake = web3.toWei('20', 'ether')
+  const jobStake = web3.toWei('10', 'ether')
+  const jobManagerBalance = web3.toWei('1000', 'ether')
+
   before(async () => {
-    work = await Work.deployed()
-    workToken = await WorkToken.deployed()
+    workToken = await WorkToken.new()
+    await workToken.init(owner)
     roles = await TILRoles.new()
     await roles.init(owner)
     await roles.setRole(owner, 1, true) // owner is the job manager
+    work = await Work.new()
+    await work.init(
+      owner,
+      workToken.address,
+      requiredStake,
+      jobStake,
+      roles.address
+    )
   })
 
   beforeEach(async () => {
