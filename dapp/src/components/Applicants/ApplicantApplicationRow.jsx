@@ -63,7 +63,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
         let {
           applicantRevealExpiresAt,
-          applicantsSecret,
           applicationId,
           createdAt,
           tokenTicker,
@@ -84,14 +83,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
-        const applicantRevealedSecret = !isBlank(applicantsSecret)
-        const applicantWon = (applicantsSecret === verifiersSecret)
-
-
-
 
         // START DUPLICATE CODE! (put in service?)
-        const success = applicantRevealedSecret
         const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
         const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
 
@@ -103,10 +96,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
         const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
         // END DUPLICATE CODE
-
-
-
-
 
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (

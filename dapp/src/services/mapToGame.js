@@ -1,4 +1,5 @@
-module.exports = function (array) {
+export function mapToGame (array) {
+  if (!array || array.length < 12) { return {} }
   return {
     applicationId: array[0],
     applicant: array[1],
@@ -6,7 +7,7 @@ module.exports = function (array) {
     randomHash: array[3],
     hint: array[4],
     createdAt: array[5],
-    updatedAt: array[6],
+    createdAt: array[6],
     applicationBalanceInWei: array[7],
     applicantTokenDeposit: array[8],
     /// @notice the block number whose hash is to be used for randomness

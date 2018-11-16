@@ -32,6 +32,8 @@ import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
+import { mapToGame } from '~/services/mapToGame'
+import { mapToVerification } from '~/services/mapToVerification'
 
 function mapStateToProps(state) {
   let verifier,
@@ -55,8 +57,10 @@ function mapStateToProps(state) {
   const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
-    verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
-    applicantsLastApplicationCreatedAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
+    const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
+    verifier = verification.verifier
+    const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicantsLastApplicationId))
+    applicantsLastApplicationCreatedAt = game.createdAt
   }
 
   return {
@@ -106,8 +110,8 @@ function* applicantRegisterTokenSaga({
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
-    yield cacheCall(coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
-    yield cacheCall(coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
+    yield cacheCall(coordinationGameAddress, 'games', applicantsLastApplicationId)
+    yield cacheCall(coordinationGameAddress, 'verifications', applicantsLastApplicationId)
   }
 }
 

@@ -4,12 +4,10 @@ import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
-import { all } from 'redux-saga/effects'
 import { toastr } from '~/toastr'
 import { get } from 'lodash'
 import {
   cacheCallValue,
-  cacheCallValueInt,
   contractByName,
   cacheCall,
   TransactionStateHandler,
@@ -22,10 +20,9 @@ import { ScrollToTop } from '~/components/ScrollToTop'
 import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import * as routes from '~/../config/routes'
+import { mapToGame } from '~/services/mapToGame'
 
 function mapStateToProps(state, { match }) {
-  let createdAt,
-    updatedAt
   let applicationObject = {}
 
   const applicationId = parseInt(match.params.applicationId, 10)
@@ -33,13 +30,14 @@ function mapStateToProps(state, { match }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   if (applicationId) {
-    const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-
+    const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
+    const {
+      createdAt,
+      updatedAt
+    } = game
+    const hexHint = game.hint
     // Parse and convert the generic hint field to our DApp-specific data
     const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
-
-    createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-    updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
 
     applicationObject = {
       applicationId,
@@ -72,11 +70,7 @@ function mapDispatchToProps(dispatch) {
 function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
-  yield all([
-    cacheCall(coordinationGameAddress, 'hints', applicationId),
-    cacheCall(coordinationGameAddress, 'createdAt', applicationId),
-    cacheCall(coordinationGameAddress, 'updatedAt', applicationId)
-  ])
+  yield cacheCall(coordinationGameAddress, 'games', applicationId)
 }
 
 export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(

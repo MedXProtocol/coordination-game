@@ -5,6 +5,7 @@ import { all } from 'redux-saga/effects'
 import { get, range } from 'lodash'
 import {
   cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   contractByName,
   withSaga,
@@ -37,7 +38,8 @@ function mapStateToProps(state) {
         address,
         index
       )
-      const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+      const game = cacheCallValue(state, coordinationGameAddress, 'games', applicationId)
+      const { createdAt } = game
 
       if (applicationId && createdAt) {
         accumulator.push({ applicationId, createdAt })
@@ -75,8 +77,7 @@ function* applicantApplicationsTableSaga({
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
 
         if (applicationId) {
-          yield cacheCall(coordinationGameAddress, 'createdAt', applicationId)
-          yield cacheCall(coordinationGameAddress, 'verifiers', applicationId)
+          yield cacheCall(coordinationGameAddress, 'games', applicationId)
         }
       })
     )

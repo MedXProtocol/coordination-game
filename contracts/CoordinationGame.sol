@@ -24,6 +24,7 @@ contract CoordinationGame is Ownable {
     bytes32 randomHash;
     bytes hint;
     uint256 createdAt;
+    uint256 updatedAt;
     uint256 applicationBalanceInWei;
     uint256 applicantTokenDeposit;
     /// @notice the block number whose hash is to be used for randomness
@@ -214,6 +215,7 @@ contract CoordinationGame is Ownable {
       _keccakOfRandom, // randomHashes
       _hint, // hints
       block.timestamp, // createdAt
+      block.timestamp, // updatedAt
       msg.value, // applicationBalancesInWei
       work.jobStake(), // applicantTokenDeposits
       block.number + 1, // randomBlockNumbers
@@ -300,6 +302,7 @@ contract CoordinationGame is Ownable {
 
     /// Update random block to be the next one
     game.randomBlockNumber = block.number + 1;
+    game.updatedAt = block.timestamp;
 
     verifiersApplicationIndices[selectedVerifier].push(_applicationId);
 
@@ -330,6 +333,7 @@ contract CoordinationGame is Ownable {
   */
   function verifierSubmitSecret(bytes32 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
     Verification storage verification = verifications[_applicationId];
+    Game storage game = games[_applicationId];
 
     require(gamesIterator.hasValue(_applicationId), 'application has been initialized');
     require(verification.verifierSecret == bytes32(0), 'verify has not already been called');
@@ -345,6 +349,7 @@ contract CoordinationGame is Ownable {
 
     verification.verifierSecret = _secret;
     verification.verifierSubmittedAt = block.timestamp;
+    game.updatedAt = block.timestamp;
 
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
@@ -403,6 +408,7 @@ contract CoordinationGame is Ownable {
     require(srHash == game.secretAndRandomHash, 'secret and random hash matches');
     require(rHash == game.randomHash, 'random hash matches');
 
+    game.updatedAt = block.timestamp;
     game.applicantSecret = _secret;
 
     if (_secret != verification.verifierSecret) {
@@ -432,6 +438,7 @@ contract CoordinationGame is Ownable {
 
     /// Transfer the verifier's deposit back to them
     returnVerifierJobStake(_applicationId);
+    game.updatedAt = block.timestamp;
 
     /// Transfer applicant's deposit back to them
     tilRegistry.token().transfer(

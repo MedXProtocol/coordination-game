@@ -15,6 +15,7 @@ import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
+import { mapToGame } from '~/services/mapToGame'
 
 function mapStateToProps(state, { listingHash }) {
   const web3 = getWeb3()
@@ -23,8 +24,9 @@ function mapStateToProps(state, { listingHash }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
   const applicationId = web3.utils.hexToNumber(listingHash)
-  const hexHint = cacheCallValue(state, CoordinationGame, 'hints', applicationId)
-  const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
+  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', applicationId))
+  const hexHint = game.hint
+  const hexSecret = game.applicantSecret
   const secret = hexSecret
   // const secret = web3.utils.hexToNumber(hexSecret || '0x0')
 
@@ -47,8 +49,7 @@ function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash, applicati
   if (!TILRegistry || !CoordinationGame || !listingHash || !applicationId) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'hints', applicationId),
-    cacheCall(CoordinationGame, 'applicantSecrets', applicationId)
+    cacheCall(CoordinationGame, 'games', applicationId)
   ])
 }
 
