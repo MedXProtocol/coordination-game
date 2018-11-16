@@ -1,5 +1,5 @@
 import React, {
-  Component
+  PureComponent
 } from 'react'
 import { all } from 'redux-saga/effects'
 import {
@@ -44,7 +44,7 @@ function* applicationRowSaga({ CoordinationGame, applicationId }) {
 }
 
 export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSaga)(withSend(
-  class _ApplicationRow extends Component {
+  class _ApplicationRow extends PureComponent {
     render () {
       let {
         applicationId,

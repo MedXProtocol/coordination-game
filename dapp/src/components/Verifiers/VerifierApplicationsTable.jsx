@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
@@ -38,7 +38,7 @@ function mapStateToProps(state) {
 
 export const VerifierApplicationsTable = connect(mapStateToProps)(
   withSaga(verifierApplicationsSaga)(
-    class _VerifierApplicationsTable extends Component {
+    class _VerifierApplicationsTable extends PureComponent {
 
       renderApplicationRows(applicationIds) {
         let applicationRows = applicationIds.map((applicationId, index) => {
