@@ -7,7 +7,7 @@ export function mapToGame (array) {
     randomHash: array[3],
     hint: array[4],
     createdAt: array[5],
-    createdAt: array[6],
+    updatedAt: array[6],
     applicationBalanceInWei: array[7],
     applicantTokenDeposit: array[8],
     /// @notice the block number whose hash is to be used for randomness
