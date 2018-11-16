@@ -111,6 +111,7 @@ export const Header = ReactTimeout(
           }
 
           toggleMobileMenu = (e) => {
+            console.log('toggleMobileMenu hit!')
             const mobileMenuActive = !this.state.mobileMenuActive
 
             this.setState({

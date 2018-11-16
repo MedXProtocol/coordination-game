@@ -944,3 +944,8 @@ header {
 .form--submit-token {
   min-height: 620px;
 }
+
+.is-clearfix .column {
+  margin: 0;
+  padding: 0 0.75rem;
+}

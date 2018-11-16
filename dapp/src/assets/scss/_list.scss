@@ -78,7 +78,7 @@
 
   @media screen and (max-width: 1200px) {
     grid-column: span 4;
-    text-align: left;
+    text-align: right;
   }
 
   @media screen and (max-width: 768px) {
@@ -91,7 +91,7 @@
   word-break: break-all;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 8;
+    grid-column: span 6;
   }
 
   @media screen and (max-width: 768px) {
@@ -104,12 +104,13 @@
   text-align: right;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 4;
-    text-align: left;
+    grid-column: span 6;
+    text-align: right;
   }
 
   @media screen and (max-width: 768px) {
     grid-column: span 12;
+    text-align: left;
   }
 }
 
@@ -184,7 +185,6 @@
   color: darken($gray, 35%);
   font-weight: 700;
   transition: color 200ms ease-in;
-  margin-right: 30px;
 }
 
 .list--item__view svg {
@@ -223,4 +223,32 @@
 
 .list--item form {
   margin: 4px 0 0;
+}
+
+.list--action-container {
+  text-align: right;
+
+  @media (max-width: 768px) {
+    text-align: left;
+  }
+}
+
+.list--action {
+  margin: 0 0 8px 0;
+  padding: 0 0 18px 0;
+
+  @media (max-width: 768px) {
+    float: none;
+    margin-bottom: 30px;
+  }
+}
+
+.list--title {
+  margin: 0 0 10px 0;
+  padding: 0 0 20px 0;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+    padding-bottom: 10px;
+  }
 }
