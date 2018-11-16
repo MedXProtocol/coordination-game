@@ -12,7 +12,8 @@ import {
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
-import TEXLogoImg from '~/assets/img/tex-logo-white.svg'
+import TEXCoinImg from '~/assets/img/tex-coin.png'
+import TEXCoinImg2x from '~/assets/img/tex-coin.png'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -62,19 +63,20 @@ export const Wallet = connect(mapStateToProps)(
             <ScrollToTop />
             <PageTitle title='wallet' />
 
+            <h1 className="is-size-1">
+              Your Wallet
+            </h1>
+
             <div className="level--container">
-              <nav className="level level--header">
-                <p className="level-item has-text-centered">
-                  <span className="title">
-                    <TEXLogoImg width="100" height="50" />
-                  </span>
-                </p>
-              </nav>
               <nav className="level level--body">
                 <div className="level-item has-text-centered">
                   <div>
                     <span className="heading">
-                      Balance
+                      <img
+                        src={TEXCoinImg}
+                        alt="TEX Token Icon"
+                        srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
+                      />
                     </span>
                     <span className="title">
                       <TILOdometer value={displayWeiToEther(this.props.texBalance)} />

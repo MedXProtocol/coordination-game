@@ -213,7 +213,7 @@ html.html-light,
   }
 
   .list--item:hover .list--item__date {
-    color: $brand-info;
+    color: white;
   }
 
   .list--item__view {
@@ -221,13 +221,38 @@ html.html-light,
   }
 
   .list--item:hover {
-    background-color: darken(white, 5%);
+    background-color: $accent-color-1--light;
+    color: white;
   }
 
   .list--item:hover .list--item__id,
   .list--item:hover .list--item__status,
   .list--item:hover .list--item__view {
-    color: $text-color--light;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .list--item:hover .list--item__status strong,
+  .list--item:hover .list--item__view strong {
+    color: white;
+  }
+
+  .list--item:hover .button.is-primary,
+  .list--item:hover .button.is-warning {
+    background-color: white;
+  }
+
+  .list--item:hover .button.is-primary:hover,
+  .list--item:hover .button.is-warning:hover {
+    background-color: white;
+    box-shadow: 0 0 2px 0 white;
+  }
+
+  .list--item:hover .button.is-primary:hover {
+    color: $brand-info--light;
+  }
+
+  .list--item:hover .button.is-warning:hover {
+    color: $brand-danger--light;
   }
 
   .progress--step {
@@ -290,18 +315,19 @@ html.html-light,
   .button.is-primary.is-outlined:hover,
   .button.is-primary.is-outlined:active,
   .button.is-primary.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten($accent-color-1--light, 5%);
-    background-color: transparent;
-    color: darken($accent-color-1--light, 5%);
+    box-shadow: 0 0 3px 0 lighten($accent-color-1--light, 5%);
+    background-color: lighten($accent-color-1--light, 5%);
+    border-color: $accent-color-1--light;
+    color: white;
   }
 
   .button.is-warning.is-outlined:hover,
   .button.is-warning.is-outlined:active,
   .button.is-warning.is-outlined:focus {
-    box-shadow: 0 0 5px 0 lighten($accent-color-2--light, 30%);
-    background-color: white;
+    box-shadow: none;
+    background-color: $accent-color-2--light;
     border-color: $accent-color-2--light;
-    color: $accent-color-2--light;
+    color: white;
   }
 
   .button.is-light.is-text {
@@ -337,6 +363,26 @@ html.html-light,
   .title svg path {
     color: $text-color--light;
     fill: $text-color--light;
+  }
+
+  .list--icon {
+    color: rgba(220, 220, 220, 0.4);
+  }
+
+  .list--item {
+    border-color: $light-gray--light;
+  }
+
+  .list--item.is-info {
+    border-color: $accent-color-1--light;
+  }
+
+  .list--item:hover.is-info {
+    border-color: white;
+  }
+
+  .list--item.is-warning {
+    border-color: $accent-color-2--light;
   }
 
   .icon-circle {

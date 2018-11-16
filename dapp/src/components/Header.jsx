@@ -27,9 +27,9 @@ import { faMoon } from '@fortawesome/free-solid-svg-icons'
 import { faSun } from '@fortawesome/free-regular-svg-icons'
 import { NetworkInfo } from '~/components/NetworkInfo'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
-import { verifierApplicationService } from '~/services/verifierApplicationService'
+import { applicationService } from '~/services/applicationService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
-import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
+import { applicationSaga } from '~/sagas/applicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
@@ -50,7 +50,7 @@ function mapStateToProps(state) {
   for (let i = 0; i < applicationIds.length; i++) {
     const applicationId = applicationIds[i]
 
-    const application = verifierApplicationService(state, applicationId, coordinationGameAddress)
+    const application = applicationService(state, applicationId, coordinationGameAddress)
     const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
 
     if (!verifierSubmittedSecret && (latestBlockTimestamp < application.verifierSubmitSecretExpiresAt)) {
@@ -75,7 +75,7 @@ function* headerSaga({ address, applicationCount, applicationIds, coordinationGa
   if (applicationIds && applicationIds.length !== 0) {
     yield all(
       applicationIds.map(function* (applicationId) {
-        yield verifierApplicationSaga({ coordinationGameAddress, applicationId })
+        yield applicationSaga({ coordinationGameAddress, applicationId })
       })
     )
   }
@@ -111,11 +111,16 @@ export const Header = ReactTimeout(
           }
 
           toggleMobileMenu = (e) => {
-            console.log('toggleMobileMenu hit!')
             const mobileMenuActive = !this.state.mobileMenuActive
 
             this.setState({
               mobileMenuActive
+            })
+          }
+
+          closeMobileMenu = (e) => {
+            this.setState({
+              mobileMenuActive: false
             })
           }
 
@@ -207,7 +212,7 @@ export const Header = ReactTimeout(
                                 activeClassName="is-active"
                                 to={routes.ADMIN}
                                 className="navbar-item"
-                                onClick={this.toggleMobileMenu}
+                                onClick={this.closeMobileMenu}
                               >
                                 <AntdIcon type={SettingOutline} className="antd-icon" />&nbsp;
                                 Admin
@@ -225,7 +230,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.HOME}
                             className="navbar-item"
-                            onClick={this.toggleMobileMenu}
+                            onClick={this.closeMobileMenu}
                           >
                             <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
                             Registry
@@ -236,7 +241,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.REGISTER_TOKEN}
                             className='navbar-item'
-                            onClick={this.toggleMobileMenu}
+                            onClick={this.closeMobileMenu}
                           >
                             <AntdIcon type={AuditOutline} className="antd-icon " />&nbsp;
                             Register Token
@@ -252,7 +257,7 @@ export const Header = ReactTimeout(
                                 'is-attention-grabby': applicationsToVerify > 0
                               }
                             )}
-                            onClick={this.toggleMobileMenu}
+                            onClick={this.closeMobileMenu}
                           >
                             <AntdIcon
                               type={applicationsToVerify > 0 ? IssuesCloseOutline : CheckCircleOutline}
@@ -266,7 +271,7 @@ export const Header = ReactTimeout(
                             activeClassName="is-active"
                             to={routes.WALLET}
                             className="navbar-item"
-                            onClick={this.toggleMobileMenu}
+                            onClick={this.closeMobileMenu}
                           >
                             <AntdIcon type={WalletOutline} className="antd-icon" />&nbsp;
                             Wallet

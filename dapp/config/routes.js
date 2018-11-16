@@ -1,4 +1,5 @@
 export const HOME = '/'
+export const APPLICATION = '/applications/:applicationId'
 export const REGISTRY = '/registry/:currentPage'
 export const ADMIN = '/admin'
 export const REGISTER_TOKEN = '/applicants/register'

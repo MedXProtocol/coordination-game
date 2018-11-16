@@ -1,125 +1,36 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
+import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
-import { all } from 'redux-saga/effects'
+import { connect } from 'react-redux'
+import { formatRoute } from 'react-router-named-routes'
+import { Link } from 'react-router-dom'
 import {
   withSaga,
-  cacheCallValue,
-  cacheCallValueInt,
-  contractByName,
-  cacheCall
+  contractByName
 } from 'saga-genesis'
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons'
+import { get } from 'lodash'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
+import { applicationService } from '~/services/applicationService'
+import { applicationSaga } from '~/sagas/applicationSaga'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
-import { getWeb3 } from '~/utils/getWeb3'
-import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
-import { get } from 'lodash'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicantRevealTimeoutInSeconds,
-    applicationRowObject,
-    verifierTimeoutInSeconds
-
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const networkId = get(state, 'sagaGenesis.network.networkId')
-  const address = get(state, 'sagaGenesis.accounts[0]')
-  const verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
 
-  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
-
-  const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
-  const verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
-
-  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
-
-  const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
-
-  // Parse and convert the generic hint field to our DApp-specific data
-  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
-
-  applicationRowObject = {
-    applicantsSecret,
-    applicationId,
-    createdAt,
-    verifierChallengedAt,
-    tokenTicker,
-    tokenName,
-    verifier,
-    verifiersSecret,
-    updatedAt
-  }
-
-  if (!isBlank(verifier)) {
-    verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
-    applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
-  }
-
-  applicationRowObject = retrieveApplicationDetailsFromLocalStorage(
-    applicationRowObject,
-    networkId,
-    address,
-    createdAt
-  )
-
-  applicationRowObject.verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
-  applicationRowObject.applicantRevealExpiresAt      = updatedAt + applicantRevealTimeoutInSeconds
-
-  // If this applicationRowObject has an ongoing blockchain transaction this will update
-  // const reversedTransactions = transactions.reverse().filter(transaction => {
-  //   const { call, confirmed, error } = transaction
-  //   const applicationId = get(transaction, 'call.args[0]')
-  //
-  //   return (
-  //     call
-  //     && (
-  //       (!confirmed && !error)
-  //       || (error && transactionErrorToCode(error) !== 'userRevert')
-  //     )
-  //     && (applicationRowObject.applicationId === applicationId)
-  //   )
-  // })
-
-  // for (let i = 0; i < reversedTransactions.length; i++) {
-  //   const applicationId = get(reversedTransactions[i], 'call.args[0]')
-  //
-  //   if (applicationRowObject.applicationId === applicationId) {
-  //     applicationRowObject = updatePendingTx(applicationRowObject, reversedTransactions[i])
-  //     break
-  //   }
-  // }
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
-    applicationRowObject,
-    address,
+    applicationObject,
     coordinationGameAddress,
     latestBlockTimestamp
   }
-}
-
-function* applicantApplicationRowSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
-
-  yield all([
-    cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
-    cacheCall(coordinationGameAddress, 'verifiers', applicationId),
-    cacheCall(coordinationGameAddress, 'hints', applicationId),
-    cacheCall(coordinationGameAddress, 'createdAt', applicationId),
-    cacheCall(coordinationGameAddress, 'updatedAt', applicationId),
-    cacheCall(coordinationGameAddress, 'applicantSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'verifierSecrets', applicationId),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
-    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
-  ])
 }
 
 function mapDispatchToProps (dispatch) {
@@ -134,101 +45,18 @@ function mapDispatchToProps (dispatch) {
 }
 
 export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(applicantApplicationRowSaga)(
+  withSaga(applicationSaga)(
     class _ApplicantApplicationRow extends Component {
 
       static propTypes = {
         applicationId: PropTypes.number
       }
 
-      // applicationRowLabel = (applicationRowObject, pendingTransaction) => {
-      //   let label = 'Pending'
-      //   const { statusLabel, error, receipt, call } = applicationRowObject
-      //
-      //   if (pendingTransaction && call) {
-      //     const { method } = call
-      //
-      //     if (error) {
-      //       label = txErrorMessage(error)
-      //     } else if (method === 'diagnoseApplication' || method === 'diagnoseChallengedApplication') {
-      //       label = 'Submitting Diagnosis'
-      //     } else if (method === 'acceptDiagnosis' || method === 'acceptAsDoctor') {
-      //       label = 'Accepting Diagnosis'
-      //     } else if (method === 'challengeWithDoctor') {
-      //       label = 'Getting Second Opinion'
-      //     }
-      //
-      //     if (receipt) {
-      //       label += ' - Confirming'
-      //     }
-      //   } else {
-      //     label = statusLabel
-      //   }
-      //
-      //   return label
-      // }
-      //
-      // applicationRowLabelClass = (applicationRowObject) => {
-      //   let labelClass = 'default'
-      //   const { error, receipt, statusClass } = applicationRowObject
-      //
-      //   if (error) {
-      //     labelClass = 'danger'
-      //   } else if (receipt) {
-      //     labelClass = 'warning'
-      //   } else if (statusClass) {
-      //     labelClass = statusClass
-      //   }
-      //
-      //   return labelClass
-      // }
-      //
-      // applicationRowAction(applicationRowObject, pendingTransaction) {
-      //   const { applicationId, error, call, options, gasUsed, transactionId } = applicationRowObject
-      //
-      //   let action = (
-      //     <React.Fragment>
-      //       <LoadingLines visible={true} color="#aaaaaa" />
-      //     </React.Fragment>
-      //   )
-      //
-      //   if (pendingTransaction) {
-      //     if (error) {
-      //       if (gasUsed) {
-      //         options['gas'] = parseInt(1.2 * gasUsed, 10)
-      //       }
-      //
-      //       action = (
-      //         <button
-      //           className="btn btn-danger btn-xs"
-      //           onClick={(e) => {
-      //             e.preventDefault()
-      //             this.props.dispatchSend(transactionId, call, options, applicationId)
-      //           }}
-      //         >
-      //           Retry
-      //         </button>
-      //       )
-      //     }
-      //   } else {
-      //     action = (
-      //       <React.Fragment>
-      //         <span className="list--item__view__view">View Application&nbsp;</span>
-      //         <FontAwesomeIcon
-      //           icon={faChevronCircleRight} />
-      //       </React.Fragment>
-      //     )
-      //   }
-      //
-      //   return action
-      // }
-
       render () {
-        let expirationMessage,
-          hintRandomAndSecret
+        let hintRandomAndSecret
 
         const {
-          applicationRowObject,
+          applicationObject,
           latestBlockTimestamp
         } = this.props
 
@@ -246,7 +74,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           verifier,
           verifiersSecret,
           verifierSubmitSecretExpiresAt
-        } = applicationRowObject
+        } = applicationObject
 
         const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
         const loadingOrCreatedAtTimestamp = createdAtDisplay
@@ -258,88 +86,40 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const applicantRevealedSecret = !isBlank(applicantsSecret)
         const applicantWon = (applicantsSecret === verifiersSecret)
 
-        if (applicantRevealedSecret) {
-          expirationMessage = (
-            <React.Fragment>
-              Submission Complete
-              <br />
-              <strong>
-                <abbr
-                  data-for='expiration-message-tooltip'
-                  data-tip={applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
-                >
-                  {applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
-                </abbr>
-              </strong>
-            </React.Fragment>
-          )
-        } else if (!isBlank(verifier) && !verifierSubmittedSecret) {
-          expirationMessage = (
-            <React.Fragment>
-              <span className="has-text-grey">Waiting on <abbr data-tip={verifier} data-for='expiration-message-tooltip'>Verifier</abbr> until:</span>
-              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
-            </React.Fragment>
-          )
-        } else if (verifierSubmittedSecret && defined(random) && defined(secret)) {
-          let secretAsHex
 
-          if (secret) {
-            secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
-          }
 
-          expirationMessage = (
-            <React.Fragment>
-              <span className="has-text-grey">Reveal your secret before:</span>
-              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-              <br />
-                <Web3ActionButton
-                  contractAddress={this.props.coordinationGameAddress}
-                  method='applicantRevealSecret'
-                  args={[applicationId, secretAsHex, random.toString()]}
-                  buttonText='Reveal Secret'
-                  loadingText='Revealing'
-                  isSmall={true}
-                  confirmationMessage='"Reveal Secret" transaction confirmed.'
-                  txHashMessage='"Reveal Secret" transaction sent successfully -
-                    it will take a few minutes to confirm on the Ethereum network.'/>
-            </React.Fragment>
-          )
-        }
 
-        if (verifierChallengedAt !== 0) {
-          expirationMessage = <span className="has-text-warning">Verifier challenged your application</span>
-        } else if (verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)) {
-          expirationMessage = <span className="has-text-grey">You missed the reveal secret deadline</span>
-        } else if (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-          expirationMessage = (
-            <React.Fragment>
-              <span className="has-text-warning">Verifier Failed to Respond</span>
-              <Web3ActionButton
-                contractAddress={this.props.coordinationGameAddress}
-                method='applicantRandomlySelectVerifier'
-                args={[applicationId]}
-                isSmall={true}
-                buttonText='Request New Verifier'
-                loadingText='Requesting New Verifier'
-                confirmationMessage='New verifier request confirmed.'
-                txHashMessage='New verifier request sent successfully -
-                  it will take a few minutes to confirm on the Ethereum network.' />
-            </React.Fragment>
-          )
-        }
+        // START DUPLICATE CODE! (put in service?)
+        const success = applicantRevealedSecret
+        const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
+        const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
+
+        const verifierHasChallenged = (verifierChallengedAt !== 0)
+        const applicantMissedRevealDeadline = (
+          verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)
+        )
+
+        const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
+        const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
+        // END DUPLICATE CODE
+
+
+
+
 
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
             <React.Fragment>
-              <strong>Token Name:</strong> {tokenName}
+              Token Name: <strong>{tokenName}</strong>
               <br />
-              <strong>Token Ticker:</strong> {tokenTicker}
-              <br />
-              <strong>Secret:</strong> {secret}
-              <br />
-              <strong>Random:</strong> {random.toString()}
+              Token Ticker: <strong>{tokenTicker}</strong>
             </React.Fragment>
           )
+          // <br />
+          // Secret: <strong>{secret}</strong>
+          // <br />
+          // Random: <strong>{random.toString()}</strong>
+
         } else {
           hintRandomAndSecret = (
             <abbr data-for='hint-random-secret-tooltip' data-tip="We were unable to find the original data for this application as it was probably saved in another Web3 browser. <br/>Please use that browser to reveal your secret.">not available</abbr>
@@ -347,15 +127,24 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         }
 
         // necessary to show the verifier on 1st-time component load
-        ReactTooltip.rebuild()
+        // ReactTooltip.rebuild()
+
+        const ofInterest = waitingOnVerifier || applicantMissedRevealDeadline
+        const needsAttention = needsAVerifier || needsApplicantReveal || verifierHasChallenged || needsNewVerifier
 
         return (
-          <div className={classnames(
-            'list--item',
-            /*,
-            { 'list--item__pending': pendingTransaction }
-          */)}>
+          <Link
+            to={formatRoute(routes.APPLICATION, { applicationId: this.props.applicationId } )}
+            className={classnames(
+              'list--item',
+              {
+                'is-warning': needsAttention,
+                'is-info': ofInterest && !needsAttention
+              }
+            )}
+          >
             <span className="list--item__id">
+              <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
               #{applicationId}
             </span>
 
@@ -386,21 +175,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__view">
-              {isBlank(verifier) && tokenTicker && tokenName && secret && random
-                ? (
-                    <Web3ActionButton
-                      contractAddress={this.props.coordinationGameAddress}
-                      method='applicantRandomlySelectVerifier'
-                      args={[applicationId]}
-                      buttonText='Request Verification'
-                      loadingText='Requesting'
-                      isSmall={true}
-                      confirmationMessage='Verification request confirmed.'
-                      txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.' />
-                  )
-                : expirationMessage
-              }
+              <button className="button is-primary is-small is-outlined">View Submission</button>
               <ReactTooltip
                 id='expiration-message-tooltip'
                 html={true}
@@ -409,7 +184,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                 wrapper='span'
               />
             </span>
-          </div>
+          </Link>
         )
       }
     }

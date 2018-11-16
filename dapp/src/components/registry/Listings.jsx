@@ -3,7 +3,6 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import { formatRoute } from 'react-router-named-routes'
-import { LoadingLines } from '~/components/LoadingLines'
 import { Link } from 'react-router-dom'
 import {
   withSaga,
@@ -13,10 +12,11 @@ import {
 } from 'saga-genesis'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
-import * as routes from '~/../config/routes'
+import { range } from 'lodash'
+import { LoadingLines } from '~/components/LoadingLines'
 import { Pagination } from '~/components/Pagination'
 import { ListingRow } from './ListingRow'
-import { range } from 'lodash'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { currentPage, pageSize }) {
   const TILRegistry = contractByName(state, 'TILRegistry')

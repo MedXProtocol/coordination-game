@@ -1,13 +1,15 @@
 import { all } from 'redux-saga/effects'
 import { cacheCall } from 'saga-genesis'
 
-export const verifierApplicationSaga = function*({
+export const applicationSaga = function*({
   coordinationGameAddress,
   applicationId
 }) {
   if (!coordinationGameAddress || !applicationId) { return }
 
   yield all([
+    cacheCall(coordinationGameAddress, 'hints', applicationId),
+    cacheCall(coordinationGameAddress, 'verifiers', applicationId),
     cacheCall(coordinationGameAddress, 'verifierChallengedAt', applicationId),
     cacheCall(coordinationGameAddress, 'verifierSubmittedAt', applicationId),
     cacheCall(coordinationGameAddress, 'createdAt', applicationId),
