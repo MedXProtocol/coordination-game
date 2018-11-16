@@ -17,6 +17,7 @@ import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplic
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
+import { getWeb3 } from '~/utils/getWeb3'
 
 function mapStateToProps(state) {
   let applicationObjects = []
@@ -31,18 +32,30 @@ function mapStateToProps(state) {
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
     applicationObjects = range(applicationCount, -1).reduce((accumulator, index) => {
-      const applicationId = cacheCallValueInt(
+      let applicationId = cacheCallValue(
         state,
         coordinationGameAddress,
         "applicantsApplicationIndices",
         address,
         index
       )
-      const game = cacheCallValue(state, coordinationGameAddress, 'games', applicationId)
-      const { createdAt } = game
+      console.log(applicationId)
 
-      if (applicationId && createdAt) {
-        accumulator.push({ applicationId, createdAt })
+      if (applicationId && applicationId.length !== 0) {
+        applicationId = getWeb3().utils.hexToNumber(applicationId)
+        console.log(applicationId)
+        const webber = getWeb3()
+        // debugger
+        const game = cacheCallValue(state, coordinationGameAddress, 'games', applicationId)
+        console.log(game)
+        if (game) {
+          const { createdAt } = game
+          console.log(game)
+
+          if (applicationId && createdAt) {
+            accumulator.push({ applicationId, createdAt })
+          }
+        }
       }
 
       return accumulator
@@ -73,8 +86,11 @@ function* applicantApplicationsTableSaga({
   if (applicationCount && applicationCount !== 0) {
     const indices = range(applicationCount)
     yield all(
+
       indices.map(function*(index) {
+        // yield console.log(index);
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
+        // console.log(applicationId)
 
         if (applicationId) {
           yield cacheCall(coordinationGameAddress, 'games', applicationId)
