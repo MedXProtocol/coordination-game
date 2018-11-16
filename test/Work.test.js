@@ -162,6 +162,28 @@ contract('Work', (accounts) => {
           assert.equal(await work.isStaker(staker), true, 'staker is active')
         })
       })
+
+      context('and the staker has withdrawn', () => {
+        beforeEach(async () => {
+          // withdraw a job stake
+          await work.withdrawJobStake(staker, { from: jobManager })
+          // have the staker withdraw and remove themselves as a staker
+          await work.withdrawStake({ from: staker })
+        })
+
+        it('should allow the deposit', async () => {
+          // add the job stake back
+          await work.depositJobStake(staker, { from: jobManager })
+          assert.equal(await work.isSuspended(staker), false, 'staker is not suspended')
+          assert.equal(await work.isStaker(staker), false, 'staker is not active')
+          assert.equal(await work.balances(staker), jobStake, 'worker balance is now the job stake')
+
+          const preWithdrawBalance = await token.balanceOf(staker)
+          await work.withdrawStake({ from: staker })
+          const postWithdrawBalance = await token.balanceOf(staker)
+          assert.equal(postWithdrawBalance.toString(), preWithdrawBalance.add(jobStake).toString(), 'worker withdrew remainder')
+        })
+      })
     })
   })
 

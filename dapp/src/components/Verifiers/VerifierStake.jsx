@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
+import { BN } from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import {
   cacheCall,
+  cacheCallValue,
   cacheCallValueBigNumber,
   contractByName,
   withSaga,
@@ -18,6 +20,7 @@ import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
@@ -30,11 +33,14 @@ function mapStateToProps(state) {
   const allowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, workAddress)
   const staked = cacheCallValueBigNumber(state, workAddress, 'balances', address)
 
+  const isActive = cacheCallValue(state, workAddress, 'isActive', address)
+
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
 
   return {
     address,
+    isActive,
     allowance,
     jobStake,
     requiredStake,
@@ -53,6 +59,7 @@ function* verifierStakeSaga({ address, workTokenAddress, workAddress }) {
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, workAddress),
     cacheCall(workAddress, 'balances', address),
+    cacheCall(workAddress, 'isActive', address),
     cacheCall(workAddress, 'jobStake'),
     cacheCall(workAddress, 'requiredStake')
   ])
@@ -98,16 +105,15 @@ export const VerifierStake = connect(mapStateToProps)(
         }
 
         stakeComplete = () => {
-          const { staked, requiredStake } = this.props
-
-          return (staked && requiredStake && staked.gte(requiredStake))
+          return !!this.props.isActive
         }
 
         render() {
           let needsTILWMessage
-          const { requiredStake, staked } = this.props
+          const { requiredStake, staked, isActive } = this.props
+          const hasBalance = staked && staked.gt(new BN(0))
 
-          if (!this.canApprove() && !this.stakeComplete()) {
+          if (!this.canApprove() && !isActive) {
             needsTILWMessage = (
               <p>
                 You need at least <strong>{displayWeiToEther(requiredStake)} TILW</strong> before you can become a verifier.
@@ -116,9 +122,19 @@ export const VerifierStake = connect(mapStateToProps)(
             )
           }
 
+          var withdrawButton =
+            <Web3ActionButton
+              contractAddress={this.props.workAddress}
+              method='withdrawStake'
+              buttonText='Withdraw'
+              loadingText='Withdrawing...'
+              confirmationMessage='"Withdraw" transaction confirmed.'
+              txHashMessage='"Withdraw" transaction sent successfully -
+                it will take a few minutes to confirm on the Ethereum network.' />
+
           return (
             <div>
-              {this.stakeComplete()
+              {isActive
                 ?
                   (
                     <React.Fragment>
@@ -126,6 +142,15 @@ export const VerifierStake = connect(mapStateToProps)(
                         <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />&nbsp;
                         You have successfully staked <strong>{displayWeiToEther(staked)} TILW</strong> and are now a Verifier.
                       </p>
+                      {hasBalance &&
+                        <React.Fragment>
+                          <p>
+                            If you wish to withdraw your stake and cease being a verifier you may do so.
+                            <br />
+                          </p>
+                          {withdrawButton}
+                        </React.Fragment>
+                      }
                       <div className="content">
                         <ul>
                           <li>
@@ -145,7 +170,15 @@ export const VerifierStake = connect(mapStateToProps)(
                       <p>
                         Stake TEX to begin receiving submissions (minimum 1000 TEX)
                       </p>
-
+                      {hasBalance &&
+                        <React.Fragment>
+                          <p>
+                            You have some balance remaining: if you like you can withdraw it.
+                            <br />
+                          </p>
+                          {withdrawButton}
+                        </React.Fragment>
+                      }
                       <Progress
                         disabled={needsTILWMessage}
                         labels={['Send Approval', 'Deposit Stake', 'Done!']}
@@ -154,9 +187,9 @@ export const VerifierStake = connect(mapStateToProps)(
                           step2Active: this.approvalComplete() && this.canStake(),
                           step3Active: false,
 
-                          step1Complete: this.canStake() || this.stakeComplete(),
-                          step2Complete: this.stakeComplete(),
-                          step3Complete: this.stakeComplete()
+                          step1Complete: this.canStake() || isActive,
+                          step2Complete: isActive,
+                          step3Complete: isActive
                         }}
                       />
 
@@ -169,7 +202,7 @@ export const VerifierStake = connect(mapStateToProps)(
 
                       <VerifierStakeStep2
                         {...this.props}
-                        stakeComplete={this.stakeComplete}
+                        isActive={isActive}
                         canStake={this.canStake}
                       />
                     </React.Fragment>

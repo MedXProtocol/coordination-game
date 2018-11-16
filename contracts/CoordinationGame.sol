@@ -34,12 +34,12 @@ contract CoordinationGame is Ownable {
   mapping (uint256 => uint256) public applicantTokenDeposits;
 
   mapping (uint256 => address) public applicants;
-  mapping (uint256 => address) public verifiers;
-
-  mapping (uint256 => bytes) public hints;
 
   mapping (uint256 => bytes32) public secretAndRandomHashes;
   mapping (uint256 => bytes32) public randomHashes;
+
+  mapping (uint256 => bytes) public hints;
+  mapping (uint256 => address) public verifiers;
 
   mapping (uint256 => bytes32) public verifierSecrets;
   mapping (uint256 => bytes32) public applicantSecrets;

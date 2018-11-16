@@ -64,10 +64,16 @@ contract Work is Ownable {
   function depositStake() public {
     require(token.allowance(msg.sender, address(this)) >= requiredStake, 'allowance is sufficient');
     token.transferFrom(msg.sender, address(this), requiredStake);
-    deposit(msg.sender, requiredStake);
+    balances[msg.sender] = balances[msg.sender].add(requiredStake);
+    if (!stakers.hasAddress(msg.sender)) {
+      stakers.pushAddress(msg.sender);
+    }
+    if (suspendedStakers.hasAddress(msg.sender)) {
+      suspendedStakers.removeAddress(msg.sender);
+    }
   }
 
-  function withdrawStake() public hasStaked(msg.sender) {
+  function withdrawStake() public {
     if (stakers.hasAddress(msg.sender)) {
       stakers.removeAddress(msg.sender);
     }
@@ -75,7 +81,7 @@ contract Work is Ownable {
       suspendedStakers.removeAddress(msg.sender);
     }
     uint256 amount = balances[msg.sender];
-    delete balances[msg.sender];
+    balances[msg.sender] = 0;
     token.transfer(msg.sender, amount);
   }
 
@@ -94,7 +100,13 @@ contract Work is Ownable {
 
   function depositJobStake(address _worker) external onlyJobManager {
     token.transferFrom(msg.sender, address(this), jobStake);
-    deposit(_worker, jobStake);
+    balances[_worker] = balances[_worker].add(jobStake);
+    if (balances[_worker] >= jobStake) {
+      if (suspendedStakers.hasAddress(_worker)) {
+        suspendedStakers.removeAddress(_worker);
+        stakers.pushAddress(_worker);
+      }
+    }
   }
 
   function selectWorker(uint256 randomValue) public view returns (address) {
@@ -103,23 +115,15 @@ contract Work is Ownable {
   }
 
   function isStaker(address _staker) public view returns (bool) {
-    return stakers.hasAddress(_staker) || suspendedStakers.hasAddress(_staker);
+    return isActive(_staker) || isSuspended(_staker);
+  }
+
+  function isActive(address _staker) public view returns (bool) {
+    return stakers.hasAddress(_staker);
   }
 
   function isSuspended(address _staker) public view returns (bool) {
     return suspendedStakers.hasAddress(_staker);
-  }
-
-  function deposit(address _worker, uint256 _amount) internal {
-    balances[_worker] = balances[_worker].add(_amount);
-    if (balances[_worker] >= jobStake) {
-      if (suspendedStakers.hasAddress(_worker)) {
-        suspendedStakers.removeAddress(_worker);
-      }
-      if (!stakers.hasAddress(_worker)) {
-        stakers.pushAddress(_worker);
-      }
-    }
   }
 
   function updateSettings(uint256 _requiredStake, uint256 _jobStake) public onlyOwner {
