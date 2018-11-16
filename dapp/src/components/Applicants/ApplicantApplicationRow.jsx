@@ -2,6 +2,8 @@ import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
+import { formatRoute } from 'react-router-named-routes'
+import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
@@ -22,6 +24,7 @@ import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { get } from 'lodash'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
   let applicantRevealTimeoutInSeconds,
@@ -331,13 +334,13 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
             <React.Fragment>
-              <strong>Token Name:</strong> {tokenName}
+              Token Name: <strong>{tokenName}</strong>
               <br />
-              <strong>Token Ticker:</strong> {tokenTicker}
+              Token Ticker: <strong>{tokenTicker}</strong>
               <br />
-              <strong>Secret:</strong> {secret}
+              Secret: <strong>{secret}</strong>
               <br />
-              <strong>Random:</strong> {random.toString()}
+              Random: <strong>{random.toString()}</strong>
             </React.Fragment>
           )
         } else {
@@ -347,14 +350,15 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         }
 
         // necessary to show the verifier on 1st-time component load
-        ReactTooltip.rebuild()
+        // ReactTooltip.rebuild()
+
+        console.log(formatRoute(routes.APPLICATION, this.props.applicationId))
 
         return (
-          <div className={classnames(
-            'list--item',
-            /*,
-            { 'list--item__pending': pendingTransaction }
-          */)}>
+          <Link
+            to={formatRoute(routes.APPLICATION, { applicationId: this.props.applicationId } )}
+            className="list--item"
+          >
             <span className="list--item__id">
               #{applicationId}
             </span>
@@ -386,21 +390,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             </span>
 
             <span className="list--item__view">
-              {isBlank(verifier) && tokenTicker && tokenName && secret && random
-                ? (
-                    <Web3ActionButton
-                      contractAddress={this.props.coordinationGameAddress}
-                      method='applicantRandomlySelectVerifier'
-                      args={[applicationId]}
-                      buttonText='Request Verification'
-                      loadingText='Requesting'
-                      isSmall={true}
-                      confirmationMessage='Verification request confirmed.'
-                      txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.' />
-                  )
-                : expirationMessage
-              }
+              <button>View</button>
               <ReactTooltip
                 id='expiration-message-tooltip'
                 html={true}
@@ -409,7 +399,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
                 wrapper='span'
               />
             </span>
-          </div>
+          </Link>
         )
       }
     }

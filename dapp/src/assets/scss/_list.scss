@@ -4,7 +4,6 @@
   border-bottom-right-radius: 5px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   font-family: 'Comfortaa', sans-serif;
-  transition: all 0.5s ease-in-out;
 }
 
 .list--container__top-borderless {
@@ -37,7 +36,8 @@
   text-decoration: none;
   width: 100%;
 
-  transition: all .5s cubic-bezier(0.4,0.0,0.2,1);
+  transition: all .2s ease-in-out;
+  transform: scale(1);
 
   @media (max-width: 1200px) {
     min-height: 200px;
@@ -57,10 +57,13 @@
 
 .list--item:hover {
   background-color: lighten(#070709, 9%);
+  transform: scale(1);
+  // box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.2);
 }
 
 .list--item__id {
   grid-column: span 1;
+  text-align: center;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 8;
@@ -149,6 +152,10 @@
 .list--item:hover .list--item__status,
 .list--item:hover .list--item__view {
   color: lighten($gray, 20%);
+}
+
+.list--item:hover .list--item__id {
+  font-size: 1.25rem;
 }
 
 .list--item .button {

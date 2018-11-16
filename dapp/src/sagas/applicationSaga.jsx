@@ -1,7 +1,7 @@
 import { all } from 'redux-saga/effects'
 import { cacheCall } from 'saga-genesis'
 
-export const verifierApplicationSaga = function*({
+export const applicationSaga = function*({
   coordinationGameAddress,
   applicationId
 }) {

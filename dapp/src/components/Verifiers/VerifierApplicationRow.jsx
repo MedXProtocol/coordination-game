@@ -13,8 +13,8 @@ import {
 } from 'saga-genesis'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { verifierApplicationService } from '~/services/verifierApplicationService'
-import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
+import { applicationService } from '~/services/applicationService'
+import { applicationSaga } from '~/sagas/applicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 import { ApplicationStatus } from './ApplicationStatus'
@@ -26,7 +26,7 @@ function mapStateToProps(state, { applicationId }) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  applicationRowObject = verifierApplicationService(state, applicationId, coordinationGameAddress)
+  applicationRowObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
     applicationRowObject,
@@ -37,7 +37,7 @@ function mapStateToProps(state, { applicationId }) {
 }
 
 export const VerifierApplicationRow = connect(mapStateToProps)(
-  withSaga(verifierApplicationSaga)(
+  withSaga()(
     class _VerifierApplicationRow extends Component {
 
       static propTypes = {

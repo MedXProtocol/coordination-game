@@ -13,6 +13,7 @@ import {
 } from 'saga-genesis'
 import { Admin } from '~/components/Admin/Admin'
 import { ApplicantRegisterTokenContainer } from '~/components/ApplicantRegisterTokenContainer'
+import { Application } from '~/components/Applications/Application'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { BodyClass } from '~/components/BodyClass'
 import { DebugLog } from '~/components/DebugLog'
@@ -169,6 +170,8 @@ const App = connect(mapStateToProps)(
                   <div className='columns'>
                     <div className='column  is-12-tablet  is-10-widescreen is-offset-1-widescreen'>
                       <Switch>
+                        <Route path={routes.APPLICATION} component={Application} />
+
                         <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
                         <Route path={routes.VERIFY} component={Verify} />
                         <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />

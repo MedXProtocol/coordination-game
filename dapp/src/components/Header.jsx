@@ -27,9 +27,9 @@ import { faMoon } from '@fortawesome/free-solid-svg-icons'
 import { faSun } from '@fortawesome/free-regular-svg-icons'
 import { NetworkInfo } from '~/components/NetworkInfo'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
-import { verifierApplicationService } from '~/services/verifierApplicationService'
+import { applicationService } from '~/services/applicationService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
-import { verifierApplicationSaga } from '~/sagas/verifierApplicationSaga'
+import { applicationSaga } from '~/sagas/applicationSaga'
 import { isBlank } from '~/utils/isBlank'
 import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
@@ -50,7 +50,7 @@ function mapStateToProps(state) {
   for (let i = 0; i < applicationIds.length; i++) {
     const applicationId = applicationIds[i]
 
-    const application = verifierApplicationService(state, applicationId, coordinationGameAddress)
+    const application = applicationService(state, applicationId, coordinationGameAddress)
     const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
 
     if (!verifierSubmittedSecret && (latestBlockTimestamp < application.verifierSubmitSecretExpiresAt)) {
@@ -75,7 +75,7 @@ function* headerSaga({ address, applicationCount, applicationIds, coordinationGa
   if (applicationIds && applicationIds.length !== 0) {
     yield all(
       applicationIds.map(function* (applicationId) {
-        yield verifierApplicationSaga(coordinationGameAddress, applicationId)
+        yield applicationSaga(coordinationGameAddress, applicationId)
       })
     )
   }
