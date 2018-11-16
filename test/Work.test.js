@@ -15,8 +15,9 @@ contract('Work', (accounts) => {
     roles,
     initialStakerBalance
 
-  const requiredStake = web3.toWei('20', 'ether')
+  const requiredStake = web3.toWei('30', 'ether')
   const jobStake = web3.toWei('10', 'ether')
+  const minimumBalanceToWork = web3.toWei('20', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   before(async () => {
@@ -27,7 +28,7 @@ contract('Work', (accounts) => {
 
   beforeEach(async () => {
     work = await Work.new()
-    await work.init(staker, token.address, requiredStake, jobStake, roles.address)
+    await work.init(staker, token.address, requiredStake, jobStake, minimumBalanceToWork, roles.address)
 
     await token.mint(jobManager, jobManagerBalance)
     await token.approve(work.address, jobManagerBalance, { from: jobManager })
@@ -162,26 +163,50 @@ contract('Work', (accounts) => {
           assert.equal(await work.isStaker(staker), true, 'staker is active')
         })
       })
+
+      context('and the staker has withdrawn', () => {
+        beforeEach(async () => {
+          // withdraw a job stake
+          await work.withdrawJobStake(staker, { from: jobManager })
+          // have the staker withdraw and remove themselves as a staker
+          await work.withdrawStake({ from: staker })
+        })
+
+        it('should allow the deposit', async () => {
+          // add the job stake back
+          await work.depositJobStake(staker, { from: jobManager })
+          assert.equal(await work.isSuspended(staker), false, 'staker is not suspended')
+          assert.equal(await work.isStaker(staker), false, 'staker is not active')
+          assert.equal(await work.balances(staker), jobStake, 'worker balance is now the job stake')
+
+          const preWithdrawBalance = await token.balanceOf(staker)
+          await work.withdrawStake({ from: staker })
+          const postWithdrawBalance = await token.balanceOf(staker)
+          assert.equal(postWithdrawBalance.toString(), preWithdrawBalance.add(jobStake).toString(), 'worker withdrew remainder')
+        })
+      })
     })
   })
 
   describe('when updating settings', () => {
     const newRequiredStake = web3.toWei('30', 'ether')
     const newJobStake = web3.toWei('3', 'ether')
+    const newMinimumBalance = web3.toWei('10', 'ether')
 
     it('should work for the contract owner', async () => {
       assert.equal(await work.requiredStake(), requiredStake)
       assert.equal(await work.jobStake(), jobStake)
 
-      await work.updateSettings(newRequiredStake, newJobStake, { from: staker })
+      await work.updateSettings(newRequiredStake, newJobStake, newMinimumBalance, { from: staker })
 
       assert.equal(await work.requiredStake(), newRequiredStake)
       assert.equal(await work.jobStake(), newJobStake)
+      assert.equal(await work.minimumBalanceToWork(), newMinimumBalance)
     })
 
     it('should not work for anyone but the owner', async () => {
       await expectThrow(async () => {
-        await work.updateSettings(newRequiredStake, newJobStake, {
+        await work.updateSettings(newRequiredStake, newJobStake, newMinimumBalance, {
           from: staker2
         })
       })

@@ -65,7 +65,7 @@ contract('BetaFaucet', function (accounts) {
 
   describe('sendTEX()', () => {
     it('should work', async () => {
-      workTokenInstance.mint(betaFaucetInstance.address, 3000000)
+      await workTokenInstance.mint(betaFaucetInstance.address, 3000000)
       const betaFaucetDelegateTEXBalance = await workTokenInstance.balanceOf(betaFaucetInstance.address)
       assert.equal(betaFaucetDelegateTEXBalance, 3000000)
 
@@ -79,7 +79,7 @@ contract('BetaFaucet', function (accounts) {
 
     it('should not allow double sends', async () => {
       await betaFaucetInstance.sendTEX(recipient2, 15)
-      expectThrow(async () => {
+      await expectThrow(async () => {
         await betaFaucetInstance.sendTEX(recipient2, 15)
       })
     })

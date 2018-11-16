@@ -84,11 +84,11 @@ export const VerifierStakeStep2 = connect(mapStateToProps, mapDispatchToProps)(
 
       render() {
         let stakeCheckmark
-        const { canStake, stakeComplete, requiredStake } = this.props
+        const { canStake, isActive, requiredStake } = this.props
 
-        if (!canStake()) { return null }
+        if (canStake && !canStake()) { return null }
 
-        if (stakeComplete()) {
+        if (isActive) {
           stakeCheckmark = (
             <React.Fragment>
               <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
