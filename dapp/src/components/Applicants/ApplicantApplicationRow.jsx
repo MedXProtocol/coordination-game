@@ -1,11 +1,9 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import classnames from 'classnames'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { formatRoute } from 'react-router-named-routes'
-import { Link } from 'react-router-dom'
 import {
   withSaga,
   contractByName
@@ -13,6 +11,7 @@ import {
 import { get } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
@@ -126,65 +125,52 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           )
         }
 
-        // necessary to show the verifier on 1st-time component load
-        // ReactTooltip.rebuild()
+        const date = (
+          <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+              Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+            <ReactTooltip
+              id='date-tooltip'
+              html={true}
+              effect='solid'
+              place={'top'}
+              wrapper='span'
+            />
+            {loadingOrCreatedAtTimestamp}
+          </abbr>
+        )
+
+        const status = (
+          <React.Fragment>
+            {hintRandomAndSecret}
+            <ReactTooltip
+              id='hint-random-secret-tooltip'
+              html={true}
+              effect='solid'
+              place={'top'}
+              wrapper='span'
+            />
+          </React.Fragment>
+        )
 
         const ofInterest = waitingOnVerifier || applicantMissedRevealDeadline
         const needsAttention = needsAVerifier || needsApplicantReveal || verifierHasChallenged || needsNewVerifier
 
         return (
-          <Link
-            to={formatRoute(routes.APPLICATION, { applicationId: this.props.applicationId } )}
-            className={classnames(
-              'list--item',
-              {
-                'is-warning': needsAttention,
-                'is-info': ofInterest && !needsAttention
-              }
+          <ApplicationListPresenter
+            linkTo={formatRoute(routes.APPLICATION, { applicationId: this.props.applicationId })}
+            id={(
+              <React.Fragment>
+                <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
+                #{applicationId}
+              </React.Fragment>
             )}
-          >
-            <span className="list--item__id">
-              <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
-              #{applicationId}
-            </span>
-
-            <span className="list--item__date">
-              <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-                  ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-                  Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-                <ReactTooltip
-                  id='date-tooltip'
-                  html={true}
-                  effect='solid'
-                  place={'top'}
-                  wrapper='span'
-                />
-                {loadingOrCreatedAtTimestamp}
-              </abbr>
-            </span>
-
-            <span className="list--item__status">
-              {hintRandomAndSecret}
-              <ReactTooltip
-                id='hint-random-secret-tooltip'
-                html={true}
-                effect='solid'
-                place={'top'}
-                wrapper='span'
-              />
-            </span>
-
-            <span className="list--item__view">
-              <button className="button is-primary is-small is-outlined">View Submission</button>
-              <ReactTooltip
-                id='expiration-message-tooltip'
-                html={true}
-                effect='solid'
-                place={'top'}
-                wrapper='span'
-              />
-            </span>
-          </Link>
+            date={date}
+            status={status}
+            view={<button className="button is-primary is-small is-outlined">View Submission</button>}
+            needsAttention={needsAttention}
+            isInfo={ofInterest && !needsAttention}
+          />
         )
       }
     }

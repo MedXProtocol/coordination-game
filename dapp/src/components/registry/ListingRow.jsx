@@ -10,7 +10,7 @@ import {
   contractByName
 } from 'saga-genesis'
 import { connect } from 'react-redux'
-import { EthAddress } from '~/components/EthAddress'
+// import { EthAddress } from '~/components/EthAddress'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { getWeb3 } from '~/utils/getWeb3'
@@ -84,7 +84,7 @@ export const ListingRow = connect(mapStateToProps)(
         return (
           <div className='list--item'>
             <span className="list--item__id">
-              <EthAddress address={owner} />
+              {/*<EthAddress address={owner} />*/}
             </span>
 
             <span className="list--item__date">

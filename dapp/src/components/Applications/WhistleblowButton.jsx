@@ -8,11 +8,13 @@ import { Modal } from '~/components/Modal'
 import { connect } from 'react-redux'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { getWeb3 } from '~/utils/getWeb3'
+import { isBlank } from '~/utils/isBlank'
 
 function mapStateToProps(state) {
-  const CoordinationGame = contractByName(state, 'CoordinationGame')
+  const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+
   return {
-    CoordinationGame
+    coordinationGameAddress
   }
 }
 
@@ -34,16 +36,18 @@ export const WhistleblowButton = connect(mapStateToProps)(
       const web3 = getWeb3()
 
       const {
-        CoordinationGame,
+        coordinationGameAddress,
         applicationId
       } = this.props
 
       const randomNumberHex = web3.eth.abi.encodeParameter('uint256', this.state.randomNumber).toString('hex')
 
+      if (isBlank(coordinationGameAddress)) { return null }
+
       return (
         <React.Fragment>
           <button
-            onClick={() => this.setState({showWhistleblowModal: true})}
+            onClick={() => this.setState({ showWhistleblowModal: true })}
             className="button is-small is-outlined is-primary"
             >
             Whistleblow
@@ -68,7 +72,7 @@ export const WhistleblowButton = connect(mapStateToProps)(
             </form>
 
             <Web3ActionButton
-              contractAddress={CoordinationGame}
+              contractAddress={coordinationGameAddress}
               method="whistleblow"
               args={[applicationId, randomNumberHex]}
               buttonText="Submit"

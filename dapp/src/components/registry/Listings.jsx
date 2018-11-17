@@ -52,12 +52,16 @@ function* listingsSaga({ TILRegistry, startIndex, endIndex }) {
 
 export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _Listings extends Component {
   render () {
+    let loadingLines,
+      noListings,
+      listingRows
+
     const totalPages = this.props.listingsCount / this.props.pageSize
     const { listingsCount } = this.props
     const loading = listingsCount === undefined
 
     if (loading) {
-      var loadingLines = (
+      loadingLines = (
         <div className="blank-state">
           <div className="blank-state--inner has-text-grey-lighter">
             <LoadingLines visible={true} />
@@ -65,7 +69,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         </div>
       )
     } else if (parseInt(listingsCount, 10) === 0) {
-      var noListings = (
+      noListings = (
         <div className="blank-state">
           <div className="blank-state--inner has-text-grey-lighter">
             <span className="is-size-6">There are no listings.</span>
@@ -73,7 +77,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         </div>
       )
     } else {
-      var listingRows = this.props.listingHashes.map(
+      listingRows = this.props.listingHashes.map(
         (listingHash) => <ListingRow listingHash={listingHash} key={listingHash} />
       )
     }

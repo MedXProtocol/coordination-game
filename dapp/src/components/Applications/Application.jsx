@@ -15,6 +15,7 @@ import { ScrollToTop } from '~/components/ScrollToTop'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
+import { WhistleblowButton } from '~/components/Applications/WhistleblowButton'
 import { defined } from '~/utils/defined'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
@@ -67,7 +68,8 @@ export const Application = connect(mapStateToProps)(
           }
 
           render () {
-            let message
+            let message,
+              whistleblowButton
 
             const {
               applicationObject,
@@ -87,7 +89,8 @@ export const Application = connect(mapStateToProps)(
               verifierChallengedAt,
               verifier,
               verifiersSecret,
-              verifierSubmitSecretExpiresAt
+              verifierSubmitSecretExpiresAt,
+              whistleblower
             } = applicationObject
 
             const verifierSubmittedSecret = !isBlank(verifiersSecret)
@@ -119,6 +122,15 @@ export const Application = connect(mapStateToProps)(
             // END DUPLICATE CODE
 
 
+            const secretNotRevealed = isBlank(applicantsSecret)
+            const noWhistleblower = isBlank(whistleblower)
+            const canWhistleblow = secretNotRevealed && noWhistleblower
+
+            if (canWhistleblow) {
+              whistleblowButton =
+                <WhistleblowButton applicationId={applicationId} />
+            }
+
 
             if (success) {
               message = (
@@ -127,7 +139,7 @@ export const Application = connect(mapStateToProps)(
                   <br />
                   <strong>
                     <abbr
-                      data-for='expiration-message-tooltip'
+                      data-for='message-tooltip'
                       data-tip={applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
                     >
                       {applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
@@ -138,7 +150,7 @@ export const Application = connect(mapStateToProps)(
             } else if (waitingOnVerifier) {
               message = (
                 <React.Fragment>
-                  <span className="has-text-grey">Waiting on <abbr data-tip={verifier} data-for='expiration-message-tooltip'>Verifier</abbr> until:</span>
+                  <strong>Waiting on <abbr data-tip={verifier} data-for='message-tooltip'>Verifier</abbr> until:</strong>
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
                 </React.Fragment>
               )
@@ -151,7 +163,7 @@ export const Application = connect(mapStateToProps)(
 
               message = (
                 <React.Fragment>
-                  <span className="has-text-grey">Reveal your secret before:</span>
+                  <strong>Reveal your secret before:</strong>
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
                   <br />
                     <Web3ActionButton
@@ -167,10 +179,10 @@ export const Application = connect(mapStateToProps)(
               )
             }
 
-            if (verifierHasChallenged) {
+            if (applicantRevealedSecret && verifierHasChallenged) {
               message = <span className="has-text-warning">Verifier challenged your application</span>
             } else if (applicantMissedRevealDeadline) {
-              message = <span className="has-text-grey">You missed the reveal secret deadline</span>
+              message = <strong>You missed the reveal secret deadline</strong>
             } else if (needsNewVerifier) {
               message = (
                 <React.Fragment>
@@ -207,6 +219,9 @@ export const Application = connect(mapStateToProps)(
                 </React.Fragment>
               )
             }
+
+            // necessary to show the verifier on 1st-time component load
+            ReactTooltip.rebuild()
 
             return (
               <div className='column is-8-widescreen is-offset-2-widescreen'>
@@ -248,6 +263,26 @@ export const Application = connect(mapStateToProps)(
                 <br />
 
                 {message}
+                <ReactTooltip
+                  id='message-tooltip'
+                  html={true}
+                  effect='solid'
+                  place={'top'}
+                  wrapper='span'
+                />
+
+                <br />
+                <br />
+                <br />
+
+                <p>
+                  If the applicant shared their random number with you then you
+                    can claim a reward and punish the cheater:
+                  <br />
+                  <br />
+                </p>
+
+                {whistleblowButton}
 
                 <br />
                 <br />

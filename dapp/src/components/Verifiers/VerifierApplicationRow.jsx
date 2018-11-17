@@ -1,23 +1,24 @@
 import ReactDOMServer from 'react-dom/server'
 import React, { PureComponent } from 'react'
 import ReactTooltip from 'react-tooltip'
-import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import { get } from 'lodash'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import {
   contractByName,
   withSaga
 } from 'saga-genesis'
+import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
+import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationSaga } from '~/sagas/applicationSaga'
 import { applicationService } from '~/services/applicationService'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
-import { ApplicationStatus } from './ApplicationStatus'
 
 function mapStateToProps(state, { applicationId }) {
   let applicationRowObject = {}
@@ -73,19 +74,21 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
         const applicantRevealedSecret = !isBlank(applicantsSecret)
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
 
-        if (
-          isBlank(whistleblower) &&
-          !applicantRevealedSecret &&
+        const canVerify = (
+          applicantRevealedSecret &&
           !verifierSubmittedSecret &&
-          (latestBlockTimestamp <= verifierSubmitSecretExpiresAt)
-        ) {
+          isBlank(whistleblower) &&
+          (latestBlockTimestamp < verifierSubmitSecretExpiresAt) &&
+          verifierChallengedAt === 0
+        )
+
+        if (canVerify) {
           verifyAction = (
-            <Link
-              to={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
+            <button
               className="button is-small is-warning is-outlined is-pulled-right"
             >
               Verify
-            </Link>
+            </button>
           )
         } else if (
           verifierSubmittedSecret &&
@@ -106,41 +109,42 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
                 it will take a few minutes to confirm on the Ethereum network.' />
           )
         }
+        console.log('6666666^^^^^^^^^^^ fix me!')
+
+        const date = (
+          <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+              Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+            <ReactTooltip
+              id='date-tooltip'
+              html={true}
+              effect='solid'
+              place={'top'}
+              wrapper='span'
+            />
+            {loadingOrUpdatedAtTimestamp}
+          </abbr>
+        )
+
+        const needsAttention = canVerify
 
         // necessary to show the verifier on 1st-time component load
         ReactTooltip.rebuild()
 
         return (
-          <div className={classnames(
-            'list--item',
-          )}>
-            <span className="list--item__id">
-              #{applicationId}
-            </span>
-
-            <span className="list--item__date">
-              <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-                  ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-                  Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-                <ReactTooltip
-                  id='date-tooltip'
-                  html={true}
-                  effect='solid'
-                  place={'top'}
-                  wrapper='span'
-                />
-                {loadingOrUpdatedAtTimestamp}
-              </abbr>
-            </span>
-
-            <span className='list--item__status'>
-              <ApplicationStatus applicationId={applicationId} />
-            </span>
-
-            <span className="list--item__view">
-              {verifyAction}
-            </span>
-          </div>
+          <ApplicationListPresenter
+            linkTo={formatRoute(routes.VERIFY_APPLICATION, { applicationId })}
+            id={(
+              <React.Fragment>
+                <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
+                #{applicationId}
+              </React.Fragment>
+            )}
+            date={date}
+            status={<ApplicationStatus applicationId={applicationId} />}
+            view={verifyAction}
+            needsAttention={needsAttention}
+          />
         )
       }
     }

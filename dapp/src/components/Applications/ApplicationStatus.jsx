@@ -95,11 +95,11 @@ export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationSt
           </React.Fragment>
         )
       } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-        expirationMessage = <span className="has-text-grey">The verify deadline has passed.</span>
+        expirationMessage = <strong>The verify deadline has passed.</strong>
       } else if (!verifierSubmittedSecret) {
         expirationMessage = (
           <React.Fragment>
-            <span className="has-text-grey">Verification required before:</span>
+            <strong>Verification required before:</strong>
             <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
           </React.Fragment>
         )
@@ -108,20 +108,20 @@ export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationSt
           if (verifierChallengedAt === 0) {
             expirationMessage = (
               <React.Fragment>
-                <span className="has-text-grey">Applicant failed to reveal secret</span>
+                <strong>Applicant failed to reveal secret</strong>
               </React.Fragment>
             )
           } else {
             expirationMessage = (
               <React.Fragment>
-                <span className="has-text-grey">The application was successfully challenged</span>
+                <strong>The application was successfully challenged</strong>
               </React.Fragment>
             )
           }
         } else {
           expirationMessage = (
             <React.Fragment>
-              <span className="has-text-grey">Waiting on applicant to reveal secret before:</span>
+              <strong>Waiting on applicant to reveal secret before:</strong>
               <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
             </React.Fragment>
           )
