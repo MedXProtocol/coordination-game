@@ -91,16 +91,15 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
               Verify
             </button>
           )
-        } else if (
+        } else if ( // also why can't we verify OR challenge at the same time?
           verifierSubmittedSecret &&
           isBlank(whistleblower) &&
-          latestBlockTimestamp > applicantRevealExpiresAt &&
+          // latestBlockTimestamp > applicantRevealExpiresAt && // why do we need to wait until the applicant reveal expires?
           verifierChallengedAt === 0
         ) {
           verifyAction = (
             <Web3ActionButton
               contractAddress={this.props.coordinationGameAddress}
-              isSmall={true}
               method='verifierChallenge'
               args={[applicationId]}
               buttonText='Challenge'
@@ -110,7 +109,6 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
                 it will take a few minutes to confirm on the Ethereum network.' />
           )
         }
-        console.log('6666666^^^^^^^^^^^ fix me!')
 
         const date = (
           <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
