@@ -20,7 +20,7 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
+  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
     applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)

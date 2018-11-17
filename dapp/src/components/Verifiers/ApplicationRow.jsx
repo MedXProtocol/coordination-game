@@ -1,7 +1,6 @@
 import React, {
   PureComponent
 } from 'react'
-import { all } from 'redux-saga/effects'
 import {
   withSaga,
   cacheCall,
@@ -15,14 +14,18 @@ import { ApplicationStatus } from './ApplicationStatus'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { WhistleblowButton } from './WhistleblowButton'
 import { get } from 'lodash'
+import { mapToGame } from '~/services/mapToGame'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const applicant = cacheCallValue(state, CoordinationGame, 'applicants', applicationId)
-  const updatedAt = cacheCallValue(state, CoordinationGame, 'updatedAt', applicationId)
-  const applicantSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
-  const whistleblower = cacheCallValue(state, CoordinationGame, 'whistleblowers', applicationId)
+  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', applicationId))
+
+  const applicant = game.applicant
+  const updatedAt = game.createdAt
+  const applicantSecret = game.applicantSecret
+  const whistleblower = game.whistleblower
   return {
     CoordinationGame,
     address,
@@ -34,13 +37,8 @@ function mapStateToProps(state, { applicationId }) {
 }
 
 function* applicationRowSaga({ CoordinationGame, applicationId }) {
-  if (!CoordinationGame || !applicationId) { return }
-  yield all([
-    cacheCall(CoordinationGame, 'applicants', applicationId),
-    cacheCall(CoordinationGame, 'updatedAt', applicationId),
-    cacheCall(CoordinationGame, 'applicantSecrets', applicationId),
-    cacheCall(CoordinationGame, 'whistleblowers', applicationId)
-  ])
+  if (!CoordinationGame || isBlank(applicationId)) { return }
+  yield cacheCall(CoordinationGame, 'games', applicationId)
 }
 
 export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSaga)(withSend(
@@ -68,7 +66,7 @@ export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSa
       return (
         <div className='list--item'>
           <span className="list--item__id">
-            #{applicationId}
+            <AppId applicationId={applicationId} />
           </span>
 
           <span className="list--item__date">

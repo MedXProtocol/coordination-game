@@ -5,16 +5,19 @@ import { all } from 'redux-saga/effects'
 import { get, range } from 'lodash'
 import {
   cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   contractByName,
   withSaga,
   withSend
 } from 'saga-genesis'
+import { isBlank } from '~/utils/isBlank'
 import { ExportOutline } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
 import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
+import { mapToGame } from '~/services/mapToGame'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 
 function mapStateToProps(state) {
@@ -25,21 +28,22 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
-  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
+  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
     // The -1 logic here is weird, range is exclusive not inclusive:
     applicationObjects = range(applicationCount, -1).reduce((accumulator, index) => {
-      const applicationId = cacheCallValueInt(
+      const applicationId = cacheCallValue(
         state,
         coordinationGameAddress,
         "applicantsApplicationIndices",
         address,
         index
       )
-      const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
+      const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
+      const { createdAt } = game
 
-      if (applicationId && createdAt) {
+      if (!isBlank(applicationId) && createdAt) {
         accumulator.push({ applicationId, createdAt })
       }
 
@@ -65,7 +69,7 @@ function* applicantApplicationsTableSaga({
   if (!coordinationGameAddress || !address) { return null }
 
   yield all([
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount')
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address)
   ])
 
   if (applicationCount && applicationCount !== 0) {
@@ -74,9 +78,8 @@ function* applicantApplicationsTableSaga({
       indices.map(function*(index) {
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
 
-        if (applicationId) {
-          yield cacheCall(coordinationGameAddress, 'createdAt', applicationId)
-          yield cacheCall(coordinationGameAddress, 'verifiers', applicationId)
+        if (!isBlank(applicationId)) {
+          yield cacheCall(coordinationGameAddress, 'games', applicationId)
         }
       })
     )

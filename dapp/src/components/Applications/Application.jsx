@@ -19,11 +19,12 @@ import { defined } from '~/utils/defined'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
 
-  const applicationId = parseInt(match.params.applicationId, 10)
+  const applicationId = match.params.applicationId
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
@@ -39,7 +40,7 @@ function mapStateToProps(state, { match }) {
 }
 
 function* viewApplicationSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
+  if (!coordinationGameAddress || isBlank(applicationId)) { return }
 
   yield applicationSaga({ coordinationGameAddress, applicationId })
 }
@@ -51,7 +52,7 @@ export const Application = connect(mapStateToProps)(
         class _Application extends Component {
 
           static propTypes = {
-            applicationId: PropTypes.number
+            applicationId: PropTypes.string
           }
 
           componentWillReceiveProps (nextProps) {
@@ -222,7 +223,7 @@ export const Application = connect(mapStateToProps)(
                 </div>
 
                 <h6 className="is-size-6 has-text-grey">
-                  Token Submission #{applicationId}
+                  <AppId applicationId={applicationId} />
                 </h6>
 
                 <br />

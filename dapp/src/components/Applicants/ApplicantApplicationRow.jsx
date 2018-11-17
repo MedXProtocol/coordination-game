@@ -19,6 +19,7 @@ import { applicationSaga } from '~/sagas/applicationSaga'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -49,7 +50,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
     class _ApplicantApplicationRow extends Component {
 
       static propTypes = {
-        applicationId: PropTypes.number
+        applicationId: PropTypes.string
       }
 
       render () {
@@ -62,7 +63,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
 
         let {
           applicantRevealExpiresAt,
-          applicantsSecret,
           applicationId,
           createdAt,
           tokenTicker,
@@ -83,14 +83,8 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
         const verifierSubmittedSecret = !isBlank(verifiersSecret)
-        const applicantRevealedSecret = !isBlank(applicantsSecret)
-        const applicantWon = (applicantsSecret === verifiersSecret)
-
-
-
 
         // START DUPLICATE CODE! (put in service?)
-        const success = applicantRevealedSecret
         const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
         const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
 
@@ -102,10 +96,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
         const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
         // END DUPLICATE CODE
-
-
-
-
 
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
@@ -145,7 +135,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           >
             <span className="list--item__id">
               <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
-              #{applicationId}
+              <AppId applicationId={applicationId} />
             </span>
 
             <span className="list--item__date">

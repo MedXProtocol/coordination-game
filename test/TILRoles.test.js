@@ -1,5 +1,6 @@
 const TILRoles = artifacts.require('TILRoles')
 const expectThrow = require('./helpers/expectThrow')
+const debug = require('debug')('TILRoles.test.js')
 
 contract('TILRoles', (addresses) => {
   const [owner, user1, user2] = addresses
@@ -7,7 +8,9 @@ contract('TILRoles', (addresses) => {
   let roles
 
   beforeEach(async () => {
+    debug('STARTING...')
     roles = await TILRoles.new()
+    debug(`${roles.address} ${owner}`)
     await roles.init(owner)
   })
 

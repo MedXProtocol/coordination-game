@@ -16,6 +16,7 @@
     "merge-local": "./scripts/zosMerge.js -n 1234 zos.dev-1234.json",
     "merge-ropsten": "./scripts/zosMerge.js -n 3 zos.ropsten.json",
     "push-ropsten": "$(npm bin)/zos push --network ropstenAdmin",
+    "update-ropsten": "$(npm bin)/zos update --all --network ropstenAdmin",
     "push-local": "$(npm bin)/zos push --network local --from $ADMIN_ACCOUNT",
     "update-local": "$(npm bin)/zos update --all --network local --from $ADMIN_ACCOUNT"
   },

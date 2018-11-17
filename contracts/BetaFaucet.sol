@@ -30,7 +30,7 @@ contract BetaFaucet is Initializable, Ownable {
    * @dev - Creates a new BetaFaucet contract with the given parameters
    * @param _workToken - the address of the previously deployed Work token contract
    */
-  function initialize(IERC20 _workToken, address _owner) public initializer {
+  function init(IERC20 _workToken, address _owner) public initializer {
     require(_workToken != address(0), 'work token is defined');
     Ownable.initialize(_owner);
     workToken = _workToken;

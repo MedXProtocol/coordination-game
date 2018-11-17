@@ -1,7 +1,7 @@
-const createProject = require('./helpers/createProject')
 const expectThrow = require('./helpers/expectThrow')
 const WorkToken = artifacts.require("./WorkToken.sol")
 const BetaFaucet = artifacts.require('./BetaFaucet.sol')
+const debug = require('debug')('BetaFaucet.test.js')
 
 contract('BetaFaucet', function (accounts) {
   const [owner, admin, recipient, recipient2, recipient3] = accounts
@@ -11,11 +11,12 @@ contract('BetaFaucet', function (accounts) {
   let project
 
   before(async () => {
-    // project = await createProject(accounts)
+    debug('starting before...')
     workTokenInstance = await WorkToken.new()
-    await workTokenInstance.initialize(owner) //project.createProxy(WorkToken, { initArgs: [owner] })
+    await workTokenInstance.init(owner) //project.createProxy(WorkToken, { initArgs: [owner] })
     betaFaucetInstance = await BetaFaucet.new()
-    await betaFaucetInstance.initialize(workTokenInstance.address, owner) //project.createProxy(BetaFaucet, { initArgs: [workTokenInstance.address, owner] })
+    await betaFaucetInstance.init(workTokenInstance.address, owner) //project.createProxy(BetaFaucet, { initArgs: [workTokenInstance.address, owner] })
+    debug('completed before')
   })
 
   describe('withdrawEther()', () => {
@@ -78,6 +79,7 @@ contract('BetaFaucet', function (accounts) {
     })
 
     it('should not allow double sends', async () => {
+      await workTokenInstance.mint(betaFaucetInstance.address, 3000000)
       await betaFaucetInstance.sendTEX(recipient2, 15)
       await expectThrow(async () => {
         await betaFaucetInstance.sendTEX(recipient2, 15)

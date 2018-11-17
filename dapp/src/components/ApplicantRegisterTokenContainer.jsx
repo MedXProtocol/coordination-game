@@ -32,6 +32,8 @@ import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
+import { mapToGame } from '~/services/mapToGame'
+import { mapToVerification } from '~/services/mapToVerification'
 
 function mapStateToProps(state) {
   let verifier,
@@ -50,13 +52,15 @@ function mapStateToProps(state) {
   const approveTx = transactionFinders.findByMethodName(state, 'approve')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
-  const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount')
-  const applicantsLastApplicationId = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsLastApplicationID')
+  const applicantsApplicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
+  const applicantsLastApplicationId = cacheCallValue(state, coordinationGameAddress, 'getApplicantsLastApplicationID', address)
   const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
-  if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
-    verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
-    applicantsLastApplicationCreatedAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
+  if (!isBlank(applicantsLastApplicationId)) {
+    const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
+    verifier = verification.verifier
+    const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicantsLastApplicationId))
+    applicantsLastApplicationCreatedAt = game.createdAt
   }
 
   return {
@@ -100,14 +104,14 @@ function* applicantRegisterTokenSaga({
     cacheCall(workTokenAddress, 'balanceOf', address),
     cacheCall(workTokenAddress, 'allowance', address, coordinationGameAddress),
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount'),
-    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID'),
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address),
+    cacheCall(coordinationGameAddress, 'getApplicantsLastApplicationID', address),
     cacheCall(coordinationGameAddress, 'weiPerApplication')
   ])
 
   if (applicantsLastApplicationId && applicantsLastApplicationId !== 0) {
-    yield cacheCall(coordinationGameAddress, 'createdAt', applicantsLastApplicationId)
-    yield cacheCall(coordinationGameAddress, 'verifiers', applicantsLastApplicationId)
+    yield cacheCall(coordinationGameAddress, 'games', applicantsLastApplicationId)
+    yield cacheCall(coordinationGameAddress, 'verifications', applicantsLastApplicationId)
   }
 }
 
