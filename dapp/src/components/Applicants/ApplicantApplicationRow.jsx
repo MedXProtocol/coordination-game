@@ -14,10 +14,10 @@ import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { applicationService } from '~/services/applicationService'
+import { mapApplicationState } from '~/services/mapApplicationState'
 import { applicationSaga } from '~/sagas/applicationSaga'
-import { defined } from '~/utils/defined'
-import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
+import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -48,7 +48,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
     class _ApplicantApplicationRow extends Component {
 
       static propTypes = {
-        applicationId: PropTypes.number
+        applicationId: PropTypes.string
       }
 
       render () {
@@ -60,19 +60,13 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         } = this.props
 
         let {
-          applicantRevealExpiresAt,
-          applicantsSecret,
           applicationId,
           createdAt,
           tokenTicker,
           tokenName,
           random,
           secret,
-          updatedAt,
-          verifierChallengedAt,
-          verifier,
-          verifiersSecret,
-          verifierSubmitSecretExpiresAt
+          updatedAt
         } = applicationObject
 
         const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
@@ -81,30 +75,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
-        const verifierSubmittedSecret = !isBlank(verifiersSecret)
-        const applicantRevealedSecret = !isBlank(applicantsSecret)
-        const applicantWon = (applicantsSecret === verifiersSecret)
-
-
-
-
-        // START DUPLICATE CODE! (put in service?)
-        const success = applicantRevealedSecret
-        const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
-        const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
-
-        const verifierHasChallenged = (verifierChallengedAt !== 0)
-        const applicantMissedRevealDeadline = (
-          verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)
-        )
-
-        const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
-        const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
-        // END DUPLICATE CODE
-
-
-
-
+        const applicationState = mapApplicationState(applicationObject, latestBlockTimestamp)
 
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
@@ -153,8 +124,16 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           </React.Fragment>
         )
 
-        const ofInterest = waitingOnVerifier || applicantMissedRevealDeadline
-        const needsAttention = needsAVerifier || needsApplicantReveal || verifierHasChallenged || needsNewVerifier
+        const ofInterest = (
+          applicationState.waitingOnVerifier
+          || applicationState.applicantMissedRevealDeadline
+        )
+        const needsAttention = (
+          applicationState.needsAVerifier
+          || applicationState.needsApplicantReveal
+          || applicationState.verifierHasChallenged
+          || applicationState.needsNewVerifier
+        )
 
         return (
           <ApplicationListPresenter
@@ -162,7 +141,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             id={(
               <React.Fragment>
                 <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
-                #{applicationId}
+                <AppId applicationId={applicationId} />
               </React.Fragment>
             )}
             date={date}

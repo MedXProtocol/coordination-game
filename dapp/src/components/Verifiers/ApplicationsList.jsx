@@ -13,6 +13,7 @@ import { range } from 'lodash'
 import { ApplicationRow } from './ApplicationRow'
 import { Pagination } from '~/components/Pagination'
 import { formatRoute } from 'react-router-named-routes'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { currentPage, pageSize }) {
@@ -20,17 +21,28 @@ function mapStateToProps(state, { currentPage, pageSize }) {
   const applicationCount = cacheCallValue(state, CoordinationGame, 'applicationCount')
   const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
   const endIndex = startIndex + pageSize
+  const applicationIds = range(startIndex, endIndex).reduce((accumulator, index) => {
+    const applicationId = cacheCallValue(state, CoordinationGame, 'applicationAt', index)
+    if (!isBlank(applicationId)) {
+      accumulator.push(applicationId)
+    }
+    return accumulator
+  }, [])
   return {
     CoordinationGame,
     applicationCount,
     startIndex,
-    endIndex
+    endIndex,
+    applicationIds
   }
 }
 
-function* applicationsListSaga({ CoordinationGame }) {
+function* applicationsListSaga({ CoordinationGame, startIndex, endIndex }) {
   if (!CoordinationGame) { return }
   yield cacheCall(CoordinationGame, 'applicationCount')
+  yield range(startIndex, endIndex).map(function* (index) {
+    yield cacheCall(CoordinationGame, 'applicationAt', index)
+  })
 }
 
 export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsListSaga)(
@@ -41,12 +53,9 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
       return (
         <div className='list--container'>
           <div className="list">
-            {range(this.props.startIndex, this.props.endIndex).reduce((accumulator, index) => {
-              if (index < this.props.applicationCount) {
-                accumulator.push(<ApplicationRow key={index} applicationId={index + 1} />)
-              }
-              return accumulator
-            }, [])}
+            {this.props.applicationIds.map(
+              (applicationId) => <ApplicationRow key={applicationId} applicationId={applicationId} />
+            )}
           </div>
 
           <Pagination

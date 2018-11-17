@@ -11,6 +11,7 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
+import { AppId } from '~/components/AppId'
 import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
@@ -42,7 +43,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
     class _VerifierApplicationRow extends PureComponent {
 
       static propTypes = {
-        applicationId: PropTypes.number
+        applicationId: PropTypes.string
       }
 
       render () {
@@ -137,7 +138,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             id={(
               <React.Fragment>
                 <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
-                #{applicationId}
+                <AppId applicationId={applicationId} />
               </React.Fragment>
             )}
             date={date}

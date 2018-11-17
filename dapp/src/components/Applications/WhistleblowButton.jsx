@@ -46,6 +46,12 @@ export const WhistleblowButton = connect(mapStateToProps)(
 
       return (
         <React.Fragment>
+          <p>
+            If the applicant shared their random number with you then you
+              can claim a reward and punish the cheater:
+            <br />
+            <br />
+          </p>
           <button
             onClick={() => this.setState({ showWhistleblowModal: true })}
             className="button is-small is-outlined is-primary"

@@ -15,19 +15,26 @@ import { isBlank } from '~/utils/isBlank'
 import { get } from 'lodash'
 import { connect } from 'react-redux'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { mapToGame } from '~/services/mapToGame'
+import { mapToVerification } from '~/services/mapToVerification'
 
 function mapStateToProps(state, { applicationId }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
 
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const updatedAt = cacheCallValueInt(state, CoordinationGame, 'updatedAt', applicationId)
   const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, CoordinationGame, 'applicantRevealTimeoutInSeconds')
   const verifierTimeoutInSeconds = cacheCallValueInt(state, CoordinationGame, 'verifierTimeoutInSeconds')
-  const verifierSubmittedAt = cacheCallValueInt(state, CoordinationGame, 'verifierSubmittedAt', applicationId)
-  const verifierChallengedAt = cacheCallValueInt(state, CoordinationGame, 'verifierChallengedAt', applicationId)
-  const verifiersSecret = cacheCallValue(state, CoordinationGame, 'verifierSecrets', applicationId)
-  const applicantsSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
-  const whistleblower = cacheCallValue(state, CoordinationGame, 'whistleblowers', applicationId)
+
+  const verification = mapToVerification(cacheCallValue(state, CoordinationGame, 'verifications', applicationId))
+  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', applicationId))
+
+  const verifierSubmittedAt = verification.verifierSubmittedAt
+  const verifierChallengedAt = verification.verifierChallengedAt
+  const verifiersSecret = verification.verifierSecret
+  const applicantsSecret = verification.applicantSecret
+
+  const updatedAt = game.updatedAt
+  const whistleblower = game.whistleblower
 
   return {
     CoordinationGame,
@@ -46,14 +53,10 @@ function mapStateToProps(state, { applicationId }) {
 function* applicationStatusSaga({ CoordinationGame, applicationId }) {
   if (!CoordinationGame || !applicationId) { return }
   yield all([
-    cacheCall(CoordinationGame, 'updatedAt', applicationId),
+    cacheCall(CoordinationGame, 'verifications', applicationId),
+    cacheCall(CoordinationGame, 'games', applicationId),
     cacheCall(CoordinationGame, 'applicantRevealTimeoutInSeconds'),
-    cacheCall(CoordinationGame, 'verifierTimeoutInSeconds'),
-    cacheCall(CoordinationGame, 'verifierSubmittedAt', applicationId),
-    cacheCall(CoordinationGame, 'verifierChallengedAt', applicationId),
-    cacheCall(CoordinationGame, 'verifierSecrets', applicationId),
-    cacheCall(CoordinationGame, 'applicantSecrets', applicationId),
-    cacheCall(CoordinationGame, 'whistleblowers', applicationId)
+    cacheCall(CoordinationGame, 'verifierTimeoutInSeconds')
   ])
 }
 

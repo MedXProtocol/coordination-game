@@ -40,7 +40,7 @@ function mapStateToProps(state) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
-  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount')
+  const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount', address)
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
   if (applicationCount && applicationCount !== 0) {

@@ -13,20 +13,18 @@ import { connect } from 'react-redux'
 // import { EthAddress } from '~/components/EthAddress'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
-import { getWeb3 } from '~/utils/getWeb3'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
+import { mapToGame } from '~/services/mapToGame'
 
 function mapStateToProps(state, { listingHash }) {
-  const web3 = getWeb3()
   const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
-  const applicationId = web3.utils.hexToNumber(listingHash)
-  const hexHint = cacheCallValue(state, CoordinationGame, 'hints', applicationId)
-  const hexSecret = cacheCallValue(state, CoordinationGame, 'applicantSecrets', applicationId)
+  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
+  const hexHint = game.hint
+  const hexSecret = game.applicantSecret
   const secret = hexSecret
-  // const secret = web3.utils.hexToNumber(hexSecret || '0x0')
 
   // Parse and convert the generic hint field to our DApp-specific data
   const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
@@ -35,7 +33,6 @@ function mapStateToProps(state, { listingHash }) {
     TILRegistry,
     CoordinationGame,
     listing,
-    applicationId,
     tokenTicker,
     tokenName,
     address,
@@ -43,12 +40,11 @@ function mapStateToProps(state, { listingHash }) {
   }
 }
 
-function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash, applicationId }) {
-  if (!TILRegistry || !CoordinationGame || !listingHash || !applicationId) { return }
+function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash }) {
+  if (!TILRegistry || !CoordinationGame || !listingHash) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'hints', applicationId),
-    cacheCall(CoordinationGame, 'applicantSecrets', applicationId)
+    cacheCall(CoordinationGame, 'games', listingHash)
   ])
 }
 

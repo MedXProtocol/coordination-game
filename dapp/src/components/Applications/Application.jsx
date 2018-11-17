@@ -10,28 +10,29 @@ import {
   withSend
 } from 'saga-genesis'
 import { get } from 'lodash'
+import { AppId } from '~/components/AppId'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
 import { WhistleblowButton } from '~/components/Applications/WhistleblowButton'
-import { defined } from '~/utils/defined'
+import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { match }) {
-  let applicationObject = {}
+  const applicationId = match.params.applicationId
 
-  const applicationId = parseInt(match.params.applicationId, 10)
-
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
-  applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
+    address,
     coordinationGameAddress,
     applicationId,
     applicationObject,
@@ -40,7 +41,7 @@ function mapStateToProps(state, { match }) {
 }
 
 function* viewApplicationSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
+  if (!coordinationGameAddress || isBlank(applicationId)) { return }
 
   yield applicationSaga({ coordinationGameAddress, applicationId })
 }
@@ -52,7 +53,7 @@ export const Application = connect(mapStateToProps)(
         class _Application extends Component {
 
           static propTypes = {
-            applicationId: PropTypes.number
+            applicationId: PropTypes.string
           }
 
           componentWillReceiveProps (nextProps) {
@@ -78,24 +79,16 @@ export const Application = connect(mapStateToProps)(
 
             let {
               applicantRevealExpiresAt,
-              applicantsSecret,
               applicationId,
               createdAt,
-              tokenTicker,
-              tokenName,
+              updatedAt,
               random,
               secret,
-              updatedAt,
-              verifierChallengedAt,
+              tokenTicker,
+              tokenName,
               verifier,
-              verifiersSecret,
-              verifierSubmitSecretExpiresAt,
-              whistleblower
+              verifierSubmitSecretExpiresAt
             } = applicationObject
-
-            const verifierSubmittedSecret = !isBlank(verifiersSecret)
-            const applicantRevealedSecret = !isBlank(applicantsSecret)
-            const applicantWon = (applicantsSecret === verifiersSecret)
 
             const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={`@`} />
 
@@ -104,35 +97,14 @@ export const Application = connect(mapStateToProps)(
 
             const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
+            const applicationState = mapApplicationState(applicationObject, latestBlockTimestamp)
 
-
-
-            // START DUPLICATE CODE! (put in service?)
-            const success = applicantRevealedSecret
-            const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
-            const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
-
-            const verifierHasChallenged = (verifierChallengedAt !== 0)
-            const applicantMissedRevealDeadline = (
-              verifierSubmittedSecret && (latestBlockTimestamp > applicantRevealExpiresAt)
-            )
-
-            const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
-            const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
-            // END DUPLICATE CODE
-
-
-            const secretNotRevealed = isBlank(applicantsSecret)
-            const noWhistleblower = isBlank(whistleblower)
-            const canWhistleblow = secretNotRevealed && noWhistleblower
-
-            if (canWhistleblow) {
+            if (applicationState.canWhistleblow) {
               whistleblowButton =
                 <WhistleblowButton applicationId={applicationId} />
             }
 
-
-            if (success) {
+            if (applicationState.success) {
               message = (
                 <React.Fragment>
                   Submission Complete
@@ -140,21 +112,21 @@ export const Application = connect(mapStateToProps)(
                   <strong>
                     <abbr
                       data-for='message-tooltip'
-                      data-tip={applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
+                      data-tip={applicationState.applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
                     >
-                      {applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
+                      {applicationState.applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
                     </abbr>
                   </strong>
                 </React.Fragment>
               )
-            } else if (waitingOnVerifier) {
+            } else if (applicationState.waitingOnVerifier) {
               message = (
                 <React.Fragment>
                   <strong>Waiting on <abbr data-tip={verifier} data-for='message-tooltip'>Verifier</abbr> until:</strong>
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
                 </React.Fragment>
               )
-            } else if (needsApplicantReveal) {
+            } else if (applicationState.needsApplicantReveal) {
               let secretAsHex
 
               if (secret) {
@@ -179,11 +151,11 @@ export const Application = connect(mapStateToProps)(
               )
             }
 
-            if (applicantRevealedSecret && verifierHasChallenged) {
+            if (applicationState.applicantRevealedSecret && applicationState.verifierHasChallenged) {
               message = <span className="has-text-warning">Verifier challenged your application</span>
-            } else if (applicantMissedRevealDeadline) {
+            } else if (applicationState.applicantMissedRevealDeadline) {
               message = <strong>You missed the reveal secret deadline</strong>
-            } else if (needsNewVerifier) {
+            } else if (applicationState.needsNewVerifier) {
               message = (
                 <React.Fragment>
                   <span className="has-text-warning">Verifier Failed to Respond</span>
@@ -200,7 +172,7 @@ export const Application = connect(mapStateToProps)(
               )
             }
 
-            if (needsAVerifier) {
+            if (applicationState.needsAVerifier) {
               message = (
                 <React.Fragment>
                   <p>
@@ -237,7 +209,7 @@ export const Application = connect(mapStateToProps)(
                 </div>
 
                 <h6 className="is-size-6 has-text-grey">
-                  Token Submission #{applicationId}
+                  <AppId applicationId={applicationId} />
                 </h6>
 
                 <br />
@@ -274,13 +246,6 @@ export const Application = connect(mapStateToProps)(
                 <br />
                 <br />
                 <br />
-
-                <p>
-                  If the applicant shared their random number with you then you
-                    can claim a reward and punish the cheater:
-                  <br />
-                  <br />
-                </p>
 
                 {whistleblowButton}
 

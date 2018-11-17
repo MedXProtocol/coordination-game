@@ -2,7 +2,6 @@ import React, {
   PureComponent
 } from 'react'
 import { formatRoute } from 'react-router-named-routes'
-import { all } from 'redux-saga/effects'
 import {
   withSaga,
   cacheCall,
@@ -12,16 +11,21 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { connect } from 'react-redux'
+import { AppId } from '~/components/AppId'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { mapToGame } from '~/services/mapToGame'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const applicant = cacheCallValue(state, CoordinationGame, 'applicants', applicationId)
-  const updatedAt = cacheCallValue(state, CoordinationGame, 'updatedAt', applicationId)
+  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', applicationId))
+
+  const applicant = game.applicant
+  const updatedAt = game.createdAt
 
   return {
     CoordinationGame,
@@ -32,11 +36,8 @@ function mapStateToProps(state, { applicationId }) {
 }
 
 function* applicationRowSaga({ CoordinationGame, applicationId }) {
-  if (!CoordinationGame || !applicationId) { return }
-  yield all([
-    cacheCall(CoordinationGame, 'applicants', applicationId),
-    cacheCall(CoordinationGame, 'updatedAt', applicationId)
-  ])
+  if (!CoordinationGame || isBlank(applicationId)) { return }
+  yield cacheCall(CoordinationGame, 'games', applicationId)
 }
 
 export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSaga)(withSend(
@@ -54,7 +55,7 @@ export const ApplicationRow = connect(mapStateToProps)(withSaga(applicationRowSa
       return (
         <ApplicationListPresenter
           linkTo={formatRoute(routes.APPLICATION, { applicationId })}
-          id={null}
+          id={<AppId applicationId={applicationId} />}
           date={updatedAtDisplay}
           status={<ApplicationStatus applicationId={applicationId} />}
           view={null}

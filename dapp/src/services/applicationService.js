@@ -3,45 +3,52 @@ import { get } from 'lodash'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { isBlank } from '~/utils/isBlank'
+import { mapToGame } from '~/services/mapToGame'
+import { mapToVerification } from '~/services/mapToVerification'
 
 export const applicationService = function(state, applicationId, coordinationGameAddress) {
   let applicationObject,
     applicantRevealExpiresAt,
     verifierSubmitSecretExpiresAt,
-    verifierSubmittedAt,
-    verifierChallengedAt,
     verifiersSecret
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  const verifier = cacheCallValue(state, coordinationGameAddress, 'verifiers', applicationId)
+  const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
+  const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifications', applicationId))
 
-  const hexHint = cacheCallValue(state, coordinationGameAddress, 'hints', applicationId)
+  const {
+    createdAt,
+    updatedAt,
+    whistleblower
+  } = game
 
+  const {
+    verifier,
+    verifierSubmittedAt,
+    verifierChallengedAt
+  } = verification
+
+  const hexHint = game.hint
   // Parse and convert the generic hint field to our DApp-specific data
   const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
 
-  const createdAt = cacheCallValueInt(state, coordinationGameAddress, 'createdAt', applicationId)
-  const updatedAt = cacheCallValueInt(state, coordinationGameAddress, 'updatedAt', applicationId)
+  const applicant = game.applicant
+  const applicantsSecret = game.applicantSecret
 
-  const applicantsSecret = cacheCallValue(state, coordinationGameAddress, 'applicantSecrets', applicationId)
-  const whistleblower = cacheCallValue(state, coordinationGameAddress, 'whistleblowers', applicationId)
+  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+  const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
 
   if (!isBlank(verifier)) {
-    const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
-    const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
-
     applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
     verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
 
-    verifierSubmittedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierSubmittedAt', applicationId)
-    verifierChallengedAt = cacheCallValueInt(state, coordinationGameAddress, 'verifierChallengedAt', applicationId)
-
-    verifiersSecret = cacheCallValue(state, coordinationGameAddress, 'verifierSecrets', applicationId)
+    verifiersSecret = verification.verifierSecret
   }
 
   applicationObject = {
+    applicant,
     applicationId,
     applicantsSecret,
     applicantRevealExpiresAt,

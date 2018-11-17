@@ -7,7 +7,7 @@ contract WorkToken is ERC20Mintable {
   string public constant symbol = "TEX";
   uint8 public constant decimals = 18;
 
-  function initialize(address _owner) public initializer {
+  function init(address _owner) public initializer {
     ERC20Mintable.initialize(_owner);
   }
 }
