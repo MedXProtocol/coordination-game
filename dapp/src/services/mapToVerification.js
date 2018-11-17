@@ -13,4 +13,3 @@ export function mapToVerification (array) {
     verifierChallengedAt: parseInt(array[4] || 0, 10)
   }
 }
-s
