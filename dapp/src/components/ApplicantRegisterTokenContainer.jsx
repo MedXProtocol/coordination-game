@@ -346,7 +346,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
           // scrap leading 0's in tokenTicker, tokenName and secret!
           const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
-          const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret)
+          const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret.trim())
 
           const secretRandomHash = getWeb3().utils.soliditySha3(
             { type: 'bytes32', value: secretAsHex },
@@ -358,7 +358,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
           // const tokenTickerAsHex = web3.utils.utf8ToHex(this.state.tokenTicker)
           // const tokenNameAsHex = web3.utils.utf8ToHex(this.state.tokenName)
-          const hexHint = web3.utils.utf8ToHex(`${this.state.tokenTicker}-${this.state.tokenName}`)
+          const hexHint = web3.utils.utf8ToHex(`${this.state.tokenTicker.trim()}-${this.state.tokenName.trim()}`)
 
           const coordinationGameStartTxId = send(
             coordinationGameAddress,
@@ -405,7 +405,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
         }
 
         handleTextInputChange = (e) => {
-          let val = e.target.value.trim()
+          let val = e.target.value
 
           this.setState({
             [e.target.name]: val

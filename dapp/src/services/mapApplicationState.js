@@ -1,7 +1,7 @@
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 
-export function mapApplicationState (applicationObject, latestBlockTimestamp) {
+export function mapApplicationState (address, applicationObject, latestBlockTimestamp) {
   const {
     applicantRevealExpiresAt,
     applicantsSecret,
@@ -33,7 +33,7 @@ export function mapApplicationState (applicationObject, latestBlockTimestamp) {
   const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
   const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
 
-  const isApplicant = applicant === this.props.address
+  const isApplicant = applicant === address
   const secretNotRevealed = isBlank(applicantsSecret)
   const noWhistleblower = isBlank(whistleblower)
   const canWhistleblow = waitingOnVerifier && secretNotRevealed && noWhistleblower && !isApplicant

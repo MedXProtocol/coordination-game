@@ -73,6 +73,7 @@ export const Application = connect(mapStateToProps)(
               whistleblowButton
 
             const {
+              address,
               applicationObject,
               latestBlockTimestamp
             } = this.props
@@ -97,7 +98,7 @@ export const Application = connect(mapStateToProps)(
 
             const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-            const applicationState = mapApplicationState(applicationObject, latestBlockTimestamp)
+            const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
 
             if (applicationState.canWhistleblow) {
               whistleblowButton =
@@ -172,11 +173,12 @@ export const Application = connect(mapStateToProps)(
               )
             }
 
-            if (applicationState.needsAVerifier) {
+            if (applicationState.isApplicant && applicationState.needsAVerifier) {
               message = (
                 <React.Fragment>
                   <p>
-                    This submissions requires a verifier review it:
+                    This submission requires a verifier review it:
+                    <br />
                     <br />
                   </p>
                   <Web3ActionButton

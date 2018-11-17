@@ -55,6 +55,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         let hintRandomAndSecret
 
         const {
+          address,
           applicationObject,
           latestBlockTimestamp
         } = this.props
@@ -75,7 +76,7 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
         const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
 
-        const applicationState = mapApplicationState(applicationObject, latestBlockTimestamp)
+        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
 
         if (tokenName && tokenTicker && secret && random) {
           hintRandomAndSecret = (
