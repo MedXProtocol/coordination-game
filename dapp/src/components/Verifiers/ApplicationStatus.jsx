@@ -79,7 +79,7 @@ export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationSt
       const verifierSubmittedSecret = !isBlank(verifiersSecret)
       const applicantWon = (applicantsSecret === verifiersSecret)
       const applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
-      const verifierSubmitSecretExpiresAt = parseInt(updatedAt, 10) + verifierTimeoutInSeconds
+      const verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
 
       var expirationMessage
 

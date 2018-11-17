@@ -26,7 +26,7 @@ import { AppId } from '~/components/AppId'
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
 
-  const applicationId = parseInt(match.params.applicationId, 10)
+  const applicationId = match.params.applicationId
   const transactions = get(state, 'sagaGenesis.transactions')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
