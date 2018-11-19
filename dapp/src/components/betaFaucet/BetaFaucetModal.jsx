@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
-// import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import { transactionFinders } from '~/finders/transactionFinders'
 import {
   cacheCall,
