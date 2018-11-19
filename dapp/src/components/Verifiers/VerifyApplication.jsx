@@ -7,52 +7,39 @@ import PropTypes from 'prop-types'
 import { toastr } from '~/toastr'
 import { get } from 'lodash'
 import {
-  cacheCallValue,
   contractByName,
-  cacheCall,
   TransactionStateHandler,
   withSaga,
   withSend
 } from 'saga-genesis'
+import { AppId } from '~/components/AppId'
 import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { ScrollToTop } from '~/components/ScrollToTop'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { applicationSaga } from '~/sagas/applicationSaga'
+import { applicationService } from '~/services/applicationService'
+import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
-import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import * as routes from '~/../config/routes'
-import { mapToGame } from '~/services/mapToGame'
-import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { match }) {
   let applicationObject = {}
 
   const applicationId = match.params.applicationId
-  const transactions = get(state, 'sagaGenesis.transactions')
+
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const transactions = get(state, 'sagaGenesis.transactions')
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
-  if (applicationId) {
-    const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
-    const {
-      createdAt,
-      updatedAt
-    } = game
-    const hexHint = game.hint
-    // Parse and convert the generic hint field to our DApp-specific data
-    const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
-
-    applicationObject = {
-      applicationId,
-      createdAt,
-      updatedAt,
-      tokenTicker,
-      tokenName
-    }
-  }
+  applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
-    coordinationGameAddress,
+    address,
     applicationId,
     applicationObject,
+    coordinationGameAddress,
+    latestBlockTimestamp,
     transactions
   }
 }
@@ -68,14 +55,8 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* verifyApplicationSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || !applicationId) { return }
-
-  yield cacheCall(coordinationGameAddress, 'games', applicationId)
-}
-
 export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(verifyApplicationSaga)(
+  withSaga(applicationSaga)(
     withSend(
       withRouter(
         class _VerifyApplication extends PureComponent {
@@ -160,7 +141,11 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
           }
 
           render () {
-            const { applicationObject } = this.props
+            const {
+              address,
+              applicationObject,
+              latestBlockTimestamp
+            } = this.props
 
             let {
               applicationId,
@@ -170,6 +155,8 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
               tokenName
             } = applicationObject
 
+            const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+
             const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={`@`} />
 
             const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
@@ -177,10 +164,25 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
 
             const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-            return (
-              <div className='column is-8-widescreen is-offset-2-widescreen'>
-                <ScrollToTop />
 
+
+            let challengeAction
+            if (applicationState.canChallenge) {
+              challengeAction = (
+                <Web3ActionButton
+                  contractAddress={this.props.coordinationGameAddress}
+                  method='verifierChallenge'
+                  args={[applicationId]}
+                  buttonText='Challenge'
+                  loadingText='Challenging'
+                  confirmationMessage='Challenge transaction confirmed.'
+                  txHashMessage='"Challenge" transaction sent successfully -
+                    it will take a few minutes to confirm on the Ethereum network.' />
+              )
+            }
+
+            return (
+              <div className='column is-8-widescreen is-offset-2-widescreen paper'>
                 <div className="has-text-right">
                   <button
                     className="is-warning is-outlined is-pulled-right delete is-large"
@@ -216,42 +218,57 @@ export const VerifyApplication = connect(mapStateToProps, mapDispatchToProps)(
 
                 <br />
 
-                <form onSubmit={this.handleVerifierSecretSubmit}>
-                  <h6 className="is-size-6">
-                    Enter this token's contract address to verify:
-                  </h6>
-
-                  <div className="field">
-                    <div className="control">
-                      <input
-                        type="text"
-                        name="secret"
-                        className="text-input text-input--large text-input--extended-extra is-marginless"
-                        placeholder="0x..."
-                        maxLength="42"
-                        pattern="^(0x)?[0-9a-fA-F]{40}$"
-                        onChange={this.handleTextInputChange}
-                        value={this.state.secret}
-                      />
+                {applicationState.canChallenge
+                  ? (
+                    <div>
+                      <p>
+                        The applicant hasn't revealed their secret in the timeframe provided. You can now challenge this application:
+                        <br />
+                        <br />
+                      </p>
+                      {challengeAction}
                     </div>
-                    {(this.state.secret.length === 42 && !this.secretValid()) ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
-                  </div>
+                  ) : applicationState.canVerify
+                        ? (
+                          <form onSubmit={this.handleVerifierSecretSubmit}>
+                            <h6 className="is-size-6">
+                              Enter this token's contract address to verify:
+                            </h6>
 
-                  {
-                    this.secretValid()
-                      ? (
-                        <LoadingButton
-                          initialText='Submit Verification'
-                          loadingText='Submitting'
-                          isLoading={this.state.verifierSubmitSecretHandler}
-                          disabled={this.state.verifierSubmitSecretHandler}
-                        />
-                      )
-                      : (
-                        null
-                      )
-                  }
-                </form>
+                            <div className="field">
+                              <div className="control">
+                                <input
+                                  type="text"
+                                  name="secret"
+                                  className="text-input text-input--large text-input--extended-extra is-marginless"
+                                  placeholder="0x..."
+                                  maxLength="42"
+                                  pattern="^(0x)?[0-9a-fA-F]{40}$"
+                                  onChange={this.handleTextInputChange}
+                                  value={this.state.secret}
+                                />
+                              </div>
+                              {(this.state.secret.length === 42 && !this.secretValid()) ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
+                            </div>
+
+                            {
+                              this.secretValid()
+                                ? (
+                                  <LoadingButton
+                                    initialText='Submit Verification'
+                                    loadingText='Submitting'
+                                    isLoading={this.state.verifierSubmitSecretHandler}
+                                    disabled={this.state.verifierSubmitSecretHandler}
+                                  />
+                                )
+                                : (
+                                  null
+                                )
+                            }
+                          </form>
+                        ) : null
+                }
+
 
 
                 <br />

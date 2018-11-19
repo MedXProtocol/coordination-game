@@ -17,13 +17,20 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     whistleblower
   } = applicationObject
 
+  const isApplicant = applicant === address
+  const isVerifier = verifier === address
+
   const verifierSubmittedSecret = !isBlank(verifiersSecret)
   const applicantRevealedSecret = !isBlank(applicantsSecret)
   const applicantWon = (applicantsSecret === verifiersSecret)
 
-  const success = applicantRevealedSecret
   const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
-  const needsApplicantReveal = (verifierSubmittedSecret && defined(random) && defined(secret))
+  const needsApplicantReveal = (
+    !applicantRevealedSecret &&
+    verifierSubmittedSecret &&
+    defined(random) &&
+    defined(secret)
+  )
 
   const verifierHasChallenged = (verifierChallengedAt !== 0)
   const applicantMissedRevealDeadline = (
@@ -33,25 +40,44 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
   const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
 
-  const isApplicant = applicant === address
-  const secretNotRevealed = isBlank(applicantsSecret)
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = waitingOnVerifier && secretNotRevealed && noWhistleblower && !isApplicant
+  const canWhistleblow = waitingOnVerifier && !applicantRevealedSecret && noWhistleblower && !isApplicant
+
+  const canVerify = (
+    isVerifier &&
+    !verifierSubmittedSecret &&
+    noWhistleblower &&
+    !verifierHasChallenged
+  )
+
+  const canChallenge = (
+    isVerifier &&
+    verifierSubmittedSecret &&
+    noWhistleblower &&
+    latestBlockTimestamp > applicantRevealExpiresAt &&
+    !verifierHasChallenged
+  )
+
+  const isComplete = (
+    verifierSubmittedSecret && applicantRevealedSecret
+  )
 
   return {
-    verifierSubmittedSecret,
+    applicantMissedRevealDeadline,
     applicantRevealedSecret,
     applicantWon,
-    success,
-    waitingOnVerifier,
+    canChallenge,
+    canVerify,
+    canWhistleblow,
+    isApplicant,
+    isVerifier,
+    isComplete,
     needsApplicantReveal,
-    verifierHasChallenged,
-    applicantMissedRevealDeadline,
     needsAVerifier,
     needsNewVerifier,
-    isApplicant,
-    secretNotRevealed,
     noWhistleblower,
-    canWhistleblow
+    waitingOnVerifier,
+    verifierHasChallenged,
+    verifierSubmittedSecret,
   }
 }

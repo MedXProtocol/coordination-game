@@ -93,9 +93,6 @@ export const ApplicationStatus = connect(mapStateToProps)(
               <br /><strong>{applicationState.applicantWon ? `Contract addresses matched` : `Contract addresses did not match`}</strong>
             </React.Fragment>
           )
-        //!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
-        } else if (applicationState.needsNewVerifier) {
-          message = <strong>The verify deadline has passed</strong>
         } else if (!applicationState.verifierSubmittedSecret) {
           message = (
             <React.Fragment>
@@ -108,7 +105,7 @@ export const ApplicationStatus = connect(mapStateToProps)(
             if (applicationState.verifierHasChallenged) {
               message = (
                 <React.Fragment>
-                  <strong>The application was successfully challenged</strong>
+                  <strong>The application was challenged</strong>
                 </React.Fragment>
               )
             } else {
@@ -118,6 +115,9 @@ export const ApplicationStatus = connect(mapStateToProps)(
                 </React.Fragment>
               )
             }
+          //!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
+          } else if (applicationState.needsNewVerifier) {
+            message = <strong>The window for verification has passed</strong>
           } else {
             message = (
               <React.Fragment>

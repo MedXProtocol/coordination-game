@@ -334,13 +334,14 @@ contract('CoordinationGame', (accounts) => {
       })
     })
 
-    it('should not allow the verifier to submit if too much time has passed', async () => {
+    it('should still allow the verifier to submit even if too much time has passed', async () => {
       debug(`increaseTime(${verifierTimeoutInSeconds})...`)
       await increaseTime(verifierTimeoutInSeconds)
 
-      await expectThrow(async () => {
-        await verifierSubmitSecret()
-      })
+      await verifierSubmitSecret()
+
+      const verification = mapToVerification(await coordinationGame.verifications(applicationId))
+      assert.equal(verification.verifierSecret, secret)
     })
   })
 

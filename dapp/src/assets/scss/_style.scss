@@ -11,6 +11,7 @@ body {
   background: $background-color;
   color: #e7dfdd;
   font-size: 1.375rem;
+  min-height: 1000px;
   line-height: 1.7;
   transition: all 0.5s ease-in-out;
 
@@ -1000,6 +1001,21 @@ header {
   background-color: darken($background-color, 3%);
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 1);
   padding: 2rem;
+
+  position: fixed;
+  top: 160px;
+  left: 0;
+
+  @media screen and (max-width: 1280px) {
+    flex: none;
+    width: 100%;
+    top: 100px;
+    left: 0;
+  }
+
+  @media screen and (max-width: 1088px) {
+    top: 50px;
+  }
 }
 
 .paper .delete {
@@ -1007,6 +1023,16 @@ header {
   right: -60px;
   transform: scale(1);
   transition: all 0.2s ease-in-out;
+
+  @media (max-width: 1280px) {
+    top: 0;
+    right: 0;
+  }
+
+  @media (max-width: 1088px) {
+    top: -6px;
+    right: -6px;
+  }
 }
 
 .paper .delete:hover {
@@ -1023,10 +1049,14 @@ header {
 }
 
 .page-exit.paper {
-  transform: scale(1);
+  transform: scale(1); // resets inherited translate
   transition: all 300ms ease-in;
 }
 
 .page-exit.paper.page-exit-active {
-  transform: scale(0);
+  transform: scale(1);  // resets inherited translate
+}
+
+.application-num {
+  margin-bottom: 2rem;
 }

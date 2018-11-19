@@ -20,12 +20,14 @@ import * as routes from '~/../config/routes'
 import { AppId } from '~/components/AppId'
 
 function mapStateToProps(state, { applicationId }) {
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
   const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
+    address,
     applicationObject,
     coordinationGameAddress,
     latestBlockTimestamp
@@ -126,15 +128,42 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
         )
 
         const ofInterest = (
-          applicationState.waitingOnVerifier
-          || applicationState.applicantMissedRevealDeadline
+          applicationState.isApplicant && (
+            applicationState.waitingOnVerifier
+            || applicationState.verifierHasChallenged
+          )
         )
         const needsAttention = (
-          applicationState.needsAVerifier
-          || applicationState.needsApplicantReveal
-          || applicationState.verifierHasChallenged
-          || applicationState.needsNewVerifier
+          applicationState.isApplicant && (
+            applicationState.needsAVerifier
+            || applicationState.needsApplicantReveal
+            || applicationState.needsNewVerifier
+          )
         )
+
+        let viewAction = (
+          <button className="button is-primary is-small is-outlined">View Submission</button>
+        )
+
+        // console.log(applicationState.isApplicant)
+        console.log('needsApplicantReveal', applicationState.needsApplicantReveal)
+        console.log('needsNewVerifier', applicationState.needsNewVerifier)
+
+        if (applicationState.isApplicant && applicationState.needsApplicantReveal) {
+          viewAction = (
+            <button className="button is-warning is-small is-outlined">Reveal Your Secret</button>
+          )
+        }
+        if (applicationState.isApplicant && applicationState.needsNewVerifier) {
+          viewAction = (
+            <button className="button is-warning is-small is-outlined">Request New Verifier</button>
+          )
+        }
+        if (applicationState.isApplicant && applicationState.needsAVerifier) {
+          viewAction = (
+            <button className="button is-warning is-small is-outlined">Request Verification</button>
+          )
+        }
 
         return (
           <ApplicationListPresenter
@@ -147,9 +176,9 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
             )}
             date={date}
             status={status}
-            view={<button className="button is-primary is-small is-outlined">View Submission</button>}
+            view={viewAction}
             needsAttention={needsAttention}
-            isInfo={ofInterest && !needsAttention}
+            ofInterest={ofInterest && !needsAttention}
           />
         )
       }
