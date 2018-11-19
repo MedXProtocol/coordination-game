@@ -65,19 +65,11 @@ const App = connect(mapStateToProps)(
         const theme = retrieveKeyValFromLocalStorage('theme')
 
         this.state = {
-          sagasReady: false,
           isLight: theme === 'light'
         }
       }
 
       componentDidMount() {
-        this.mountedAt = Date.now()
-        this.props.setTimeout(() => {
-          this.setState({
-            sagasReady: true
-          })
-        }, 600)
-
         this.onAccountChangeSignOut(this.props)
       }
 
