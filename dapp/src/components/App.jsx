@@ -5,6 +5,9 @@ import { hot } from 'react-hot-loader'
 import { Link, Route, Switch, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
+// import ReactTransitionGroup from 'react-transition-group/TransitionGroup' // ES6
+// import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 import {
   cacheCall,
   cacheCallValue,
@@ -16,7 +19,6 @@ import { ApplicantRegisterTokenContainer } from '~/components/ApplicantRegisterT
 import { Application } from '~/components/Applications/Application'
 import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
 import { BodyClass } from '~/components/BodyClass'
-import { DebugLog } from '~/components/DebugLog'
 import { FAQ } from '~/components/FAQ'
 import { IntroModal } from '~/components/IntroModal'
 import { FourOhFour } from '~/components/FourOhFour'
@@ -54,6 +56,11 @@ function* appSaga({ workTokenAddress, address }) {
   if (!workTokenAddress) { return }
 
   yield cacheCall(workTokenAddress, 'isMinter', address)
+}
+
+const FirstChild = props => {
+  const childrenArray = React.Children.toArray(props.children)
+  return childrenArray[0] || null
 }
 
 const App = connect(mapStateToProps)(
@@ -115,6 +122,8 @@ const App = connect(mapStateToProps)(
           getTEX,
           header
 
+        const locationKey = this.props.location.pathname
+
         betaFaucetModal = <BetaFaucetModal />
         introModal = <IntroModal />
         getTEX = <GetTEX />
@@ -123,26 +132,6 @@ const App = connect(mapStateToProps)(
           toggleTheme={this.toggleTheme}
           isLight={this.state.isLight}
         />
-
-        if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
-          if (this.state.debugging) {
-            var debugLog =
-              <div>
-                <hr />
-                <DebugLog />
-              </div>
-          }
-
-          var debugLink =
-            <div>
-              {/*<a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>*/}
-              <button
-                onClick={() => this.setState({ debugging: !this.state.debugging })}
-                className='button button-primary'
-              >Toggle Log</button>
-              {debugLog}
-            </div>
-        }
 
         return (
           <BodyClass isLight={this.state.isLight}>
@@ -169,84 +158,36 @@ const App = connect(mapStateToProps)(
                 <div className='container is-fluid'>
                   <div className='columns'>
                     <div className='column  is-12-tablet  is-10-widescreen is-offset-1-widescreen'>
-                      <Switch>
-                        <Route path={routes.APPLICATION} component={Application} />
+                      <TransitionGroup>
+                        <CSSTransition
+                          key={this.props.location.key}
+                          timeout={{ enter: 1500, exit: 400 }}
+                          classNames='page'
+                          appear='hello'
+                          appearActive='hello-act'
+                        >
+                          <Switch location={this.props.location}>
+                            <Route path={routes.APPLICATION} component={Application} />
+                            <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
+                            <Route path={routes.VERIFY} component={Verify} />
+                            <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
+                            <Route path={routes.WALLET} component={Wallet} />
+                            <Route path={routes.ADMIN} component={Admin} />
+                            <Route path={routes.FAQ} component={FAQ} />
+                            <Route path={routes.REGISTRY} component={Home} />
+                            <Route path={routes.HOME} component={Home} />
 
-                        <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
-                        <Route path={routes.VERIFY} component={Verify} />
-                        <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
-                        <Route path={routes.WALLET} component={Wallet} />
-                        <Route path={routes.ADMIN} component={Admin} />
-
-                        <Route path={routes.FAQ} component={FAQ} />
-                        <Route path={routes.REGISTRY} component={Home} />
-                        <Route path={routes.HOME} component={Home} />
-
-                        <Route component={FourOhFour} />
-                      </Switch>
+                            <Route component={FourOhFour} />
+                          </Switch>
+                        </CSSTransition>
+                      </TransitionGroup>
                       <br />
                     </div>
                   </div>
 
-                  <br />
-                  <br />
-                  <br />
-
-                  <div className="level--container">
-                    <nav className="level level--body">
-                      <div className="level-item has-text-centered">
-                        <div>
-                          <p className="heading is-size-5 has-text-grey-lighter">
-                            What is this?
-                          </p>
-                          <p className="title">
-                            <Link to={routes.FAQ} className="is-size-7">
-                              Read the FAQ
-                            </Link>
-                          </p>
-                        </div>
-                      </div>
-                    </nav>
-
-                    <nav className="level level--footer">
-                      <div className="level-item has-text-centered">
-                        <div>
-                          <p className="title">
-                            <Link to={routes.REGISTER_TOKEN} className="is-size-7">
-                              Apply to be on the Registry
-                            </Link>
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="level-item has-text-centered">
-                        <div>
-                          <p className="title">
-                            <Link to={routes.VERIFY} className="is-size-7">
-                              Stake to become a Verifier
-                            </Link>
-                          </p>
-                        </div>
-                      </div>
-                    </nav>
-                  </div>
                 </div>
               </section>
 
-              <section className='section section--footer'>
-                <footer className="footer has-text-centered">
-                  <div className='columns'>
-                    <div className='column is-half-tablet is-offset-one-quarter'>
-                      <p className="text-footer">
-                        &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
-                      </p>
-                      <br />
-                      <br />
-                      {debugLink}
-                    </div>
-                  </div>
-                </footer>
-              </section>
             </React.Fragment>
           </BodyClass>
         )

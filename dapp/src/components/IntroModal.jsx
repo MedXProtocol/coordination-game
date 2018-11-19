@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import {
   cacheCall,
   cacheCallValue,
@@ -132,30 +132,31 @@ export const IntroModal =
 
               <div className='columns is-mobile'>
                 <div className='column is-6 has-text-right is-gapless is-paddingless'>
-                  <CSSTransitionGroup
-                    transitionName="slide-up"
-                    transitionAppear={true}
-                    transitionAppearTimeout={2100}
-                    transitionEnterTimeout={300}
-                    transitionLeaveTimeout={3000}
-                  >
-                    <QSpeechBubble key='1' width="416" height="155" className="q-speech-bubble"  style={{"transitionDelay": `.4s` }} />
-                    <br  key='2' />
-                    <br key='3' />
-                    <AInBox key='4' width="300" height="163" className="a-in-box" style={{"transitionDelay": `.2s` }} />
-                  </CSSTransitionGroup>
+                  <TransitionGroup>
+                    <CSSTransition key='1' classNames="slide-up" timeout={3000}>
+                      <QSpeechBubble key='1' width="416" height="155" className="q-speech-bubble"  style={{"transitionDelay": `.4s` }} />
+                    </CSSTransition>
+
+                    <CSSTransition key='2' classNames="slide-up" timeout={3000}>
+                      <br  key='2' />
+                    </CSSTransition>
+
+                    <CSSTransition key='3' classNames="slide-up" timeout={3000}>
+                      <br key='3' />
+                    </CSSTransition>
+
+                    <CSSTransition key='4' classNames="slide-up" timeout={3000}>
+                      <AInBox key='4' width="300" height="163" className="a-in-box" style={{"transitionDelay": `.2s` }} />
+                    </CSSTransition>
+                  </TransitionGroup>
                 </div>
 
                 <div className='column is-6 has-text-left is-gapless is-paddingless'>
-                  <CSSTransitionGroup
-                    transitionName="slide-up"
-                    transitionAppear={true}
-                    transitionAppearTimeout={0}
-                    transitionEnterTimeout={0}
-                    transitionLeaveTimeout={0}
-                  >
-                    <GuyFrame1 width="400" height="400" className="guy-frame-1" />
-                  </CSSTransitionGroup>
+                  <TransitionGroup>
+                    <CSSTransition key='78' classNames="slide-up" timeout={3000}>
+                      <GuyFrame1 width="400" height="400" className="guy-frame-1" />
+                    </CSSTransition>
+                  </TransitionGroup>
                 </div>
               </div>
 
