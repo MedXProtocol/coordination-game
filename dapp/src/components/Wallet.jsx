@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { AnimatedWrapper } from "~/components/AnimatedWrapper"
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import TILOdometer from 'react-odometerjs'
@@ -55,68 +56,70 @@ function* walletSaga({ address, workTokenAddress, workAddress }) {
 
 export const Wallet = connect(mapStateToProps)(
   withSaga(walletSaga)(
-    class _Wallet extends Component {
+    AnimatedWrapper(
+      class _Wallet extends Component {
 
-      render() {
-        return (
-          <div>
-            <ScrollToTop />
-            <PageTitle title='wallet' />
+        render() {
+          return (
+            <div>
+              <ScrollToTop />
+              <PageTitle title='wallet' />
 
-            <h1 className="is-size-1">
-              Your Wallet
-            </h1>
+              <h1 className="is-size-1">
+                Your Wallet
+              </h1>
 
-            <div className="level--container">
-              <nav className="level level--body">
-                <div className="level-item has-text-centered">
-                  <div>
-                    <span className="heading">
-                      <img
-                        src={TEXCoinImg}
-                        alt="TEX Token Icon"
-                        srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
-                      />
-                    </span>
-                    <span className="title">
-                      <TILOdometer value={displayWeiToEther(this.props.texBalance)} />
-                    </span>
+              <div className="level--container">
+                <nav className="level level--body">
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <span className="heading">
+                        <img
+                          src={TEXCoinImg}
+                          alt="TEX Token Icon"
+                          srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
+                        />
+                      </span>
+                      <span className="title">
+                        <TILOdometer value={displayWeiToEther(this.props.texBalance)} />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </nav>
+                </nav>
 
-              <nav className="level level--footer">
-                <div className="level-item has-text-centered">
-                  <div>
-                    <span className="heading">
-                      Approved:
-                    </span>
-                    <span className="title">
-                      <TILOdometer value={displayWeiToEther(this.props.allowance)} />
-                    </span>
+                <nav className="level level--footer">
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <span className="heading">
+                        Approved:
+                      </span>
+                      <span className="title">
+                        <TILOdometer value={displayWeiToEther(this.props.allowance)} />
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="level-item has-text-centered">
-                  <div>
-                    <span className="heading">
-                      {this.props.staked > 0 ? 'Staked:' : 'Required Stake:'}
-                    </span>
-                    <span className="title">
-                      {
-                        this.props.staked > 0
-                          ? <TILOdometer value={displayWeiToEther(this.props.staked)} />
-                          : <TILOdometer value={displayWeiToEther(this.props.requiredStake)} />
-                      }
-                    </span>
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <span className="heading">
+                        {this.props.staked > 0 ? 'Staked:' : 'Required Stake:'}
+                      </span>
+                      <span className="title">
+                        {
+                          this.props.staked > 0
+                            ? <TILOdometer value={displayWeiToEther(this.props.staked)} />
+                            : <TILOdometer value={displayWeiToEther(this.props.requiredStake)} />
+                        }
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </nav>
+                </nav>
+              </div>
+
+
             </div>
-
-
-          </div>
-        )
+          )
+        }
       }
-    }
+    )
   )
 )
