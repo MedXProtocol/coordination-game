@@ -294,7 +294,6 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
               applicationStakeAmount,
               applicantsLastApplicationId
             } = this.props
-            console.log(coordinationGameAllowance, applicationStakeAmount, applicantsLastApplicationId)
 
             const valuesDefined = (
               defined(coordinationGameAllowance)
@@ -309,7 +308,6 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
             const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
             const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
-            // console.log(valuesDefined, valuesAreEqual)
 
             return (this.state.stepManual > 0) ||
               (this.step2Completed() || (valuesDefined && valuesAreEqual))

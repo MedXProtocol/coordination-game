@@ -6,8 +6,6 @@ import { Route, Switch, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
-// import ReactTransitionGroup from 'react-transition-group/TransitionGroup' // ES6
-// import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 import {
   cacheCall,
   cacheCallValue,
@@ -120,7 +118,7 @@ const App = connect(mapStateToProps)(
         betaFaucetModal = <BetaFaucetModal />
         introModal = <IntroModal />
         getTEX = <GetTEX />
-        
+
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}

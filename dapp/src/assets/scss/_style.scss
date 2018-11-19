@@ -961,3 +961,37 @@ header {
 .column {
   position: relative;
 }
+
+.page-appear {
+  opacity: 0.01;
+  transform: scaleX(0) translateY(0);
+}
+
+.page-appear.page-appear-active {
+  opacity: 1;
+  transform: scaleX(1) translateY(0);
+  transition: all 1000ms ease-in-out;
+  transition-timing-function: cubic-bezier(0.8, 0.1, 0.2, 1.02);
+}
+
+.page-enter {
+  opacity: 0.01;
+  transform: translateY(-30px);
+}
+
+.page-enter.page-enter-active {
+  transition: all 1500ms ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit {
+   opacity: 1;
+   transform: translateY(0);
+   transition: all 400ms ease-in;
+ }
+
+.page-exit.page-exit-active {
+  opacity: 0.01;
+  transform: translateY(120px);
+}
