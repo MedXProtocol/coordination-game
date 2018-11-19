@@ -288,6 +288,22 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             }
           }
 
+          dataReady = () => {
+            const {
+              coordinationGameAllowance,
+              applicationStakeAmount,
+              applicantsLastApplicationId
+            } = this.props
+            console.log(coordinationGameAllowance, applicationStakeAmount, applicantsLastApplicationId)
+
+            const valuesDefined = (
+              defined(coordinationGameAllowance)
+              && defined(applicationStakeAmount)
+              && defined(applicantsLastApplicationId)
+            )
+            return valuesDefined
+          }
+
           step1Completed = () => {
             const { coordinationGameAllowance, applicationStakeAmount } = this.props
 
@@ -423,6 +439,10 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
           }
 
           render() {
+            if (!this.dataReady()) {
+              return null
+            }
+
             return (
               <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
                 <PageTitle title='registerToken' />
@@ -451,255 +471,261 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                   }}
                 />
 
-                <h6 className="is-size-6">
-                  <span className="multistep-form--step-number">1.</span>
-                  Approve TEX
-                  {
-                    this.step1Completed()
-                    ? (
-                      <React.Fragment>
-                        &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
-                      </React.Fragment>
-                    ) : (
-                      null
-                    )
-                  }
-                </h6>
 
-                {this.step1Completed()
-                  ? (
-                    null
-                  ) : (
-                    <React.Fragment>
+                {this.dataReady() ? (
+                  <React.Fragment>
+                    <h6 className="is-size-6">
+                      <span className="multistep-form--step-number">1.</span>
+                      Approve TEX
                       {
-                        weiToEther(this.props.texBalance) < 1 ? (
-                          <p>
-                            You will need TEX to register a token
-                            <br />
-                            <br />
-                            <GetTEXLink />
-                            <br />
-                            <br />
-                          </p>
+                        this.step1Completed()
+                        ? (
+                          <React.Fragment>
+                            &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                          </React.Fragment>
                         ) : (
-                          <form onSubmit={this.handleSubmitApproval}>
-                            <div className='columns'>
-                              <div className='column is-8'>
-                                <p>
-                                  The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token. If your application is successful, half of this amount will be returned to you.
-                                </p>
-                              </div>
-                            </div>
-
-                            <LoadingButton
-                              initialText='Approve'
-                              loadingText='Approving'
-                              isLoading={this.state.workTokenApproveHandler}
-                            />
-                            <br />
-                            <br />
-                          </form>
+                          null
                         )
                       }
-                    </React.Fragment>
-                  )
-                }
+                    </h6>
 
-                <div className="multistep-form--step-container">
-                  {
-                    this.step1Completed()
-                    ? (
-                      <React.Fragment>
-                        <h6 className="is-size-6">
-                          <span className="multistep-form--step-number">2.</span>
-                          Create a Hint and Secret for the Verifier to check
+                    {!this.step1Completed()
+                      ? (
+                        <React.Fragment>
                           {
-                            this.step2Completed()
-                            ? (
-                              <React.Fragment>
-                                &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
-                              </React.Fragment>
+                            weiToEther(this.props.texBalance) < 1 ? (
+                              <p>
+                                You will need TEX to register a token
+                                <br />
+                                <br />
+                                <GetTEXLink />
+                                <br />
+                                <br />
+                              </p>
                             ) : (
-                              <span className="help has-text-grey-dark">We're using ERC20 tokens as an example but you could use anything you'd like to verify <br className="is-hidden-touch" />(eg. if someone is a Doctor, etc.)</span>
-                            )
-                          }
-
-                        </h6>
-
-
-                        {
-                          this.step2Completed()
-                          ? (
-                            null
-                          ) : (
-                            <div className="multistep-form--step-child">
-                              <form onSubmit={this.handleSubmit} className="form--submit-token">
-                                <h6 className="is-size-6">
-                                  a. Token Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
-                                </h6>
-
-                                <div className="field">
-                                  <p className="control">
-                                    <input
-                                      maxLength="40"
-                                      type="text"
-                                      name="tokenName"
-                                      className="text-input text-input--large text-input--extended is-marginless"
-                                      placeholder="Decentraland"
-                                      onChange={this.handleTextInputChange}
-                                      value={this.state.tokenName}
-                                    />
-                                  </p>
-                                </div>
-
-                                <h6 className="is-size-6">
-                                  b. Token Symbol:
-                                </h6>
-
-                                <div className="field has-addons">
-                                  <div className="control-with-addons">
-                                    <p className="control">
-                                      <button
-                                        className="button is-static"
-                                        tabIndex={-1}
-                                        onClick={this.handleAddonClick}
-                                      >
-                                        $
-                                      </button>
-                                    </p>
-                                    <p className="control">
-                                      <input
-                                        ref={this.tokenNameRef}
-                                        maxLength="5"
-                                        type="text"
-                                        name="tokenTicker"
-                                        pattern="^[a-zA-Z0-9]+$"
-                                        className="text-input text-input--large is-marginless"
-                                        placeholder="MANA"
-                                        onChange={this.handleTextInputChange}
-                                        value={this.state.tokenTicker}
-                                      />
+                              <form onSubmit={this.handleSubmitApproval}>
+                                <div className='columns'>
+                                  <div className='column is-8'>
+                                    <p>
+                                      The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token. If your application is successful, half of this amount will be returned to you.
                                     </p>
                                   </div>
-                                  {(!this.tokenTickerValid() && this.state.tokenTicker !== '') ? <span className="help has-text-grey">Please enter only alphanumeric characters</span> : null }
                                 </div>
 
-                                {(this.tokenTickerValid() && this.state.tokenTicker !== '' && this.state.tokenName !== '') ?
-                                    (
-                                      <Flipped flipId="wat">
-                                        <React.Fragment>
-                                          <h6 className="is-size-6">
-                                            c. Token's Contract Address:
-                                          </h6>
-                                          <div className="field">
-                                            <div className="control">
-                                              <input
-                                                name="secret"
-                                                type="text"
-                                                maxLength="42"
-                                                placeholder="0x..."
-                                                className="text-input text-input--large text-input--extended-extra is-marginless"
-                                                pattern="^(0x)?[0-9a-fA-F]{40}$"
-                                                onChange={this.handleTextInputChange}
-                                              />
-                                            </div>
-                                            {(!this.secretValid() && this.state.secret !== '') ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
-                                          </div>
-                                        </React.Fragment>
-                                      </Flipped>
-                                    )
-                                  : null
-                                }
-
-                                <Flipped flipId="coolDiv">
-                                  <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
-                                    <LoadingButton
-                                      initialText='Submit Hint &amp; Secret'
-                                      loadingText='Submitting'
-                                      isLoading={this.state.coordinationGameStartHandler}
-                                    />
-
-                                    <br />
-                                    <p className="help has-text-grey">
-                                      <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
-                                    </p>
-                                  </div>
-                                </Flipped>
-
+                                <LoadingButton
+                                  initialText='Approve'
+                                  loadingText='Approving'
+                                  isLoading={this.state.workTokenApproveHandler}
+                                />
+                                <br />
+                                <br />
                               </form>
-                            </div>
-                          )
-                        }
-
-                      </React.Fragment>
-                    ) : (
-                      null
-                    )
-                  }
-                </div>
-
-                <div className="multistep-form--step-container">
-                  {
-                    this.step2Completed()
-                    ? (
-                      <React.Fragment>
-                        <h6 className="is-size-6">
-                          <span className="multistep-form--step-number">3.</span>
-                          Request Verification
-                          {
-                            this.step3Completed()
-                            ? (
-                              <React.Fragment>
-                                &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
-                              </React.Fragment>
-                            ) : (
-                              null
                             )
                           }
-                        </h6>
+                        </React.Fragment>
+                      ) : null
+                    }
+
+                    <div className="multistep-form--step-container">
+                      {
+                        this.step1Completed()
+                        ? (
+                          <React.Fragment>
+                            <h6 className="is-size-6">
+                              <span className="multistep-form--step-number">2.</span>
+                              Create a Hint and Secret for the Verifier to check
+                              {
+                                this.step2Completed()
+                                ? (
+                                  <React.Fragment>
+                                    &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                                  </React.Fragment>
+                                ) : (
+                                  <span className="help has-text-grey-dark">We're using ERC20 tokens as an example but you could use anything you'd like to verify <br className="is-hidden-touch" />(eg. if someone is a Doctor, etc.)</span>
+                                )
+                              }
+
+                            </h6>
 
 
-                        {
-                          this.step3Completed()
-                          ? (
-                            <div className='columns'>
-                              <div className='column is-8'>
-                                <p>
-                                  Your application has been sent for review. The
-                                  reviewer will attempt to verify the accuracy of your application,
-                                  after which you will need to come back and reveal your secret.
-                                </p>
-                                <br />
-                                <br />
-                              </div>
-                            </div>
-                          ) : (
-                            <form onSubmit={this.handleSubmitSelectVerifier}>
-                              <div className='columns'>
-                                <div className='column is-8'>
-                                  <p>
-                                    Your application requires you to choose a verifier at random. This uses the next block's hash for unique randomness.
-                                  </p>
+                            {
+                              this.step2Completed()
+                              ? (
+                                null
+                              ) : (
+                                <div className="multistep-form--step-child">
+                                  <form onSubmit={this.handleSubmit} className="form--submit-token">
+                                    <h6 className="is-size-6">
+                                      a. Token Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
+                                    </h6>
+
+                                    <div className="field">
+                                      <p className="control">
+                                        <input
+                                          maxLength="40"
+                                          type="text"
+                                          name="tokenName"
+                                          className="text-input text-input--large text-input--extended is-marginless"
+                                          placeholder="Decentraland"
+                                          onChange={this.handleTextInputChange}
+                                          value={this.state.tokenName}
+                                        />
+                                      </p>
+                                    </div>
+
+                                    <h6 className="is-size-6">
+                                      b. Token Symbol:
+                                    </h6>
+
+                                    <div className="field has-addons">
+                                      <div className="control-with-addons">
+                                        <p className="control">
+                                          <button
+                                            className="button is-static"
+                                            tabIndex={-1}
+                                            onClick={this.handleAddonClick}
+                                          >
+                                            $
+                                          </button>
+                                        </p>
+                                        <p className="control">
+                                          <input
+                                            ref={this.tokenNameRef}
+                                            maxLength="5"
+                                            type="text"
+                                            name="tokenTicker"
+                                            pattern="^[a-zA-Z0-9]+$"
+                                            className="text-input text-input--large is-marginless"
+                                            placeholder="MANA"
+                                            onChange={this.handleTextInputChange}
+                                            value={this.state.tokenTicker}
+                                          />
+                                        </p>
+                                      </div>
+                                      {(!this.tokenTickerValid() && this.state.tokenTicker !== '') ? <span className="help has-text-grey">Please enter only alphanumeric characters</span> : null }
+                                    </div>
+
+                                    {(this.tokenTickerValid() && this.state.tokenTicker !== '' && this.state.tokenName !== '') ?
+                                        (
+                                          <Flipped flipId="wat">
+                                            <React.Fragment>
+                                              <h6 className="is-size-6">
+                                                c. Token's Contract Address:
+                                              </h6>
+                                              <div className="field">
+                                                <div className="control">
+                                                  <input
+                                                    name="secret"
+                                                    type="text"
+                                                    maxLength="42"
+                                                    placeholder="0x..."
+                                                    className="text-input text-input--large text-input--extended-extra is-marginless"
+                                                    pattern="^(0x)?[0-9a-fA-F]{40}$"
+                                                    onChange={this.handleTextInputChange}
+                                                  />
+                                                </div>
+                                                {(!this.secretValid() && this.state.secret !== '') ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
+                                              </div>
+                                            </React.Fragment>
+                                          </Flipped>
+                                        )
+                                      : null
+                                    }
+
+                                    <Flipped flipId="coolDiv">
+                                      <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
+                                        <LoadingButton
+                                          initialText='Submit Hint &amp; Secret'
+                                          loadingText='Submitting'
+                                          isLoading={this.state.coordinationGameStartHandler}
+                                        />
+
+                                        <br />
+                                        <p className="help has-text-grey">
+                                          <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
+                                        </p>
+                                      </div>
+                                    </Flipped>
+
+                                  </form>
                                 </div>
-                              </div>
+                              )
+                            }
 
-                              <LoadingButton
-                                initialText='Request Verification'
-                                loadingText='Requesting'
-                                isLoading={this.state.coordinationGameSelectVerifierHandler}
-                              />
-                              <br />
-                              <br />
-                            </form>
-                          )
-                        }
+                          </React.Fragment>
+                        ) : (
+                          null
+                        )
+                      }
+                    </div>
 
-                      </React.Fragment>
-                    ) : (
-                      null
-                    )
-                  }
-                </div>
+                    <div className="multistep-form--step-container">
+                      {
+                        this.step2Completed()
+                        ? (
+                          <React.Fragment>
+                            <h6 className="is-size-6">
+                              <span className="multistep-form--step-number">3.</span>
+                              Request Verification
+                              {
+                                this.step3Completed()
+                                ? (
+                                  <React.Fragment>
+                                    &nbsp;<FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />
+                                  </React.Fragment>
+                                ) : (
+                                  null
+                                )
+                              }
+                            </h6>
+
+
+                            {
+                              this.step3Completed()
+                              ? (
+                                <div className='columns'>
+                                  <div className='column is-8'>
+                                    <p>
+                                      Your application has been sent for review. The
+                                      reviewer will attempt to verify the accuracy of your application,
+                                      after which you will need to come back and reveal your secret.
+                                    </p>
+                                    <br />
+                                    <br />
+                                  </div>
+                                </div>
+                              ) : (
+                                <form onSubmit={this.handleSubmitSelectVerifier}>
+                                  <div className='columns'>
+                                    <div className='column is-8'>
+                                      <p>
+                                        Your application requires you to choose a verifier at random. This uses the next block's hash for unique randomness.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <LoadingButton
+                                    initialText='Request Verification'
+                                    loadingText='Requesting'
+                                    isLoading={this.state.coordinationGameSelectVerifierHandler}
+                                  />
+                                  <br />
+                                  <br />
+                                </form>
+                              )
+                            }
+
+                          </React.Fragment>
+                        ) : (
+                          null
+                        )
+                      }
+                    </div>
+                  </React.Fragment>
+
+                ) : null }
+
+
 
 
                 <div className="is-clearfix">

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import ReduxToastr from 'react-redux-toastr'
 import { hot } from 'react-hot-loader'
-import { Link, Route, Switch, withRouter } from 'react-router-dom'
+import { Route, Switch, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
@@ -56,11 +56,6 @@ function* appSaga({ workTokenAddress, address }) {
   if (!workTokenAddress) { return }
 
   yield cacheCall(workTokenAddress, 'isMinter', address)
-}
-
-const FirstChild = props => {
-  const childrenArray = React.Children.toArray(props.children)
-  return childrenArray[0] || null
 }
 
 const App = connect(mapStateToProps)(
@@ -122,11 +117,10 @@ const App = connect(mapStateToProps)(
           getTEX,
           header
 
-        const locationKey = this.props.location.pathname
-
         betaFaucetModal = <BetaFaucetModal />
         introModal = <IntroModal />
         getTEX = <GetTEX />
+        
         header = <Header
           isOwner={this.props.isOwner}
           toggleTheme={this.toggleTheme}
@@ -163,8 +157,7 @@ const App = connect(mapStateToProps)(
                           key={this.props.location.key}
                           timeout={{ enter: 1500, exit: 400 }}
                           classNames='page'
-                          appear='hello'
-                          appearActive='hello-act'
+                          appear={true}
                         >
                           <Switch location={this.props.location}>
                             <Route path={routes.APPLICATION} component={Application} />

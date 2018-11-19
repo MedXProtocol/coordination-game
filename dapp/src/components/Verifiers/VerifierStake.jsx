@@ -122,6 +122,11 @@ export const VerifierStake = connect(mapStateToProps)(
             )
           }
 
+          // Prevent blips/flashing UI while loading data
+          if (!defined(isActive)) {
+            return null
+          }
+
           return (
             <div>
               {isActive
