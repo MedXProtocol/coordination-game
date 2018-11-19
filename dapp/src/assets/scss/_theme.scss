@@ -647,4 +647,10 @@ html.html-light,
   .button.is-static:hover {
     color: white;
   }
+
+  .paper {
+    background-color: lighten($background-color--light, 3%);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  }
+
 }

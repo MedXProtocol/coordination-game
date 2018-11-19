@@ -13,6 +13,7 @@ import {
   withSend
 } from 'saga-genesis'
 import { toastr } from '~/toastr'
+import { Footer } from '~/components/Footer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
@@ -367,6 +368,8 @@ export const Admin = connect(mapStateToProps)(
                   </button>
                 </div>
               </form>
+
+              <Footer />
             </div>
           )
         }

@@ -160,10 +160,13 @@ const App = connect(mapStateToProps)(
                           <Switch location={this.props.location}>
                             <Route path={routes.APPLICATION} component={Application} />
                             <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
+
+                            <Route path={routes.ADMIN} component={Admin} />
+
                             <Route path={routes.VERIFY} component={Verify} />
                             <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                             <Route path={routes.WALLET} component={Wallet} />
-                            <Route path={routes.ADMIN} component={Admin} />
+
                             <Route path={routes.FAQ} component={FAQ} />
                             <Route path={routes.REGISTRY} component={Home} />
                             <Route path={routes.HOME} component={Home} />

@@ -10,6 +10,7 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
+import { Footer } from '~/components/Footer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
@@ -115,7 +116,7 @@ export const Wallet = connect(mapStateToProps)(
                 </nav>
               </div>
 
-
+              <Footer />
             </div>
           )
         }

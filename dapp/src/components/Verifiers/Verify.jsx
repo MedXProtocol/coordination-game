@@ -2,9 +2,10 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { AnimatedWrapper } from "~/components/AnimatedWrapper"
 import { get } from 'lodash'
-import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
+import { Footer } from '~/components/Footer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
 import { VerifierApplicationsTable } from '~/components/Verifiers/VerifierApplicationsTable'
 import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
 import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
@@ -71,6 +72,8 @@ export const Verify = connect(mapStateToProps)(
               </h6>
             </div>
             <VerifiersTable />
+
+            <Footer />
           </div>
         )
       }

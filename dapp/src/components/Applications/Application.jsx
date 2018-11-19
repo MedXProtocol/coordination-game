@@ -19,8 +19,6 @@ import { applicationSaga } from '~/sagas/applicationSaga'
 import { WhistleblowButton } from '~/components/Applications/WhistleblowButton'
 import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
-import { isBlank } from '~/utils/isBlank'
-import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { match }) {
   const applicationId = match.params.applicationId
@@ -40,14 +38,8 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function* viewApplicationSaga({ coordinationGameAddress, applicationId }) {
-  if (!coordinationGameAddress || isBlank(applicationId)) { return }
-
-  yield applicationSaga({ coordinationGameAddress, applicationId })
-}
-
 export const Application = connect(mapStateToProps)(
-  withSaga(viewApplicationSaga)(
+  withSaga(applicationSaga)(
     withSend(
       withRouter(
         class _Application extends Component {
@@ -62,10 +54,7 @@ export const Application = connect(mapStateToProps)(
           handleCloseClick = (e) => {
             e.preventDefault()
 
-            // if applicant then registry or submit
-            // if verifier then registry or verifications table
-
-            this.props.history.push(routes.VERIFY)
+            this.props.history.goBack()
           }
 
           render () {
@@ -198,7 +187,7 @@ export const Application = connect(mapStateToProps)(
             ReactTooltip.rebuild()
 
             return (
-              <div className='column is-8-widescreen is-offset-2-widescreen'>
+              <div className='column is-8-widescreen is-offset-2-widescreen paper'>
                 <ScrollToTop />
 
                 <div className="has-text-right">

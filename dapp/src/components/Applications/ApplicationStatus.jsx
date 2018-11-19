@@ -2,135 +2,134 @@ import React, {
   PureComponent
 } from 'react'
 import {
-  all
-} from 'redux-saga/effects'
-import {
   withSaga,
-  cacheCall,
-  cacheCallValue,
-  cacheCallValueInt,
   contractByName
 } from 'saga-genesis'
-import { isBlank } from '~/utils/isBlank'
 import { get } from 'lodash'
 import { connect } from 'react-redux'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { mapToGame } from '~/services/mapToGame'
-import { mapToVerification } from '~/services/mapToVerification'
+import { applicationService } from '~/services/applicationService'
+import { applicationSaga } from '~/sagas/applicationSaga'
+import { mapApplicationState } from '~/services/mapApplicationState'
 
 function mapStateToProps(state, { applicationId }) {
-  const CoordinationGame = contractByName(state, 'CoordinationGame')
-
+  const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, CoordinationGame, 'applicantRevealTimeoutInSeconds')
-  const verifierTimeoutInSeconds = cacheCallValueInt(state, CoordinationGame, 'verifierTimeoutInSeconds')
 
-  const verification = mapToVerification(cacheCallValue(state, CoordinationGame, 'verifications', applicationId))
-  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', applicationId))
+  // const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+  // const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+  //
+  // const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifications', applicationId))
+  // const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
+  //
+  // const verifierSubmittedAt = verification.verifierSubmittedAt
+  // const verifierChallengedAt = verification.verifierChallengedAt
+  // const verifiersSecret = verification.verifierSecret
+  // const applicantsSecret = verification.applicantSecret
+  //
+  // const updatedAt = game.updatedAt
+  // const whistleblower = game.whistleblower
 
-  const verifierSubmittedAt = verification.verifierSubmittedAt
-  const verifierChallengedAt = verification.verifierChallengedAt
-  const verifiersSecret = verification.verifierSecret
-  const applicantsSecret = verification.applicantSecret
-
-  const updatedAt = game.updatedAt
-  const whistleblower = game.whistleblower
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
-    CoordinationGame,
-    latestBlockTimestamp,
-    updatedAt,
-    applicantRevealTimeoutInSeconds,
-    verifierTimeoutInSeconds,
-    verifierSubmittedAt,
-    verifierChallengedAt,
-    verifiersSecret,
-    applicantsSecret,
-    whistleblower
+    address,
+    applicationObject,
+    coordinationGameAddress,
+    latestBlockTimestamp//,
+    // updatedAt,
+    // applicantRevealTimeoutInSeconds,
+    // verifierTimeoutInSeconds,
+    // verifierSubmittedAt,
+    // verifierChallengedAt,
+    // verifiersSecret,
+    // applicantsSecret,
+    // whistleblower
   }
 }
 
-function* applicationStatusSaga({ CoordinationGame, applicationId }) {
-  if (!CoordinationGame || !applicationId) { return }
-  yield all([
-    cacheCall(CoordinationGame, 'verifications', applicationId),
-    cacheCall(CoordinationGame, 'games', applicationId),
-    cacheCall(CoordinationGame, 'applicantRevealTimeoutInSeconds'),
-    cacheCall(CoordinationGame, 'verifierTimeoutInSeconds')
-  ])
-}
+// function* applicationStatusSaga({ coordinationGameAddress, applicationId }) {
+//   if (!coordinationGameAddress || !applicationId) { return }
+//   yield all([
+//     cacheCall(coordinationGameAddress, 'verifications', applicationId),
+//     cacheCall(coordinationGameAddress, 'games', applicationId),
+//     cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+//     cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds')
+//   ])
+// }
 
-export const ApplicationStatus = connect(mapStateToProps)(withSaga(applicationStatusSaga)(
-  class _ApplicationStatus extends PureComponent {
-    render () {
-      const {
-        latestBlockTimestamp,
-        updatedAt,
-        applicantRevealTimeoutInSeconds,
-        verifierTimeoutInSeconds,
-        verifierSubmittedAt,
-        verifierChallengedAt,
-        verifiersSecret,
-        applicantsSecret,
-        whistleblower
-      } = this.props
+export const ApplicationStatus = connect(mapStateToProps)(
+  withSaga(applicationSaga)(
+    class _ApplicationStatus extends PureComponent {
+      render () {
+        let message
 
-      const applicantRevealedSecret = !isBlank(applicantsSecret)
-      const verifierSubmittedSecret = !isBlank(verifiersSecret)
-      const applicantWon = (applicantsSecret === verifiersSecret)
-      const applicantRevealExpiresAt      = verifierSubmittedAt + applicantRevealTimeoutInSeconds
-      const verifierSubmitSecretExpiresAt = updatedAt + verifierTimeoutInSeconds
+        const {
+          address,
+          applicationObject,
+          latestBlockTimestamp,
+        } = this.props
 
-      var expirationMessage
+        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
 
-      if (!isBlank(whistleblower)) {
-        expirationMessage = (
-          <React.Fragment>
-            Application Disqualified
-            <br /><strong>Whistleblown!</strong>
-          </React.Fragment>
-        )
-      } else if (applicantRevealedSecret) {
-        expirationMessage = (
-          <React.Fragment>
-            Application Complete
-            <br /><strong>{applicantWon ? `Contract addresses matched` : `Contract addresses did not match`}</strong>
-          </React.Fragment>
-        )
-      } else if (!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)) {
-        expirationMessage = <strong>The verify deadline has passed.</strong>
-      } else if (!verifierSubmittedSecret) {
-        expirationMessage = (
-          <React.Fragment>
-            <strong>Verification required before:</strong>
-            <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
-          </React.Fragment>
-        )
-      } else if (verifierSubmittedSecret) {
-        if (latestBlockTimestamp > applicantRevealExpiresAt) {
-          if (verifierChallengedAt === 0) {
-            expirationMessage = (
-              <React.Fragment>
-                <strong>Applicant failed to reveal secret</strong>
-              </React.Fragment>
-            )
+        if (applicationState.needsAVerifier) {
+          message = (
+            <React.Fragment>
+              <strong>Waiting on Applicant</strong>
+            </React.Fragment>
+          )
+        } else if (!applicationState.noWhistleblower) {
+          message = (
+            <React.Fragment>
+              Application Disqualified
+              <br /><strong>Whistleblown!</strong>
+            </React.Fragment>
+          )
+        } else if (applicationState.applicantRevealedSecret) {
+          message = (
+            <React.Fragment>
+              Application Complete
+              <br /><strong>{applicationState.applicantWon ? `Contract addresses matched` : `Contract addresses did not match`}</strong>
+            </React.Fragment>
+          )
+        //!verifierSubmittedSecret && (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
+        } else if (applicationState.needsNewVerifier) {
+          message = <strong>The verify deadline has passed</strong>
+        } else if (!applicationState.verifierSubmittedSecret) {
+          message = (
+            <React.Fragment>
+              <strong>Verification required before:</strong>
+              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicationObject.verifierSubmitSecretExpiresAt} />
+            </React.Fragment>
+          )
+        } else if (applicationState.verifierSubmittedSecret) {
+          if (applicationState.applicantMissedRevealDeadline) {
+            if (applicationState.verifierHasChallenged) {
+              message = (
+                <React.Fragment>
+                  <strong>The application was successfully challenged</strong>
+                </React.Fragment>
+              )
+            } else {
+              message = (
+                <React.Fragment>
+                  <strong>Applicant failed to reveal secret</strong>
+                </React.Fragment>
+              )
+            }
           } else {
-            expirationMessage = (
+            message = (
               <React.Fragment>
-                <strong>The application was successfully challenged</strong>
+                <strong>Waiting on applicant to reveal secret before:</strong>
+                <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicationObject.applicantRevealExpiresAt} />
               </React.Fragment>
             )
           }
-        } else {
-          expirationMessage = (
-            <React.Fragment>
-              <strong>Waiting on applicant to reveal secret before:</strong>
-              <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-            </React.Fragment>
-          )
         }
+
+        return message
       }
-      return expirationMessage
     }
-  }
-))
+  )
+)

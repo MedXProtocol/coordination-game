@@ -55,7 +55,7 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
         } = this.props
 
         let {
-          applicantRevealExpiresAt,
+          // applicantRevealExpiresAt,
           applicationId,
           applicantsSecret,
           verifierChallengedAt,

@@ -21,6 +21,7 @@ import {
 } from 'saga-genesis'
 import { ApplicantApplicationsTable } from '~/components/ApplicantApplicationsTable'
 import { EtherFlip } from '~/components/EtherFlip'
+import { Footer } from '~/components/Footer'
 import { GetTEXLink } from '~/components/GetTEXLink'
 import { LoadingButton } from '~/components/LoadingButton'
 import { Modal } from '~/components/Modal'
@@ -766,6 +767,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                   </div>
                 </Modal>
 
+                <Footer />
               </Flipper>
             )
           }

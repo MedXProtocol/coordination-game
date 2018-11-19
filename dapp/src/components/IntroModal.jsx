@@ -164,6 +164,7 @@ export const IntroModal =
           case 3:
             text = `Great, thanks! I'd like to try it out`
             break
+          // no default
         }
 
         return text
@@ -194,7 +195,7 @@ export const IntroModal =
                       <div className='column is-6 has-text-left is-gapless is-paddingless'>
                         <TransitionGroup>
                           <CSSTransition key='1' classNames="slide-up" timeout={3700} appear={true}>
-                            <QSpeechBubble key='1' width="316" height="116" className="q-speech-bubble" className="delay-two" />
+                            <QSpeechBubble key='1' width="316" height="116" className="q-speech-bubble delay-two" />
                           </CSSTransition>
 
                           <CSSTransition key='2' classNames="slide-up" timeout={0} appear={true}>
@@ -206,7 +207,7 @@ export const IntroModal =
                           </CSSTransition>
 
                           <CSSTransition key='4' classNames="slide-up" timeout={3700} appear={true}>
-                            <AInBox key='4' width="221" height="124" className="a-in-box" className="delay-three" />
+                            <AInBox key='4' width="221" height="124" className="a-in-box delay-three" />
                           </CSSTransition>
                         </TransitionGroup>
                       </div>
