@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
+import "./TILRegistry.sol";
 
 contract PowerChallenge is Ownable {
   using SafeMath for uint256;
@@ -37,6 +38,7 @@ contract PowerChallenge is Ownable {
   IERC20 public token;
   uint256 public timeout;
   mapping(bytes32 => Challenge) public challenges;
+  TILRegistry registry;
 
   modifier notStarted(bytes32 _id) {
     State state = challenges[_id].state;
@@ -72,11 +74,12 @@ contract PowerChallenge is Ownable {
   }
 
   function init(
-    address _owner, IERC20 _token, uint256 _firstChallengeAmount, uint256 _timeout
+    address _owner, IERC20 _token, uint256 _firstChallengeAmount, uint256 _timeout, TILRegistry _registry
   ) public initializer {
     require(_owner != address(0), 'owner is defined');
     require(_token != address(0), 'token is defined');
     require(_firstChallengeAmount > 0, 'first deposit cannot be zero');
+    require(_registry != address(0), 'registry is defined');
     Ownable.initialize(_owner);
     token = _token;
     firstChallengeAmount = _firstChallengeAmount;

@@ -1,6 +1,7 @@
 const TILRegistry = artifacts.require('TILRegistry.sol')
 const TILRoles = artifacts.require('TILRoles.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
+const MockPowerChallenge = artifacts.require('MockPowerChallenge.sol')
 const Work = artifacts.require('Work.sol')
 
 const abi = require('ethereumjs-abi')
@@ -10,6 +11,7 @@ const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
 const leftPadHexString = require('./helpers/leftPadHexString')
+const mapToListing = require('./helpers/mapToListing')
 
 contract('TILRegistry', (accounts) => {
   const [owner, user1, user2] = accounts
@@ -28,6 +30,7 @@ contract('TILRegistry', (accounts) => {
   const jobManagerBalance = web3.toWei('1000', 'ether')
 
   before(async () => {
+    powerChallenge = await MockPowerChallenge.new()
     workToken = await WorkToken.new()
     await workToken.init(owner)
     roles = await TILRoles.new()
@@ -46,58 +49,60 @@ contract('TILRegistry', (accounts) => {
 
   beforeEach(async () => {
     registry = await TILRegistry.new()
-    await registry.initialize(workToken.address, roles.address, work.address)
+    await registry.initialize(workToken.address, roles.address, work.address, powerChallenge.address)
     await workToken.mint(owner, listingStake)
     await workToken.approve(registry.address, listingStake)
   })
 
-  describe('newListing()', () => {
+  async function getListing(listingHash) {
+    return mapToListing(await registry.listings(listingHash))
+  }
+
+  describe('applicantWonCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.newListing(user1, listingHash, listingStake, { from: user2 })
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake, { from: user2 })
       })
     })
 
     context('on success', () => {
       beforeEach(async () => {
-        await registry.newListing(user1, listingHash, listingStake)
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake)
       })
 
       it('should add an applicant', async () => {
         assert.equal(await registry.listingsLength(), 1)
         assert.equal(await registry.listingAt(0), listingHash)
-        assert.equal((await registry.listings(listingHash))[2].toNumber(), 0) // LISTED
       })
     })
   })
 
-  describe('newListingChallenge()', () => {
+  describe('applicantLostCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.newListingChallenge(user1, listingHash, listingStake, { from: user2 })
+        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake, 0, 0, 0, { from: user2 })
       })
     })
 
     context('on success', () => {
       beforeEach(async () => {
-        await registry.newListingChallenge(user1, listingHash, listingStake)
+        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake, 0, 0, 0)
       })
 
       it('should add an applicant', async () => {
         const newListing = await registry.listings(listingHash)
 
-        debug(`newListingChallenge(): ${newListing}`)
+        debug(`applicantLostCoordinationGame(): ${newListing}`)
 
         assert.equal(await registry.listingsLength(), 1)
         assert.equal(await registry.listingAt(0), listingHash) // exists
-        assert.equal(newListing[2].toNumber(), 1) // CHALLENGED
       })
     })
   })
 
   describe('withdrawListing()', () => {
     beforeEach(async () => {
-      await registry.newListing(user1, listingHash, listingStake)
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake)
     })
 
     it('should allow an applicant to withdraw their listing', async () => {

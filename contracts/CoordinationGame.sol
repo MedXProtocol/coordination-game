@@ -63,9 +63,6 @@ contract CoordinationGame is Ownable {
   mapping (bytes32 => Game) public games;
   mapping (bytes32 => Verification) public verifications;
 
-  mapping (address => uint256) wins;
-  mapping (address => uint256) losses;
-
   event NewApplication(
     bytes32 indexed applicationId,
     address indexed applicant,
@@ -393,7 +390,7 @@ contract CoordinationGame is Ownable {
     bytes32 _applicationId,
     bytes32 _secret,
     uint256 _randomNumber
-  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) {
+  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
@@ -419,7 +416,9 @@ contract CoordinationGame is Ownable {
   @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
   @param _applicationId The application that the verifier is challenging
   */
-  function verifierChallenge(bytes32 _applicationId) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
+  function verifierChallenge(
+    bytes32 _applicationId
+  ) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
@@ -451,30 +450,39 @@ contract CoordinationGame is Ownable {
 
   function applicantWon(bytes32 _applicationId) internal {
     Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
 
+    /// provide the stake for the Registry
     tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
-    tilRegistry.newListing(
-      game.applicant, _applicationId, game.applicantTokenDeposit
-    );
 
-    wins[msg.sender] += 1;
+    tilRegistry.applicantWonCoordinationGame(
+      _applicationId, game.applicant, game.applicantTokenDeposit
+    );
 
     /// Return the verifier's job stake
     returnVerifierJobStake(_applicationId);
+    /// Pay the verifier the application fee
+    verification.verifier.transfer(game.applicationBalanceInWei);
 
     emit ApplicantWon(_applicationId);
   }
 
   function applicantLost(bytes32 _applicationId) internal {
-    // NOTE: This will change when we deposit the verifier's stake into the registry
-    returnVerifierJobStake(_applicationId);
-
     Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
 
+    /// Approve of the verifier token transfer
+    tilRegistry.token().approve(address(work), work.jobStake());
+
+    /// Approve of the applicant token transfer
     tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
-    tilRegistry.newListingChallenge(game.applicant, _applicationId, game.applicantTokenDeposit);
 
-    losses[msg.sender] += 1;
+    tilRegistry.applicantLostCoordinationGame(
+      _applicationId, game.applicant, game.applicantTokenDeposit, game.applicationBalanceInWei,
+      verification.verifier, work.jobStake()
+    );
+
+    // address(tilRegistry).transfer(work.jobStake());
 
     emit ApplicantLost(_applicationId);
   }
