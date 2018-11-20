@@ -105,10 +105,6 @@ export const ApplicationRow = connect(mapStateToProps)(
                 Token Name: <strong>{tokenName}</strong>
                 <br />
                 Token Ticker: <strong>{tokenTicker}</strong>
-                <br />
-                Secret: <strong>{secret}</strong>
-                <br />
-                Random: <strong>{random.toString()}</strong>
               </React.Fragment>
             )
             // <br />

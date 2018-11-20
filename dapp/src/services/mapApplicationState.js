@@ -34,15 +34,26 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
 
   const verifierHasChallenged = (verifierChallengedAt !== 0)
   const applicantMissedRevealDeadline = (
+    !applicantRevealedSecret &&
     verifierSubmittedSecret &&
     (latestBlockTimestamp > applicantRevealExpiresAt)
   )
 
-  const needsAVerifier = (isBlank(verifier) && defined(tokenTicker) && defined(tokenName) && defined(secret) && defined(random))
-  const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
+  const needsAVerifier = (
+    isBlank(verifier) &&
+    defined(tokenTicker) &&
+    defined(tokenName) &&
+    defined(secret) &&
+    defined(random)
+  )
+
+  const needsNewVerifier = (
+    !isBlank(verifier) &&
+    !verifierSubmittedSecret &&
+    (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
+  )
 
   const noWhistleblower = isBlank(whistleblower)
-  // const canWhistleblow = waitingOnVerifier && !applicantRevealedSecret && noWhistleblower && !isApplicant
   const canWhistleblow = !applicantRevealedSecret && noWhistleblower && !isApplicant
 
   const canVerify = (

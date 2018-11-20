@@ -244,8 +244,6 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             if (applicationState.isApplicant) {
               if (applicationState.verifierHasChallenged) {
                 message = <span className="has-text-warning">Verifier challenged your application</span>
-              } else if (applicationState.applicantMissedRevealDeadline) {
-                message = <strong>You missed the reveal secret deadline</strong>
               } else if (applicationState.needsNewVerifier) {
                 message = (
                   <div>
