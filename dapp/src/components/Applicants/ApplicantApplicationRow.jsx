@@ -145,10 +145,6 @@ export const ApplicantApplicationRow = connect(mapStateToProps, mapDispatchToPro
           <button className="button is-primary is-small is-outlined">View Submission</button>
         )
 
-        // console.log(applicationState.isApplicant)
-        console.log('needsApplicantReveal', applicationState.needsApplicantReveal)
-        console.log('needsNewVerifier', applicationState.needsNewVerifier)
-
         if (applicationState.isApplicant && applicationState.needsApplicantReveal) {
           viewAction = (
             <button className="button is-warning is-small is-outlined">Reveal Your Secret</button>
