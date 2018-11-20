@@ -1063,3 +1063,35 @@ header {
 .application-num {
   margin-bottom: 2rem;
 }
+
+.button.is-attention-grabby {
+  animation: attention-grabby--button 4s infinite ease-in !important;
+  margin-left: 12px;
+}
+
+@keyframes attention-grabby--button {
+  0% {
+    background-color: $accent-color-3;
+    border-color: white;
+    color: white;
+    transform: scale(1.1);
+  }
+  20% {
+    background-color: $accent-color-1;
+    border-color: white;
+    color: white;
+    transform: scale(1.05);
+  }
+  80% {
+    background-color: $accent-color-2;
+    border-color: white;
+    color: white;
+    transform: scale(1.07);
+  }
+  100% {
+    background-color: $accent-color-3;
+    border-color: white;
+    color: white;
+    transform: scale(1.1);
+  }
+}

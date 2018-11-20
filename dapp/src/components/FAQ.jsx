@@ -48,7 +48,7 @@ export const FAQ = connect(null, mapDispatchToProps)(
               <br />
             </p>
 
-            <button onClick={this.handleShowIntro} className="button is-outlined is-info">
+            <button onClick={this.handleShowIntro} className="button is-outlined is-info is-attention-grabby">
               See Illustrated Explanation
             </button>
 
