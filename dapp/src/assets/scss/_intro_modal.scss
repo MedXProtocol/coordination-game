@@ -1,10 +1,26 @@
 .intro-modal {
   padding-left: 2rem;
   padding-right: 2rem;
+
+  @media screen and (max-width: 768px) {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+}
+
+.intro-modal .modal-content--inner {
+  @media screen and (max-width: 768px) {
+    padding: 3rem 0.5rem;
+  }
 }
 
 .intro-modal .modal-content {
   width: 780px;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .next-link,
@@ -18,6 +34,11 @@
   height: 100px;
   position: absolute;
   width: 100px;
+
+  @media screen and (max-width: 768px) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
 
 .next-link:hover,
@@ -38,11 +59,23 @@
 .previous-link[disabled]:hover {
   background: transparent;
   border: 0;
+  color: rgba(200, 200, 200, 0.1);
+  transform: scale(1);
+}
+
+.previous-link {
+  @media screen and (max-width: 768px) {
+    left: -20px;
+  }
 }
 
 .next-link {
   left: initial;
   right: 10px;
+
+  @media screen and (max-width: 768px) {
+    right: -20px;
+  }
 }
 
 .next-link--icon {
@@ -54,42 +87,43 @@
 }
 
 .intro-modal {
-  @media screen and (max-width: 1088px) {
-    .q-speech-bubble {
-      height: 180px;
-      width: 280px;
-    }
-
-    .a-in-box {
-      height: 140px;
-      width: 240px;
-    }
-
-    .guy-frame-1 {
-      margin-top: 60px;
-      width: 300px;
-      height: 300px;
-    }
-  }
-
   @media screen and (max-width: 768px) {
     .q-speech-bubble {
-      height: 90px;
+      height: 160px;
       width: 140px;
     }
 
-    .a-in-box {
-      height: 70px;
-      width: 120px;
-    }
-
     .guy-frame-1 {
-      margin-top: 40px;
       width: 150px;
       height: 150px;
     }
+
+    .qa-list {
+      width: 150px;
+      height: 150px;
+    }
+
+    .qa-word-appear {
+      left: 28px;
+      top: 97px;
+      transform: scale(0.35);
+    }
   }
 }
+
+
+.intro-modal .column.intro-modal--image-column > div {
+  height: 260px;
+
+  @media screen and (max-width: 768px) {
+    height: 190px;
+  }
+
+  @media screen and (max-width: 400px) {
+    height: 160px;
+  }
+}
+
 
 // .fade-enter {
 //   opacity: 0.01;
@@ -132,81 +166,59 @@
   }
 }
 
-.delay-one {
-  transition-delay: 0.7s;
-}
-
-.delay-two {
-  transition-delay: 1.2s;
-}
-
-.delay-three {
-  transition-delay: 1.6s;
-}
-
-
-
-.fadeIn-appear,
-.fadeIn-enter {
-  opacity: 0.01;
-  transition: all 300ms ease-in-out,
-              height 100ms ease-in-out;
-  transform: scale(0);
-
-  transition-delay: 300ms !important;
-}
-
-.fadeIn-appear.fadeIn-appear-active,
-.fadeIn-enter.fadeIn-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition-delay: 300ms !important;
-}
-
-.fadeIn-exit {
-  opacity: 1;
-  transition: all 300ms ease-in-out,
-              height 100ms ease-in-out;
-  transform: scale(0);
-  transition-delay: 0 !important;
-}
-
-.fadeIn-exit.fadeIn-exit-active {
-  opacity: 0.01;
-  transform: scale(0);
-  transition-delay: 0 !important;
-}
-
-
-
 .cross-fade-enter {
-  opacity: 0.01;
-  transition: opacity 1000ms ease-in;
+  transform: translate3d(0, -300px, 0) rotate(60deg) scale(0);
+  transition: all 1000ms ease-in-out;
 }
 
 .cross-fade-enter.cross-fade-enter-active {
-  opacity: 1;
-  transition: opacity 1000ms ease-in;
+  transform: translate3d(0, 0, 0)  rotate(0deg) scale(1);
+  transition: all 1000ms ease-in-out;
 }
 
 .cross-fade-leave {
-  opacity: 1;
-  transition: opacity 400ms ease-in;
+  transform: translate3d(0, 0, 0)  rotate(0deg) scale(1);
+  transition: all 400ms ease-in-out;
 }
 
 .cross-fade-leave.cross-fade-leave-active {
-  opacity: 0.01;
-  transition: opacity 400ms ease-in;
-}
-
-.cross-fade-height {
-  transition: height 200ms ease-in-out;
-}
-
-.intro-modal .column > div {
-  height: 260px;
+  transform: translate3d(0, -300px, 0) rotate(60deg) scale(0);
+  transition: all 400ms ease-in-out;
 }
 
 .intro-modal--text {
   height: 140px;
+
+  @media screen and (max-width: 768px) {
+    height: 190px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+  }
+}
+
+.qa-word {
+  height: 65px;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: all 500ms ease-in-out;
+  transform: scale(2);
+  left: 0;
+  width: 101px;
+}
+
+.qa-word-appear {
+  left: 89px;
+  opacity: 1;
+  top: 172px;
+  transition: all 2500ms ease-in-out;
+  transform: scale(0.55);
+}
+
+.is-intro-modal-button {
+  width: 281px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  min-height: 100px;
 }

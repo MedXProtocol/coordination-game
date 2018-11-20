@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
+import classnames from 'classnames'
 import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import {
   cacheCall,
@@ -18,10 +19,13 @@ import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 import { weiToEther } from '~/utils/weiToEther'
-import AInBox from '~/assets/img/a-in-box.svg'
 import GuyFrame1 from '~/assets/img/guy-frame-1.svg'
-import GuyFrame4 from '~/assets/img/guy-frame-4.svg'
+import GuyFrame3 from '~/assets/img/guy-frame-3.svg'
+import GalFrame2 from '~/assets/img/gal-frame-2.svg'
 import QSpeechBubble from '~/assets/img/q-speech-bubble.svg'
+import QAList from '~/assets/img/qa-list.svg'
+import IsQA from '~/assets/img/is-qa.svg'
+import QA from '~/assets/img/qa.svg'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -174,11 +178,22 @@ export const IntroModal =
       }
 
       render () {
-        const guy1 = <GuyFrame1 key="guy1" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
-        const guy2 = <GuyFrame4 key="guy2" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
-        const guy3 = <GuyFrame1 key="guy3" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
+        const guy1 = <GuyFrame1 key="guy1" width="240" height="240" className="guy-frame-1" />
+        const guy3 = <GuyFrame3 key="guy3" width="240" height="240" className="guy-frame-1" />
 
-        const qSpeechBubble = <QSpeechBubble width="270" height="230" className="q-speech-bubble delay-two" />
+        const isQA = <IsQA key="is-qa" width="240" height="240" className="guy-frame-1" />
+
+        const gal2 = <GalFrame2 key="gal2" width="240" height="240" className="guy-frame-1" />
+
+        const qSpeechBubble = <QSpeechBubble key="q-speech-bubble" width="270" height="230" className="q-speech-bubble" />
+        const qaList = <QAList key="qa-list" width="271" height="230" className="qa-list" />
+
+        const qa = <QA key="qa" width="101" height="65" className={classnames(
+          'qa-word',
+          {
+            'qa-word-appear': this.state.step === 3
+          }
+        )} />
 
         const step1Text = (
           <div className="intro-modal--text">
@@ -197,7 +212,7 @@ export const IntroModal =
         const step2Text = (
           <div className="intro-modal--text">
             <p>
-              A Verifier is then assigned to check the validity of the submission (ie. That Q == A).
+              A Verifier is then assigned to check the validity of the submission. In other words, to make sure the Hint matches the <strong>Secret</strong>.
               <br />
               <br />
             </p>
@@ -211,7 +226,7 @@ export const IntroModal =
         const step3Text = (
           <div className="intro-modal--text">
             <p>
-              If the Verifier's <strong>Secret</strong> matched the Applicant's <strong>Secret</strong> (ie. they both had the same answer to Q), then the Applicant's submission is added to the registry. At this point anyone can start a Power Challenge to contest the validity of the entry in the registry.
+              If the Verifier came up with the same <strong>Secret</strong> as the Applicant's then the submission is added to the registry. Now anyone can start a Power Challenge to contest the validity of the entry in the registry.
               <br />
               <br />
             </p>
@@ -232,37 +247,45 @@ export const IntroModal =
             <div className='intro-modal has-text-centered'>
 
               <div className='columns is-mobile'>
-                <div className='column is-6 has-text-right is-gapless is-paddingless'>
+                <div className={classnames('intro-modal--image-column', 'column', 'is-6', 'is-gapless', 'is-paddingless', {
+                  'has-text-right': this.state.step === 1 || this.state.step === 2 || this.state.step === 3
+                })}>
                   <ReactCSSTransitionReplace
                     transitionName="cross-fade"
                     transitionEnterTimeout={1000}
                     transitionLeaveTimeout={400}
                     overflowHidden={false}
                   >
-                    {this.state.step === 1 ? (guy1) : this.state.step === 2 ? (guy2) : (guy3) }
+                    {this.state.step === 1 ? (guy1) : this.state.step === 2 ? (isQA) : this.state.step === 3 ? (guy3) : null }
                   </ReactCSSTransitionReplace>
                 </div>
 
-                <div className='column is-6 has-text-left is-gapless is-paddingless'>
+                <div className={classnames('intro-modal--image-column', 'column', 'is-6', 'is-gapless', 'is-paddingless', {
+                  'has-text-left': this.state.step === 1 || this.state.step === 2 || this.state.step === 3
+                })}>
                   <ReactCSSTransitionReplace
                     transitionName="cross-fade"
                     transitionEnterTimeout={1000}
                     transitionLeaveTimeout={400}
                     overflowHidden={false}
                   >
-                    {this.state.step === 1 ? (qSpeechBubble) : this.state.step === 2 ? (qSpeechBubble) : (qSpeechBubble) }
+                    {this.state.step === 1 ? (qSpeechBubble) : this.state.step === 2 ? (gal2) : this.state.step === 3 ? (qaList) : null }
                   </ReactCSSTransitionReplace>
+
+                  {qa}
                 </div>
               </div>
 
-              {this.state.step === 1 ? (step1Text) : this.state.step === 2 ? (step2Text) : (step3Text) }
+              <div className='columns'>
+                <div className='column is-12'>
+                  {this.state.step === 1 ? (step1Text) : this.state.step === 2 ? (step2Text) : (step3Text) }
+                </div>
+              </div>
 
               <p>
-                <br />
-                <br />
                 <button
                   onClick={this.handlePrimaryButtonClick}
-                  className="button is-primary is-outlined"
+                  className="button is-primary is-outlined is-intro-modal-button"
                 >
                   {this.buttonText()}
                 </button>
