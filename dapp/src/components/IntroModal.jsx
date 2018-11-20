@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { CSSTransition } from 'react-transition-group'
 import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import {
   cacheCall,
@@ -11,6 +10,8 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { Modal } from '~/components/Modal'
 import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
 import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
@@ -161,7 +162,7 @@ export const IntroModal =
             text = `Ok - then what happens?`
             break
           case 2:
-            text = `Cool, what next?`
+            text = `Cool, what's next?`
             break
           case 3:
             text = `Great, thanks! I'd like to try it out`
@@ -173,19 +174,60 @@ export const IntroModal =
       }
 
       render () {
-        const guy1 = <GuyFrame1 key="guy1" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
-        const guy2 = <GuyFrame4 key="guy2" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
-        const guy3 = <GuyFrame1 key="guy3" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
+        const guy1 = <GuyFrame1 key="guy1" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
+        const guy2 = <GuyFrame4 key="guy2" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
+        const guy3 = <GuyFrame1 key="guy3" width="240" height="240" className="guy-frame-1 guy" style={{ height: 240 }} />
 
-        const qSpeechBubble = <QSpeechBubble width="316" height="116" className="q-speech-bubble delay-two" />
+        const qSpeechBubble = <QSpeechBubble width="270" height="230" className="q-speech-bubble delay-two" />
 
-        const aInBox = <AInBox width="221" height="124" className="a-in-box delay-three" />
+        const step1Text = (
+          <div className="intro-modal--text">
+            <p>
+              Welcome to <strong>The Token Registry</strong>! This is a demo of a trustless incentivized list (TIL for short).
+              <br />
+              <br />
+            </p>
+
+            <p>
+              The game starts off with an Applicant submitting both a <strong>Hint</strong> (or Q for Question) and a <strong>Secret</strong> (or A for Answer).
+            </p>
+          </div>
+        )
+
+        const step2Text = (
+          <div className="intro-modal--text">
+            <p>
+              A Verifier is then assigned to check the validity of the submission (ie. That Q == A).
+              <br />
+              <br />
+            </p>
+
+            <p>
+              The Applicant then needs to come back and reveal their <strong>Secret</strong>.
+            </p>
+          </div>
+        )
+
+        const step3Text = (
+          <div className="intro-modal--text">
+            <p>
+              If the Verifier's <strong>Secret</strong> matched the Applicant's <strong>Secret</strong> (ie. they both had the same answer to Q), then the Applicant's submission is added to the registry. At this point anyone can start a Power Challenge to contest the validity of the entry in the registry.
+              <br />
+              <br />
+            </p>
+
+            <p>
+              That's about it!
+            </p>
+          </div>
+        )
 
         return (
           <Modal
             closeModal={this.handleCloseModal}
             modalState={this.state.modalState}
             title="Intro Modal"
+            modalCssClass='intro-modal'
           >
             <div className='intro-modal has-text-centered'>
 
@@ -195,6 +237,7 @@ export const IntroModal =
                     transitionName="cross-fade"
                     transitionEnterTimeout={1000}
                     transitionLeaveTimeout={400}
+                    overflowHidden={false}
                   >
                     {this.state.step === 1 ? (guy1) : this.state.step === 2 ? (guy2) : (guy3) }
                   </ReactCSSTransitionReplace>
@@ -205,24 +248,17 @@ export const IntroModal =
                     transitionName="cross-fade"
                     transitionEnterTimeout={1000}
                     transitionLeaveTimeout={400}
+                    overflowHidden={false}
                   >
-                    {this.state.step === 1 ? (qSpeechBubble) : this.state.step === 2 ? (aInBox) : (aInBox) }
+                    {this.state.step === 1 ? (qSpeechBubble) : this.state.step === 2 ? (qSpeechBubble) : (qSpeechBubble) }
                   </ReactCSSTransitionReplace>
                 </div>
               </div>
 
+              {this.state.step === 1 ? (step1Text) : this.state.step === 2 ? (step2Text) : (step3Text) }
 
               <p>
-                Welcome to <strong>The Token Registry</strong>! This is a demo of a trustless incentivized list (TIL for short).
                 <br />
-                <br />
-              </p>
-
-              <p>
-                The game starts off with one party creating both a <strong>Hint</strong> (or Q for Question) and a <strong>Secret</strong> (or A for Answer).
-              </p>
-
-              <p>
                 <br />
                 <button
                   onClick={this.handlePrimaryButtonClick}
@@ -232,19 +268,20 @@ export const IntroModal =
                 </button>
               </p>
 
-
               <button
                 onClick={this.handlePreviousStep}
-                className="button is-light is-text is-small"
+                className="button previous-link"
+                disabled={this.state.step === 1}
               >
-                previous
+                <FontAwesomeIcon icon={faChevronUp} className="previous-link--icon" />
               </button>
 
               <button
                 onClick={this.handleNextStep}
-                className="button is-light is-text is-small"
+                className="button next-link"
+                disabled={this.state.step === 3}
               >
-                next
+                <FontAwesomeIcon icon={faChevronUp} className="next-link--icon" />
               </button>
 
 
