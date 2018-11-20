@@ -21,7 +21,7 @@ contract MockTILRegistry {
     bytes32 _listingHash,
     address _applicant, uint256 _applicantDepositTokens, uint256 _applicantDepositEther,
     address _challenger, uint256 _challengerDepositTokens
-  ) external {
+  ) external payable {
     challenges[_listingHash] = true;
   }
 }

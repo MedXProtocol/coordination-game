@@ -477,12 +477,10 @@ contract CoordinationGame is Ownable {
     /// Approve of the applicant token transfer
     tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
 
-    tilRegistry.applicantLostCoordinationGame(
+    tilRegistry.applicantLostCoordinationGame.value(game.applicationBalanceInWei)(
       _applicationId, game.applicant, game.applicantTokenDeposit, game.applicationBalanceInWei,
       verification.verifier, work.jobStake()
     );
-
-    // address(tilRegistry).transfer(work.jobStake());
 
     emit ApplicantLost(_applicationId);
   }

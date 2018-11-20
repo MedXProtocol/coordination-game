@@ -10,7 +10,8 @@
     "Work": "Work",
     "CoordinationGame": "CoordinationGame",
     "TILRegistry": "TILRegistry",
-    "Migrations": "Migrations"
+    "Migrations": "Migrations",
+    "PowerChallenge": "PowerChallenge"
   },
   "dependencies": {}
 }

@@ -4,9 +4,12 @@ import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "./TILRegistry.sol";
+import "./IndexedBytes32Array.sol";
+import "./IPowerChallenge.sol";
 
-contract PowerChallenge is Ownable {
+contract PowerChallenge is Ownable, IPowerChallenge {
   using SafeMath for uint256;
+  using IndexedBytes32Array for IndexedBytes32Array.Data;
 
   enum State {
       BLANK,
@@ -18,7 +21,6 @@ contract PowerChallenge is Ownable {
 
   struct Challenge {
     bytes32 id;
-    uint256 firstChallengeAmount;
     uint256 round;
     uint256 challengeTotal;
     uint256 approveTotal;
@@ -28,17 +30,16 @@ contract PowerChallenge is Ownable {
     mapping(address => uint256) approveDeposits;
   }
 
-  event ChallengeStarted(bytes32 id);
+  event ChallengeStarted(bytes32 id, State state);
   event Approved(bytes32 id);
   event Challenged(bytes32 id);
   event TimedOut(bytes32 id);
   event Withdrawal(bytes32 id, address recipient, uint256 amount);
 
-  uint256 public firstChallengeAmount;
   IERC20 public token;
   uint256 public timeout;
   mapping(bytes32 => Challenge) public challenges;
-  TILRegistry registry;
+  IndexedBytes32Array.Data challengeIterator;
 
   modifier notStarted(bytes32 _id) {
     State state = challenges[_id].state;
@@ -62,9 +63,8 @@ contract PowerChallenge is Ownable {
     _;
   }
 
-  modifier isComplete(bytes32 _id) {
-    State state = challenges[_id].state;
-    require(state == State.CHALLENGE_SUCCESS || state == State.CHALLENGE_FAIL, 'challenge is complete');
+  modifier onlyComplete(bytes32 _id) {
+    require(isComplete(_id), 'challenge is complete');
     _;
   }
 
@@ -74,39 +74,64 @@ contract PowerChallenge is Ownable {
   }
 
   function init(
-    address _owner, IERC20 _token, uint256 _firstChallengeAmount, uint256 _timeout, TILRegistry _registry
+    address _owner, IERC20 _token, uint256 _timeout
   ) public initializer {
     require(_owner != address(0), 'owner is defined');
     require(_token != address(0), 'token is defined');
-    require(_firstChallengeAmount > 0, 'first deposit cannot be zero');
-    require(_registry != address(0), 'registry is defined');
     Ownable.initialize(_owner);
     token = _token;
-    firstChallengeAmount = _firstChallengeAmount;
     timeout = _timeout;
   }
 
-  function startChallenge(bytes32 _id) external notStarted(_id) {
-    require(token.transferFrom(msg.sender, address(this), firstChallengeAmount), 'transferred tokens');
+  function startChallenge(bytes32 _id, uint256 _amount) external {
+    startChallengeFrom(_id, _amount, msg.sender, msg.sender);
+  }
+
+  function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public notStarted(_id) {
+    require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
       _id,
-      firstChallengeAmount,
       0,
-      firstChallengeAmount,
+      _amount,
       0,
       block.timestamp,
       State.CHALLENGED
     );
-    challenges[_id].challengeDeposits[msg.sender] = firstChallengeAmount;
+    challenges[_id].challengeDeposits[_beneficiary] = _amount;
+    challengeIterator.pushValue(_id);
 
-    emit ChallengeStarted(_id);
+    emit ChallengeStarted(_id, challenges[_id].state);
   }
 
-  function approve(bytes32 _id) external isChallenged(_id) notTimedOut(_id) {
+  function startApproval(bytes32 _id, uint256 _amount) external {
+    startApprovalFrom(_id, _amount, msg.sender, msg.sender);
+  }
+
+  function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public notStarted(_id) {
+    require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
+    challenges[_id] = Challenge(
+      _id,
+      0,
+      0,
+      _amount,
+      block.timestamp,
+      State.APPROVED
+    );
+    challenges[_id].approveDeposits[_beneficiary] = _amount;
+    challengeIterator.pushValue(_id);
+
+    emit ChallengeStarted(_id, challenges[_id].state);
+  }
+
+  function approve(bytes32 _id) external {
+    approveFrom(_id, msg.sender, msg.sender);
+  }
+
+  function approveFrom(bytes32 _id, address _payer, address _beneficiary) public isChallenged(_id) notTimedOut(_id) {
     Challenge storage challengeStore = challenges[_id];
-    uint256 deposit = nextRound(challengeStore, msg.sender);
+    uint256 deposit = nextRound(_id, _payer);
     challengeStore.approveTotal = challengeStore.approveTotal.add(deposit);
-    challengeStore.approveDeposits[msg.sender] = challengeStore.approveDeposits[msg.sender].add(deposit);
+    challengeStore.approveDeposits[_beneficiary] = challengeStore.approveDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.APPROVED;
 
     emit Approved(_id);
@@ -116,11 +141,15 @@ contract PowerChallenge is Ownable {
     * @notice Starts or continues a challenge against a key.
     * @param _id The challenge id
     */
-  function challenge(bytes32 _id) external isApproved(_id) notTimedOut(_id) {
+  function challenge(bytes32 _id) external {
+    challengeFrom(_id, msg.sender, msg.sender);
+  }
+
+  function challengeFrom(bytes32 _id, address _payer, address _beneficiary) public isApproved(_id) notTimedOut(_id) {
     Challenge storage challengeStore = challenges[_id];
-    uint256 deposit = nextRound(challengeStore, msg.sender);
+    uint256 deposit = nextRound(_id, _payer);
     challengeStore.challengeTotal = challengeStore.challengeTotal.add(deposit);
-    challengeStore.challengeDeposits[msg.sender] = challengeStore.challengeDeposits[msg.sender].add(deposit);
+    challengeStore.challengeDeposits[_beneficiary] = challengeStore.challengeDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.CHALLENGED;
 
     emit Challenged(_id);
@@ -139,7 +168,7 @@ contract PowerChallenge is Ownable {
     emit TimedOut(_id);
   }
 
-  function withdraw(bytes32 _id) external isComplete(_id) {
+  function withdraw(bytes32 _id) external onlyComplete(_id) {
     Challenge storage challengeStore = challenges[_id];
     uint256 total = challengeStore.challengeTotal.add(challengeStore.approveTotal);
     uint256 withdrawal = 0;
@@ -155,16 +184,18 @@ contract PowerChallenge is Ownable {
     emit Withdrawal(_id, msg.sender, withdrawal);
   }
 
-  function nextRound(Challenge storage challengeStore, address _address) internal returns (uint256) {
-    uint256 deposit = nextDepositAmount(challengeStore);
-    require(token.transferFrom(_address, address(this), deposit), 'transferred tokens');
+  function nextDepositAmount(bytes32 _id) public view returns (uint256) {
+    Challenge storage challengeStore = challenges[_id];
+    return challengeStore.challengeTotal.add(challengeStore.approveTotal).mul(2);
+  }
+
+  function nextRound(bytes32 _id, address _payer) internal returns (uint256) {
+    Challenge storage challengeStore = challenges[_id];
+    uint256 deposit = nextDepositAmount(_id);
+    require(token.transferFrom(_payer, address(this), deposit), 'transferred tokens');
     challengeStore.round = challengeStore.round.add(1);
     challengeStore.updatedAt = block.timestamp;
     return deposit;
-  }
-
-  function nextDepositAmount(Challenge storage challengeStore) internal view returns (uint256) {
-    return challengeStore.firstChallengeAmount.mul(2 ** (challengeStore.round.add(1)));
   }
 
   function isTimedOut(bytes32 _id) internal view returns (bool) {
@@ -182,5 +213,14 @@ contract PowerChallenge is Ownable {
 
   function approveBalance(bytes32 _id, address _address) external view returns (uint256) {
     return challenges[_id].approveDeposits[_address];
+  }
+
+  function isComplete(bytes32 _id) public view returns (bool) {
+    State state = challenges[_id].state;
+    return state == State.CHALLENGE_SUCCESS || state == State.CHALLENGE_FAIL;
+  }
+
+  function getState(bytes32 _id) public view returns (State) {
+    return challenges[_id].state;
   }
 }

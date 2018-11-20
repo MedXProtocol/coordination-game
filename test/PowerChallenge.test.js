@@ -9,7 +9,7 @@ const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
 const mapToChallenge = require('./helpers/mapToChallenge')
 
-contract('CoordinationGame', (accounts) => {
+contract('PowerChallenge', (accounts) => {
   const [owner, admin, challenger, approver] = accounts
 
   const firstChallengeAmount = new BN(web3.toWei('30', 'ether'))
@@ -19,7 +19,7 @@ contract('CoordinationGame', (accounts) => {
     token = await WorkToken.new()
     await token.init(owner)
     powerChallenge = await PowerChallenge.new()
-    await powerChallenge.init(owner, token.address, firstChallengeAmount.toString(), timeout)
+    await powerChallenge.init(owner, token.address, timeout)
     await token.mint(owner, web3.toWei('1000', 'ether'))
     await token.mint(challenger, web3.toWei('1000', 'ether'))
     await token.mint(approver, web3.toWei('1000', 'ether'))
@@ -28,7 +28,7 @@ contract('CoordinationGame', (accounts) => {
   let challengeCount = 0
   let challengeId
   const firstApprovalAmount = new BN(firstChallengeAmount).mul(new BN(2))
-  const secondChallengeAmount = firstApprovalAmount.mul(new BN(2))
+  const secondChallengeAmount = firstChallengeAmount.add(firstApprovalAmount).mul(new BN(2))
 
   beforeEach(async () => {
     challengeId = numToBytes32(challengeCount += 1)
@@ -41,7 +41,7 @@ contract('CoordinationGame', (accounts) => {
 
   async function startChallenge() {
     await token.approve(powerChallenge.address, firstChallengeAmount.toString(), { from: challenger })
-    return await powerChallenge.startChallenge(challengeId, { from: challenger })
+    return await powerChallenge.startChallenge(challengeId, firstChallengeAmount.toString(), { from: challenger })
   }
 
   async function approve(amount) {
@@ -64,6 +64,7 @@ contract('CoordinationGame', (accounts) => {
 
   describe('startChallenge()', () => {
     it('should create a new challenge', async () => {
+      debug('startChallenge()')
       const tx = await startChallenge()
       debug(tx)
       const challenge = await getChallenge()
@@ -79,9 +80,10 @@ contract('CoordinationGame', (accounts) => {
 
     context('when not approved for enough tokens', () => {
       it('should reject', async () => {
+        await token.approve(powerChallenge.address, 0, { from: challenger })
         debug(`approved for ${(await token.allowance(challenger, powerChallenge.address)).toString()}`)
         await expectThrow(async () => {
-          await powerChallenge.startChallenge(challengeId, { from: challenger })
+          await powerChallenge.startChallenge(challengeId, firstChallengeAmount.toString(), { from: challenger })
         })
       })
     })

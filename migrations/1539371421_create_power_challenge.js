@@ -8,10 +8,13 @@ const ownerAccount = require('./support/ownerAccount')
 
 module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
-    const roles = await TILRoles.deployed()
-    const work = await Work.deployed()
     const token = await WorkToken.deployed()
+    const timeout = 60
 
-    execAdmin(`zos create TILRegistry --init initialize --args ${token.address},${roles.address},${work.address}`, networkName, accounts)
+    execAdmin(
+      `zos create PowerChallenge --init init --args ${ownerAccount(accounts)},${token.address},${timeout}`,
+      networkName,
+      accounts
+    )
   })
 };

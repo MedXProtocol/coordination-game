@@ -12,9 +12,10 @@ const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
 const leftPadHexString = require('./helpers/leftPadHexString')
 const mapToListing = require('./helpers/mapToListing')
+const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 
 contract('TILRegistry', (accounts) => {
-  const [owner, user1, user2] = accounts
+  const [owner, user1, user2, verifier] = accounts
 
   const listingStake = web3.toWei('100', 'ether')
   const listingHash = '0x1000000000000000000000000000000000000000000000000000000000000000'
@@ -28,9 +29,10 @@ contract('TILRegistry', (accounts) => {
   const jobStake = web3.toWei('10', 'ether')
   const minimumBalanceToWork = web3.toWei('15', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
+  const applicantDepositEther = web3.toWei('5', 'ether')
+  const challengerDepositTokens = web3.toWei('20', 'ether')
 
   before(async () => {
-    powerChallenge = await MockPowerChallenge.new()
     workToken = await WorkToken.new()
     await workToken.init(owner)
     roles = await TILRoles.new()
@@ -48,6 +50,7 @@ contract('TILRegistry', (accounts) => {
   })
 
   beforeEach(async () => {
+    powerChallenge = await MockPowerChallenge.new()
     registry = await TILRegistry.new()
     await registry.initialize(workToken.address, roles.address, work.address, powerChallenge.address)
     await workToken.mint(owner, listingStake)
@@ -86,16 +89,113 @@ contract('TILRegistry', (accounts) => {
 
     context('on success', () => {
       beforeEach(async () => {
-        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake, 0, 0, 0)
+        await registry.applicantLostCoordinationGame(
+          listingHash, user1, listingStake, applicantDepositEther, verifier, challengerDepositTokens
+        )
       })
 
       it('should add an applicant', async () => {
-        const newListing = await registry.listings(listingHash)
+        const newListing = await getListing(listingHash)
 
         debug(`applicantLostCoordinationGame(): ${newListing}`)
 
         assert.equal(await registry.listingsLength(), 1)
         assert.equal(await registry.listingAt(0), listingHash) // exists
+        assert.equal(newListing.owner, user1)
+        const startApprovalFrom = (await powerChallenge.startApprovalFroms(0)).map(f => f.toString())
+        debug(startApprovalFrom)
+        assert.deepEqual(startApprovalFrom, [
+          listingHash,
+          listingStake,
+          registry.address,
+          user1
+        ])
+        const challengeFrom = (await powerChallenge.challengeFroms(0)).map(f => f.toString())
+        debug(challengeFrom)
+        assert.deepEqual(challengeFrom, [
+          listingHash,
+          registry.address,
+          verifier
+        ])
+        assert.deepEqual((await registry.deposits(listingHash)).map(f => f.toString()), [verifier, applicantDepositEther])
+      })
+    })
+  })
+
+  describe('withdrawFromLostCoordinationGame()', () => {
+
+    beforeEach(async () => {
+      await registry.applicantLostCoordinationGame(
+        listingHash, user1, listingStake, applicantDepositEther, verifier, challengerDepositTokens,
+        { from: owner, value: applicantDepositEther }
+      )
+    })
+
+    context('when challenge failed', () => {
+      beforeEach(async () => {
+        await powerChallenge.setState(listingHash, 3) // Challenge Failed
+      })
+
+      it('should allow the applicant to withdraw once', async () => {
+        const applicantEtherStartingBalance = await web3.eth.getBalance(user1)
+        let tx = await registry.withdrawFromLostCoordinationGame(listingHash, { from: user1 })
+        const applicantEtherFinishingBalance = await web3.eth.getBalance(user1)
+
+        const initialBalancePlusDeposit = applicantEtherStartingBalance.add(applicantDepositEther)
+        const finalBalanceWithGas = applicantEtherFinishingBalance.add(new BN(tx.receipt.gasUsed))
+
+        const diff = initialBalancePlusDeposit.sub(finalBalanceWithGas)
+        const maxDiff = web3.toWei('0.1', 'ether')
+        debug(`initialBalancePlusDeposit: ${initialBalancePlusDeposit.toString()}`)
+        debug(`finalBalanceWithGas: ${finalBalanceWithGas.toString()}`)
+        debug(`ETHER: ${web3.fromWei(diff, 'ether')}`)
+        debug(`MAX DIFF: ${maxDiff.toString()}`)
+
+        assert.ok(
+          isApproxEqualBN(
+            initialBalancePlusDeposit,
+            finalBalanceWithGas
+          ),
+          'Applicant withdrew the fee'
+        )
+
+        tx = await registry.withdrawFromLostCoordinationGame(listingHash, { from: user1 })
+        const applicantEtherSecondBalance = await web3.eth.getBalance(user1)
+
+        assert.ok(
+          isApproxEqualBN(
+            applicantEtherSecondBalance,
+            applicantEtherFinishingBalance.add(new BN(tx.receipt.gasUsed))
+          ),
+          'balance has not changed'
+        )
+      })
+
+      it('should do nothing for the verifier', async () => {
+        const verifierEtherStartingBalance = await web3.eth.getBalance(verifier)
+        const tx = await registry.withdrawFromLostCoordinationGame(listingHash, { from: verifier })
+        debug(tx)
+        const verifierEtherFinishingBalance = await web3.eth.getBalance(verifier)
+
+        debug(`${verifierEtherStartingBalance.sub(verifierEtherFinishingBalance).toString()}`)
+
+        assert.ok(
+          isApproxEqualBN(verifierEtherStartingBalance, verifierEtherFinishingBalance),
+          'Verifier withdrew nothing'
+        )
+      })
+
+      it('should do nothing for anyone else', async () => {
+        const etherStartingBalance = await web3.eth.getBalance(owner)
+        await registry.withdrawFromLostCoordinationGame(listingHash, { from: owner })
+        const etherFinishingBalance = await web3.eth.getBalance(owner)
+
+        debug(`${etherStartingBalance.sub(etherFinishingBalance).toString()}`)
+
+        assert.ok(
+          isApproxEqualBN(etherStartingBalance, etherFinishingBalance),
+          'Owner withdrew nothing'
+        )
       })
     })
   })

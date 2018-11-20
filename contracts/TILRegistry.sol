@@ -1,19 +1,25 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "./IndexedBytes32Array.sol";
 import "./Work.sol";
 import "./PowerChallenge.sol";
-import "./IPowerChallengeResult.sol";
 import "./TILRoles.sol";
 import "zos-lib/contracts/Initializable.sol";
 
-contract TILRegistry is Initializable, IPowerChallengeResult {
+contract TILRegistry is Initializable {
   using IndexedBytes32Array for IndexedBytes32Array.Data;
+  using SafeMath for uint256;
 
   struct Listing {
     address owner;          // Owner of Listing
     uint unstakedDeposit;   // Number of tokens staked in the listing
+  }
+
+  struct CoordinationGameEtherDeposit {
+    address verifier;
+    uint256 applicantDepositEther;
   }
 
   event NewListing(address owner, bytes32 listingHash);
@@ -25,6 +31,7 @@ contract TILRegistry is Initializable, IPowerChallengeResult {
   TILRoles roles;
   Work work;
   PowerChallenge powerChallenge;
+  mapping(bytes32 => CoordinationGameEtherDeposit) public deposits;
 
   modifier onlyJobManager() {
     require(roles.hasRole(msg.sender, uint(TILRoles.All.JOB_MANAGER)), "only the job manager");
@@ -55,17 +62,29 @@ contract TILRegistry is Initializable, IPowerChallengeResult {
     bytes32 _listingHash,
     address _applicant, uint256 _applicantDepositTokens, uint256 _applicantDepositEther,
     address _challenger, uint256 _challengerDepositTokens
-  ) external onlyJobManager {
+  ) external payable onlyJobManager {
     createNewListing(msg.sender, _applicant, _listingHash, _applicantDepositTokens);
-    powerChallenge.startChallenge(_listingHash);
+    token.approve(address(powerChallenge), _applicantDepositTokens.add(_challengerDepositTokens));
+    powerChallenge.startApprovalFrom(_listingHash, _applicantDepositTokens, address(this), _applicant);
+    powerChallenge.challengeFrom(_listingHash, address(this), _challenger);
+    deposits[_listingHash] = CoordinationGameEtherDeposit(_challenger, _applicantDepositEther);
   }
 
-  function challengeSucceeded(bytes32 _listingHash) {
-
-  }
-
-  function challengeFailed(bytes32 _listingHash) {
-
+  function withdrawFromLostCoordinationGame(bytes32 _listingHash) external {
+    require(powerChallenge.isComplete(_listingHash), 'challenge has completed');
+    PowerChallenge.State state = powerChallenge.getState(_listingHash);
+    CoordinationGameEtherDeposit storage deposit = deposits[_listingHash];
+    uint256 withdrawal = 0;
+    if (state == PowerChallenge.State.CHALLENGE_FAIL && msg.sender == listings[_listingHash].owner) {
+      withdrawal = deposit.applicantDepositEther;
+      deposit.applicantDepositEther = 0;
+    } else if (state == PowerChallenge.State.CHALLENGE_SUCCESS && msg.sender == deposit.verifier) {
+      withdrawal = deposit.applicantDepositEther;
+      deposit.applicantDepositEther = 0;
+    }
+    if (withdrawal > 0) {
+      msg.sender.transfer(withdrawal);
+    }
   }
 
   function createNewListing(address _sender, address _applicant, bytes32 _listingHash, uint256 _deposit) internal {
