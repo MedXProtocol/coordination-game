@@ -42,7 +42,8 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   const needsNewVerifier = (!isBlank(verifier) && (latestBlockTimestamp > verifierSubmitSecretExpiresAt))
 
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = waitingOnVerifier && !applicantRevealedSecret && noWhistleblower && !isApplicant
+  // const canWhistleblow = waitingOnVerifier && !applicantRevealedSecret && noWhistleblower && !isApplicant
+  const canWhistleblow = !applicantRevealedSecret && noWhistleblower && !isApplicant
 
   const canVerify = (
     isVerifier &&
@@ -59,7 +60,8 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   )
 
   const isComplete = (
-    verifierSubmittedSecret && applicantRevealedSecret
+    (verifierSubmittedSecret && applicantRevealedSecret) ||
+    !noWhistleblower
   )
 
   return {

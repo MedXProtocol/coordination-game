@@ -97,7 +97,7 @@ export const ApplicationRow = connect(mapStateToProps)(
         status = <ApplicationStatus applicationId={applicationId} />
 
 
-        /// APPLICANT
+        // APPLICANT: Could be a component or function ...
         if (applicationState.isApplicant) {
           if (tokenName && tokenTicker && secret && random) {
             statusText = (
@@ -105,6 +105,10 @@ export const ApplicationRow = connect(mapStateToProps)(
                 Token Name: <strong>{tokenName}</strong>
                 <br />
                 Token Ticker: <strong>{tokenTicker}</strong>
+                <br />
+                Secret: <strong>{secret}</strong>
+                <br />
+                Random: <strong>{random.toString()}</strong>
               </React.Fragment>
             )
             // <br />
@@ -135,8 +139,6 @@ export const ApplicationRow = connect(mapStateToProps)(
             </React.Fragment>
           )
 
-
-
           ofInterest = (
             applicationState.waitingOnVerifier
             || applicationState.verifierHasChallenged
@@ -147,24 +149,29 @@ export const ApplicationRow = connect(mapStateToProps)(
             || applicationState.needsNewVerifier
           )
 
-
-          if (applicationState.isApplicant && applicationState.needsApplicantReveal) {
+          if (applicationState.needsApplicantReveal) {
             action = (
               <button className="button is-warning is-small is-outlined">Reveal Your Secret</button>
             )
           }
-          if (applicationState.isApplicant && applicationState.needsNewVerifier) {
+          if (applicationState.needsNewVerifier) {
             action = (
               <button className="button is-warning is-small is-outlined">Request New Verifier</button>
             )
           }
-          if (applicationState.isApplicant && applicationState.needsAVerifier) {
+          if (applicationState.needsAVerifier) {
             action = (
               <button className="button is-warning is-small is-outlined">Request Verification</button>
             )
           }
+          if (!applicationState.noWhistleblower) {
+            action = (
+              <button className="button is-danger is-small is-outlined">Whistleblown!</button>
+            )
+          }
         }
 
+        // VERIFIER: Could be a component or function ...
         if (applicationState.isVerifier) {
           // until we remove the index from the array completely
           if (applicationState.isComplete || applicationState.verifierHasChallenged) {
