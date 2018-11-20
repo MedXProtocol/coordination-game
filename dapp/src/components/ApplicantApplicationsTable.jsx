@@ -3,6 +3,8 @@ import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get, range } from 'lodash'
+import { ExportOutline } from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
 import {
   cacheCall,
   cacheCallValue,
@@ -11,14 +13,12 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { isBlank } from '~/utils/isBlank'
-import { ExportOutline } from '@ant-design/icons'
-import AntdIcon from '@ant-design/icons-react'
-import { ApplicantApplicationRow } from '~/components/Applicants/ApplicantApplicationRow'
+import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
 import { mapToGame } from '~/services/mapToGame'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
+import { isBlank } from '~/utils/isBlank'
 
 function mapStateToProps(state) {
   let applicationObjects = []
@@ -68,9 +68,7 @@ function* applicantApplicationsTableSaga({
 }) {
   if (!coordinationGameAddress || !address) { return null }
 
-  yield all([
-    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address)
-  ])
+  yield cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
     const indices = range(applicationCount)
@@ -125,10 +123,9 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
         }
 
         renderApplicationRows(applicationObjects) {
-          // renderApplicationRows(applicationObjects, transactions, applicationCount) {
           let applicationRows = applicationObjects.map((applicationObject, index) => {
             return (
-              <ApplicantApplicationRow
+              <ApplicationRow
                 applicationId={applicationObject.applicationId}
                 key={`application-row-${index}`}
               />
@@ -185,9 +182,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
               </div>
             )
           } else {
-            applicationRows = (
-              this.renderApplicationRows(applicationObjects)
-            )
+            applicationRows = this.renderApplicationRows(applicationObjects)
           }
 
           return (

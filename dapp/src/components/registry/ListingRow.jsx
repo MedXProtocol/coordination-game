@@ -71,7 +71,7 @@ export const ListingRow = connect(mapStateToProps)(
               args={[this.props.listingHash]}
               buttonText='Withdraw'
               loadingText='Withdrawing...'
-              className="button is-small is-warning is-outlined is-pulled-right"
+              className="button is-small is-info is-outlined is-pulled-right"
               confirmationMessage='Your listing has been withdrawn.'
               txHashMessage='Withdraw listing request sent -
                 it will take a few minutes to confirm on the Ethereum network.' />

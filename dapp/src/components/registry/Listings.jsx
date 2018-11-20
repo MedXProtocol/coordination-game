@@ -56,7 +56,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
       noListings,
       listingRows
 
-    const totalPages = this.props.listingsCount / this.props.pageSize
+    const totalPages = parseInt(this.props.listingsCount / this.props.pageSize, 10)
     const { listingsCount } = this.props
     const loading = listingsCount === undefined
 

@@ -37,10 +37,11 @@ $navbar-padding-vertical: 20px;
 // Bulma overrides
 $card-color: #aaa;
 $card-background-color: transparent;
-$pagination-current-background-color: $accent-color-1;
-$pagination-current-border-color: $accent-color-2;
-$pagination-hover-color: #aaa;
+
+$pagination-current-background-color: $accent-color-2;
+$pagination-current-border-color: $accent-color-1;
+$pagination-hover-color: #fff;
 $pagination-hover-border-color: $accent-color-1;
-$pagination-focus-color: #aaa;
+$pagination-focus-color: #fff;
 $pagination-focus-border-color: $accent-color-2;
 $pagination-color: #aaa;

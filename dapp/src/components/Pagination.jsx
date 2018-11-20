@@ -36,6 +36,7 @@ export class Pagination extends Component {
       pageNumbers.splice(0, 0, '...')
     }
 
+
     // We always want the first and last pages in the array
     const needsFirstPage = pageNumbers[0] !== 1
     if (needsFirstPage) {

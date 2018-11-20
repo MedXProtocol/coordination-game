@@ -49,8 +49,6 @@ export const WhistleblowButton = connect(mapStateToProps)(
           <p>
             If the applicant shared their random number with you then you
               can claim a reward and punish the cheater:
-            <br />
-            <br />
           </p>
           <button
             onClick={() => this.setState({ showWhistleblowModal: true })}
@@ -70,7 +68,7 @@ export const WhistleblowButton = connect(mapStateToProps)(
               <input
                 type="number"
                 name="randomNumber"
-                className="text-input text-input--medium"
+                className="text-input text-input--extended"
                 placeholder="random number"
                 onChange={(e) => this.setState({randomNumber: e.target.value})}
                 value={this.state.randomNumber}

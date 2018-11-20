@@ -9,8 +9,7 @@ export const LoadingButton = props => (
     className={classnames(
       'button',
       'is-outlined',
-      props.className,
-      'is-primary',
+      props.className || 'is-primary',
       {
         'is-small': props.isSmall
       }

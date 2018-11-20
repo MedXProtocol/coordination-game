@@ -7,7 +7,7 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import { VerifierApplicationRow } from '~/components/Verifiers/VerifierApplicationRow'
+import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
@@ -43,14 +43,14 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
       renderApplicationRows(applicationIds) {
         let applicationRows = applicationIds.map((applicationId, index) => {
           return (
-            <VerifierApplicationRow
+            <ApplicationRow
               applicationId={applicationId}
-              key={`application-row-${index}`}
+              key={`verifier-application-row-${applicationId}`}
             />
           )
         })
 
-        return applicationRows.reverse()
+        return applicationRows
       }
 
       render() {

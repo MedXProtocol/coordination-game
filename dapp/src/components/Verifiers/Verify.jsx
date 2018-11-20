@@ -5,10 +5,10 @@ import { get } from 'lodash'
 import { Footer } from '~/components/Footer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { Application } from '~/components/Applications/Application'
 import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
 import { VerifierApplicationsTable } from '~/components/Verifiers/VerifierApplicationsTable'
 import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
-import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { VerifierStake } from '~/components/Verifiers/VerifierStake'
 
 function mapStateToProps(state) {
@@ -24,11 +24,11 @@ export const Verify = connect(mapStateToProps)(
     class _Verify extends PureComponent {
 
       render() {
-        let verifyApplication,
+        let application,
           verifyApplicationsTable
 
         if (this.props.applicationId) {
-          verifyApplication = <VerifyApplication applicationId={this.props.applicationId} />
+          application = <Application applicationId={this.props.applicationId} />
         } else {
           verifyApplicationsTable = <VerifierApplicationsTable />
         }
@@ -48,7 +48,7 @@ export const Verify = connect(mapStateToProps)(
             <br />
 
             {verifyApplicationsTable}
-            {verifyApplication}
+            {application}
 
             <br />
             <br />
