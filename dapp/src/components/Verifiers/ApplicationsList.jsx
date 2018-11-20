@@ -1,6 +1,7 @@
 import React, {
   PureComponent
 } from 'react'
+import { all } from 'redux-saga/effects'
 import {
   withSaga,
   cacheCall,
@@ -10,7 +11,7 @@ import {
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { range } from 'lodash'
-import { ApplicationRow } from './ApplicationRow'
+import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { Pagination } from '~/components/Pagination'
 import { formatRoute } from 'react-router-named-routes'
 import { isBlank } from '~/utils/isBlank'
@@ -40,22 +41,34 @@ function mapStateToProps(state, { currentPage, pageSize }) {
 function* applicationsListSaga({ CoordinationGame, startIndex, endIndex }) {
   if (!CoordinationGame) { return }
   yield cacheCall(CoordinationGame, 'applicationCount')
-  yield range(startIndex, endIndex).map(function* (index) {
-    yield cacheCall(CoordinationGame, 'applicationAt', index)
-  })
+  yield all(
+    range(startIndex, endIndex).map(function* (index) {
+      yield cacheCall(CoordinationGame, 'applicationAt', index)
+    })
+  )
 }
 
 export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsListSaga)(
   class _ApplicationsList extends PureComponent {
+
+    renderApplicationRows(applicationIds) {
+      return applicationIds.map((applicationId) => {
+        return (
+          <ApplicationRow
+            applicationId={applicationId}
+            key={`applications-list-application-row-${applicationId}`}
+          />
+        )
+      })
+    }
+
     render () {
-      const totalPages = this.props.applicationCount / this.props.pageSize
+      const totalPages = parseInt(this.props.applicationCount / this.props.pageSize, 10)
 
       return (
         <div className='list--container'>
           <div className="list">
-            {this.props.applicationIds.map(
-              (applicationId) => <ApplicationRow key={applicationId} applicationId={applicationId} />
-            )}
+            {this.renderApplicationRows(this.props.applicationIds)}
           </div>
 
           <Pagination

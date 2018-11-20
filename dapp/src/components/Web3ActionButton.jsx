@@ -118,6 +118,8 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
       render() {
         const { buttonText, contractAddress, loadingText, isSmall } = this.props
 
+        const classNames = this.props.className || 'is-primary'
+
         return (
           <form onSubmit={this.handleSend}>
             <LoadingButton
@@ -126,7 +128,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               isLoading={this.state.txHandler}
               isSmall={isSmall}
               disabled={!contractAddress || this.state.txHandler}
-              className={this.props.className}
+              className={classNames}
             />
           </form>
         )

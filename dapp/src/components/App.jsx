@@ -27,7 +27,6 @@ import { Home } from '~/components/Home'
 import { Loading } from '~/components/Loading'
 import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
-import { VerifyApplication } from '~/components/Verifiers/VerifyApplication'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
 import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
@@ -150,11 +149,9 @@ const App = connect(mapStateToProps)(
                           appear={true}
                         >
                           <Switch location={this.props.location}>
-                            <Route path={routes.APPLICATION} component={Application} />
-                            <Route path={routes.VERIFY_APPLICATION} component={VerifyApplication} />
-
                             <Route path={routes.ADMIN} component={Admin} />
 
+                            <Route path={routes.APPLICATION} component={Application} />
                             <Route path={routes.VERIFY} component={Verify} />
                             <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                             <Route path={routes.WALLET} component={Wallet} />

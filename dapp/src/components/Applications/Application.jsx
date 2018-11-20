@@ -2,15 +2,18 @@ import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
 import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
+import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 import {
   contractByName,
+  TransactionStateHandler,
   withSaga,
   withSend
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { AppId } from '~/components/AppId'
+import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
@@ -18,6 +21,7 @@ import { applicationSaga } from '~/sagas/applicationSaga'
 import { WhistleblowButton } from '~/components/Applications/WhistleblowButton'
 import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
+import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { match }) {
   const applicationId = match.params.applicationId
@@ -37,7 +41,18 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-export const Application = connect(mapStateToProps)(
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchShowLoadingStatus: () => {
+      dispatch({ type: 'SHOW_LOADING_STATUS' })
+    },
+    dispatchHideLoadingStatus: () => {
+      dispatch({ type: 'HIDE_LOADING_STATUS' })
+    }
+  }
+}
+
+export const Application = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(applicationSaga)(
     withSend(
       withRouter(
@@ -47,13 +62,79 @@ export const Application = connect(mapStateToProps)(
             applicationId: PropTypes.string
           }
 
+          constructor(props) {
+            super(props)
+            this.state = {
+              secret: ''
+            }
+          }
+
           componentWillReceiveProps (nextProps) {
+            this.registerVerifierSubmitSecretHandlers(nextProps)
+          }
+
+          registerVerifierSubmitSecretHandlers = (nextProps) => {
+            if (this.state.verifierSubmitSecretHandler) {
+              this.state.verifierSubmitSecretHandler.handle(
+                nextProps.transactions[this.state.verifierSubmitSecretTxId]
+              )
+                .onError((error) => {
+                  this.props.dispatchHideLoadingStatus()
+
+                  console.log(error)
+                  this.setState({ verifierSubmitSecretHandler: null })
+                  toastr.transactionError(error)
+                })
+                .onConfirmed(() => {
+                  this.setState({ verifierSubmitSecretHandler: null })
+                  toastr.success(`Verification secret transaction for application #${this.props.applicationId} has been confirmed.`)
+                })
+                .onTxHash(() => {
+                  this.props.dispatchHideLoadingStatus()
+
+                  this.setState({ loading: false })
+                  toastr.success('Verification secret sent - it will take a few minutes to confirm on the Ethereum network.')
+                  this.props.history.push(routes.VERIFY)
+                })
+            }
+          }
+
+          handleVerifierSecretSubmit = (e) => {
+            e.preventDefault()
+
+            const { send, coordinationGameAddress, applicationId } = this.props
+
+            const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', this.state.secret.toString())
+
+            const verifierSubmitSecretTxId = send(
+              coordinationGameAddress,
+              'verifierSubmitSecret',
+              applicationId,
+              secretAsHex
+            )()
+
+            this.setState({
+              verifierSubmitSecretHandler: new TransactionStateHandler(),
+              verifierSubmitSecretTxId
+            })
+
+            this.props.dispatchShowLoadingStatus()
+          }
+
+          handleTextInputChange = (e) => {
+            this.setState({
+              [e.target.name]: e.target.value
+            })
           }
 
           handleCloseClick = (e) => {
             e.preventDefault()
 
             this.props.history.goBack()
+          }
+
+          secretValid = () => {
+            return this.state.secret.length === 42 && this.state.secret.match(/^(0x)?[0-9a-fA-F]{40}$/)
           }
 
           render () {
@@ -92,6 +173,8 @@ export const Application = connect(mapStateToProps)(
               whistleblowButton =
                 <WhistleblowButton applicationId={applicationId} />
             }
+
+
 
             if (applicationState.isComplete) {
               message = (
@@ -190,6 +273,27 @@ export const Application = connect(mapStateToProps)(
               )
             }
 
+            if (applicationState.canChallenge) {
+              message = (
+                <div>
+                  <p>
+                    The applicant hasn't revealed their secret in the timeframe provided. You can now challenge this application:
+                    <br />
+                    <br />
+                  </p>
+                  <Web3ActionButton
+                    contractAddress={this.props.coordinationGameAddress}
+                    method='verifierChallenge'
+                    args={[applicationId]}
+                    buttonText='Challenge'
+                    loadingText='Challenging'
+                    confirmationMessage='Challenge transaction confirmed.'
+                    txHashMessage='"Challenge" transaction sent successfully -
+                      it will take a few minutes to confirm on the Ethereum network.' />
+                </div>
+              )
+            }
+
             // necessary to show the verifier on 1st-time component load
             ReactTooltip.rebuild()
 
@@ -236,6 +340,47 @@ export const Application = connect(mapStateToProps)(
                   place={'top'}
                   wrapper='span'
                 />
+
+                {applicationState.canVerify
+                  ? (
+                    <form onSubmit={this.handleVerifierSecretSubmit}>
+                      <h6 className="is-size-6">
+                        Enter this token's contract address to verify:
+                      </h6>
+
+                      <div className="field">
+                        <div className="control">
+                          <input
+                            type="text"
+                            name="secret"
+                            className="text-input text-input--large text-input--extended-extra is-marginless"
+                            placeholder="0x..."
+                            maxLength="42"
+                            pattern="^(0x)?[0-9a-fA-F]{40}$"
+                            onChange={this.handleTextInputChange}
+                            value={this.state.secret}
+                          />
+                        </div>
+                        {(this.state.secret.length === 42 && !this.secretValid()) ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
+                      </div>
+
+                      {
+                        this.secretValid()
+                          ? (
+                            <LoadingButton
+                              initialText='Submit Verification'
+                              loadingText='Submitting'
+                              isLoading={this.state.verifierSubmitSecretHandler}
+                              disabled={this.state.verifierSubmitSecretHandler}
+                            />
+                          )
+                          : (
+                            null
+                          )
+                      }
+                    </form>
+                  ) : null
+                }
 
                 <br />
                 <br />

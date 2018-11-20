@@ -67,7 +67,7 @@
 .list--item:hover {
   background-color: lighten(#070709, 9%);
   transform: scale(1.005);
-  transition: transform 500ms ease-in-out;
+  transition: transform 300ms ease-in-out;
 }
 
 .list--icon {

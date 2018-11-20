@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
@@ -121,7 +121,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
   withSaga(applicantRegisterTokenSaga)(
     withSend(
       AnimatedWrapper(
-        class _ApplicantRegisterTokenContainer extends Component {
+        class _ApplicantRegisterTokenContainer extends PureComponent {
 
           constructor(props) {
             super(props)
