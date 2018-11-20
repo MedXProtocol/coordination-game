@@ -108,8 +108,8 @@
 
 .list--item__date {
   grid-column: span 2;
-  text-align: center;
-  padding-top: 0.75rem;
+  // text-align: center;
+  // padding-top: 0.75rem;
 
   @media screen and (max-width: 1200px) {
     grid-column: span 4;
