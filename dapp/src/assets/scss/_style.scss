@@ -558,9 +558,12 @@ header {
   pointer-events: none;
 }
 
+.rcs-custom-scroll .rcs-inner-handle {
+  background-color: $brand-info;
+}
+
 .rcs-custom-scroll,
-.redux-toastr .toastr-status
- {
+.redux-toastr .toastr-status {
   position: relative;
 }
 

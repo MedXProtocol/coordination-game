@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import { CSSTransition } from 'react-transition-group'
+import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import {
   cacheCall,
   cacheCallValue,
@@ -18,6 +19,7 @@ import { isBlank } from '~/utils/isBlank'
 import { weiToEther } from '~/utils/weiToEther'
 import AInBox from '~/assets/img/a-in-box.svg'
 import GuyFrame1 from '~/assets/img/guy-frame-1.svg'
+import GuyFrame4 from '~/assets/img/guy-frame-4.svg'
 import QSpeechBubble from '~/assets/img/q-speech-bubble.svg'
 
 function mapStateToProps(state) {
@@ -171,6 +173,14 @@ export const IntroModal =
       }
 
       render () {
+        const guy1 = <GuyFrame1 key="guy1" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
+        const guy2 = <GuyFrame4 key="guy2" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
+        const guy3 = <GuyFrame1 key="guy3" width="221" height="221" className="guy-frame-1 guy" style={{ height: 220 }} />
+
+        const qSpeechBubble = <QSpeechBubble width="316" height="116" className="q-speech-bubble delay-two" />
+
+        const aInBox = <AInBox width="221" height="124" className="a-in-box delay-three" />
+
         return (
           <Modal
             closeModal={this.handleCloseModal}
@@ -180,84 +190,27 @@ export const IntroModal =
             <div className='intro-modal has-text-centered'>
 
               <div className='columns is-mobile'>
-                {
-                  this.state.step === 1
-                  ? (
-                    <React.Fragment>
-                      <div className='column is-6 has-text-right is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='78' classNames="slide-up" timeout={3700} appear={true}>
-                            <GuyFrame1 width="300" height="300" className="guy-frame-1 delay-one" />
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
+                <div className='column is-6 has-text-right is-gapless is-paddingless'>
+                  <ReactCSSTransitionReplace
+                    transitionName="cross-fade"
+                    transitionEnterTimeout={1000}
+                    transitionLeaveTimeout={400}
+                  >
+                    {this.state.step === 1 ? (guy1) : this.state.step === 2 ? (guy2) : (guy3) }
+                  </ReactCSSTransitionReplace>
+                </div>
 
-                      <div className='column is-6 has-text-left is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='1' classNames="slide-up" timeout={3700} appear={true}>
-                            <QSpeechBubble key='1' width="316" height="116" className="q-speech-bubble delay-two" />
-                          </CSSTransition>
-
-                          <CSSTransition key='2' classNames="slide-up" timeout={0} appear={true}>
-                            <br  key='2' />
-                          </CSSTransition>
-
-                          <CSSTransition key='3' classNames="slide-up" timeout={0} appear={true}>
-                            <br key='3' />
-                          </CSSTransition>
-
-                          <CSSTransition key='4' classNames="slide-up" timeout={3700} appear={true}>
-                            <AInBox key='4' width="221" height="124" className="a-in-box delay-three" />
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
-                    </React.Fragment>
-                  )
-                  : this.state.step === 2
-                  ? (
-                    <React.Fragment>
-                      <div className='column is-6 has-text-right is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='20' classNames="slide-up" timeout={3700} appear={true}>
-                            <span>next step goes here 2</span>
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
-
-                      <div className='column is-6 has-text-left is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='10' classNames="slide-up" timeout={3700} appear={true}>
-                            <span>hey</span>
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
-                    </React.Fragment>
-                  )
-                  : this.state.step === 3
-                  ? (
-                    <React.Fragment>
-                      <div className='column is-6 has-text-right is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='20' classNames="slide-up" timeout={3700} appear={true}>
-                            <span>next step goes here 3</span>
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
-
-                      <div className='column is-6 has-text-left is-gapless is-paddingless'>
-                        <TransitionGroup>
-                          <CSSTransition key='10' classNames="slide-up" timeout={3700} appear={true}>
-                            <span>yo</span>
-                          </CSSTransition>
-                        </TransitionGroup>
-                      </div>
-                    </React.Fragment>
-                  )
-                  : null
-                }
-
-
+                <div className='column is-6 has-text-left is-gapless is-paddingless'>
+                  <ReactCSSTransitionReplace
+                    transitionName="cross-fade"
+                    transitionEnterTimeout={1000}
+                    transitionLeaveTimeout={400}
+                  >
+                    {this.state.step === 1 ? (qSpeechBubble) : this.state.step === 2 ? (aInBox) : (aInBox) }
+                  </ReactCSSTransitionReplace>
+                </div>
               </div>
+
 
               <p>
                 Welcome to <strong>The Token Registry</strong>! This is a demo of a trustless incentivized list (TIL for short).
@@ -301,7 +254,7 @@ export const IntroModal =
                   onClick={this.handleDontShow}
                   className="button is-light is-text is-small"
                 >
-                  don't show this message again
+                  don't show this again
                 </button>
               </p>
             </div>

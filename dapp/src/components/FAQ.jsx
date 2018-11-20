@@ -36,12 +36,6 @@ export const FAQ = connect(null, mapDispatchToProps)(
               Frequently Asked Questions
             </h2>
 
-
-            <button onClick={this.handleShowIntro} className="button is-small is-outlined is-primary">
-              See Illustrated Demo
-            </button>
-
-            <br />
             <br />
 
             <h6 className="is-size-6">
@@ -50,8 +44,16 @@ export const FAQ = connect(null, mapDispatchToProps)(
 
             <p>
               This is a game for incentivizing objective TCRs using a work contract.
+              <br />
+              <br />
             </p>
 
+            <button onClick={this.handleShowIntro} className="button is-outlined is-info">
+              See Illustrated Explanation
+            </button>
+
+            <br />
+            <br />
             <h6 className="is-size-6 faq-h6">
               What is a work contract?
             </h6>
