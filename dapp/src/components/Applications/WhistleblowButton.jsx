@@ -82,9 +82,9 @@ export const WhistleblowButton = connect(mapStateToProps)(
               buttonText="Submit"
               isSmall={true}
               loadingText="Submitting..."
-              confirmationMessage="Successfully whistleblown the applicant 1"
-              txHashMessage="Successfully whistleblown the applicant 2"
-              />
+              confirmationMessage="Whistleblown successfully on this application"
+              txHashMessage="Blowing the whistle on this application"
+            />
           </Modal>
         </React.Fragment>
       )

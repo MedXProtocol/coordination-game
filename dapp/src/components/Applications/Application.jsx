@@ -176,9 +176,19 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 <WhistleblowButton applicationId={applicationId} />
             }
 
-
-
-            if (applicationState.isComplete) {
+            if (!applicationState.noWhistleblower) {
+              message = (
+                <div>
+                  <p>
+                    <span className="has-text-danger">Whistleblown!</span>
+                    <br />
+                    <strong>
+                      The random number was leaked and a whistleblower successfully called this applicant out.
+                    </strong>
+                  </p>
+                </div>
+              )
+            } else if (applicationState.isComplete) {
               message = (
                 <div>
                   <p>
@@ -230,50 +240,52 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
               )
             }
 
-            if (applicationState.isApplicant && applicationState.applicantRevealedSecret && applicationState.verifierHasChallenged) {
-              message = <span className="has-text-warning">Verifier challenged your application</span>
-            } else if (applicationState.isApplicant && applicationState.applicantMissedRevealDeadline) {
-              message = <strong>You missed the reveal secret deadline</strong>
-            } else if (applicationState.isApplicant && applicationState.needsNewVerifier) {
-              message = (
-                <div>
-                  <h4 className="has-text-warning">
-                    Verifier Failed to Respond:
-                    <br />
-                  </h4>
-                  <Web3ActionButton
-                    contractAddress={this.props.coordinationGameAddress}
-                    method='applicantRandomlySelectVerifier'
-                    args={[applicationId]}
-                    buttonText='Request New Verifier'
-                    loadingText='Requesting New Verifier'
-                    confirmationMessage='New verifier request confirmed.'
-                    txHashMessage='New verifier request sent successfully -
-                      it will take a few minutes to confirm on the Ethereum network.' />
-                </div>
-              )
+            // APPLICANT:
+            if (applicationState.isApplicant) {
+              if (applicationState.verifierHasChallenged) {
+                message = <span className="has-text-warning">Verifier challenged your application</span>
+              } else if (applicationState.applicantMissedRevealDeadline) {
+                message = <strong>You missed the reveal secret deadline</strong>
+              } else if (applicationState.needsNewVerifier) {
+                message = (
+                  <div>
+                    <h4 className="has-text-warning">
+                      Verifier Failed to Respond:
+                      <br />
+                    </h4>
+                    <Web3ActionButton
+                      contractAddress={this.props.coordinationGameAddress}
+                      method='applicantRandomlySelectVerifier'
+                      args={[applicationId]}
+                      buttonText='Request New Verifier'
+                      loadingText='Requesting New Verifier'
+                      confirmationMessage='New verifier request confirmed.'
+                      txHashMessage='New verifier request sent successfully -
+                        it will take a few minutes to confirm on the Ethereum network.' />
+                  </div>
+                )
+              } else if (applicationState.needsAVerifier) {
+                message = (
+                  <React.Fragment>
+                    <p>
+                      This submission requires a verifier review it:
+                      <br />
+                      <br />
+                    </p>
+                    <Web3ActionButton
+                      contractAddress={this.props.coordinationGameAddress}
+                      method='applicantRandomlySelectVerifier'
+                      args={[applicationId]}
+                      buttonText='Request Verification'
+                      loadingText='Requesting'
+                      confirmationMessage='Verification request confirmed.'
+                      txHashMessage='Verification request sent successfully -
+                        it will take a few minutes to confirm on the Ethereum network.' />
+                  </React.Fragment>
+                )
+              }
             }
 
-            if (applicationState.isApplicant && applicationState.needsAVerifier) {
-              message = (
-                <React.Fragment>
-                  <p>
-                    This submission requires a verifier review it:
-                    <br />
-                    <br />
-                  </p>
-                  <Web3ActionButton
-                    contractAddress={this.props.coordinationGameAddress}
-                    method='applicantRandomlySelectVerifier'
-                    args={[applicationId]}
-                    buttonText='Request Verification'
-                    loadingText='Requesting'
-                    confirmationMessage='Verification request confirmed.'
-                    txHashMessage='Verification request sent successfully -
-                      it will take a few minutes to confirm on the Ethereum network.' />
-                </React.Fragment>
-              )
-            }
 
             if (applicationState.canChallenge) {
               message = (
