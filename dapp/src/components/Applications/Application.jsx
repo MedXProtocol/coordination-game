@@ -29,6 +29,7 @@ function mapStateToProps(state, { match }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  const transactions = get(state, 'sagaGenesis.transactions')
 
   const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
@@ -37,7 +38,8 @@ function mapStateToProps(state, { match }) {
     coordinationGameAddress,
     applicationId,
     applicationObject,
-    latestBlockTimestamp
+    latestBlockTimestamp,
+    transactions
   }
 }
 
@@ -332,15 +334,6 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                   </div>
                 </div>
 
-                {message}
-                <ReactTooltip
-                  id='message-tooltip'
-                  html={true}
-                  effect='solid'
-                  place={'top'}
-                  wrapper='span'
-                />
-
                 {applicationState.canVerify
                   ? (
                     <form onSubmit={this.handleVerifierSecretSubmit}>
@@ -379,15 +372,22 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                           )
                       }
                     </form>
-                  ) : null
+                  ) : (
+                    <React.Fragment>
+                      {message}
+                      <ReactTooltip
+                        id='message-tooltip'
+                        html={true}
+                        effect='solid'
+                        place={'top'}
+                        wrapper='span'
+                      />
+                    </React.Fragment>
+                  )
                 }
 
                 <br />
-                <br />
-                <br />
-
                 {whistleblowButton}
-
                 <br />
                 <br />
 

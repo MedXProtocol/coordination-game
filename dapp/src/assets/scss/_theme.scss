@@ -107,16 +107,16 @@ html.html-light,
   }
 
   .text-input {
-    background-color: rgba(255, 255, 255, 0.7);
-    border-color: white;
+    background-color: rgba(255, 255, 255, 1);
+    border-color: lighten($accent-color-3--light, 35%);
     color: lighten($text-color--light, 25%);
   }
 
   .text-input:focus,
   .text-input:active,
   .text-input:hover {
-    background-color: rgba(255, 255, 255, 1);
-    border-color: lighten($accent-color-3--light, 40%);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-color: lighten($accent-color-3--light, 20%);
     color: $text-color--light;
   }
 
@@ -661,8 +661,7 @@ html.html-light,
   }
 
   .paper {
-    background-color: lighten($background-color--light, 3%);
+    background-color: lighten($background-color--light, 2%);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   }
-
 }
