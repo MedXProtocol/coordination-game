@@ -243,6 +243,8 @@ html.html-light,
   }
 
   .list--item:hover .button.is-primary,
+  .list--item:hover .button.is-info,
+  .list--item:hover .button.is-danger,
   .list--item:hover .button.is-warning {
     background-color: white;
   }
@@ -253,6 +255,8 @@ html.html-light,
   }
 
   .list--item:hover .button.is-primary:hover,
+  .list--item:hover .button.is-info:hover,
+  .list--item:hover .button.is-danger:hover,
   .list--item:hover .button.is-warning:hover {
     background-color: white;
     box-shadow: 0 0 2px 0 white;
@@ -260,6 +264,14 @@ html.html-light,
 
   .list--item:hover .button.is-primary:hover {
     color: $brand-info--light;
+  }
+
+  .list--item:hover .button.is-info:hover {
+    color: $brand-info--light;
+  }
+
+  .list--item:hover .button.is-danger:hover {
+    color: $brand-danger--light;
   }
 
   .list--item:hover .button.is-warning:hover {
