@@ -110,6 +110,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                       e.preventDefault()
                       this.props.dispatchSend(key, call, options, address)
                     }}
+                    className="is-paddingless"
                   >
                     Retry
                   </button>
@@ -150,9 +151,12 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                 </span>
               </div>
               {confirmed}
-              {errorMessage}
-              {resendButton}
-              {removeButton}
+
+              <div className="has-text-right">
+                {errorMessage}
+                {resendButton}
+                {removeButton}
+              </div>
             </li>
           )
         })

@@ -332,21 +332,17 @@ contract CoordinationGame is Ownable {
   @param _applicationId The application that the verifier is submitting for
   @param _secret The secret that the verifier is guessing
   */
-  function verifierSubmitSecret(bytes32 _applicationId, bytes32 _secret) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
+  function verifierSubmitSecret(bytes32 _applicationId, bytes32 _secret)
+    public
+    onlyVerifier(_applicationId)
+    notWhistleblown(_applicationId)
+  {
     Verification storage verification = verifications[_applicationId];
     Game storage game = games[_applicationId];
 
     require(gamesIterator.hasValue(_applicationId), 'application has been initialized');
     require(verification.verifierSecret == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
-
-    // DISCUSS: do we actually want to do this? We could let them move
-    // the application forward at anytime, but also allow the applicant
-    // to reject this verifier and choose a new one after the expiry date
-    require(
-      !verifierSubmissionTimedOut(_applicationId),
-      'verifier can still submit their secret'
-    );
 
     verification.verifierSecret = _secret;
     verification.verifierSubmittedAt = block.timestamp;

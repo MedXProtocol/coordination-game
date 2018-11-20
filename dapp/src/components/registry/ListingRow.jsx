@@ -80,18 +80,18 @@ export const ListingRow = connect(mapStateToProps)(
         return (
           <div className='list--item'>
             <span className="list--item__id">
-              {/*<EthAddress address={owner} />*/}
-            </span>
-
-            <span className="list--item__date">
               <TEX wei={unstakedDeposit} />
             </span>
 
-            <span className='list--item__status'>
+            <span className="list--item__date">
+              {/*<EthAddress address={owner} />*/}
               <strong>Token Ticker:</strong> {this.props.tokenTicker}
               <br />
               <strong>Token Name:</strong> {this.props.tokenName}
               <br />
+            </span>
+
+            <span className='list--item__status'>
               <strong>Contract Address:</strong> {this.props.secret}
             </span>
 

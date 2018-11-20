@@ -236,9 +236,20 @@ html.html-light,
     color: white;
   }
 
+  .list--item .button.is-warning {
+    background-color: white;
+    border-color: $brand-danger--light;
+    color: $brand-danger--light;
+  }
+
   .list--item:hover .button.is-primary,
   .list--item:hover .button.is-warning {
     background-color: white;
+  }
+
+  .list--item:hover .button.is-warning {
+    border-color: $brand-danger--light;
+    color: $brand-danger--light;
   }
 
   .list--item:hover .button.is-primary:hover,
@@ -252,6 +263,7 @@ html.html-light,
   }
 
   .list--item:hover .button.is-warning:hover {
+    border-color: $brand-danger--light;
     color: $brand-danger--light;
   }
 
@@ -382,7 +394,7 @@ html.html-light,
   }
 
   .list--item.is-warning {
-    border-color: $accent-color-2--light;
+    border-color: $brand-danger--light;
   }
 
   .icon-circle {

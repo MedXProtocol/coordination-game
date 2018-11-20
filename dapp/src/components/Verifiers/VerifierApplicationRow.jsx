@@ -15,23 +15,22 @@ import { AppId } from '~/components/AppId'
 import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationSaga } from '~/sagas/applicationSaga'
 import { applicationService } from '~/services/applicationService'
-import { isBlank } from '~/utils/isBlank'
+import { mapApplicationState } from '~/services/mapApplicationState'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { applicationId }) {
-  let applicationRowObject = {}
+  let applicationObject = {}
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
-  applicationRowObject = applicationService(state, applicationId, coordinationGameAddress)
+  applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
   return {
-    applicationRowObject,
+    applicationObject,
     address,
     coordinationGameAddress,
     latestBlockTimestamp
@@ -47,24 +46,26 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
       }
 
       render () {
-        let verifyAction
+        let action
 
         const {
-          applicationRowObject,
+          address,
+          applicationObject,
           latestBlockTimestamp
         } = this.props
 
         let {
-          // applicantRevealExpiresAt,
           applicationId,
-          applicantsSecret,
-          verifierChallengedAt,
           createdAt,
-          verifierSubmitSecretExpiresAt,
-          updatedAt,
-          verifiersSecret,
-          whistleblower
-        } = applicationRowObject
+          updatedAt
+        } = applicationObject
+
+        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+
+        // until we remove the index from the array completely
+        if (applicationState.isComplete) {
+          return null
+        }
 
         const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
         const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
@@ -72,41 +73,13 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
 
         const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-        const applicantRevealedSecret = !isBlank(applicantsSecret)
-        const verifierSubmittedSecret = !isBlank(verifiersSecret)
-
-        const canVerify = (
-          applicantRevealedSecret &&
-          !verifierSubmittedSecret &&
-          isBlank(whistleblower) &&
-          (latestBlockTimestamp < verifierSubmitSecretExpiresAt) &&
-          verifierChallengedAt === 0
-        )
-
-        if (canVerify) {
-          verifyAction = (
+        if (applicationState.canVerify) {
+          action = (
             <button
               className="button is-small is-warning is-outlined is-pulled-right"
             >
               Verify
             </button>
-          )
-        } else if ( // also why can't we verify OR challenge at the same time?
-          verifierSubmittedSecret &&
-          isBlank(whistleblower) &&
-          // latestBlockTimestamp > applicantRevealExpiresAt && // why do we need to wait until the applicant reveal expires?
-          verifierChallengedAt === 0
-        ) {
-          verifyAction = (
-            <Web3ActionButton
-              contractAddress={this.props.coordinationGameAddress}
-              method='verifierChallenge'
-              args={[applicationId]}
-              buttonText='Challenge'
-              loadingText='Challenging'
-              confirmationMessage='Challenge transaction confirmed.'
-              txHashMessage='"Challenge" transaction sent successfully -
-                it will take a few minutes to confirm on the Ethereum network.' />
           )
         }
 
@@ -125,7 +98,8 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
           </abbr>
         )
 
-        const needsAttention = canVerify
+        const needsAttention = applicationState.canVerify
+        const ofInterest = applicationState.canChallenge
 
         // necessary to show the verifier on 1st-time component load
         ReactTooltip.rebuild()
@@ -141,8 +115,9 @@ export const VerifierApplicationRow = connect(mapStateToProps)(
             )}
             date={date}
             status={<ApplicationStatus applicationId={applicationId} />}
-            view={verifyAction}
+            view={action}
             needsAttention={needsAttention}
+            ofInterest={ofInterest && !needsAttention}
           />
         )
       }

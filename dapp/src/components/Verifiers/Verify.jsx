@@ -57,9 +57,11 @@ export const Verify = connect(mapStateToProps)(
             <div className="is-clearfix">
               <h6 className="is-size-6">
                 All Token Submissions
+                {/* This should possibly be it's own route, and should be something like /applications/:pageNumber */}
               </h6>
             </div>
 
+            {/* This should possibly be it's own route, and should be something like /applications/:pageNumber */}
             <ApplicationsList />
 
             <br />

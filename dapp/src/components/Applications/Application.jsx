@@ -12,7 +12,6 @@ import {
 import { get } from 'lodash'
 import { AppId } from '~/components/AppId'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { ScrollToTop } from '~/components/ScrollToTop'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
@@ -94,27 +93,29 @@ export const Application = connect(mapStateToProps)(
                 <WhistleblowButton applicationId={applicationId} />
             }
 
-            if (applicationState.success) {
+            if (applicationState.isComplete) {
               message = (
-                <React.Fragment>
-                  Submission Complete
-                  <br />
-                  <strong>
-                    <abbr
-                      data-for='message-tooltip'
-                      data-tip={applicationState.applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
-                    >
-                      {applicationState.applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
-                    </abbr>
-                  </strong>
-                </React.Fragment>
+                <div>
+                  <p>
+                    <span className="has-text-info">Submission Complete</span>
+                    <br />
+                    <strong>
+                      <abbr
+                        data-for='message-tooltip'
+                        data-tip={applicationState.applicantWon ? `The Verifier entered the same contract address as you` : `The Verifier entered a different secret that did not match yours`}
+                      >
+                        {applicationState.applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
+                      </abbr>
+                    </strong>
+                  </p>
+                </div>
               )
             } else if (applicationState.waitingOnVerifier) {
               message = (
-                <React.Fragment>
+                <p>
                   <strong>Waiting on <abbr data-tip={verifier} data-for='message-tooltip'>Verifier</abbr> until:</strong>
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
-                </React.Fragment>
+                </p>
               )
             } else if (applicationState.needsApplicantReveal) {
               let secretAsHex
@@ -124,31 +125,37 @@ export const Application = connect(mapStateToProps)(
               }
 
               message = (
-                <React.Fragment>
-                  <strong>Reveal your secret before:</strong>
-                  <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-                  <br />
-                    <Web3ActionButton
-                      contractAddress={this.props.coordinationGameAddress}
-                      method='applicantRevealSecret'
-                      args={[applicationId, secretAsHex, random.toString()]}
-                      buttonText='Reveal Secret'
-                      loadingText='Revealing'
-                      confirmationMessage='"Reveal Secret" transaction confirmed.'
-                      txHashMessage='"Reveal Secret" transaction sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.'/>
-                </React.Fragment>
+                <div>
+                  <p>
+                    <strong>Reveal your secret before:</strong>
+                    <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
+                    <br />
+                    <br />
+                  </p>
+                  <Web3ActionButton
+                    contractAddress={this.props.coordinationGameAddress}
+                    method='applicantRevealSecret'
+                    args={[applicationId, secretAsHex, random.toString()]}
+                    buttonText='Reveal Secret'
+                    loadingText='Revealing'
+                    confirmationMessage='"Reveal Secret" transaction confirmed.'
+                    txHashMessage='"Reveal Secret" transaction sent successfully -
+                      it will take a few minutes to confirm on the Ethereum network.'/>
+                </div>
               )
             }
 
-            if (applicationState.applicantRevealedSecret && applicationState.verifierHasChallenged) {
+            if (applicationState.isApplicant && applicationState.applicantRevealedSecret && applicationState.verifierHasChallenged) {
               message = <span className="has-text-warning">Verifier challenged your application</span>
-            } else if (applicationState.applicantMissedRevealDeadline) {
+            } else if (applicationState.isApplicant && applicationState.applicantMissedRevealDeadline) {
               message = <strong>You missed the reveal secret deadline</strong>
-            } else if (applicationState.needsNewVerifier) {
+            } else if (applicationState.isApplicant && applicationState.needsNewVerifier) {
               message = (
-                <React.Fragment>
-                  <span className="has-text-warning">Verifier Failed to Respond</span>
+                <div>
+                  <h4 className="has-text-warning">
+                    Verifier Failed to Respond:
+                    <br />
+                  </h4>
                   <Web3ActionButton
                     contractAddress={this.props.coordinationGameAddress}
                     method='applicantRandomlySelectVerifier'
@@ -158,7 +165,7 @@ export const Application = connect(mapStateToProps)(
                     confirmationMessage='New verifier request confirmed.'
                     txHashMessage='New verifier request sent successfully -
                       it will take a few minutes to confirm on the Ethereum network.' />
-                </React.Fragment>
+                </div>
               )
             }
 
@@ -188,8 +195,6 @@ export const Application = connect(mapStateToProps)(
 
             return (
               <div className='column is-8-widescreen is-offset-2-widescreen paper'>
-                <ScrollToTop />
-
                 <div className="has-text-right">
                   <button
                     className="is-warning is-outlined is-pulled-right delete is-large"
@@ -199,31 +204,29 @@ export const Application = connect(mapStateToProps)(
                   </button>
                 </div>
 
-                <h6 className="is-size-6 has-text-grey">
+                <h6 className="is-size-6 has-text-grey application-num">
                   <AppId applicationId={applicationId} />
                 </h6>
 
-                <br />
-
                 <div className="columns">
                   <div className="column is-6">
-                    <h3 className="is-size-3 has-text-grey-lighter">
+                    <h5 className="is-size-5 has-text-grey-lighter">
                       Token Name:
-                      <br />
-                      <span className="has-text-grey-light">{tokenName}</span>
+                    </h5>
+                    <h3 className="is-size-3 has-text-grey-light">
+                      {tokenName}
                     </h3>
                   </div>
 
                   <div className="column is-6">
-                    <h3 className="is-size-3 has-text-grey-lighter">
+                    <h5 className="is-size-5 has-text-grey-lighter">
                       Token Ticker:
-                      <br />
-                      <span className="has-text-grey-light">${tokenTicker}</span>
+                    </h5>
+                    <h3 className="is-size-3 has-text-grey-light">
+                      ${tokenTicker}
                     </h3>
                   </div>
                 </div>
-
-                <br />
 
                 {message}
                 <ReactTooltip
