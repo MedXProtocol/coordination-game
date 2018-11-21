@@ -164,8 +164,8 @@ contract('PowerChallenge', (accounts) => {
         const approverFinishingBalance = await token.balanceOf(approver)
 
         assert.equal(tx1.logs[0].event, 'Closed', 'challenger closed event was emitted')
-        assert.equal(tx1.logs[1].event, 'Withdrawal', 'challenger withdrawal event was emitted')
-        assert.equal(tx2.logs[0].event, 'Withdrawal', 'approver withdrawal event was emitted')
+        assert.equal(tx1.logs[1].event, 'Withdrew', 'challenger withdrawal event was emitted')
+        assert.equal(tx2.logs[0].event, 'Withdrew', 'approver withdrawal event was emitted')
 
         assert.equal(approverFinishingBalance.sub(approverStartingBalance).toString(), 0, 'approver made no money')
         assert.equal(

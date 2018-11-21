@@ -34,7 +34,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   event Approved(bytes32 id);
   event Challenged(bytes32 id);
   event Closed(bytes32 id);
-  event Withdrawal(bytes32 id, address recipient, uint256 amount);
+  event Withdrew(bytes32 id, address recipient, uint256 amount);
 
   IERC20 public token;
   uint256 public timeout;
@@ -77,6 +77,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   ) public initializer {
     require(_owner != address(0), 'owner is defined');
     require(_token != address(0), 'token is defined');
+    require(_timeout > 0, '_timeout must be greater than zero');
     Ownable.initialize(_owner);
     token = _token;
     timeout = _timeout;
@@ -86,6 +87,13 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     startChallengeFrom(_id, _amount, msg.sender, msg.sender);
   }
 
+  /**
+    * @notice Starts a challenge.  The tokens come from the _payer and are denoted as belonging to the _beneficiary.
+    * @param _id The listing hash
+    * @param _amount The amount to start the challenge with
+    * @param _payer The address that is paying the tokens
+    * @param _beneficiary The address that will be able to withdraw these tokens.
+    */
   function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
@@ -106,6 +114,13 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     startApprovalFrom(_id, _amount, msg.sender, msg.sender);
   }
 
+  /**
+    * @notice Starts an approval.  Really only used by the TILRegistry. The tokens come from the _payer and are denoted as belonging to the _beneficiary.
+    * @param _id The listing hash
+    * @param _amount The amount to start the approval with
+    * @param _payer The address that is paying the tokens
+    * @param _beneficiary The address that will be able to withdraw these tokens.
+    */
   function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
@@ -181,7 +196,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     }
     token.transfer(_beneficiary, withdrawal);
 
-    emit Withdrawal(_id, _beneficiary, withdrawal);
+    emit Withdrew(_id, _beneficiary, withdrawal);
   }
 
   function nextDepositAmount(bytes32 _id) public view returns (uint256) {
