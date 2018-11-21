@@ -699,7 +699,7 @@ html.html-light,
   }
 
   .card {
-    background-color: white;
-    border-color: #fafafa;
+    background-color: lighten($background-color--light, 3%);
+    border-color: #f0f0f0;
   }
 }

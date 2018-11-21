@@ -169,9 +169,9 @@ export const ApplicationRow = connect(mapStateToProps)(
         // VERIFIER: Could be a component or function ...
         if (applicationState.isVerifier) {
           // until we remove the index from the array completely
-          if (applicationState.isComplete || applicationState.verifierHasChallenged) {
-            return null
-          }
+          // if (!this.props.dontSkip && applicationState.isComplete || applicationState.verifierHasChallenged) {
+          //   return null
+          // }
 
           if (applicationState.canVerify) {
             action = (

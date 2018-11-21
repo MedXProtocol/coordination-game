@@ -55,6 +55,7 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
       return applicationIds.map((applicationId) => {
         return (
           <ApplicationRow
+            dontSkip={true}
             applicationId={applicationId}
             key={`applications-list-application-row-${applicationId}`}
           />
@@ -75,7 +76,7 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
             linkTo={(number, location) => formatPageRouteQueryParams(
-              routes.VERIFY,
+              routes.REGISTRY,
               'applicationsListCurrentPage',
               number,
               location

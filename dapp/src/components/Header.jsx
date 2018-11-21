@@ -36,7 +36,7 @@ import * as routes from '~/../config/routes'
 
 function mapStateToProps(state) {
   let applicationsToVerify = 0
-  let applicationIds = []
+  let applicationObjects = []
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -44,11 +44,11 @@ function mapStateToProps(state) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
   if (applicationCount && applicationCount !== 0) {
-    applicationIds = verifierApplicationsService(state, applicationCount)
+    applicationObjects = verifierApplicationsService(state, applicationCount)
   }
 
-  for (let i = 0; i < applicationIds.length; i++) {
-    const applicationId = applicationIds[i]
+  for (let i = 0; i < applicationObjects.length; i++) {
+    const applicationId = applicationObjects[i].applicationId
 
     const application = applicationService(state, applicationId, coordinationGameAddress)
     const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
@@ -62,20 +62,20 @@ function mapStateToProps(state) {
     address,
     applicationsToVerify,
     applicationCount,
-    applicationIds,
+    applicationObjects,
     coordinationGameAddress
   }
 }
 
-function* headerSaga({ address, applicationCount, applicationIds, coordinationGameAddress }) {
+function* headerSaga({ address, applicationCount, applicationObjects, coordinationGameAddress }) {
   if (!coordinationGameAddress || !address) { return }
 
   yield verifierApplicationsSaga({ coordinationGameAddress, address, applicationCount })
 
-  if (applicationIds && applicationIds.length !== 0) {
+  if (applicationObjects && applicationObjects.length !== 0) {
     yield all(
-      applicationIds.map(function* (applicationId) {
-        yield applicationSaga({ coordinationGameAddress, applicationId })
+      applicationObjects.map(function* (applicationObject) {
+        yield applicationSaga({ coordinationGameAddress, applicationId: applicationObject.applicationId })
       })
     )
   }

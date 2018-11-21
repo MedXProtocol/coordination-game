@@ -107,18 +107,17 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
           <div className="list">
             {listingRows}
           </div>
+          <Pagination
+            currentPage={parseInt(this.props.currentPage, 10)}
+            totalPages={totalPages}
+            linkTo={(number, location) => formatPageRouteQueryParams(
+              routes.REGISTRY,
+              'listingsCurrentPage',
+              number,
+              location
+            )}
+          />
         </div>
-
-        <Pagination
-          currentPage={parseInt(this.props.currentPage, 10)}
-          totalPages={totalPages}
-          linkTo={(number, location) => formatPageRouteQueryParams(
-            routes.REGISTRY,
-            'listingsCurrentPage',
-            number,
-            location
-          )}
-        />
       </React.Fragment>
     )
   }

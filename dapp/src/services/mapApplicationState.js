@@ -75,6 +75,18 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     !noWhistleblower
   )
 
+  // priority can be from 0 to 5, and states how important this (5 is highest importance)
+  let priority = 2
+  if (canVerify || (needsApplicantReveal && isApplicant)) {
+    priority = 5
+  } else if (canChallenge) {
+    priority = 4
+  } else if (isApplicant && (needsAVerifier || needsNewVerifier)) {
+    priority = 3
+  } else if (isComplete) {
+    priority = 0
+  }
+
   return {
     applicantMissedRevealDeadline,
     applicantRevealedSecret,
@@ -89,6 +101,7 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     needsAVerifier,
     needsNewVerifier,
     noWhistleblower,
+    priority,
     waitingOnVerifier,
     verifierHasChallenged,
     verifierSubmittedSecret,

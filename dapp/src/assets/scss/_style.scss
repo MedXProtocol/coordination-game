@@ -1099,6 +1099,8 @@ header {
 .card {
   background-color: darken($dark-gray, 17%);
   border-top: 1px solid darken($dark-gray, 6%);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   box-shadow: none;
 }
 

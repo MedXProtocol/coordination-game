@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
-import { get } from 'lodash'
+import { get, sortBy } from 'lodash'
 import PropTypes from 'prop-types'
 import {
   cacheCallValueInt,
@@ -17,7 +17,7 @@ import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { currentPage, pageSize }) {
-  let applicationIds = []
+  let applicationObjects = []
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const transactions = get(state, 'sagaGenesis.transactions')
@@ -30,12 +30,13 @@ function mapStateToProps(state, { currentPage, pageSize }) {
     const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
     const endIndex = startIndex + pageSize
 
-    applicationIds = verifierApplicationsService(state, startIndex, endIndex)
+    applicationObjects = verifierApplicationsService(state, startIndex, endIndex)
+    applicationObjects = sortBy(applicationObjects, (obj => obj.priority)).reverse()
   }
 
   return {
     applicationCount,
-    applicationIds,
+    applicationObjects,
     address,
     coordinationGameAddress,
     networkId,
@@ -47,8 +48,9 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
   withSaga(verifierApplicationsSaga)(
     class _VerifierApplicationsTable extends PureComponent {
 
-      renderApplicationRows(applicationIds) {
-        let applicationRows = applicationIds.map((applicationId, index) => {
+      renderApplicationRows(applicationObjects) {
+        let applicationRows = applicationObjects.map((applicationObject, index) => {
+          const applicationId = applicationObject.applicationId
           return (
             <ApplicationRow
               applicationId={applicationId}
@@ -62,7 +64,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
 
       render() {
         let noApplications, loadingLines, applicationRows
-        const { applicationIds, applicationCount } = this.props
+        const { applicationObjects, applicationCount } = this.props
         const loading = applicationCount === undefined
         const totalPages = Math.ceil(this.props.applicationCount / this.props.pageSize)
 
@@ -74,7 +76,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
               </div>
             </div>
           )
-        } else if (!applicationIds.length) {
+        } else if (!applicationObjects.length) {
           noApplications = (
             <div className="blank-state">
               <div className="blank-state--inner has-text-grey">
@@ -84,7 +86,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
           )
         } else {
           applicationRows = (
-            this.renderApplicationRows(applicationIds)
+            this.renderApplicationRows(applicationObjects)
           )
         }
 
