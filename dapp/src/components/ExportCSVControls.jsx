@@ -4,10 +4,6 @@ import { CSVLink } from 'react-csv'
 
 // This is a bugfix for react-csv which can be removed when they fix it upstream:
 class PropDataUpdatedCSVLink extends CSVLink {
-	// constructor(props) {
-	// 	super(props)
-	// }
-
 	componentWillReceiveProps(nextProps) {
 		const { data, headers, separator, uFEFF } = nextProps
 		this.setState({ href: this.buildURI(data, uFEFF, headers, separator) })
@@ -59,7 +55,7 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
                 { label: "Secret", key: "secret" }
               ]}
               filename={this.state.filename}
-              className="button is-outlined is-primary is-addon text-input--filename-button"
+              className="button is-primary is-addon text-input--filename-button"
             >
               Download
             </PropDataUpdatedCSVLink>

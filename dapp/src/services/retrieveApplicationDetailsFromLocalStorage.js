@@ -16,6 +16,7 @@ export const retrieveApplicationDetailsFromLocalStorage = (
       const object = JSON.parse(json)
       applicationRowObject = {
         ...applicationRowObject,
+        hint: object.hint,
         random: new BN(object.random),
         secret: object.secret
       }

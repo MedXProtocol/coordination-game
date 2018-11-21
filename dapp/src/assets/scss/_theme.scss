@@ -341,7 +341,13 @@ html.html-light,
     border-color: lighten($accent-color-2--light, 10%);
   }
 
+  .button.is-primary {
+    background-color: $brand-info--light;
+    border-color: transparent;
+  }
+
   .button.is-primary.is-outlined {
+    background-color: transparent;
     border-color: $accent-color-1--light;
     color: $accent-color-1--light;
   }

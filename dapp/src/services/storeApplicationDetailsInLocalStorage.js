@@ -12,12 +12,10 @@ export const storeApplicationDetailsInLocalStorage = (
       application.applicantsLastApplicationCreatedAt
     )
 
-    // console.log('in storeApplicationDetailsInLocalStorage', state.random, state.random.toString())
-
     const object = {
       applicationId: application.applicantsLastApplicationId,
       random: state.random.toString(),
-      hint: `${state.hintLeft} + ${state.hintRight}`,
+      hint: `${state.tokenTicker.trim()} - $${state.tokenName.trim()}`,
       secret: state.secret
     }
 

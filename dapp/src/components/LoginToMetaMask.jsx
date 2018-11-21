@@ -118,9 +118,7 @@ export const LoginToMetaMask =
       }
 
       toggleModal = () => {
-        // this.setState((prev, props) => {
-        //   return { modalState: !prev.modalState }
-        // })
+
       }
 
       render () {
