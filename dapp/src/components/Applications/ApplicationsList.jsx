@@ -55,7 +55,6 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
       return applicationIds.map((applicationId) => {
         return (
           <ApplicationRow
-            dontSkip={true}
             applicationId={applicationId}
             key={`applications-list-application-row-${applicationId}`}
           />

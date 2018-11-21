@@ -1,7 +1,19 @@
 import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 
+const PRIORITIES = {
+  low: 1,
+  medium: 2,
+  high: 3,
+  veryHigh: 4,
+  superImportant: 5
+}
+
+const DEFAULT_PRIORITY = PRIORITIES['medium']
+
 export function mapApplicationState (address, applicationObject, latestBlockTimestamp) {
+  let priority = DEFAULT_PRIORITY
+
   const {
     applicantRevealExpiresAt,
     applicantsSecret,
@@ -75,16 +87,15 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     !noWhistleblower
   )
 
-  // priority can be from 0 to 5, and states how important this (5 is highest importance)
-  let priority = 2
+  // priority can be from 1 to 5, and states how important this (5 is highest importance)
   if (canVerify || (needsApplicantReveal && isApplicant)) {
-    priority = 5
+    priority = PRIORITIES['superImportant']
   } else if (canChallenge) {
-    priority = 4
+    priority = PRIORITIES['veryHigh']
   } else if (isApplicant && (needsAVerifier || needsNewVerifier)) {
-    priority = 3
+    priority = PRIORITIES['high']
   } else if (isComplete) {
-    priority = 0
+    priority = PRIORITIES['low']
   }
 
   return {
