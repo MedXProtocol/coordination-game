@@ -54,10 +54,6 @@ contract('PowerChallenge', (accounts) => {
     return await powerChallenge.challenge(challengeId, { from: challenger })
   }
 
-  async function close() {
-    return await powerChallenge.close(challengeId)
-  }
-
   async function withdraw(options) {
     return await powerChallenge.withdraw(challengeId, options || {})
   }
@@ -137,31 +133,6 @@ contract('PowerChallenge', (accounts) => {
     })
   })
 
-  describe('timeout()', () => {
-    beforeEach(async () => {
-      await startChallenge()
-    })
-
-    it('should fail', async () => {
-      await expectThrow(async () => {
-        await close()
-      })
-    })
-
-    context('when timed out', () => {
-      beforeEach(async () => {
-        await powerChallenge.setTimeout(0)
-      })
-
-      it('should finish the challenge', async () => {
-        const tx = await close()
-        assert.equal(tx.logs[0].event, 'TimedOut', 'TimedOut event was emitted')
-        const storage = await getChallenge()
-        assert.equal(storage.state, 4, 'challenge was successful')
-      })
-    })
-  })
-
   describe('withdraw()', () => {
     beforeEach(async () => {
       await startChallenge()
@@ -169,16 +140,17 @@ contract('PowerChallenge', (accounts) => {
       await challenge(secondChallengeAmount)
     })
 
-    context('when challenge incomplete', () => {
+    context('when challenge has not timed out', () => {
       it('should fail', async () => {
-        await expectThrow(withdraw)
+        await expectThrow(async () => {
+          await withdraw({ from: challenger })
+        })
       })
     })
 
     context('when completed', () => {
       beforeEach(async () => {
         await powerChallenge.setTimeout(0)
-        await close()
       })
 
       it('should withdraw the funds', async () => {
@@ -191,7 +163,8 @@ contract('PowerChallenge', (accounts) => {
         const challengerFinishingBalance = await token.balanceOf(challenger)
         const approverFinishingBalance = await token.balanceOf(approver)
 
-        assert.equal(tx1.logs[0].event, 'Withdrawal', 'challenger withdrawal event was emitted')
+        assert.equal(tx1.logs[0].event, 'Closed', 'challenger closed event was emitted')
+        assert.equal(tx1.logs[1].event, 'Withdrawal', 'challenger withdrawal event was emitted')
         assert.equal(tx2.logs[0].event, 'Withdrawal', 'approver withdrawal event was emitted')
 
         assert.equal(approverFinishingBalance.sub(approverStartingBalance).toString(), 0, 'approver made no money')

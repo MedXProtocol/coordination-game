@@ -33,7 +33,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   event ChallengeStarted(bytes32 id, State state);
   event Approved(bytes32 id);
   event Challenged(bytes32 id);
-  event TimedOut(bytes32 id);
+  event Closed(bytes32 id);
   event Withdrawal(bytes32 id, address recipient, uint256 amount);
 
   IERC20 public token;
@@ -41,9 +41,8 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   mapping(bytes32 => Challenge) public challenges;
   IndexedBytes32Array.Data challengeIterator;
 
-  modifier notStarted(bytes32 _id) {
-    State state = challenges[_id].state;
-    require(state == State.BLANK || state == State.CHALLENGE_FAIL || state == State.CHALLENGE_SUCCESS, "challenge not started");
+  modifier onlyNotStarted(bytes32 _id) {
+    require(notStarted(_id), "challenge not started");
     _;
   }
 
@@ -63,13 +62,13 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     _;
   }
 
-  modifier onlyComplete(bytes32 _id) {
-    require(isComplete(_id), 'challenge is complete');
+  modifier notTimedOut(bytes32 _id) {
+    require(!isTimedOut(_id), 'challenge has not timed out');
     _;
   }
 
-  modifier notTimedOut(bytes32 _id) {
-    require(!isTimedOut(_id), 'challenge has not timed out');
+  modifier onlyTimedOut(bytes32 _id) {
+    require(isTimedOut(_id), 'challenge has timed out');
     _;
   }
 
@@ -87,7 +86,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     startChallengeFrom(_id, _amount, msg.sender, msg.sender);
   }
 
-  function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public notStarted(_id) {
+  function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
       _id,
@@ -107,7 +106,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     startApprovalFrom(_id, _amount, msg.sender, msg.sender);
   }
 
-  function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public notStarted(_id) {
+  function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
       _id,
@@ -155,33 +154,34 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     emit Challenged(_id);
   }
 
-  function close(bytes32 _id) external isStarted(_id) {
-    require(isTimedOut(_id), 'challenge has timed out');
+  function close(bytes32 _id) internal onlyTimedOut(_id) {
     Challenge storage challengeStore = challenges[_id];
-    if (challengeStore.challengeTotal > challengeStore.approveTotal) {
-      challengeStore.state = State.CHALLENGE_SUCCESS;
-    } else {
-      challengeStore.state = State.CHALLENGE_FAIL;
-    }
+    challengeStore.state = winningState(_id);
     challengeStore.updatedAt = block.timestamp;
 
-    emit TimedOut(_id);
+    emit Closed(_id);
   }
 
-  function withdraw(bytes32 _id) external onlyComplete(_id) {
-    Challenge storage challengeStore = challenges[_id];
-    uint256 total = challengeStore.challengeTotal.add(challengeStore.approveTotal);
-    uint256 withdrawal = 0;
-    if (challengeStore.state == State.CHALLENGE_FAIL) {
-      withdrawal = total.mul(challengeStore.approveDeposits[msg.sender]).div(challengeStore.approveTotal);
-      challengeStore.approveDeposits[msg.sender] = 0;
-    } else if (challengeStore.state == State.CHALLENGE_SUCCESS) {
-      withdrawal = total.mul(challengeStore.challengeDeposits[msg.sender]).div(challengeStore.challengeTotal);
-      challengeStore.challengeDeposits[msg.sender] = 0;
-    }
-    token.transfer(msg.sender, withdrawal);
+  function withdraw(bytes32 _id) external {
+    withdrawFor(_id, msg.sender);
+  }
 
-    emit Withdrawal(_id, msg.sender, withdrawal);
+  function withdrawFor(bytes32 _id, address _beneficiary) public {
+    if (!isComplete(_id)) {
+      close(_id);
+    }
+    Challenge storage challengeStore = challenges[_id];
+    uint256 withdrawal;
+    if (challengeStore.state == State.CHALLENGE_FAIL) {
+      withdrawal = totalApproveWithdrawal(_id, _beneficiary);
+      challengeStore.approveDeposits[_beneficiary] = 0;
+    } else if (challengeStore.state == State.CHALLENGE_SUCCESS) {
+      withdrawal = totalChallengeWithdrawal(_id, _beneficiary);
+      challengeStore.challengeDeposits[_beneficiary] = 0;
+    }
+    token.transfer(_beneficiary, withdrawal);
+
+    emit Withdrawal(_id, _beneficiary, withdrawal);
   }
 
   function nextDepositAmount(bytes32 _id) public view returns (uint256) {
@@ -198,7 +198,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     return deposit;
   }
 
-  function isTimedOut(bytes32 _id) internal view returns (bool) {
+  function isTimedOut(bytes32 _id) public view returns (bool) {
     Challenge storage challengeStore = challenges[_id];
     return block.timestamp >= challengeStore.updatedAt.add(timeout);
   }
@@ -222,5 +222,57 @@ contract PowerChallenge is Ownable, IPowerChallenge {
 
   function getState(bytes32 _id) public view returns (State) {
     return challenges[_id].state;
+  }
+
+  function challengeCount() public view returns (uint256) {
+    return challengeIterator.length();
+  }
+
+  function challengeAt(uint256 index) public view returns (bytes32) {
+    return challengeIterator.valueAtIndex(index);
+  }
+
+  function notStarted(bytes32 _id) public view returns (bool) {
+    State state = challenges[_id].state;
+    return state == State.BLANK || state == State.CHALLENGE_FAIL || state == State.CHALLENGE_SUCCESS;
+  }
+
+  function winningState(bytes32 _id) public view returns (State) {
+    State state;
+    Challenge storage challengeStore = challenges[_id];
+    if (challengeStore.challengeTotal > challengeStore.approveTotal) {
+      state = State.CHALLENGE_SUCCESS;
+    } else {
+      state = State.CHALLENGE_FAIL;
+    }
+    return state;
+  }
+
+  function totalDeposit(bytes32 _id, address _user) public view returns (uint256) {
+    Challenge storage challengeStore = challenges[_id];
+    return challengeStore.challengeDeposits[_user] + challengeStore.approveDeposits[_user];
+  }
+
+  function totalWithdrawal(bytes32 _id, address _user) external view returns (uint256) {
+    uint256 withdrawal;
+    State state = winningState(_id);
+    if (state == State.CHALLENGE_FAIL) {
+      withdrawal = totalApproveWithdrawal(_id, _user);
+    } else if (state == State.CHALLENGE_SUCCESS) {
+      withdrawal = totalChallengeWithdrawal(_id, _user);
+    }
+    return withdrawal;
+  }
+
+  function totalChallengeWithdrawal(bytes32 _id, address _user) public view returns (uint256) {
+    Challenge storage _challenge = challenges[_id];
+    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
+    return total.mul(_challenge.challengeDeposits[_user]).div(_challenge.challengeTotal);
+  }
+
+  function totalApproveWithdrawal(bytes32 _id, address _user) public view returns (uint256) {
+    Challenge storage _challenge = challenges[_id];
+    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
+    return total.mul(_challenge.approveDeposits[_user]).div(_challenge.approveTotal);
   }
 }

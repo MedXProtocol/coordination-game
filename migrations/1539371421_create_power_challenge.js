@@ -9,7 +9,7 @@ const ownerAccount = require('./support/ownerAccount')
 module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
     const token = await WorkToken.deployed()
-    const timeout = 60
+    const timeout = 3600 // one hour
 
     execAdmin(
       `zos create PowerChallenge --init init --args ${ownerAccount(accounts)},${token.address},${timeout}`,

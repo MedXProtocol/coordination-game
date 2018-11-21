@@ -1,4 +1,4 @@
-module.exports = function (array) {
+export function mapToListing (array) {
   if (!array) return {}
   return {
     owner: array[0],

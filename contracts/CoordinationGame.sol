@@ -215,7 +215,7 @@ contract CoordinationGame is Ownable {
       block.timestamp, // createdAt
       block.timestamp, // updatedAt
       msg.value, // applicationBalancesInWei
-      work.jobStake(), // applicantTokenDeposits
+      applicationStakeAmount, // applicantTokenDeposits
       block.number + 1, // randomBlockNumbers
       0, // applicantSecret
       0 // whistleblower
@@ -471,11 +471,11 @@ contract CoordinationGame is Ownable {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
-    /// Approve of the verifier token transfer
-    tilRegistry.token().approve(address(work), work.jobStake());
-
-    /// Approve of the applicant token transfer
-    tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
+    /// Approve of the verifier token transfer & applicant token transfer
+    tilRegistry.token().approve(
+      address(tilRegistry),
+      game.applicantTokenDeposit.add(work.jobStake())
+    );
 
     tilRegistry.applicantLostCoordinationGame.value(game.applicationBalanceInWei)(
       _applicationId, game.applicant, game.applicantTokenDeposit, game.applicationBalanceInWei,
@@ -516,11 +516,11 @@ contract CoordinationGame is Ownable {
     }
   }
 
-  function verifierSubmissionTimedOut(bytes32 _applicationId) internal view returns (bool) {
+  function verifierSubmissionTimedOut(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSelectedAt) > verifierTimeoutInSeconds;
   }
 
-  function applicantRevealExpired(bytes32 _applicationId) internal view returns (bool) {
+  function applicantRevealExpired(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSubmittedAt) > applicantRevealTimeoutInSeconds;
   }
 

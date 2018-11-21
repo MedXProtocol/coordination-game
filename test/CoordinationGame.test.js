@@ -16,6 +16,7 @@ const leftPadHexString = require('./helpers/leftPadHexString')
 const mapToGame = require('./helpers/mapToGame')
 const mapToVerification = require('./helpers/mapToVerification')
 const mapToListing = require('./helpers/mapToListing')
+const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
@@ -41,7 +42,7 @@ contract('CoordinationGame', (accounts) => {
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
   const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
-  const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
+  const jobStake = web3.toWei('20', 'ether') // verifiers stake held during a verification
   const minimumBalanceToWork = web3.toWei('500', 'ether') // verifiers stake held during a verification
 
   debug(`using secret ${secret} and random ${random}`)
@@ -200,7 +201,7 @@ contract('CoordinationGame', (accounts) => {
 
       assert.equal(
         storedGame.applicantTokenDeposit.toString(),
-        jobStake.toString()
+        applicationStakeAmount.toString()
       )
 
       assert.equal(
@@ -436,7 +437,6 @@ contract('CoordinationGame', (accounts) => {
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
-        assert.equal(jobStake.toString(), applicationStakeAmount.toString())
         await verifierChallenges(selectedVerifier)
 
         const verifierFinishingBalance = (await work.balances(selectedVerifier))
@@ -451,20 +451,18 @@ contract('CoordinationGame', (accounts) => {
           'verifier was paid in ether'
         )
 
-        const approxJobStake = new BN(jobStake).mul(new BN(90)).div(new BN(100))
         const verifierBalanceDelta = verifierFinishingBalance.sub(verifierStartingBalance)
         const applicantBalanceDelta = applicantFinishingBalance.sub(applicantStartingBalance)
 
-        debug(`approxJobStake: ${approxJobStake.toString()}`)
         debug(`verifierBalanceDelta: ${verifierBalanceDelta.toString()}`)
         debug(`applicantBalanceDelta: ${applicantBalanceDelta.toString()}`)
 
         assert.ok(
-          verifierBalanceDelta.gt(approxJobStake),
+          isApproxEqualBN(verifierBalanceDelta, jobStake),
           'verifier deposit was returned'
         )
         assert.ok(
-          applicantBalanceDelta.gt(approxJobStake),
+          isApproxEqualBN(applicantBalanceDelta, applicationStakeAmount),
           'applicant deposit was returned'
         )
       })

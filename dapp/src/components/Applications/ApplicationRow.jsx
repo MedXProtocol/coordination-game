@@ -62,8 +62,6 @@ export const ApplicationRow = connect(mapStateToProps)(
           createdAt,
           tokenTicker,
           tokenName,
-          random,
-          secret,
           updatedAt
         } = applicationObject
 
@@ -99,7 +97,7 @@ export const ApplicationRow = connect(mapStateToProps)(
 
         /// APPLICANT
         if (applicationState.isApplicant) {
-          if (tokenName && tokenTicker && secret && random) {
+          if (tokenName && tokenTicker) {
             statusText = (
               <React.Fragment>
                 Token Name: <strong>{tokenName}</strong>
@@ -107,10 +105,6 @@ export const ApplicationRow = connect(mapStateToProps)(
                 Token Ticker: <strong>{tokenTicker}</strong>
               </React.Fragment>
             )
-            // <br />
-            // Secret: <strong>{secret}</strong>
-            // <br />
-            // Random: <strong>{random.toString()}</strong>
           } else {
             statusText = (
               <abbr

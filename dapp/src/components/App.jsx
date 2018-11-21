@@ -29,6 +29,8 @@ import { LoginToMetaMask } from '~/components/LoginToMetaMask'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import { Verify } from '~/components/Verifiers/Verify'
 import { Wallet } from '~/components/Wallet'
+import { Challenges } from '~/components/Challenges'
+import { Listing } from '~/components/Listing'
 import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
 import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import * as routes from '~/../config/routes'
@@ -155,6 +157,8 @@ const App = connect(mapStateToProps)(
                             <Route path={routes.VERIFY} component={Verify} />
                             <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                             <Route path={routes.WALLET} component={Wallet} />
+                            <Route path={routes.CHALLENGES} component={Challenges} />
+                            <Route path={routes.LISTING} component={Listing} />
 
                             <Route path={routes.FAQ} component={FAQ} />
                             <Route path={routes.REGISTRY} component={Home} />
