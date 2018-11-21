@@ -279,6 +279,16 @@ html.html-light,
     color: $brand-danger--light;
   }
 
+  .list--application-item .list--item__date {
+    background-color: lighten($background-color--light, 3%);
+    color: lighten($text-color--light, 10%);
+  }
+
+  .list--application-item:hover .list--item__date {
+    background-color: lighten($accent-color-1--light, 3%);
+    color: white;
+  }
+
   .progress--step {
     color: lighten($text-color--light, 40%);
   }
@@ -394,7 +404,7 @@ html.html-light,
   }
 
   .list--item {
-    border-color: $light-gray--light;
+    border-color: darken($light-gray--light, 15%);
   }
 
   .list--item.is-info {
