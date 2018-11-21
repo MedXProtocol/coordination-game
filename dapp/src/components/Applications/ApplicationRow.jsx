@@ -58,7 +58,6 @@ export const ApplicationRow = connect(mapStateToProps)(
 
         let {
           applicationId,
-          // createdAt,
           tokenTicker,
           tokenName,
           random,
