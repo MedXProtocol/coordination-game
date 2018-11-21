@@ -5,7 +5,8 @@ import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 contract TILRoles is Ownable {
   enum All {
     TOKEN_MINTER,
-    JOB_MANAGER
+    JOB_MANAGER,
+    CHALLENGE_MANAGER
   }
 
   mapping(address => mapping(uint256 => bool)) addressRoles;

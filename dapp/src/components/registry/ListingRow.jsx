@@ -10,41 +10,47 @@ import {
   contractByName
 } from 'saga-genesis'
 import { connect } from 'react-redux'
-// import { EthAddress } from '~/components/EthAddress'
+import { AppId } from '~/components/AppId'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import { formatRoute } from 'react-router-named-routes'
+import * as routes from '~/../config/routes'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
-import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { mapToGame } from '~/services/mapToGame'
+import { mapToListing } from '~/services/mapToListing'
+import { mapToChallenge } from '~/services/mapToChallenge'
+import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
+import { HintStatus } from '~/components/HintStatus'
+const debug = require('debug')('ListingRow.jsx')
 
 function mapStateToProps(state, { listingHash }) {
+  debug(listingHash)
   const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
+  const PowerChallenge = contractByName(state, 'PowerChallenge')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
-  const listing = cacheCallValue(state, TILRegistry, 'listings', listingHash)
   const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
-  const hexHint = game.hint
-  const hexSecret = game.applicantSecret
-  const secret = hexSecret
-
-  // Parse and convert the generic hint field to our DApp-specific data
-  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+  const listing = mapToListing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
+  const challenge = mapToChallenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
 
   return {
     TILRegistry,
     CoordinationGame,
+    PowerChallenge,
     listing,
-    tokenTicker,
-    tokenName,
     address,
-    secret
+    challenge,
+    game
   }
 }
 
-function* listingRowSaga({ TILRegistry, CoordinationGame, listingHash }) {
-  if (!TILRegistry || !CoordinationGame || !listingHash) { return }
+function* listingRowSaga({ TILRegistry, CoordinationGame, PowerChallenge, listingHash }) {
+  if (!TILRegistry || !CoordinationGame || !PowerChallenge || !listingHash) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'games', listingHash)
+    cacheCall(CoordinationGame, 'games', listingHash),
+    cacheCall(PowerChallenge, 'challenges', listingHash)
   ])
 }
 
@@ -53,52 +59,37 @@ export const ListingRow = connect(mapStateToProps)(
     class _ListingRow extends PureComponent {
       render () {
         const {
+          listingHash,
           TILRegistry,
-          address
+          address,
+          listing,
+          game
         } = this.props
 
         const {
           owner,
-          unstakedDeposit,
-          state
-        } = this.props.listing || {}
+          deposit
+        } = listing || {}
 
-        if (owner === address && state === '0') {
-          var action =
-            <Web3ActionButton
-              contractAddress={TILRegistry}
-              method='withdrawListing'
-              args={[this.props.listingHash]}
-              buttonText='Withdraw'
-              loadingText='Withdrawing...'
-              className="button is-small is-info is-outlined is-pulled-right"
-              confirmationMessage='Your listing has been withdrawn.'
-              txHashMessage='Withdraw listing request sent -
-                it will take a few minutes to confirm on the Ethereum network.' />
-        }
+        const {
+          hint
+        } = game || {}
 
         return (
-          <div className='list--item'>
-            <span className="list--item__id">
-              <TEX wei={unstakedDeposit} />
-            </span>
-
-            <span className="list--item__date">
-              {/*<EthAddress address={owner} />*/}
-              <strong>Token Ticker:</strong> {this.props.tokenTicker}
-              <br />
-              <strong>Token Name:</strong> {this.props.tokenName}
-              <br />
-            </span>
-
-            <span className='list--item__status'>
-              <strong>Contract Address:</strong> {this.props.secret}
-            </span>
-
-            <span className="list--item__view">
-              {action}
-            </span>
-          </div>
+          <ApplicationListPresenter
+            linkTo={formatRoute(routes.LISTING, { listingHash })}
+            id={(
+              <React.Fragment>
+                <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
+                <AppId applicationId={listingHash} />
+              </React.Fragment>
+            )}
+            date={<TEX wei={deposit} />}
+            status={<HintStatus hint={hint} />}
+            view={''}
+            needsAttention={false}
+            ofInterest={false}
+          />
         )
       }
     }

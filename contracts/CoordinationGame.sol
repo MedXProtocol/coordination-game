@@ -63,9 +63,6 @@ contract CoordinationGame is Ownable {
   mapping (bytes32 => Game) public games;
   mapping (bytes32 => Verification) public verifications;
 
-  mapping (address => uint256) wins;
-  mapping (address => uint256) losses;
-
   event NewApplication(
     bytes32 indexed applicationId,
     address indexed applicant,
@@ -218,7 +215,7 @@ contract CoordinationGame is Ownable {
       block.timestamp, // createdAt
       block.timestamp, // updatedAt
       msg.value, // applicationBalancesInWei
-      work.jobStake(), // applicantTokenDeposits
+      applicationStakeAmount, // applicantTokenDeposits
       block.number + 1, // randomBlockNumbers
       0, // applicantSecret
       0 // whistleblower
@@ -393,7 +390,7 @@ contract CoordinationGame is Ownable {
     bytes32 _applicationId,
     bytes32 _secret,
     uint256 _randomNumber
-  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) {
+  ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
@@ -419,7 +416,9 @@ contract CoordinationGame is Ownable {
   @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
   @param _applicationId The application that the verifier is challenging
   */
-  function verifierChallenge(bytes32 _applicationId) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) {
+  function verifierChallenge(
+    bytes32 _applicationId
+  ) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
@@ -451,30 +450,37 @@ contract CoordinationGame is Ownable {
 
   function applicantWon(bytes32 _applicationId) internal {
     Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
 
+    /// provide the stake for the Registry
     tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
-    tilRegistry.newListing(
-      game.applicant, _applicationId, game.applicantTokenDeposit
-    );
 
-    wins[msg.sender] += 1;
+    tilRegistry.applicantWonCoordinationGame(
+      _applicationId, game.applicant, game.applicantTokenDeposit
+    );
 
     /// Return the verifier's job stake
     returnVerifierJobStake(_applicationId);
+    /// Pay the verifier the application fee
+    verification.verifier.transfer(game.applicationBalanceInWei);
 
     emit ApplicantWon(_applicationId);
   }
 
   function applicantLost(bytes32 _applicationId) internal {
-    // NOTE: This will change when we deposit the verifier's stake into the registry
-    returnVerifierJobStake(_applicationId);
-
     Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
 
-    tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
-    tilRegistry.newListingChallenge(game.applicant, _applicationId, game.applicantTokenDeposit);
+    /// Approve of the verifier token transfer & applicant token transfer
+    tilRegistry.token().approve(
+      address(tilRegistry),
+      game.applicantTokenDeposit.add(work.jobStake())
+    );
 
-    losses[msg.sender] += 1;
+    tilRegistry.applicantLostCoordinationGame.value(game.applicationBalanceInWei)(
+      _applicationId, game.applicant, game.applicantTokenDeposit, game.applicationBalanceInWei,
+      verification.verifier, work.jobStake()
+    );
 
     emit ApplicantLost(_applicationId);
   }
@@ -510,11 +516,11 @@ contract CoordinationGame is Ownable {
     }
   }
 
-  function verifierSubmissionTimedOut(bytes32 _applicationId) internal view returns (bool) {
+  function verifierSubmissionTimedOut(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSelectedAt) > verifierTimeoutInSeconds;
   }
 
-  function applicantRevealExpired(bytes32 _applicationId) internal view returns (bool) {
+  function applicantRevealExpired(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSubmittedAt) > applicantRevealTimeoutInSeconds;
   }
 

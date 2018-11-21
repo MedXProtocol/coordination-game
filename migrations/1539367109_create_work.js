@@ -7,7 +7,7 @@ const ownerAccount = require('./support/ownerAccount')
 module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
     const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
-    const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
+    const jobStake = web3.toWei('20', 'ether') // verifiers stake held during a verification
     const minimumBalanceToWork = web3.toWei('500', 'ether')
 
     await WorkToken.deployed()

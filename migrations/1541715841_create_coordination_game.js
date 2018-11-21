@@ -8,7 +8,7 @@ module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
     const work = await Work.deployed()
     const registry = await TILRegistry.deployed()
-    const applicationStakeAmount = web3.toWei('20', 'ether') // the cost to apply
+    const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply
     const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
     const etherPriceFeed = await etherPriceFeedAddress(artifacts, web3)
 

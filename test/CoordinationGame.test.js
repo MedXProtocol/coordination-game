@@ -1,6 +1,7 @@
 const EtherPriceFeed = artifacts.require('EtherPriceFeed.sol')
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
-const TILRegistry = artifacts.require('TILRegistry.sol')
+const PowerChallenge = artifacts.require('PowerChallenge.sol')
+const MockTILRegistry = artifacts.require('MockTILRegistry.sol')
 const TILRoles = artifacts.require('TILRoles.sol')
 const Work = artifacts.require('Work.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
@@ -14,6 +15,8 @@ const mineBlock = require('./helpers/mineBlock')
 const leftPadHexString = require('./helpers/leftPadHexString')
 const mapToGame = require('./helpers/mapToGame')
 const mapToVerification = require('./helpers/mapToVerification')
+const mapToListing = require('./helpers/mapToListing')
+const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 
 contract('CoordinationGame', (accounts) => {
   let coordinationGame,
@@ -39,7 +42,7 @@ contract('CoordinationGame', (accounts) => {
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
   const requiredStake = web3.toWei('1000', 'ether') // to be a verifier
-  const jobStake = web3.toWei('10', 'ether') // verifiers stake held during a verification
+  const jobStake = web3.toWei('20', 'ether') // verifiers stake held during a verification
   const minimumBalanceToWork = web3.toWei('500', 'ether') // verifiers stake held during a verification
 
   debug(`using secret ${secret} and random ${random}`)
@@ -70,12 +73,7 @@ contract('CoordinationGame', (accounts) => {
     await registerWorker(verifier)
     await registerWorker(verifier2)
 
-    tilRegistry = await TILRegistry.new()
-    debug(`Created new TILRegistry at ${tilRegistry.address}`)
-    debug(`Initializing... ${owner} ${workToken.address} ${roles.address} ${work.address}`)
-    debug(tilRegistry.initialize)
-    await tilRegistry.initialize(workToken.address, roles.address, work.address)
-    debug(`Initialized TILRegistry`)
+    tilRegistry = await MockTILRegistry.new(workToken.address)
     assert.equal((await tilRegistry.token()), workToken.address, 'token addresses match')
 
     coordinationGame = await CoordinationGame.new()
@@ -147,7 +145,7 @@ contract('CoordinationGame', (accounts) => {
 
   async function applicantRevealsTheirSecret() {
     debug(`applicantRevealsTheirSecret`)
-    await coordinationGame.applicantRevealSecret(
+    return await coordinationGame.applicantRevealSecret(
       applicationId,
       secret,
       random.toString(),
@@ -203,7 +201,7 @@ contract('CoordinationGame', (accounts) => {
 
       assert.equal(
         storedGame.applicantTokenDeposit.toString(),
-        jobStake.toString()
+        applicationStakeAmount.toString()
       )
 
       assert.equal(
@@ -364,17 +362,34 @@ contract('CoordinationGame', (accounts) => {
       })
 
       it('should add applicant to registry (and pay out verifier)', async () => {
-        await applicantRevealsTheirSecret()
+        const verifierStartingWorkBalance = await work.balances(selectedVerifier)
+        const verifierStartingBalance = await web3.eth.getBalance(selectedVerifier)
+
+        const tx = await applicantRevealsTheirSecret()
+        debug(tx)
+        assert.equal(tx.logs[0].event, 'ApplicantWon', 'application won event was emitted')
+
+        const verifierFinishingWorkBalance = await work.balances(selectedVerifier)
+        const verifierFinishingBalance = await web3.eth.getBalance(selectedVerifier)
+
+        const verifierTokenDiff = verifierFinishingWorkBalance.sub(verifierStartingWorkBalance)
+        const verifierEtherDiff = verifierFinishingBalance.sub(verifierStartingBalance)
+
+        debug(`Token Diff: ${verifierTokenDiff.toString()}`)
+        debug(`Ether Diff: ${verifierEtherDiff.toString()}`)
+        debug(`base fee: ${weiPerApplication.toString()}`)
+
+        assert.equal(verifierTokenDiff.toString(), jobStake, 'verifier has received their job stake back')
+
+        assert.ok(
+          verifierEtherDiff.gt(weiPerApplication.mul(new BN(98)).div(new BN(100))),
+          'verifier has received the application fee'
+        )
 
         game = mapToGame(await coordinationGame.games(applicationId))
+        assert.equal(game.applicantSecret, secret, 'the recorded applicant secret is correct')
 
-        debug(`applicantRevealSecret() won applicantSecrets(${applicationId})...`)
-        assert.equal(game.applicantSecret, secret)
-
-        debug(`applicantRevealSecret() won listings(${applicationId})...`)
-        const listing = await tilRegistry.listings(applicationId)
-
-        assert.equal(listing[2], 0, 'application is listed')
+        assert.equal(await tilRegistry.approvals(applicationId), true, 'application was approved')
       })
     })
 
@@ -388,10 +403,7 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
         await applicantRevealsTheirSecret()
 
-        debug(`applicantRevealSecret() failed listings(${applicationId})...`)
-        const listing = await tilRegistry.listings(applicationId)
-
-        assert.equal(listing[2], 1, 'application is challenged')
+        assert.equal(await tilRegistry.challenges(applicationId), true, 'application was challenged')
       })
     })
 
@@ -425,7 +437,6 @@ contract('CoordinationGame', (accounts) => {
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
-        assert.equal(jobStake.toString(), applicationStakeAmount.toString())
         await verifierChallenges(selectedVerifier)
 
         const verifierFinishingBalance = (await work.balances(selectedVerifier))
@@ -440,28 +451,20 @@ contract('CoordinationGame', (accounts) => {
           'verifier was paid in ether'
         )
 
-        const approxJobStake = new BN(jobStake).mul(new BN(90)).div(new BN(100))
         const verifierBalanceDelta = verifierFinishingBalance.sub(verifierStartingBalance)
         const applicantBalanceDelta = applicantFinishingBalance.sub(applicantStartingBalance)
 
-        debug(`approxJobStake: ${approxJobStake.toString()}`)
         debug(`verifierBalanceDelta: ${verifierBalanceDelta.toString()}`)
         debug(`applicantBalanceDelta: ${applicantBalanceDelta.toString()}`)
 
         assert.ok(
-          verifierBalanceDelta.gt(approxJobStake),
+          isApproxEqualBN(verifierBalanceDelta, jobStake),
           'verifier deposit was returned'
         )
         assert.ok(
-          applicantBalanceDelta.gt(approxJobStake),
+          isApproxEqualBN(applicantBalanceDelta, applicationStakeAmount),
           'applicant deposit was returned'
         )
-
-        debug(`applicantRevealSecret() failed listings(${applicationId})...`)
-        const listing = await tilRegistry.listings(applicationId)
-
-        /// These assertions essentially make sure there is no listing
-        assert.equal(listing[0].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
       })
     })
   })

@@ -8,6 +8,7 @@ import coordinationGameConfig from '#/CoordinationGame.json'
 import tilRegistryConfig from '#/TILRegistry.json'
 import workConfig from '#/Work.json'
 import workTokenConfig from '#/WorkToken.json'
+import powerChallengeConfig from '#/PowerChallenge.json'
 
 export const addTruffleArtifactAddresses = function* (contractJson) {
   var networkIds = Object.keys(contractJson.networks)
@@ -32,4 +33,5 @@ export const addContractsSaga = function* () {
   yield addTruffleArtifactAddresses(tilRegistryConfig)
   yield addTruffleArtifactAddresses(workConfig)
   yield addTruffleArtifactAddresses(workTokenConfig)
+  yield addTruffleArtifactAddresses(powerChallengeConfig)
 }

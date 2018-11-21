@@ -43,7 +43,8 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         isSmall: PropTypes.bool,
         onError: PropTypes.func,
         onConfirmed: PropTypes.func,
-        onTxHash: PropTypes.func
+        onTxHash: PropTypes.func,
+        disabled: PropTypes.bool
       }
 
       static defaultProps = {
@@ -127,7 +128,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               loadingText={loadingText}
               isLoading={this.state.txHandler}
               isSmall={isSmall}
-              disabled={!contractAddress || this.state.txHandler}
+              disabled={this.props.disabled || !contractAddress || this.state.txHandler}
               className={classNames}
             />
           </form>
