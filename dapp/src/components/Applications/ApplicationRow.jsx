@@ -1,4 +1,3 @@
-// import ReactDOMServer from 'react-dom/server'
 import React, { PureComponent } from 'react'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
@@ -14,8 +13,6 @@ import {
 import { AppId } from '~/components/AppId'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
-// import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { TILOdometer } from '~/components/TILOdometer'
 import { applicationService } from '~/services/applicationService'
 import { applicationTimeLeft } from '~/services/applicationTimeLeft'
 import { mapApplicationState } from '~/services/mapApplicationState'
@@ -73,30 +70,18 @@ export const ApplicationRow = connect(mapStateToProps)(
           <button className="button is-primary is-small is-outlined">View Submission</button>
         )
 
-        // const createdAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} delimiter={``} />
-        // const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={``} />
-        // const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
-        // const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
-
         const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
 
         /// OBSERVER (defaults, anyone who isn't involved in the application)
-        // console.log('updatedAt', updatedAt)
-        // date = <TILOdometer delay={700} value={updatedAt ? updatedAt.toString() : ''} />
         if (latestBlockTimestamp && updatedAt) {
           const timeLeft = applicationTimeLeft(latestBlockTimestamp, applicationObject, applicationState)
-          console.log('asjdhkj', `${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`)
-
           if (timeLeft.minutes) {
-            console.log('timeLeft!', `${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`)
             date = (
               <abbr
                 data-for={`date-tooltip-countdown-${applicationId}`}
-                data-tip={`Seconds remaining: ${timeLeft.seconds}`}
+                data-tip={`Time left until next phase: ${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
               >
-                wat
                 {timeLeft.hours}:{timeLeft.minutes}
-
                 <ReactTooltip
                   id={`date-tooltip-countdown-${applicationId}`}
                   html={true}
@@ -109,35 +94,7 @@ export const ApplicationRow = connect(mapStateToProps)(
           }
         }
 
-        //
-        // <TILOdometer
-        //   delay={1000}
-        //   value={timeLeft.hours}
-        // />
-        // :
-        // <TILOdometer
-        //   delay={2000}
-        //   value={timeLeft.minutes}
-        // />
-
-
-        // date = (
-        //   <abbr data-for='date-tooltip' data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-        //       ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-        //       Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-        //     <ReactTooltip
-        //       id='date-tooltip'
-        //       html={true}
-        //       effect='solid'
-        //       place={'top'}
-        //       wrapper='span'
-        //     />
-        //     {updatedAtDisplay}
-        //   </abbr>
-        // )
-
         status = <ApplicationStatus applicationId={applicationId} />
-
 
         // APPLICANT: Could be a component or function ...
         if (applicationState.isApplicant) {
@@ -149,10 +106,6 @@ export const ApplicationRow = connect(mapStateToProps)(
                 Token Ticker: <strong>{tokenTicker}</strong>
               </React.Fragment>
             )
-            // <br />
-            // Secret: <strong>{secret}</strong>
-            // <br />
-            // Random: <strong>{random.toString()}</strong>
           } else {
             statusText = (
               <abbr

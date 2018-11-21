@@ -19,7 +19,9 @@ export const applicationTimeLeft = function(currentTime, applicationObject, appl
   totalSecondsRemaining = calculateSecondsRemaining(currentTime, applicationObject, applicationState)
 
   if (totalSecondsRemaining <= 0) {
-    hours = `00`, minutes = `00`, seconds = `00`
+    hours = `00`
+    minutes = `00`
+    seconds = `00`
   } else if (totalSecondsRemaining) {
     hours   = parseInt((totalSecondsRemaining / 3600), 10)
     minutes = parseInt((totalSecondsRemaining / 60) % 60, 10)
@@ -28,8 +30,6 @@ export const applicationTimeLeft = function(currentTime, applicationObject, appl
     hours   = hours   < 10 ? `0${hours}`   : hours.toString()
     minutes = minutes < 10 ? `0${minutes}` : minutes.toString()
     seconds = seconds < 10 ? `0${seconds}` : seconds.toString()
-
-    totalSecondsRemaining
   }
 
   return {
