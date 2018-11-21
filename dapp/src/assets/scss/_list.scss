@@ -110,7 +110,7 @@
   grid-column: span 2;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 4;
+    grid-column: span 3;
     padding-top: 0.75rem;
     text-align: right;
   }
@@ -123,14 +123,14 @@
 .list--item__status {
   grid-column: span 5;
   padding-top: 0.75rem;
-  word-break: break-all;
 
   @media screen and (max-width: 1200px) {
-    grid-column: span 6;
+    grid-column: span 7;
   }
 
   @media screen and (max-width: 768px) {
     grid-column: span 12;
+    word-break: break-all;
   }
 }
 

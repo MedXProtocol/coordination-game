@@ -692,7 +692,7 @@ header {
 }
 
 .has-text-transparent-white {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .columns--is-button-container .column {
@@ -1094,4 +1094,28 @@ header {
     color: white;
     transform: scale(1.1);
   }
+}
+
+.card {
+  background-color: darken($dark-gray, 17%);
+  border-top: 1px solid darken($dark-gray, 6%);
+  box-shadow: none;
+}
+
+.pagination-previous,
+.pagination-next,
+.pagination-link {
+  border-color: lighten($brand-info, 20%);
+  padding-bottom: 3px;
+}
+
+.pagination-link.is-current {
+  background-color: lighten($brand-info, 20%);
+  border-color: lighten($brand-info, 20%);
+}
+
+.pagination-link:hover {
+  background-color: lighten($brand-info, 10%);
+  border-color: lighten($brand-info, 20%);
+  color: white;
 }

@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
+import { withRouter } from 'react-router-dom'
 import { get, range } from 'lodash'
+import PropTypes from 'prop-types'
 import { ExportOutline } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
 import {
@@ -16,11 +18,15 @@ import {
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
+import { Pagination } from '~/components/Pagination'
+import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { mapToGame } from '~/services/mapToGame'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { isBlank } from '~/utils/isBlank'
+import * as routes from '~/../config/routes'
 
-function mapStateToProps(state) {
+function mapStateToProps(state, { currentPage, pageSize }) {
+  let totalPages
   let applicationObjects = []
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -31,8 +37,12 @@ function mapStateToProps(state) {
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
-    // The -1 logic here is weird, range is exclusive not inclusive:
-    applicationObjects = range(applicationCount, -1).reduce((accumulator, index) => {
+    const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
+    const endIndex = startIndex + pageSize
+
+    totalPages = Math.ceil(applicationCount / pageSize)
+
+    applicationObjects = range(startIndex, endIndex).reduce((accumulator, index) => {
       const applicationId = cacheCallValue(
         state,
         coordinationGameAddress,
@@ -57,6 +67,7 @@ function mapStateToProps(state) {
     address,
     coordinationGameAddress,
     networkId,
+    totalPages,
     transactions
   }
 }
@@ -87,146 +98,152 @@ function* applicantApplicationsTableSaga({
 export const ApplicantApplicationsTable = connect(mapStateToProps)(
   withSaga(applicantApplicationsTableSaga)(
     withSend(
-      class _ApplicantApplicationsTable extends Component {
+      withRouter(
+        class _ApplicantApplicationsTable extends Component {
 
-        constructor(props) {
-          super(props)
+          constructor(props) {
+            super(props)
 
-          this.state = {
-            showCsvLink: false,
-            csvData: []
+            this.state = {
+              showCsvLink: false,
+              csvData: []
+            }
           }
-        }
 
-        csvData = () => {
-          const data = []
+          csvData = () => {
+            const data = []
 
-          this.props.applicationObjects.forEach((applicationObject) => {
-            let appObject = {
-              applicationId: applicationObject.applicationId,
-              hint: 'unknown',
-              random: 'unknown',
-              secret: 'unknown'
+            this.props.applicationObjects.forEach((applicationObject) => {
+              let appObject = {
+                applicationId: applicationObject.applicationId,
+                hint: 'unknown',
+                random: 'unknown',
+                secret: 'unknown'
+              }
+
+              appObject = retrieveApplicationDetailsFromLocalStorage(
+                appObject,
+                this.props.networkId,
+                this.props.address,
+                applicationObject.createdAt
+              )
+
+              data.push(appObject)
+            })
+
+            return data
+          }
+
+          renderApplicationRows(applicationObjects) {
+            let applicationRows = applicationObjects.map((applicationObject, index) => {
+              return (
+                <ApplicationRow
+                  applicationId={applicationObject.applicationId}
+                  key={`application-row-${index}`}
+                />
+              )
+            })
+
+            return applicationRows.reverse()
+          }
+
+          exportAll = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              showCsvLink: true
+            })
+          }
+
+          render() {
+            let noApplications, loadingLines, applicationRows
+            const { applicationObjects, applicationCount } = this.props
+            const loading = applicationCount === undefined
+
+            if (loading) {
+              loadingLines = (
+                <div className="blank-state">
+                  <div className="blank-state--inner has-text-grey">
+                    <LoadingLines visible={true} />
+                  </div>
+                </div>
+              )
+            } else if (!applicationObjects.length) {
+              noApplications = (
+                <div className="blank-state">
+                  <div className="blank-state--inner has-text-grey">
+                    <span className="is-size-6">You have not applied yet.</span>
+                  </div>
+                </div>
+              )
+            } else {
+              applicationRows = this.renderApplicationRows(applicationObjects)
             }
 
-            appObject = retrieveApplicationDetailsFromLocalStorage(
-              appObject,
-              this.props.networkId,
-              this.props.address,
-              applicationObject.createdAt
-            )
-
-            data.push(appObject)
-          })
-
-          return data
-        }
-
-        renderApplicationRows(applicationObjects) {
-          let applicationRows = applicationObjects.map((applicationObject, index) => {
             return (
-              <ApplicationRow
-                applicationId={applicationObject.applicationId}
-                key={`application-row-${index}`}
-              />
-            )
-          })
+              <React.Fragment>
+                <div className={classnames(
+                  'list--container',
+                  {
+                    'list--container__top-borderless': this.props.topBorderless
+                  }
+                )}>
+                  {loadingLines}
+                  {noApplications}
 
-          // let objIndex = applicationCount + 1
-          // transactions.forEach(transaction => {
-          //   const applicationRowObject = addPendingTx(transaction, objIndex)
-          //
-          //   if (applicationRowObject) {
-          //     applicationRows.push(
-          //       <ApplicationRow
-          //         applicationRowObject={applicationRowObject}
-          //         objIndex={objIndex}
-          //         key={`new-application-row-${objIndex}`}
-          //       />
-          //     )
-          //
-          //     objIndex++
-          //   }
-          // })
+                  <div className="list">
+                    {applicationRows}
+                  </div>
 
-          return applicationRows.reverse()
-        }
-
-        exportAll = (e) => {
-          e.preventDefault()
-
-          this.setState({
-            showCsvLink: true
-          })
-        }
-
-        render() {
-          let noApplications, loadingLines, applicationRows
-          const { applicationObjects, applicationCount } = this.props
-          const loading = applicationCount === undefined
-
-          if (loading) {
-            loadingLines = (
-              <div className="blank-state">
-                <div className="blank-state--inner has-text-grey">
-                  <LoadingLines visible={true} />
+                  <Pagination
+                    currentPage={parseInt(this.props.currentPage, 10)}
+                    totalPages={this.props.totalPages}
+                    linkTo={(number, location) => formatPageRouteQueryParams(
+                      routes.REGISTER_TOKEN,
+                      'applicantApplicationsTableCurrentPage',
+                      number,
+                      location
+                    )}
+                  />
                 </div>
-              </div>
-            )
-          } else if (!applicationObjects.length) {
-            noApplications = (
-              <div className="blank-state">
-                <div className="blank-state--inner has-text-grey">
-                  <span className="is-size-6">You have not applied yet.</span>
+
+                <div
+                  className={classnames(
+                    'is-pulled-right',
+                    { 'is-hidden': this.state.showCsvLink || !this.props.applicationCount || this.props.applicationCount === 0 }
+                  )}
+                >
+                  <button onClick={this.exportAll} className="is-size-7">
+                    <AntdIcon type={ExportOutline} className="antd-icon icon-export" />&nbsp;
+                    Export a Backup
+                  </button>
                 </div>
-              </div>
+
+                <ExportCSVControls
+                  showCsvLink={this.state.showCsvLink}
+                  csvData={this.csvData()}
+                  headers={[
+                    { label: "Application ID#", key: "applicationId" },
+                    { label: "Hint", key: "hint" },
+                    { label: "Random #", key: "random" },
+                    { label: "Secret", key: "secret" }
+                  ]}
+                />
+              </React.Fragment>
             )
-          } else {
-            applicationRows = this.renderApplicationRows(applicationObjects)
           }
-
-          return (
-            <React.Fragment>
-              <div className={classnames(
-                'list--container',
-                {
-                  'list--container__top-borderless': this.props.topBorderless
-                }
-              )}>
-                {loadingLines}
-                {noApplications}
-
-                <div className="list">
-                  {applicationRows}
-                </div>
-              </div>
-
-              <div
-                className={classnames(
-                  'is-pulled-right',
-                  { 'is-hidden': this.state.showCsvLink || !this.props.applicationCount || this.props.applicationCount === 0 }
-                )}
-              >
-                <button onClick={this.exportAll} className="is-size-7">
-                  <AntdIcon type={ExportOutline} className="antd-icon icon-export" />&nbsp;
-                  Export a Backup
-                </button>
-              </div>
-
-              <ExportCSVControls
-                showCsvLink={this.state.showCsvLink}
-                csvData={this.csvData()}
-                headers={[
-                  { label: "Application ID#", key: "applicationId" },
-                  { label: "Hint", key: "hint" },
-                  { label: "Random #", key: "random" },
-                  { label: "Secret", key: "secret" }
-                ]}
-              />
-            </React.Fragment>
-          )
         }
-      }
+      )
     )
   )
 )
+
+ApplicantApplicationsTable.propTypes = {
+  pageSize: PropTypes.number.isRequired,
+  currentPage: PropTypes.any
+}
+
+ApplicantApplicationsTable.defaultProps = {
+  pageSize: 5,
+  currentPage: 1
+}

@@ -2,11 +2,13 @@ import { Component } from 'react'
 
 export class ScrollToTop extends Component {
   componentDidMount() {
-    window.scrollTo(0, 0)
+    if (!this.props.disabled) {
+      window.scrollTo(0, 0)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.scrollToTop) {
+    if (nextProps.scrollToTop && !nextProps.disabled) {
       window.scrollTo(0, 0)
     }
   }

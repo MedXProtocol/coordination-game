@@ -688,13 +688,18 @@ html.html-light,
   }
 
   .pagination-link.is-current {
-    background-color: lighten($accent-color-1--light, 20%);
-    border-color: lighten($accent-color-1--light, 10%);
+    background-color: lighten($accent-color-1--light, 30%);
+    border-color: lighten($accent-color-1--light, 20%);
   }
 
   .pagination-link:hover {
-    background-color: lighten($accent-color-1--light, 30%);
-    border-color: lighten($accent-color-1--light, 10%);
+    background-color: lighten($accent-color-1--light, 10%);
+    border-color: lighten($accent-color-1--light, 20%);
     color: white;
+  }
+
+  .card {
+    background-color: white;
+    border-color: #fafafa;
   }
 }

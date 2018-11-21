@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
+import queryString from 'query-string'
 import {
   cacheCall,
   cacheCallValue,
@@ -37,9 +38,11 @@ import { weiToEther } from '~/utils/weiToEther'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToVerification } from '~/services/mapToVerification'
 
-function mapStateToProps(state) {
+function mapStateToProps(state, { location }) {
   let verifier,
     applicantsLastApplicationCreatedAt
+
+  const applicantApplicationsTableCurrentPage = queryString.parse(location.search).applicantApplicationsTableCurrentPage
 
   const transactions = get(state, 'sagaGenesis.transactions')
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -70,6 +73,7 @@ function mapStateToProps(state) {
     applicantsLastApplicationCreatedAt,
     applicantsLastApplicationId,
     applicationStakeAmount,
+    applicantApplicationsTableCurrentPage,
     approveTx,
     address,
     coordinationGameAddress,
@@ -444,7 +448,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             return (
               <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
                 <PageTitle title='registerToken' />
-                <ScrollToTop />
+                <ScrollToTop disabled={this.props.applicantApplicationsTableCurrentPage} />
 
                 <h1 className="is-size-1">
                   Submit Token Details
@@ -731,7 +735,9 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                     Your Current Applications:
                   </h6>
                 </div>
-                <ApplicantApplicationsTable />
+                <ApplicantApplicationsTable
+                  currentPage={this.props.applicantApplicationsTableCurrentPage}
+                />
 
                 <Modal
                   closeModal={this.handleCloseModal}

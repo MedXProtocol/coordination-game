@@ -2,7 +2,6 @@ import React, {
   Component
 } from 'react'
 import PropTypes from 'prop-types'
-import { formatRoute } from 'react-router-named-routes'
 import { Link } from 'react-router-dom'
 import {
   withSaga,
@@ -16,6 +15,7 @@ import { range } from 'lodash'
 import { LoadingLines } from '~/components/LoadingLines'
 import { Pagination } from '~/components/Pagination'
 import { ListingRow } from './ListingRow'
+import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { currentPage, pageSize }) {
@@ -56,7 +56,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
       noListings,
       listingRows
 
-    const totalPages = parseInt(this.props.listingsCount / this.props.pageSize, 10)
+    const totalPages = Math.ceil(this.props.listingsCount / this.props.pageSize)
     const { listingsCount } = this.props
     const loading = listingsCount === undefined
 
@@ -112,8 +112,13 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
         <Pagination
           currentPage={parseInt(this.props.currentPage, 10)}
           totalPages={totalPages}
-          formatPageRoute={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
-          />
+          linkTo={(number, location) => formatPageRouteQueryParams(
+            routes.REGISTRY,
+            'listingsCurrentPage',
+            number,
+            location
+          )}
+        />
       </React.Fragment>
     )
   }
