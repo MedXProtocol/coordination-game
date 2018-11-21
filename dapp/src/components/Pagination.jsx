@@ -13,7 +13,7 @@ export const Pagination = withRouter(
     static propTypes = {
       path: PropTypes.string.isRequired,
       currentPage: PropTypes.number.isRequired,
-      totalPages: PropTypes.number.isRequired,
+      totalPages: PropTypes.number,
       linkTo: PropTypes.func.isRequired,
       paramName: PropTypes.string.isRequired
     }
