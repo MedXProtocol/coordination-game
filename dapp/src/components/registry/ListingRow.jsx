@@ -19,7 +19,7 @@ import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToListing } from '~/services/mapToListing'
-import { mapToChallenge } from '~/services/mapToChallenge'
+import { Challenge } from '~/models/Challenge'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { HintStatus } from '~/components/HintStatus'
 const debug = require('debug')('ListingRow.jsx')
@@ -32,7 +32,7 @@ function mapStateToProps(state, { listingHash }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
   const listing = mapToListing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
-  const challenge = mapToChallenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
+  const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
 
   return {
     TILRegistry,

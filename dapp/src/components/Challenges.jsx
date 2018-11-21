@@ -17,12 +17,14 @@ import { formatRoute } from 'react-router-named-routes'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
-function mapStateToProps(state, { match, pageSize }) {
-  const { currentPage } = match.params
+const PAGE_SIZE = 5
+
+function mapStateToProps(state, { match }) {
+  const currentPage = match.params.currentPage || 1
   const PowerChallenge = contractByName(state, 'PowerChallenge')
   const challengeCount = cacheCallValue(state, PowerChallenge, 'challengeCount')
-  const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
-  const endIndex = startIndex + pageSize
+  const startIndex = (parseInt(currentPage, 10) - 1) * PAGE_SIZE
+  const endIndex = startIndex + PAGE_SIZE
   const ids = range(startIndex, endIndex).reduce((accumulator, index) => {
     const challengeId = cacheCallValue(state, PowerChallenge, 'challengeAt', index)
     if (!isBlank(challengeId)) {
@@ -44,14 +46,13 @@ function* challengesSaga({ PowerChallenge, startIndex, endIndex }) {
   yield cacheCall(PowerChallenge, 'challengeCount')
   yield all(
     range(startIndex, endIndex).map(function* (index) {
-      yield cacheCall(PowerChallenge, 'applicationAt', index)
+      yield cacheCall(PowerChallenge, 'challengeAt', index)
     })
   )
 }
 
 export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
   class _Challenges extends PureComponent {
-
     renderApplicationRows(ids) {
       return ids.map((challengeId) => {
         return (
@@ -64,7 +65,7 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
     }
 
     render () {
-      const totalPages = parseInt(this.props.challengeCount / this.props.pageSize, 10)
+      const totalPages = parseInt(this.props.challengeCount / PAGE_SIZE, 10)
 
       return (
         <div className='list--container'>
@@ -82,13 +83,3 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
     }
   }
 ))
-
-Challenges.propTypes = {
-  pageSize: PropTypes.number.isRequired,
-  currentPage: PropTypes.any
-}
-
-Challenges.defaultProps = {
-  pageSize: 1,
-  currentPage: 1
-}
