@@ -293,3 +293,19 @@
 .list--registry-list .list--item__id {
   padding-top: 0.625rem;
 }
+
+.list--application-item .list--item__date {
+  background-color: darken($background-color, 4%);
+  border-radius: 0.5rem;
+  color: darken($text-color, 10%);
+  font-size: 1.5rem;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 400;
+}
+
+.list--application-item:hover .list--item__date {
+  background-color: darken($background-color, 2%);
+  color: darken($text-color, 20%);
+}

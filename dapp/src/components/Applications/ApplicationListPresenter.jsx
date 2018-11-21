@@ -14,6 +14,7 @@ export const ApplicationListPresenter = function({ linkTo, id, date, status, vie
       to={linkTo}
       className={classnames(
         'list--item',
+        'list--application-item',
         {
           'is-warning': needsAttention,
           'is-info': ofInterest && !needsAttention
