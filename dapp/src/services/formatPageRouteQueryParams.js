@@ -1,6 +1,6 @@
 import queryString from 'query-string'
 
-export function formatPageRouteQueryParams (path, location, paramName, number) {
+export function formatPageRouteQueryParams (path, paramName, number, location) {
   const queryParamsString =
     queryString.stringify(
       Object.assign({},

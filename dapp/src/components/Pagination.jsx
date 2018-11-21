@@ -11,11 +11,9 @@ const NUM_VALUES_TO_SHOW = 5
 export const Pagination = withRouter(
   class _Pagination extends Component {
     static propTypes = {
-      path: PropTypes.string.isRequired,
       currentPage: PropTypes.number.isRequired,
       totalPages: PropTypes.number,
-      linkTo: PropTypes.func.isRequired,
-      paramName: PropTypes.string.isRequired
+      linkTo: PropTypes.func.isRequired // has the signature fxn(pageNumber, location)
     }
 
     calculatePageValues = () => {
@@ -59,9 +57,7 @@ export const Pagination = withRouter(
 
       const {
         linkTo,
-        path,
         location,
-        paramName,
         currentPage
       } = this.props
 
@@ -78,7 +74,7 @@ export const Pagination = withRouter(
           pageListItems.push(
             <li key={`page-number-${value}`} >
               <Link
-                to={linkTo(path, location, paramName, value)}
+                to={linkTo(value, location)}
                 className={classnames(
                   'pagination-link',
                   { 'is-current': currentPage === value }

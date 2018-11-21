@@ -63,7 +63,7 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
     }
 
     render () {
-      const totalPages = parseInt(this.props.applicationCount / this.props.pageSize, 10)
+      const totalPages = Math.ceil(this.props.applicationCount / this.props.pageSize)
 
       return (
         <div className='list--container'>
@@ -74,9 +74,12 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
           <Pagination
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
-            linkTo={formatPageRouteQueryParams}
-            path={routes.VERIFY}
-            paramName='applicationsListCurrentPage'
+            linkTo={(number, location) => formatPageRouteQueryParams(
+              routes.VERIFY,
+              'applicationsListCurrentPage',
+              number,
+              location
+            )}
           />
         </div>
       )

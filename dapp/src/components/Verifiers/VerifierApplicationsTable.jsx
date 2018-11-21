@@ -3,7 +3,6 @@ import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import PropTypes from 'prop-types'
-import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCallValueInt,
   contractByName,
@@ -12,6 +11,7 @@ import {
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { Pagination } from '~/components/Pagination'
+import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
 import * as routes from '~/../config/routes'
@@ -64,7 +64,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
         let noApplications, loadingLines, applicationRows
         const { applicationIds, applicationCount } = this.props
         const loading = applicationCount === undefined
-        const totalPages = parseInt(this.props.applicationCount / this.props.pageSize, 10)
+        const totalPages = Math.ceil(this.props.applicationCount / this.props.pageSize)
 
         if (loading) {
           loadingLines = (
@@ -112,9 +112,12 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
               <Pagination
                 currentPage={parseInt(this.props.currentPage, 10)}
                 totalPages={totalPages}
-                linkTo={(number) => formatRoute(routes.VERIFY, { currentPage: number })}
-                path={routes.VERIFY}
-                paramName='verifierApplicationsTableCurrentPage'
+                linkTo={(number, location) => formatPageRouteQueryParams(
+                  routes.VERIFY,
+                  'verifierApplicationsTableCurrentPage',
+                  number,
+                  location
+                )}
               />
             </div>
           </React.Fragment>

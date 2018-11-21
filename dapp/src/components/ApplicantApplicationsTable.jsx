@@ -40,7 +40,7 @@ function mapStateToProps(state, { currentPage, pageSize }) {
     const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
     const endIndex = startIndex + pageSize
 
-    totalPages = parseInt(applicationCount / pageSize, 10)
+    totalPages = Math.ceil(applicationCount / pageSize)
 
     applicationObjects = range(startIndex, endIndex).reduce((accumulator, index) => {
       const applicationId = cacheCallValue(
@@ -144,23 +144,6 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
               )
             })
 
-            // let objIndex = applicationCount + 1
-            // transactions.forEach(transaction => {
-            //   const applicationRowObject = addPendingTx(transaction, objIndex)
-            //
-            //   if (applicationRowObject) {
-            //     applicationRows.push(
-            //       <ApplicationRow
-            //         applicationRowObject={applicationRowObject}
-            //         objIndex={objIndex}
-            //         key={`new-application-row-${objIndex}`}
-            //       />
-            //     )
-            //
-            //     objIndex++
-            //   }
-            // })
-
             return applicationRows.reverse()
           }
 
@@ -215,9 +198,12 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                   <Pagination
                     currentPage={parseInt(this.props.currentPage, 10)}
                     totalPages={this.props.totalPages}
-                    path={routes.REGISTER_TOKEN}
-                    linkTo={formatPageRouteQueryParams}
-                    paramName='applicantApplicationsTableCurrentPage'
+                    linkTo={(number, location) => formatPageRouteQueryParams(
+                      routes.REGISTER_TOKEN,
+                      'applicantApplicationsTableCurrentPage',
+                      number,
+                      location
+                    )}
                   />
                 </div>
 
