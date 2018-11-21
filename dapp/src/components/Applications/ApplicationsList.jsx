@@ -75,7 +75,7 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
             linkTo={(number, location) => formatPageRouteQueryParams(
-              routes.VERIFY,
+              routes.REGISTRY,
               'applicationsListCurrentPage',
               number,
               location

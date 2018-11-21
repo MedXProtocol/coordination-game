@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { withRouter } from 'react-router-dom'
-import { get, range } from 'lodash'
+import { get, range, sortBy } from 'lodash'
 import PropTypes from 'prop-types'
 import { ExportOutline } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
@@ -20,6 +20,8 @@ import { ExportCSVControls } from '~/components/ExportCSVControls'
 import { LoadingLines } from '~/components/LoadingLines'
 import { Pagination } from '~/components/Pagination'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
+import { applicationService } from '~/services/applicationService'
+import { mapApplicationState } from '~/services/mapApplicationState'
 import { mapToGame } from '~/services/mapToGame'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { isBlank } from '~/utils/isBlank'
@@ -32,9 +34,12 @@ function mapStateToProps(state, { currentPage, pageSize }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
+  const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
+  const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
 
   if (applicationCount && applicationCount !== 0) {
     const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
@@ -50,25 +55,36 @@ function mapStateToProps(state, { currentPage, pageSize }) {
         address,
         index
       )
+
       const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
-      const { createdAt } = game
+      const { createdAt, updatedAt } = game
 
       if (!isBlank(applicationId) && createdAt) {
-        accumulator.push({ applicationId, createdAt })
+        const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+
+        const { verifierSubmittedAt } = applicationObject
+        const { priority } = applicationState
+
+        accumulator.push({ applicationId, createdAt, updatedAt, verifierSubmittedAt, priority })
       }
 
       return accumulator
     }, [])
+
+    applicationObjects = sortBy(applicationObjects, (obj => obj.priority)).reverse()
   }
 
   return {
     applicationCount,
     applicationObjects,
+    applicantRevealTimeoutInSeconds,
     address,
     coordinationGameAddress,
     networkId,
     totalPages,
-    transactions
+    transactions,
+    verifierTimeoutInSeconds
   }
 }
 
@@ -79,7 +95,11 @@ function* applicantApplicationsTableSaga({
 }) {
   if (!coordinationGameAddress || !address) { return null }
 
-  yield cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address)
+  yield all([
+    cacheCall(coordinationGameAddress, 'getApplicantsApplicationCount', address),
+    cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+  ])
 
   if (applicationCount && applicationCount !== 0) {
     const indices = range(applicationCount)
@@ -88,7 +108,10 @@ function* applicantApplicationsTableSaga({
         const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
 
         if (!isBlank(applicationId)) {
-          yield cacheCall(coordinationGameAddress, 'games', applicationId)
+          yield all([
+            cacheCall(coordinationGameAddress, 'games', applicationId),
+            cacheCall(coordinationGameAddress, 'verifications', applicationId)
+          ])
         }
       })
     )
@@ -144,7 +167,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
               )
             })
 
-            return applicationRows.reverse()
+            return applicationRows
           }
 
           exportAll = (e) => {
