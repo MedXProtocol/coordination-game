@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
+import PropTypes from 'prop-types'
+import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCallValueInt,
   contractByName,
@@ -9,10 +11,12 @@ import {
 } from 'saga-genesis'
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { LoadingLines } from '~/components/LoadingLines'
+import { Pagination } from '~/components/Pagination'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
+import * as routes from '~/../config/routes'
 
-function mapStateToProps(state) {
+function mapStateToProps(state, { currentPage, pageSize }) {
   let applicationIds = []
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -23,7 +27,10 @@ function mapStateToProps(state) {
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount', address)
 
   if (applicationCount && applicationCount !== 0) {
-    applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)
+    const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
+    const endIndex = startIndex + pageSize
+
+    applicationIds = verifierApplicationsService(state, startIndex, endIndex)
   }
 
   return {
@@ -57,6 +64,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
         let noApplications, loadingLines, applicationRows
         const { applicationIds, applicationCount } = this.props
         const loading = applicationCount === undefined
+        const totalPages = parseInt(this.props.applicationCount / this.props.pageSize, 10)
 
         if (loading) {
           loadingLines = (
@@ -100,6 +108,14 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
               <div className="list">
                 {applicationRows}
               </div>
+
+              <Pagination
+                currentPage={parseInt(this.props.currentPage, 10)}
+                totalPages={totalPages}
+                linkTo={(number) => formatRoute(routes.VERIFY, { currentPage: number })}
+                path={routes.VERIFY}
+                paramName='verifierApplicationsTableCurrentPage'
+              />
             </div>
           </React.Fragment>
         )
@@ -107,3 +123,13 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
     }
   )
 )
+
+VerifierApplicationsTable.propTypes = {
+  pageSize: PropTypes.number.isRequired,
+  currentPage: PropTypes.any
+}
+
+VerifierApplicationsTable.defaultProps = {
+  pageSize: 5,
+  currentPage: 1
+}

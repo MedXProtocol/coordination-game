@@ -1,21 +1,25 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { AnimatedWrapper } from "~/components/AnimatedWrapper"
 import { get } from 'lodash'
+import queryString from 'query-string'
+import { AnimatedWrapper } from "~/components/AnimatedWrapper"
 import { Footer } from '~/components/Footer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { Application } from '~/components/Applications/Application'
 import { ApplicationsList } from '~/components/Verifiers/ApplicationsList'
 import { VerifierApplicationsTable } from '~/components/Verifiers/VerifierApplicationsTable'
 import { VerifiersTable } from '~/components/Verifiers/VerifiersTable'
 import { VerifierStake } from '~/components/Verifiers/VerifierStake'
 
-function mapStateToProps(state) {
+function mapStateToProps(state, { location }) {
   const applicationId = get(state, 'verifier.applicationId')
+  const applicationsListCurrentPage = queryString.parse(location.search).applicationsListCurrentPage
+  const verifierApplicationsTableCurrentPage = queryString.parse(location.search).verifierApplicationsTableCurrentPage
 
   return {
-    applicationId
+    applicationId,
+    applicationsListCurrentPage,
+    verifierApplicationsTableCurrentPage
   }
 }
 
@@ -24,18 +28,11 @@ export const Verify = connect(mapStateToProps)(
     class _Verify extends PureComponent {
 
       render() {
-        let application,
-          verifyApplicationsTable
-
-        if (this.props.applicationId) {
-          application = <Application applicationId={this.props.applicationId} />
-        } else {
-          verifyApplicationsTable = <VerifierApplicationsTable />
-        }
-
         return (
           <div>
-            <ScrollToTop />
+            <ScrollToTop
+              disabled={this.props.applicationsListCurrentPage || this.props.verifierApplicationsTableCurrentPage}
+            />
             <PageTitle title='verify' />
 
             <h1 className="is-size-1">
@@ -47,8 +44,9 @@ export const Verify = connect(mapStateToProps)(
             <br />
             <br />
 
-            {verifyApplicationsTable}
-            {application}
+            <VerifierApplicationsTable
+              currentPage={this.props.verifierApplicationsTableCurrentPage}
+            />
 
             <br />
             <br />
@@ -57,12 +55,12 @@ export const Verify = connect(mapStateToProps)(
             <div className="is-clearfix">
               <h6 className="is-size-6">
                 All Token Submissions
-                {/* This should possibly be it's own route, and should be something like /applications/:pageNumber */}
               </h6>
             </div>
 
-            {/* This should possibly be it's own route, and should be something like /applications/:pageNumber */}
-            <ApplicationsList />
+            <ApplicationsList
+              currentPage={this.props.applicationsListCurrentPage}
+            />
 
             <br />
             <br />

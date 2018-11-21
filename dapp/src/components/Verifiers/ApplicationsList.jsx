@@ -2,18 +2,18 @@ import React, {
   PureComponent
 } from 'react'
 import { all } from 'redux-saga/effects'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { range } from 'lodash'
 import {
   withSaga,
   cacheCall,
   contractByName,
   cacheCallValue
 } from 'saga-genesis'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { range } from 'lodash'
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
 import { Pagination } from '~/components/Pagination'
-import { formatRoute } from 'react-router-named-routes'
+import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
@@ -74,8 +74,10 @@ export const ApplicationsList = connect(mapStateToProps)(withSaga(applicationsLi
           <Pagination
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
-            formatPageRoute={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
-            />
+            linkTo={formatPageRouteQueryParams}
+            path={routes.VERIFY}
+            paramName='applicationsListCurrentPage'
+          />
         </div>
       )
     }

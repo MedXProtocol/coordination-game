@@ -1,12 +1,21 @@
 import { get, range } from 'lodash'
-import { cacheCallValue } from 'saga-genesis'
+import {
+  cacheCallValue,
+  contractByName
+} from 'saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 
-export const verifierApplicationsService = function(state, applicationCount, coordinationGameAddress) {
+export const verifierApplicationsService = function(state, startIndex, endIndex) {
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const coordinationGameAddress = contractByName(state, 'CoordinationGame')
 
   // The -1 logic here is weird, range is exclusive not inclusive:
-  return range(applicationCount, -1).reduce((accumulator, index) => {
+  if (!endIndex) {
+    endIndex = -1
+  }
+  // console.log(startIndex, endIndex)
+
+  return range(startIndex, endIndex).reduce((accumulator, index) => {
     const applicationId = cacheCallValue(
       state,
       coordinationGameAddress,

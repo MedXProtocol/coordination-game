@@ -44,7 +44,7 @@ function mapStateToProps(state) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
   if (applicationCount && applicationCount !== 0) {
-    applicationIds = verifierApplicationsService(state, applicationCount, coordinationGameAddress)
+    applicationIds = verifierApplicationsService(state, applicationCount)
   }
 
   for (let i = 0; i < applicationIds.length; i++) {
