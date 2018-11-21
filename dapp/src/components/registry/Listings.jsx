@@ -100,7 +100,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
           </div>
         </div>
 
-        <div className='list--container'>
+        <div className='list--container list--registry-list'>
           {loadingLines}
           {noListings}
 

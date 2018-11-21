@@ -81,9 +81,9 @@ export const ApplicationStatus = connect(mapStateToProps)(
             message = <strong>Applicant failed to reveal secret</strong>
 
             if (applicationState.canChallenge) {
-              message = <strong>Applicant waited too long, you can challenge this:</strong>
+              message = <strong>Applicant waited too long, you can close this application and collect your payment</strong>
             } else if (applicationState.verifierHasChallenged) {
-              message = <strong>The application was challenged</strong>
+              message = <strong>The application was closed</strong>
             }
           }
         }

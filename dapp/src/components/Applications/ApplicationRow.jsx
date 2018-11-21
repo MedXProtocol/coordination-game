@@ -160,6 +160,11 @@ export const ApplicationRow = connect(mapStateToProps)(
               <button className="button is-warning is-small is-outlined">Request Verification</button>
             )
           }
+          if (applicationState.verifierHasChallenged) {
+            action = (
+              <button className="button is-info is-small is-outlined">Closed</button>
+            )
+          }
           if (!applicationState.noWhistleblower) {
             action = (
               <button className="button is-danger is-small is-outlined">Whistleblown!</button>

@@ -144,7 +144,7 @@ const App = connect(mapStateToProps)(
                       <TransitionGroup>
                         <CSSTransition
                           key={this.props.location.key}
-                          timeout={{ enter: 1500, exit: 400 }}
+                          timeout={{ enter: 1000, exit: 300 }}
                           classNames='page'
                           appear={true}
                         >

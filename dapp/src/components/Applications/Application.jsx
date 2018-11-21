@@ -243,7 +243,9 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             // APPLICANT:
             if (applicationState.isApplicant) {
               if (applicationState.verifierHasChallenged) {
-                message = <span className="has-text-warning">Verifier challenged your application</span>
+                message = <span className="has-text-warning">
+                  You did not reveal your secret in time. Your verifier has closed the application. Please consider resubmitting another application.
+                </span>
               } else if (applicationState.needsNewVerifier) {
                 message = (
                   <div>
@@ -289,7 +291,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
               message = (
                 <div>
                   <p>
-                    The applicant hasn't revealed their secret in the timeframe provided. You can now challenge this application:
+                    The applicant hasn't revealed their secret in the timeframe provided. You can close this application and collect your payment:
                     <br />
                     <br />
                   </p>
