@@ -33,8 +33,6 @@ export const TILOdometer = ReactTimeout(
     }
 
     render() {
-      // console.log(this.state.nextValue)
-      // console.log(this.state.currentValue)
       return (
         <Odometer value={this.state.upToDate ? this.state.nextValue : this.state.currentValue} />
       )
