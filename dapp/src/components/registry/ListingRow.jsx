@@ -15,7 +15,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { formatRoute } from 'react-router-named-routes'
 import * as routes from '~/../config/routes'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToListing } from '~/services/mapToListing'
@@ -60,14 +59,11 @@ export const ListingRow = connect(mapStateToProps)(
       render () {
         const {
           listingHash,
-          TILRegistry,
-          address,
           listing,
           game
         } = this.props
 
         const {
-          owner,
           deposit
         } = listing || {}
 

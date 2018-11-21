@@ -8,7 +8,6 @@ import {
   contractByName,
   cacheCallValue
 } from 'saga-genesis'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { range } from 'lodash'
 import { ListingRow } from '~/components/registry/ListingRow'

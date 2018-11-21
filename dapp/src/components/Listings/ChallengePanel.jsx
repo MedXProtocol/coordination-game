@@ -1,9 +1,5 @@
-import ReactDOMServer from 'react-dom/server'
 import React, { PureComponent } from 'react'
-import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { toastr } from '~/toastr'
-import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
@@ -14,22 +10,10 @@ import {
   contractByName
 } from 'saga-genesis'
 import BN from 'bn.js'
-import { AppId } from '~/components/AppId'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { EtherscanLink } from '~/components/EtherscanLink'
-import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { formatRoute } from 'react-router-named-routes'
-import * as routes from '~/../config/routes'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
-import { mapToGame } from '~/services/mapToGame'
-import { mapToListing } from '~/services/mapToListing'
 import { Challenge } from '~/models/Challenge'
-import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
-import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
-import { bytes32ToAddress } from '~/utils/bytes32ToAddress'
 import { get } from 'lodash'
-const debug = require('debug')('ChallengePanel.jsx')
 
 function mapStateToProps(state, { listingHash }) {
   const address = state.sagaGenesis.accounts[0]
@@ -83,7 +67,6 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         PowerChallenge,
         powerChallengeAllowance,
         nextDepositAmount,
-        address,
         challenge,
         latestBlockTimestamp,
         timeout,
@@ -109,7 +92,6 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             key='approval' />
       }
 
-      const challengeStarted = !challenge.isComplete()
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
 
       if (isTimedOut) {
@@ -141,7 +123,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 {challengeWithdrawMessage}
             </p>
         }
-      } else if (challenge.state == '1' && PowerChallenge) { // CHALLENGED
+      } else if (challenge.state === '1' && PowerChallenge) { // CHALLENGED
         challengeTitle = "The Listing has been Challenged"
         if (!hasAllowance) {
           challengeMessage =

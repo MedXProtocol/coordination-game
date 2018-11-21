@@ -1,10 +1,6 @@
-import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
-import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
   withSaga,
@@ -15,21 +11,14 @@ import {
 } from 'saga-genesis'
 import BN from 'bn.js'
 import { AppId } from '~/components/AppId'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { EtherscanLink } from '~/components/EtherscanLink'
-import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { formatRoute } from 'react-router-named-routes'
-import * as routes from '~/../config/routes'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { TEX } from '~/components/TEX'
 import { mapToGame } from '~/services/mapToGame'
 import { ChallengePanel } from '~/components/Listings/ChallengePanel'
 import { mapToListing } from '~/services/mapToListing'
 import { Challenge } from '~/models/Challenge'
-import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { bytes32ToAddress } from '~/utils/bytes32ToAddress'
-const debug = require('debug')('Listing.jsx')
 
 function mapStateToProps(state, { match }) {
   const listingHash = match.params.listingHash
@@ -88,19 +77,14 @@ export const Listing = connect(mapStateToProps)(
         const {
           listingHash,
           TILRegistry,
-          WorkToken,
-          PowerChallenge,
-          powerChallengeAllowance,
           game,
-          nextDepositAmount,
           address,
           listing,
           challenge
         } = this.props
 
         const {
-          owner,
-          deposit
+          owner
         } = listing || {}
 
         const {
