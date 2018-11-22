@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
 
 export class Listing {
@@ -12,6 +13,6 @@ export class Listing {
   }
 
   isDeleted() {
-    return isBlank(this.owner)
+    return defined(this.owner) && isBlank(this.owner)
   }
 }

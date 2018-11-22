@@ -77,6 +77,7 @@ export const ListingRow = connect(mapStateToProps)(
             date={<TEX wei={listing.deposit} />}
             status={<HintStatus hint={hint} />}
             view={''}
+            cssClass='list--listings-item'
             needsAttention={false}
             ofInterest={false}
           />

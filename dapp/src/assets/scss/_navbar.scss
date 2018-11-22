@@ -35,10 +35,6 @@
   padding-top: 0.25rem;
 }
 
-.navbar-item path {
-  fill: white;
-}
-
 .navbar-item.has-dropdown:hover .navbar-dropdown {
   transition: all 0.5s ease-in-out;
 
@@ -147,6 +143,14 @@
   padding: 0.25rem 0.5rem 0;
 }
 
+.navbar-item path {
+  fill: white;
+}
+
+.navbar-item .antd-icon path {
+  fill: $nav-link-color;
+}
+
 .navbar-item button,
 .navbar-link button {
   border-color: none;
@@ -158,10 +162,14 @@
 
 a.navbar-item:hover,
 a.navbar-item.is-active,
+a.navbar-item:hover .antd-icon path,
+a.navbar-item:focus .antd-icon path,
+a.navbar-item.is-active .antd-icon path,
 .navbar-link:hover,
 .navbar-link.is-active {
   background-color: inherit;
   color: white;
+  fill: white;
 }
 
 .navbar-brand a.navbar-item {

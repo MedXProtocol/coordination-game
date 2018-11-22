@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
-export const ApplicationListPresenter = function({ linkTo, id, date, status, view, needsAttention, ofInterest }) {
+export const ApplicationListPresenter = function({ linkTo, id, date, status, view, cssClass, needsAttention, ofInterest }) {
   // necessary to show the verifier on 1st-time component load
   ReactTooltip.rebuild()
 
@@ -14,7 +14,7 @@ export const ApplicationListPresenter = function({ linkTo, id, date, status, vie
       to={linkTo}
       className={classnames(
         'list--item',
-        'list--application-item',
+        cssClass,
         {
           'is-warning': needsAttention,
           'is-info': ofInterest && !needsAttention

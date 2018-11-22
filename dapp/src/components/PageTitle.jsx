@@ -2,14 +2,15 @@ import React from 'react'
 import DocumentTitle from 'react-document-title'
 
 const titles = {
-  home: 'Home - Trustless Incentivized List Demo',
-  registerToken: 'Register a new Token - Trustless Incentivized List Demo',
-  stake: 'Stake - Trustless Incentivized List Demo',
-  wallet: 'Wallet - Trustless Incentivized List Demo',
-  verify: 'Verify - Trustless Incentivized List Demo',
-  faq: 'Frequently Asked Questions - Trustless Incentivized List Demo',
-  fourOhFour: '404 - Trustless Incentivized List Demo',
-  admin: 'Admin - Trustless Incentivized List Demo'
+  challenges: 'Challenges - The Token Registry, a Trustless Incentivized List Demo',
+  home: 'Home - The Token Registry, a Trustless Incentivized List Demo',
+  registerToken: 'Register a new Token - The Token Registry, a Trustless Incentivized List Demo',
+  stake: 'Stake - The Token Registry, a Trustless Incentivized List Demo',
+  wallet: 'Wallet - The Token Registry, a Trustless Incentivized List Demo',
+  verify: 'Verify - The Token Registry, a Trustless Incentivized List Demo',
+  faq: 'Frequently Asked Questions - The Token Registry, a Trustless Incentivized List Demo',
+  fourOhFour: '404 - The Token Registry, a Trustless Incentivized List Demo',
+  admin: 'Admin - The Token Registry, a Trustless Incentivized List Demo'
 }
 
 export function PageTitle({ title }) {

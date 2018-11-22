@@ -74,19 +74,21 @@ export const ApplicationRow = connect(mapStateToProps)(
           const timeLeft = applicationTimeLeft(latestBlockTimestamp, applicationObject, applicationState)
           if (timeLeft.minutes) {
             date = (
-              <abbr
-                data-for={`date-tooltip-countdown-${applicationId}`}
-                data-tip={`Time left until next phase: ${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
-              >
-                {timeLeft.hours}:{timeLeft.minutes}
-                <ReactTooltip
-                  id={`date-tooltip-countdown-${applicationId}`}
-                  html={true}
-                  effect='solid'
-                  place='top'
-                  wrapper='span'
-                />
-              </abbr>
+              <span className="list--item__timer">
+                <abbr
+                  data-for={`date-tooltip-countdown-${applicationId}`}
+                  data-tip={`Time left until next phase: ${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
+                >
+                  {timeLeft.hours}:{timeLeft.minutes}
+                  <ReactTooltip
+                    id={`date-tooltip-countdown-${applicationId}`}
+                    html={true}
+                    effect='solid'
+                    place='top'
+                    wrapper='span'
+                  />
+                </abbr>
+              </span>
             )
           }
         }
@@ -193,6 +195,7 @@ export const ApplicationRow = connect(mapStateToProps)(
             date={date}
             status={status}
             view={action}
+            cssClass='list--application-item'
             needsAttention={needsAttention}
             ofInterest={ofInterest && !needsAttention}
           />

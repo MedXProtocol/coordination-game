@@ -279,12 +279,12 @@ html.html-light,
     color: $brand-danger--light;
   }
 
-  .list--application-item .list--item__date {
+  .list--application-item .list--item__timer {
     background-color: lighten($background-color--light, 3%);
     color: lighten($text-color--light, 10%);
   }
 
-  .list--application-item:hover .list--item__date {
+  .list--application-item:hover .list--item__timer {
     background-color: lighten($accent-color-1--light, 3%);
     color: white;
   }

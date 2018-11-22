@@ -306,7 +306,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 </div>
 
                 <h6 className="is-size-6 has-text-grey application-num">
-                  <AppId applicationId={applicationId} />
+                  Submission <AppId applicationId={applicationId} />
                 </h6>
 
                 <div className="columns">
@@ -314,7 +314,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                     <h5 className="is-size-5 has-text-grey-lighter">
                       Token Name:
                     </h5>
-                    <h3 className="is-size-3 has-text-grey-light">
+                    <h3 className="is-size-3 has-text-grey">
                       {tokenName}
                     </h3>
                   </div>
@@ -323,7 +323,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                     <h5 className="is-size-5 has-text-grey-lighter">
                       Token Ticker:
                     </h5>
-                    <h3 className="is-size-3 has-text-grey-light">
+                    <h3 className="is-size-3 has-text-grey">
                       ${tokenTicker}
                     </h3>
                   </div>
@@ -355,20 +355,12 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                         {(this.state.secret.length === 42 && !this.secretValid()) ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
                       </div>
 
-                      {
-                        this.secretValid()
-                          ? (
-                            <LoadingButton
-                              initialText='Submit Verification'
-                              loadingText='Submitting'
-                              isLoading={this.state.verifierSubmitSecretHandler}
-                              disabled={this.state.verifierSubmitSecretHandler}
-                            />
-                          )
-                          : (
-                            null
-                          )
-                      }
+                      <LoadingButton
+                        initialText='Submit Verification'
+                        loadingText='Submitting'
+                        isLoading={this.state.verifierSubmitSecretHandler}
+                        disabled={!this.secretValid() || this.state.verifierSubmitSecretHandler}
+                      />
                     </form>
                   ) : (
                     <React.Fragment>
