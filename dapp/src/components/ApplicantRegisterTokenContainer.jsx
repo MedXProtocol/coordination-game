@@ -37,6 +37,7 @@ import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToVerification } from '~/services/mapToVerification'
+import { tickerToBytes32 } from '~/utils/tickerToBytes32'
 
 function mapStateToProps(state, { location }) {
   let verifier,
@@ -377,18 +378,19 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
               { type: 'uint256', value: random.toString() }
             )
 
-            const hexHint = web3.utils.utf8ToHex(`${this.state.tokenTicker.trim()}-${this.state.tokenName.trim()}`)
+            const hexHint = web3.utils.utf8ToHex(this.state.tokenName.trim())
+            const applicationId = tickerToBytes32(this.state.tokenTicker)
 
             const coordinationGameStartTxId = send(
               coordinationGameAddress,
               'start',
+              applicationId,
               secretRandomHash,
               randomHash,
               hexHint
             )({
               value: this.props.weiPerApplication
             })
-
 
             this.setState({
               coordinationGameStartHandler: new TransactionStateHandler(),

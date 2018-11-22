@@ -24,9 +24,10 @@ import { WhistleblowButton } from '~/components/Applications/WhistleblowButton'
 import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
 import * as routes from '~/../config/routes'
+import { tickerToBytes32 } from '~/utils/tickerToBytes32'
 
 function mapStateToProps(state, { match }) {
-  const applicationId = match.params.applicationId
+  const applicationId = tickerToBytes32(match.params.applicationId)
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')

@@ -21,6 +21,7 @@ import { Listing } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { HintStatus } from '~/components/HintStatus'
+import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
 function mapStateToProps(state, { listingHash }) {
   const address = state.sagaGenesis.accounts[0]
@@ -67,7 +68,7 @@ export const ListingRow = connect(mapStateToProps)(
 
         return (
           <ApplicationListPresenter
-            linkTo={formatRoute(routes.LISTING, { listingHash })}
+            linkTo={formatRoute(routes.LISTING, { listingHash: bytes32ToTicker(listingHash) })}
             id={(
               <React.Fragment>
                 <FontAwesomeIcon icon={faChevronUp} className="list--icon" />
@@ -75,7 +76,7 @@ export const ListingRow = connect(mapStateToProps)(
               </React.Fragment>
             )}
             date={<TEX wei={listing.deposit} />}
-            status={<HintStatus hint={hint} />}
+            status={<HintStatus applicationId={listingHash} hint={hint} />}
             view={''}
             needsAttention={false}
             ofInterest={false}

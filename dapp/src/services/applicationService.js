@@ -5,6 +5,7 @@ import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { isBlank } from '~/utils/isBlank'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToVerification } from '~/services/mapToVerification'
+import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
 export const applicationService = function(state, applicationId, coordinationGameAddress) {
   let applicationObject,
@@ -32,7 +33,8 @@ export const applicationService = function(state, applicationId, coordinationGam
 
   const hexHint = game.hint
   // Parse and convert the generic hint field to our DApp-specific data
-  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+  const tokenName = hexHintToTokenData(hexHint)
+  const tokenTicker = bytes32ToTicker(applicationId)
 
   const applicant = game.applicant
   const applicantsSecret = game.applicantSecret

@@ -1,8 +1,10 @@
 import React from 'react'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
+import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
-export const HintStatus = function ({ hint }) {
-  const [tokenTicker, tokenName] = hexHintToTokenData(hint)
+export const HintStatus = function ({ applicationId, hint }) {
+  const tokenName = hexHintToTokenData(hint)
+  const tokenTicker = bytes32ToTicker(applicationId)
 
   if (tokenName && tokenTicker) {
     var statusText = (

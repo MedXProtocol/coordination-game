@@ -137,6 +137,11 @@ contract CoordinationGame is Ownable {
     _;
   }
 
+  modifier onlyNewApplication(bytes32 _applicationId) {
+    require(games[_applicationId].applicant == address(0), 'application has not been made before');
+    _;
+  }
+
   modifier secretNotRevealed(bytes32 _applicationId) {
     require(games[_applicationId].applicantSecret == bytes32(0), 'secret has not been revealed');
     _;
@@ -192,12 +197,14 @@ contract CoordinationGame is Ownable {
   @param _hint The hint the Applicant provided for the Verifier
   */
   function start(
+    bytes32 _applicationId,
     bytes32 _keccakOfSecretAndRandom,
     bytes32 _keccakOfRandom,
     bytes _hint
   )
     external
     payable
+    onlyNewApplication(_applicationId)
   {
     // make this configurable if we want to lock down 1 application per Eth address
     // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
@@ -205,10 +212,8 @@ contract CoordinationGame is Ownable {
     uint256 depositWei = weiPerApplication();
     require(msg.value >= depositWei, 'not enough ether');
 
-    uint256 index = gamesIterator.length();
-    bytes32 applicationId = bytes32(index + 1);
-    games[applicationId] = Game(
-      applicationId,
+    games[_applicationId] = Game(
+      _applicationId,
       msg.sender, // applicant
       _keccakOfSecretAndRandom, // secretAndRandomHashes
       _keccakOfRandom, // randomHashes
@@ -221,7 +226,7 @@ contract CoordinationGame is Ownable {
       0, // applicantSecret
       0 // whistleblower
     );
-    verifications[applicationId] = Verification(
+    verifications[_applicationId] = Verification(
       0, // verifier
       0, // verifierSecret
       0, // verifierSelectedAt
@@ -229,28 +234,17 @@ contract CoordinationGame is Ownable {
       0, // verifierChallengedAt
       0 // verifierDepositWei
     );
-    gamesIterator.pushValue(bytes32(applicationId));
-    applicantsApplicationIndices[msg.sender].pushValue(applicationId);
-    //
-    // applicationBalancesInWei[applicationId] = msg.value;
-    // applicants[applicationId] = msg.sender;
-    // secretAndRandomHashes[applicationId] = _keccakOfSecretAndRandom;
-    // randomHashes[applicationId] = _keccakOfRandom;
-    // hints[applicationId] = _hint;
-    // /// Make sure the next block is used for randomness
-    // randomBlockNumbers[applicationId] = block.number + 1;
-    // applicantTokenDeposits[applicationId] = work.jobStake();
-    // createdAt[applicationId] = block.timestamp;
-    // updatedAt[applicationId] = block.timestamp;
+    gamesIterator.pushValue(_applicationId);
+    applicantsApplicationIndices[msg.sender].pushValue(_applicationId);
 
     // Transfer a deposit of work tokens from the Applicant to this contract
     require(
-      tilRegistry.token().transferFrom(msg.sender, address(this), games[applicationId].applicantTokenDeposit),
+      tilRegistry.token().transferFrom(msg.sender, address(this), games[_applicationId].applicantTokenDeposit),
       '2nd token transfer succeeded'
     );
 
     emit NewApplication(
-      applicationId,
+      _applicationId,
       msg.sender,
       _keccakOfSecretAndRandom,
       _keccakOfRandom,
