@@ -160,7 +160,7 @@ contract('CoordinationGame', (accounts) => {
     debug(`verifierSubmitSecret`)
     await coordinationGame.verifierSubmitSecret(applicationId, _secret, {
       from: verification.verifier,
-      value: baseApplicationFeeUsdWei.toString()
+      value: weiPerApplication.toString()
     })
   }
 
@@ -225,7 +225,6 @@ contract('CoordinationGame', (accounts) => {
       })
     })
   })
-
 
   describe('applicantRandomlySelectVerifier()', () => {
     it('should not work before the next block has been mined', async () => {
@@ -401,9 +400,25 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
         await verifierSubmitSecret(differentSecret)
 
+        const cgStartingBalance = await web3.eth.getBalance(coordinationGame.address)
+        const regStartingBalance = await web3.eth.getBalance(tilRegistry.address)
+
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
         await applicantRevealsTheirSecret()
 
+        const regFinishingBalance = await web3.eth.getBalance(tilRegistry.address)
+
+        const rewardWei = weiPerApplication.mul(new BN(2))
+
+        assert.equal(
+          regStartingBalance.add(rewardWei).toString(),
+          regFinishingBalance.toString(),
+          'registry was transferred all of the ether'
+        )
+
+        const game = await tilRegistry.lostCoordinationGames(applicationId)
+
+        assert.equal(game[3].toString(), rewardWei.toString(), 'registry has recorded the reward wei');
         assert.equal(await tilRegistry.challenges(applicationId), true, 'application was challenged')
       })
     })
