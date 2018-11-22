@@ -15,6 +15,7 @@ import { get } from 'lodash'
 import { AppId } from '~/components/AppId'
 import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
@@ -313,6 +314,8 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
             return (
               <div className='column is-8-widescreen is-offset-2-widescreen paper'>
+                <ScrollToTop />
+
                 <div className="has-text-right">
                   <button
                     className="is-warning is-outlined is-pulled-right delete is-large"
