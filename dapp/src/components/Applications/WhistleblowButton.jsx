@@ -54,7 +54,7 @@ export const WhistleblowButton = connect(mapStateToProps)(
           </p>
           <button
             onClick={() => this.setState({ showWhistleblowModal: true })}
-            className="button is-small is-outlined is-primary"
+            className="button is-small is-outlined is-info"
             >
             Whistleblow
           </button>

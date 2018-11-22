@@ -30,9 +30,12 @@ function mapStateToProps(state) {
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
 
+  const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
+
   return {
     address,
     allowance,
+    ethBalance,
     jobStake,
     requiredStake,
     staked,
@@ -71,6 +74,18 @@ export const Wallet = connect(mapStateToProps)(
               </h1>
 
               <div className="level--container">
+                <nav className="level level--header">
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <span className="heading">
+                        Eth:
+                      </span>
+                      <span className="title">
+                        <TILOdometer value={displayWeiToEther(this.props.ethBalance)} />&nbsp;Ξ
+                      </span>
+                    </div>
+                  </div>
+                </nav>
                 <nav className="level level--body">
                   <div className="level-item has-text-centered">
                     <div>
@@ -79,6 +94,7 @@ export const Wallet = connect(mapStateToProps)(
                           src={TEXCoinImg}
                           alt="TEX Token Icon"
                           srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
+                          width="100"
                         />
                       </span>
                       <span className="title">

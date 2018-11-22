@@ -75,6 +75,9 @@ export const Listing = connect(mapStateToProps)(
       }
 
       render () {
+        let tip,
+          action
+
         const {
           listingHash,
           TILRegistry,
@@ -88,13 +91,20 @@ export const Listing = connect(mapStateToProps)(
           hint,
           applicantSecret
         } = game || {}
-        // necessary to show the verifier on 1st-time component load
-        ReactTooltip.rebuild()
 
         const challengeStarted = challenge.isChallenging()
 
+
         if (listing.owner === address && TILRegistry) {
-          var action =
+          if (challengeStarted) {
+            tip = `There is currently a challenge against this listing preventing you from withdrawing your the deposit you invested in it.`
+          } else {
+            tip = `You can remove this listing and withdraw the deposit you invested in it.`
+          }
+          action = <abbr
+            data-for={`listing-withdrawal`}
+            data-tip={tip}
+          >
             <Web3ActionButton
               contractAddress={TILRegistry}
               method='withdrawListing'
@@ -102,10 +112,20 @@ export const Listing = connect(mapStateToProps)(
               disabled={challengeStarted}
               buttonText='Withdraw'
               loadingText='Withdrawing...'
-              className="button is-small is-info is-outlined is-pulled-right"
+              className="button is-small is-info is-outlined"
               confirmationMessage='Your listing has been withdrawn.'
               txHashMessage='Withdraw listing request sent -
                 it will take a few minutes to confirm on the Ethereum network.' />
+            <ReactTooltip
+              id={`listing-withdrawal`}
+              html={true}
+              effect='solid'
+              place='top'
+              wrapper='span'
+            />
+          </abbr>
+
+          ReactTooltip.rebuild()
         }
 
         if (listing.isDeleted()) {
@@ -142,7 +162,7 @@ export const Listing = connect(mapStateToProps)(
                 <h5 className="is-size-5 has-text-grey-lighter">
                   Token Name:
                 </h5>
-                <h3 className="is-size-3 has-text-grey-light">
+                <h3 className="is-size-3 has-text-grey">
                   {tokenName}
                 </h3>
               </div>
@@ -151,7 +171,7 @@ export const Listing = connect(mapStateToProps)(
                 <h5 className="is-size-5 has-text-grey-lighter">
                   Token Ticker:
                 </h5>
-                <h3 className="is-size-3 has-text-grey-light">
+                <h3 className="is-size-3 has-text-grey">
                   ${tokenTicker}
                 </h3>
               </div>
@@ -168,11 +188,9 @@ export const Listing = connect(mapStateToProps)(
               </div>
             </div>
 
-            <br />
             {action}
             <br />
             {challengeAction}
-            <br />
             {message}
           </div>
         )

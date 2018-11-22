@@ -39,6 +39,7 @@ export const Verify = connect(mapStateToProps)(
             <VerifierStake />
 
             <br />
+            <hr />
             <br />
 
             <VerifierApplicationsTable

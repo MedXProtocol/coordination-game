@@ -107,13 +107,13 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
       const stateLabel = challenge.stateAsLabel()
 
       if (challenge.canStart()) {
-        challengeTitle = "Challenge"
+        challengeTitle = "Challenge."
         if (!hasChallengeAllowance) {
           challengeMessage =
             <p>
-              <span>You may challenge the validity of this listing</span>
+              You may challenge the validity of this listing
               <br />
-              <span>First you must approve the contract to spend the tokens.</span>
+              To start a vote against this listing you must first approve the contract to spend <strong><TEX wei={challengeDeposit} /></strong>:
             </p>
           challengeAction =
             <Web3ActionButton
@@ -130,7 +130,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         } else {
           challengeMessage =
             <p>
-              <span>You may challenge the validity of this listing.</span>
+              You may challenge the validity of this listing:
             </p>
           challengeAction =
             <Web3ActionButton
@@ -140,7 +140,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               buttonText={<span>Challange</span>}
               loadingText='Challenging...'
               className="button is-small is-info is-outlined"
-              confirmationMessage='You have challenged the listing.'
+              confirmationMessage='You have challenged this listing.'
               txHashMessage='Challenge request sent -
                 it will take a few minutes to confirm on the Ethereum network.'
               key='startChallenge' />
@@ -161,30 +161,35 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 it will take a few minutes to confirm on the Ethereum network.'
               key='withdraw' />
         }
+
         if (stateLabel === 'challengeFailed') {
-          challengeTitle = "The challenge was unsuccessful"
+          challengeTitle = "The challenge was unsuccessful."
           challengeMessage =
             <p>
-                {challengeWithdrawMessage}
+              {challengeWithdrawMessage}
             </p>
         } else {
-          challengeTitle = "This listing was successfully Challenged"
+          challengeTitle = "This listing was successfully challenged."
           challengeMessage =
             <p>
-                {challengeWithdrawMessage}
+              {challengeWithdrawMessage}
             </p>
         }
       } else if (stateLabel === 'challenged' && PowerChallenge) {
-        challengeTitle = "The listing has been Challenged"
+        challengeTitle = "An ongoing challenge currently favours removing this listing."
+
         if (!hasNextChallengeAllowance) {
           challengeMessage =
             <p>
-              <span>To reject the challenge, you must first approve the Power Challenge contract to spend <TEX wei={nextDepositAmount} /></span>
+              The listing will be removed in X days.
+              <br />You can vote against this challenge. To vote in favour of this listing you must first approve the Power Challenge contract to spend <strong><TEX wei={nextDepositAmount} /></strong>:
             </p>
           challengeAction = approvePowerChallenge
         } else {
           challengeMessage =
-            <p><span>You may reject the challenge with <TEX wei={nextDepositAmount} /></span></p>
+            <p>
+              To vote in favour of this listing and reject the challenge put down <strong><TEX wei={nextDepositAmount} /></strong>:
+            </p>
           challengeAction =
             <Web3ActionButton
               contractAddress={PowerChallenge}
@@ -199,15 +204,16 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               key='rejectChallenge' />
         }
       } else if (stateLabel === 'approved' && PowerChallenge) {
-        challengeTitle = "The Listing Challenge has been Rejected"
+        challengeTitle = "An ongoing challenge currently favours keeping this listing. You can vote against it to have it removed."
+
         if (!hasNextChallengeAllowance) {
           challengeMessage =
             <p>
-              <span>To challenge the listing, you must first approve the Power Challenge contract to spend <TEX wei={nextDepositAmount} /></span>
+              To challenge this listing, you must first approve the Power Challenge contract to spend <strong><TEX wei={nextDepositAmount} /></strong>
             </p>
           challengeAction = approvePowerChallenge
         } else {
-          challengeMessage = <p><span>You can challenge the rejection using <TEX wei={nextDepositAmount} /></span></p>
+          challengeMessage = <p>You can challenge the rejection using <strong><TEX wei={nextDepositAmount} /></strong>:</p>
           challengeAction =
             <Web3ActionButton
               contractAddress={PowerChallenge}
@@ -216,7 +222,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               buttonText='Challenge'
               loadingText='Challenging...'
               className="button is-small is-info is-outlined"
-              confirmationMessage='The listing has been challenged.'
+              confirmationMessage='This listing has been challenged.'
               txHashMessage='Challenge request sent -
                 it will take a few minutes to confirm on the Ethereum network.'
               key='approveChallenge' />
@@ -225,15 +231,20 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
 
       return (
         <React.Fragment>
-          <h6 className="is-size-6">
-            {challengeTitle}
-          </h6>
           <div className="columns">
             <div className="column is-8">
+              <h5 className="is-size-5">
+                Remove This Listing
+              </h5>
+              <h6 className="is-size-6">
+                {challengeTitle}
+              </h6>
               {challengeMessage}
+              <br />
+
+              {challengeAction}
             </div>
           </div>
-          {challengeAction}
         </React.Fragment>
       )
     }

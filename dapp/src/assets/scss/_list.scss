@@ -287,10 +287,11 @@
   }
 }
 
-.list--application-item .list--item__date {
+.list--application-item .list--item__timer {
   background-color: darken($background-color, 4%);
   border-radius: 0.5rem;
   color: darken($text-color, 10%);
+  display: block;
   font-size: 1.5rem;
   padding: 1.5rem 0.5rem;
   text-align: center;
@@ -298,7 +299,7 @@
   font-weight: 400;
 }
 
-.list--application-item:hover .list--item__date {
+.list--application-item:hover .list--item__timer {
   background-color: darken($background-color, 2%);
   color: darken($text-color, 20%);
 }

@@ -11,6 +11,7 @@ import {
 import { connect } from 'react-redux'
 import { range } from 'lodash'
 import { ListingRow } from '~/components/registry/ListingRow'
+import { LoadingLines } from '~/components/LoadingLines'
 import { PageTitle } from '~/components/PageTitle'
 import { Pagination } from '~/components/Pagination'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -57,7 +58,7 @@ function* challengesSaga({ PowerChallenge, startIndex, endIndex }) {
 
 export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
   class _Challenges extends PureComponent {
-    renderApplicationRows(ids) {
+    renderChallengeRows(ids) {
       return ids.map((challengeId) => {
         return (
           <ListingRow
@@ -69,6 +70,35 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
     }
 
     render () {
+      let noChallenges,
+        loadingLines,
+        challengeRows
+
+      const { ids, challengeCount } = this.props
+      const loading = challengeCount === undefined
+
+      if (loading) {
+        loadingLines = (
+          <div className="blank-state">
+            <div className="blank-state--inner has-text-grey">
+              <LoadingLines visible={true} />
+            </div>
+          </div>
+        )
+      } else if (!ids.length) {
+        noChallenges = (
+          <div className="blank-state">
+            <div className="blank-state--inner has-text-grey">
+              <span className="is-size-6">There are currently no challenges to vote on.</span>
+            </div>
+          </div>
+        )
+      } else {
+        challengeRows = (
+          this.renderChallengeRows(ids)
+        )
+      }
+
       return (
         <React.Fragment>
           <ScrollToTop
@@ -87,8 +117,11 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
           <hr />
 
           <div className='list--container'>
+            {loadingLines}
+            {noChallenges}
+
             <div className="list">
-              {this.renderApplicationRows(this.props.ids)}
+              {challengeRows}
             </div>
 
             <Pagination

@@ -50,6 +50,7 @@ function mapStateToProps(state) {
     jobStake,
     requiredStake,
     minimumBalanceToWork,
+    powerChallengeAddress,
     powerChallengeTimeoutInSeconds,
     transactions,
     verifierTimeoutInSeconds,

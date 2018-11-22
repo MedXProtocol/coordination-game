@@ -137,7 +137,7 @@ export const VerifierStake = connect(mapStateToProps)(
                         <div className='column'>
                           <p>
                             <FontAwesomeIcon icon={faCheckCircle} width="100" className="has-text-primary" />&nbsp;
-                            You have successfully staked <strong>{displayWeiToEther(staked)} TEX</strong> and are now a Verifier.
+                            Successfully staked <strong>{displayWeiToEther(staked)} TEX</strong> and are now a Verifier.
                           </p>
                           <div className="content">
                             <ul>
@@ -146,8 +146,7 @@ export const VerifierStake = connect(mapStateToProps)(
                                 appear on the <Link to={routes.VERIFY}>Verify</Link> page.
                               </li>
                               <li>
-                                On the <Link to={routes.WALLET}>Wallet</Link> page you
-                                may withdraw your stake to give up your Verifying rights.
+                                You may also withdraw your stake and give up your Verifying privileges.
                               </li>
                             </ul>
                           </div>
