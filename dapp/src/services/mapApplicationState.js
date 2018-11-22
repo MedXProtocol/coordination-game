@@ -66,7 +66,7 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   )
 
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = !applicantRevealedSecret && noWhistleblower && !isApplicant
+  const canWhistleblow = !verifierSubmittedSecret && !applicantRevealedSecret && noWhistleblower && !isApplicant
 
   const canVerify = (
     isVerifier &&

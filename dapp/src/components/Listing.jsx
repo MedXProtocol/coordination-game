@@ -12,10 +12,11 @@ import {
 import BN from 'bn.js'
 import { AppId } from '~/components/AppId'
 import { EtherscanLink } from '~/components/EtherscanLink'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
-import { mapToGame } from '~/services/mapToGame'
 import { ChallengePanel } from '~/components/Listings/ChallengePanel'
+import { ScrollToTop } from '~/components/ScrollToTop'
+import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { mapToListing } from '~/services/mapToListing'
+import { mapToGame } from '~/services/mapToGame'
 import { Challenge } from '~/models/Challenge'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { bytes32ToAddress } from '~/utils/bytes32ToAddress'
@@ -120,6 +121,8 @@ export const Listing = connect(mapStateToProps)(
 
         return (
           <div className='column is-8-widescreen is-offset-2-widescreen paper'>
+            <ScrollToTop />
+
             <div className="has-text-right">
               <button
                 className="is-warning is-outlined is-pulled-right delete is-large"
