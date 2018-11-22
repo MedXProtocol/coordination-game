@@ -8,7 +8,7 @@ export function mapToGame (array) {
     hint: array[4],
     createdAt: parseInt(array[5] || 0, 10),
     updatedAt: parseInt(array[6] || 0, 10),
-    applicationBalanceInWei: array[7],
+    applicationFeeWei: array[7],
     applicantTokenDeposit: array[8],
     /// @notice the block number whose hash is to be used for randomness
     randomBlockNumber: array[9],

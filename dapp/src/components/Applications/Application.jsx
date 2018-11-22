@@ -106,7 +106,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
           handleVerifierSecretSubmit = (e) => {
             e.preventDefault()
 
-            const { send, coordinationGameAddress, applicationId } = this.props
+            const { send, coordinationGameAddress, applicationId, applicationObject } = this.props
 
             const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', this.state.secret.toString())
 
@@ -115,7 +115,9 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
               'verifierSubmitSecret',
               applicationId,
               secretAsHex
-            )()
+            )({
+              value: applicationObject.game.applicationFeeWei
+            })
 
             this.setState({
               verifierSubmitSecretHandler: new TransactionStateHandler(),

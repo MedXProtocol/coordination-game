@@ -25,7 +25,7 @@ contract CoordinationGame is Ownable {
     bytes hint;
     uint256 createdAt;
     uint256 updatedAt;
-    uint256 applicationBalanceInWei;
+    uint256 applicationFeeWei;
     uint256 applicantTokenDeposit;
     /// @notice the block number whose hash is to be used for randomness
     uint256 randomBlockNumber;
@@ -44,6 +44,7 @@ contract CoordinationGame is Ownable {
     uint256 verifierSubmittedAt;
     /// @notice The time at which the verifier challenged the game due to a reveal timeout
     uint256 verifierChallengedAt;
+    uint256 verifierDepositWei;
   }
 
   EtherPriceFeed etherPriceFeed;
@@ -225,7 +226,8 @@ contract CoordinationGame is Ownable {
       0, // verifierSecret
       0, // verifierSelectedAt
       0, // verifierSubmittedAt
-      0 // verifierChallengedAt
+      0, // verifierChallengedAt
+      0 // verifierDepositWei
     );
     gamesIterator.pushValue(bytes32(applicationId));
     applicantsApplicationIndices[msg.sender].push(applicationId);
@@ -331,18 +333,21 @@ contract CoordinationGame is Ownable {
   */
   function verifierSubmitSecret(bytes32 _applicationId, bytes32 _secret)
     public
+    payable
     onlyVerifier(_applicationId)
     notWhistleblown(_applicationId)
   {
     Verification storage verification = verifications[_applicationId];
     Game storage game = games[_applicationId];
 
+    require(msg.value >= game.applicationFeeWei, 'verifier is submitting enough ether');
     require(gamesIterator.hasValue(_applicationId), 'application has been initialized');
     require(verification.verifierSecret == bytes32(0), 'verify has not already been called');
     require(_secret.length > 0, 'secret is not empty');
 
     verification.verifierSecret = _secret;
     verification.verifierSubmittedAt = block.timestamp;
+    verification.verifierDepositWei = msg.value;
     game.updatedAt = block.timestamp;
 
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
@@ -378,7 +383,7 @@ contract CoordinationGame is Ownable {
     emit Whistleblown(msg.sender, _applicationId, _randomNumber);
 
     /// Transfer applicant's deposit to the whistleblower
-    msg.sender.transfer(game.applicationBalanceInWei);
+    msg.sender.transfer(game.applicationFeeWei);
   }
 
   /**
@@ -445,7 +450,7 @@ contract CoordinationGame is Ownable {
     emit VerifierChallenged(_applicationId, msg.sender);
 
     /// Transfer the applicant's application fee to the verifier
-    msg.sender.transfer(game.applicationBalanceInWei);
+    msg.sender.transfer(game.applicationFeeWei);
   }
 
   function applicantWon(bytes32 _applicationId) internal {
@@ -462,7 +467,7 @@ contract CoordinationGame is Ownable {
     /// Return the verifier's job stake
     returnVerifierJobStake(_applicationId);
     /// Pay the verifier the application fee
-    verification.verifier.transfer(game.applicationBalanceInWei);
+    verification.verifier.transfer(game.applicationFeeWei);
 
     emit ApplicantWon(_applicationId);
   }
@@ -477,8 +482,10 @@ contract CoordinationGame is Ownable {
       game.applicantTokenDeposit.add(work.jobStake())
     );
 
-    tilRegistry.applicantLostCoordinationGame.value(game.applicationBalanceInWei)(
-      _applicationId, game.applicant, game.applicantTokenDeposit, game.applicationBalanceInWei,
+    uint256 totalTransfer = game.applicationFeeWei.add(verification.verifierDepositWei);
+
+    tilRegistry.applicantLostCoordinationGame.value(totalTransfer)(
+      _applicationId, game.applicant, game.applicantTokenDeposit, totalTransfer,
       verification.verifier, work.jobStake()
     );
 
@@ -486,8 +493,12 @@ contract CoordinationGame is Ownable {
   }
 
   function returnVerifierJobStake(bytes32 _applicationId) internal {
+    Verification storage verification = verifications[_applicationId];
     tilRegistry.token().approve(address(work), work.jobStake());
-    work.depositJobStake(verifications[_applicationId].verifier);
+    work.depositJobStake(verification.verifier);
+    uint256 deposit = verification.verifierDepositWei;
+    verification.verifierDepositWei = 0;
+    verification.verifier.transfer(deposit);
   }
 
   function getApplicantsApplicationCount(address _applicant) external view returns (uint256) {

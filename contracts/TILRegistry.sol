@@ -19,7 +19,7 @@ contract TILRegistry is Initializable {
 
   struct CoordinationGameEtherDeposit {
     address verifier;
-    uint256 applicantDepositEther;
+    uint256 rewardWei;
   }
 
   event NewListing(address owner, bytes32 listingHash);
@@ -66,16 +66,16 @@ contract TILRegistry is Initializable {
 
   function applicantLostCoordinationGame(
     bytes32 _listingHash,
-    address _applicant, uint256 _applicantDepositTokens, uint256 _applicantDepositEther,
+    address _applicant, uint256 _applicantDepositTokens, uint256 _rewardWei,
     address _challenger, uint256 _challengerDepositTokens
   ) external payable onlyJobManager {
-    require(msg.value >= _applicantDepositEther, 'ether has been sent');
+    require(msg.value == _rewardWei, 'ether has been sent');
     createNewListing(_applicant, _listingHash, _applicantDepositTokens);
     require(token.transferFrom(msg.sender, address(this), _applicantDepositTokens.add(_challengerDepositTokens)));
     token.approve(address(powerChallenge), _applicantDepositTokens.add(_challengerDepositTokens));
     powerChallenge.startApproval(_listingHash, _applicantDepositTokens);
     powerChallenge.challengeFrom(_listingHash, address(this), _challenger);
-    deposits[_listingHash] = CoordinationGameEtherDeposit(_challenger, _applicantDepositEther);
+    deposits[_listingHash] = CoordinationGameEtherDeposit(_challenger, _rewardWei);
   }
 
   function challenge(bytes32 _listingHash) external onlyCompleted(_listingHash) {
@@ -114,11 +114,11 @@ contract TILRegistry is Initializable {
     CoordinationGameEtherDeposit storage deposit = deposits[_listingHash];
     uint256 withdrawal = 0;
     if (state == PowerChallenge.State.CHALLENGE_FAIL && _beneficiary == listings[_listingHash].owner) {
-      withdrawal = deposit.applicantDepositEther;
-      deposit.applicantDepositEther = 0;
+      withdrawal = deposit.rewardWei;
+      deposit.rewardWei = 0;
     } else if (state == PowerChallenge.State.CHALLENGE_SUCCESS && _beneficiary == deposit.verifier) {
-      withdrawal = deposit.applicantDepositEther;
-      deposit.applicantDepositEther = 0;
+      withdrawal = deposit.rewardWei;
+      deposit.rewardWei = 0;
     }
     if (withdrawal > 0) {
       _beneficiary.transfer(withdrawal);

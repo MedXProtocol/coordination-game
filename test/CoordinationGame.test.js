@@ -159,7 +159,8 @@ contract('CoordinationGame', (accounts) => {
     if (!_secret) { _secret = secret }
     debug(`verifierSubmitSecret`)
     await coordinationGame.verifierSubmitSecret(applicationId, _secret, {
-      from: verification.verifier
+      from: verification.verifier,
+      value: weiPerApplication.toString()
     })
   }
 
@@ -205,7 +206,7 @@ contract('CoordinationGame', (accounts) => {
       )
 
       assert.equal(
-        storedGame.applicationBalanceInWei.toString(),
+        storedGame.applicationFeeWei.toString(),
         weiPerApplication.toString()
       )
     })
@@ -224,7 +225,6 @@ contract('CoordinationGame', (accounts) => {
       })
     })
   })
-
 
   describe('applicantRandomlySelectVerifier()', () => {
     it('should not work before the next block has been mined', async () => {
@@ -400,9 +400,25 @@ contract('CoordinationGame', (accounts) => {
         debug(`applicantRevealSecret() failed verifierSubmitSecret(${applicationId}, ${secret})...`)
         await verifierSubmitSecret(differentSecret)
 
+        const cgStartingBalance = await web3.eth.getBalance(coordinationGame.address)
+        const regStartingBalance = await web3.eth.getBalance(tilRegistry.address)
+
         debug(`applicantRevealSecret() failed applicantRevealSecret(${secret}, ${random})...`)
         await applicantRevealsTheirSecret()
 
+        const regFinishingBalance = await web3.eth.getBalance(tilRegistry.address)
+
+        const rewardWei = weiPerApplication.mul(new BN(2))
+
+        assert.equal(
+          regStartingBalance.add(rewardWei).toString(),
+          regFinishingBalance.toString(),
+          'registry was transferred all of the ether'
+        )
+
+        const game = await tilRegistry.lostCoordinationGames(applicationId)
+
+        assert.equal(game[3].toString(), rewardWei.toString(), 'registry has recorded the reward wei');
         assert.equal(await tilRegistry.challenges(applicationId), true, 'application was challenged')
       })
     })
@@ -433,7 +449,7 @@ contract('CoordinationGame', (accounts) => {
 
         game = mapToGame(await coordinationGame.games(applicationId))
 
-        const applicantEtherDeposit = game.applicationBalanceInWei
+        const applicantEtherDeposit = game.applicationFeeWei
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
