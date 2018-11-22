@@ -36,37 +36,31 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   const applicantRevealedSecret = !isBlank(applicantsSecret)
   const applicantWon = (applicantsSecret === verifiersSecret)
 
+  const needsAVerifier = isBlank(verifier)
   const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
+  const verifierHasChallenged = (defined(verifierChallengedAt) && verifierChallengedAt !== 0)
+
   const needsApplicantReveal = (
     !applicantRevealedSecret &&
-    verifierSubmittedSecret &&
-    defined(random) &&
-    defined(secret)
+    verifierSubmittedSecret
   )
 
-  const verifierHasChallenged = (verifierChallengedAt !== 0)
   const applicantMissedRevealDeadline = (
-    !applicantRevealedSecret &&
-    verifierSubmittedSecret &&
+    needsApplicantReveal &&
     (latestBlockTimestamp > applicantRevealExpiresAt)
   )
 
-  const needsAVerifier = (
-    isBlank(verifier) &&
-    defined(tokenTicker) &&
-    defined(tokenName) &&
-    defined(secret) &&
-    defined(random)
-  )
-
   const needsNewVerifier = (
-    !isBlank(verifier) &&
-    !verifierSubmittedSecret &&
+    waitingOnVerifier &&
     (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
   )
 
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = !verifierSubmittedSecret && !applicantRevealedSecret && noWhistleblower && !isApplicant
+  const canWhistleblow = (
+    !isApplicant &&
+    !verifierSubmittedSecret
+    && noWhistleblower
+  )
 
   const canVerify = (
     isVerifier &&
@@ -83,7 +77,8 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   )
 
   const isComplete = (
-    (verifierSubmittedSecret && applicantRevealedSecret) ||
+    applicantRevealedSecret ||
+    verifierHasChallenged ||
     !noWhistleblower
   )
 

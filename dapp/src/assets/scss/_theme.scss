@@ -521,6 +521,12 @@ html.html-light,
     box-shadow: 0 0 5px 0 lighten(#ebe400, 5%);
   }
 
+  .delete.is-warning.is-outlined:hover,
+  .delete.is-warning.is-outlined:active,
+  .delete.is-warning.is-outlined:focus {
+    box-shadow: 0 0 5px 0 $brand-warning--light;
+  }
+
   @keyframes attention-grabby--light {
     0% {
       color: $accent-color-3--light;

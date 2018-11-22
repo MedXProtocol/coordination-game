@@ -425,10 +425,8 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
           }
 
           handleTextInputChange = (e) => {
-            let val = e.target.value
-
             this.setState({
-              [e.target.name]: val
+              [e.target.name]: e.target.value
             })
           }
 

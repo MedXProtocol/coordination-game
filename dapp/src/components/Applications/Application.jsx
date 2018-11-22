@@ -13,6 +13,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { AppId } from '~/components/AppId'
+import { ApplicantRevealForm } from '~/components/Applications/ApplicantRevealForm'
 import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -151,12 +152,9 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             } = this.props
 
             let {
-              applicantRevealExpiresAt,
               applicationId,
               createdAt,
               updatedAt,
-              random,
-              secret,
               tokenTicker,
               tokenName,
               verifier,
@@ -213,37 +211,17 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
                 </p>
               )
-            } else if (applicationState.needsApplicantReveal) {
-              let secretAsHex
-
-              if (secret) {
-                secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
-              }
-
-              message = (
-                <div>
-                  <p>
-                    <strong>Reveal your secret before:</strong>
-                    <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
-                    <br />
-                    <br />
-                  </p>
-                  <Web3ActionButton
-                    contractAddress={this.props.coordinationGameAddress}
-                    method='applicantRevealSecret'
-                    args={[applicationId, secretAsHex, random.toString()]}
-                    buttonText='Reveal Secret'
-                    loadingText='Revealing'
-                    confirmationMessage='"Reveal Secret" transaction confirmed.'
-                    txHashMessage='"Reveal Secret" transaction sent successfully -
-                      it will take a few minutes to confirm on the Ethereum network.'/>
-                </div>
-              )
             }
 
             // APPLICANT:
             if (applicationState.isApplicant) {
-              if (applicationState.verifierHasChallenged) {
+              if (applicationState.needsApplicantReveal) {
+                message = <ApplicantRevealForm
+                  applicationObject={applicationObject}
+                  coordinationGameAddress={this.props.coordinationGameAddress}
+                  transactions={this.props.transactions}
+                />
+              } else if (applicationState.verifierHasChallenged) {
                 message = <span className="has-text-warning">
                   You did not reveal your secret in time. Your verifier has closed the application. Please consider resubmitting another application.
                 </span>
@@ -348,6 +326,9 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                     </h3>
                   </div>
                 </div>
+
+
+
 
                 {applicationState.canVerify
                   ? (
