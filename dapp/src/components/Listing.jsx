@@ -15,7 +15,7 @@ import { EtherscanLink } from '~/components/EtherscanLink'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { mapToGame } from '~/services/mapToGame'
 import { ChallengePanel } from '~/components/Listings/ChallengePanel'
-import { mapToListing } from '~/services/mapToListing'
+import { Listing as ListingModel } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { bytes32ToAddress } from '~/utils/bytes32ToAddress'
@@ -28,7 +28,7 @@ function mapStateToProps(state, { match }) {
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const WorkToken = contractByName(state, 'WorkToken')
   const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
-  const listing = mapToListing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
+  const listing = new ListingModel(cacheCallValue(state, TILRegistry, 'listings', listingHash))
   const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
   const powerChallengeAllowance = cacheCallValueBigNumber(state, WorkToken, 'allowance', address, PowerChallenge) || new BN(0)
   const nextDepositAmount = cacheCallValueBigNumber(state, PowerChallenge, 'nextDepositAmount', listingHash) || new BN(0)
@@ -84,19 +84,15 @@ export const Listing = connect(mapStateToProps)(
         } = this.props
 
         const {
-          owner
-        } = listing || {}
-
-        const {
           hint,
           applicantSecret
         } = game || {}
         // necessary to show the verifier on 1st-time component load
         ReactTooltip.rebuild()
 
-        const challengeStarted = !challenge.isComplete()
+        const challengeStarted = challenge.isChallenging()
 
-        if (owner === address && TILRegistry) {
+        if (listing.owner === address && TILRegistry) {
           var action =
             <Web3ActionButton
               contractAddress={TILRegistry}
@@ -111,7 +107,12 @@ export const Listing = connect(mapStateToProps)(
                 it will take a few minutes to confirm on the Ethereum network.' />
         }
 
-        if (challengeStarted) {
+        if (listing.isDeleted()) {
+          var message =
+            <p className="is-size-7 has-text-grey-lighter">
+              This listing was challenged and removed.
+            </p>
+        } else {
           var challengeAction = <ChallengePanel listingHash={listingHash} />
         }
 
@@ -169,10 +170,7 @@ export const Listing = connect(mapStateToProps)(
             <br />
             { challengeAction }
             <br />
-
-            <p className="is-size-7 has-text-grey-lighter">
-              This was made sometime
-            </p>
+            { message }
           </div>
         )
       }

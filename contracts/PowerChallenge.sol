@@ -3,11 +3,9 @@ pragma solidity ^0.4.24;
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
-import "./TILRegistry.sol";
 import "./IndexedBytes32Array.sol";
-import "./IPowerChallenge.sol";
 
-contract PowerChallenge is Ownable, IPowerChallenge {
+contract PowerChallenge is Ownable {
   using SafeMath for uint256;
   using IndexedBytes32Array for IndexedBytes32Array.Data;
 
@@ -28,6 +26,9 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     State state;
     mapping(address => uint256) challengeDeposits;
     mapping(address => uint256) approveDeposits;
+    uint256 totalWithdrawn;
+    uint256 challengerDepositCount;
+    uint256 approverDepositCount;
   }
 
   event ChallengeStarted(bytes32 id, State state);
@@ -41,8 +42,8 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   mapping(bytes32 => Challenge) public challenges;
   IndexedBytes32Array.Data challengeIterator;
 
-  modifier onlyNotStarted(bytes32 _id) {
-    require(notStarted(_id), "challenge not started");
+  modifier onlyCompleted(bytes32 _id) {
+    require(isComplete(_id), "challenge has completed");
     _;
   }
 
@@ -94,7 +95,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     * @param _payer The address that is paying the tokens
     * @param _beneficiary The address that will be able to withdraw these tokens.
     */
-  function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
+  function startChallengeFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyCompleted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
       _id,
@@ -102,10 +103,15 @@ contract PowerChallenge is Ownable, IPowerChallenge {
       _amount,
       0,
       block.timestamp,
-      State.CHALLENGED
+      State.CHALLENGED,
+      0,
+      1,
+      0
     );
     challenges[_id].challengeDeposits[_beneficiary] = _amount;
-    challengeIterator.pushValue(_id);
+    if (!challengeIterator.hasValue(_id)) {
+      challengeIterator.pushValue(_id);
+    }
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -121,7 +127,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     * @param _payer The address that is paying the tokens
     * @param _beneficiary The address that will be able to withdraw these tokens.
     */
-  function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyNotStarted(_id) {
+  function startApprovalFrom(bytes32 _id, uint256 _amount, address _payer, address _beneficiary) public onlyCompleted(_id) {
     require(token.transferFrom(_payer, address(this), _amount), 'transferred tokens');
     challenges[_id] = Challenge(
       _id,
@@ -129,10 +135,15 @@ contract PowerChallenge is Ownable, IPowerChallenge {
       0,
       _amount,
       block.timestamp,
-      State.APPROVED
+      State.APPROVED,
+      0,
+      0,
+      1
     );
     challenges[_id].approveDeposits[_beneficiary] = _amount;
-    challengeIterator.pushValue(_id);
+    if (!challengeIterator.hasValue(_id)) {
+      challengeIterator.pushValue(_id);
+    }
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -147,6 +158,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     challengeStore.approveTotal = challengeStore.approveTotal.add(deposit);
     challengeStore.approveDeposits[_beneficiary] = challengeStore.approveDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.APPROVED;
+    challengeStore.approverDepositCount = challengeStore.approverDepositCount.add(1);
 
     emit Approved(_id);
   }
@@ -165,6 +177,7 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     challengeStore.challengeTotal = challengeStore.challengeTotal.add(deposit);
     challengeStore.challengeDeposits[_beneficiary] = challengeStore.challengeDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.CHALLENGED;
+    challengeStore.challengerDepositCount = challengeStore.challengerDepositCount.add(1);
 
     emit Challenged(_id);
   }
@@ -177,26 +190,71 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     emit Closed(_id);
   }
 
-  function withdraw(bytes32 _id) external {
-    withdrawFor(_id, msg.sender);
+  function withdraw(bytes32 _id) external returns (uint256) {
+    return withdrawFor(_id, msg.sender);
   }
 
-  function withdrawFor(bytes32 _id, address _beneficiary) public {
-    if (!isComplete(_id)) {
+  function withdrawFor(bytes32 _id, address _beneficiary) public returns (uint256) {
+    if (isChallenging(_id)) {
       close(_id);
     }
-    Challenge storage challengeStore = challenges[_id];
     uint256 withdrawal;
-    if (challengeStore.state == State.CHALLENGE_FAIL) {
-      withdrawal = totalApproveWithdrawal(_id, _beneficiary);
-      challengeStore.approveDeposits[_beneficiary] = 0;
-    } else if (challengeStore.state == State.CHALLENGE_SUCCESS) {
-      withdrawal = totalChallengeWithdrawal(_id, _beneficiary);
-      challengeStore.challengeDeposits[_beneficiary] = 0;
+    Challenge storage _challenge = challenges[_id];
+    if (_challenge.state == State.CHALLENGE_FAIL) {
+      withdrawal = approveWithdrawalOrRemainder(_id, _beneficiary);
+      if (withdrawal > 0) {
+        _challenge.approverDepositCount = _challenge.approverDepositCount.sub(1);
+      }
+      _challenge.approveDeposits[_beneficiary] = 0;
+    } else if (_challenge.state == State.CHALLENGE_SUCCESS) {
+      withdrawal = challengeWithdrawalOrRemainder(_id, _beneficiary);
+      if (withdrawal > 0) {
+        _challenge.challengerDepositCount = _challenge.challengerDepositCount.sub(1);
+      }
+      _challenge.challengeDeposits[_beneficiary] = 0;
     }
+    _challenge.totalWithdrawn = _challenge.totalWithdrawn.add(withdrawal);
+
     token.transfer(_beneficiary, withdrawal);
 
     emit Withdrew(_id, _beneficiary, withdrawal);
+
+    return withdrawal;
+  }
+
+  function challengeWithdrawalOrRemainder(bytes32 _id, address _user) internal view returns (uint256) {
+    Challenge storage _challenge = challenges[_id];
+    uint256 result;
+    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
+    if (_challenge.challengerDepositCount == 1 && _challenge.challengeDeposits[_user] > 0) {
+      result = total.sub(_challenge.totalWithdrawn);
+    } else if (_challenge.challengeTotal != 0) {
+      result = total.mul(_challenge.challengeDeposits[_user]).div(_challenge.challengeTotal);
+    }
+    return result;
+  }
+
+  function approveWithdrawalOrRemainder(bytes32 _id, address _user) internal view returns (uint256) {
+    Challenge storage _challenge = challenges[_id];
+    uint256 result;
+    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
+    if (_challenge.approverDepositCount == 1 && _challenge.approveDeposits[_user] > 0) {
+      result = total.sub(_challenge.totalWithdrawn);
+    } else if (_challenge.approveTotal != 0) {
+      result = total.mul(_challenge.approveDeposits[_user]).div(_challenge.approveTotal);
+    }
+    return result;
+  }
+
+  function hasShit(bytes32 _id) public returns (bool) {
+    return challengeIterator.hasValue(_id);
+  }
+
+  function removeChallenge(bytes32 _id) public onlyCompleted(_id) {
+    if (challengeIterator.hasValue(_id)) {
+      challengeIterator.removeValue(_id);
+      delete challenges[_id];
+    }
   }
 
   function nextDepositAmount(bytes32 _id) public view returns (uint256) {
@@ -230,11 +288,6 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     return challenges[_id].approveDeposits[_address];
   }
 
-  function isComplete(bytes32 _id) public view returns (bool) {
-    State state = challenges[_id].state;
-    return state == State.CHALLENGE_SUCCESS || state == State.CHALLENGE_FAIL;
-  }
-
   function getState(bytes32 _id) public view returns (State) {
     return challenges[_id].state;
   }
@@ -247,9 +300,17 @@ contract PowerChallenge is Ownable, IPowerChallenge {
     return challengeIterator.valueAtIndex(index);
   }
 
-  function notStarted(bytes32 _id) public view returns (bool) {
-    State state = challenges[_id].state;
-    return state == State.BLANK || state == State.CHALLENGE_FAIL || state == State.CHALLENGE_SUCCESS;
+  function isChallenging(bytes32 _id) public view returns (bool) {
+    Challenge storage _challenge = challenges[_id];
+    return _challenge.state == State.CHALLENGED || _challenge.state == State.APPROVED;
+  }
+
+  function isComplete(bytes32 _id) public view returns (bool) {
+    Challenge storage _challenge = challenges[_id];
+    State state = _challenge.state;
+    bool hasCompleted = state == State.CHALLENGE_FAIL || state == State.CHALLENGE_SUCCESS;
+    bool hasPaidOut = _challenge.totalWithdrawn == _challenge.approveTotal.add(_challenge.challengeTotal);
+    return state == State.BLANK || (hasCompleted && hasPaidOut);
   }
 
   function winningState(bytes32 _id) public view returns (State) {
@@ -271,23 +332,13 @@ contract PowerChallenge is Ownable, IPowerChallenge {
   function totalWithdrawal(bytes32 _id, address _user) external view returns (uint256) {
     uint256 withdrawal;
     State state = winningState(_id);
-    if (state == State.CHALLENGE_FAIL) {
-      withdrawal = totalApproveWithdrawal(_id, _user);
-    } else if (state == State.CHALLENGE_SUCCESS) {
-      withdrawal = totalChallengeWithdrawal(_id, _user);
+    Challenge storage _challenge = challenges[_id];
+    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
+    if (state == State.CHALLENGE_FAIL && _challenge.approveTotal != 0) {
+      withdrawal = total.mul(_challenge.approveDeposits[_user]).div(_challenge.approveTotal);
+    } else if (state == State.CHALLENGE_SUCCESS && _challenge.challengeTotal != 0) {
+      withdrawal = total.mul(_challenge.challengeDeposits[_user]).div(_challenge.challengeTotal);
     }
     return withdrawal;
-  }
-
-  function totalChallengeWithdrawal(bytes32 _id, address _user) public view returns (uint256) {
-    Challenge storage _challenge = challenges[_id];
-    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
-    return total.mul(_challenge.challengeDeposits[_user]).div(_challenge.challengeTotal);
-  }
-
-  function totalApproveWithdrawal(bytes32 _id, address _user) public view returns (uint256) {
-    Challenge storage _challenge = challenges[_id];
-    uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
-    return total.mul(_challenge.approveDeposits[_user]).div(_challenge.approveTotal);
   }
 }

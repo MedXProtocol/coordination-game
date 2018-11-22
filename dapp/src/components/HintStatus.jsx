@@ -1,8 +1,8 @@
 import React from 'react'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 
-export const HintStatus = function ({ hexHint }) {
-  const [tokenTicker, tokenName] = hexHintToTokenData(hexHint)
+export const HintStatus = function ({ hint }) {
+  const [tokenTicker, tokenName] = hexHintToTokenData(hint)
 
   if (tokenName && tokenTicker) {
     var statusText = (

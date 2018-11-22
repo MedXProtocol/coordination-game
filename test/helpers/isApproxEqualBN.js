@@ -6,13 +6,16 @@ module.exports = function (a, b, diff) {
   if (!diff) {
     diff = new BN('100000000000000000') // 0.01 ether
   }
-  if (typeof a === 'string') {
+  if (typeof a === 'string' ||
+      typeof a === 'number') {
     a = new BN(a)
   }
-  if (typeof b === 'string') {
+  if (typeof b === 'string' ||
+      typeof b === 'number') {
     b = new BN(b)
   }
-  if (typeof diff === 'string') {
+  if (typeof diff === 'string' ||
+      typeof diff === 'number') {
     diff = new BN(diff)
   }
   const div = a.sub(b).abs()
