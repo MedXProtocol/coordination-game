@@ -30,7 +30,7 @@ contract('TILRegistry', (accounts) => {
   const jobStake = web3.toWei('20', 'ether')
   const minimumBalanceToWork = web3.toWei('15', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
-  const applicantDepositEther = web3.toWei('25', 'ether')
+  const rewardWei = web3.toWei('25', 'ether')
   const depositAndJobAmount = listingStake.add(new BN(jobStake))
 
   before(async () => {
@@ -140,9 +140,9 @@ contract('TILRegistry', (accounts) => {
         powerChallengeTokenBalance = await workToken.balanceOf(powerChallenge.address)
         powerChallengeEtherBalance = await web3.eth.getBalance(powerChallenge.address)
         await registry.applicantLostCoordinationGame(
-          listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake, {
+          listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake, {
             from: owner,
-            value: applicantDepositEther
+            value: rewardWei
           }
         )
       })
@@ -154,7 +154,7 @@ contract('TILRegistry', (accounts) => {
         let powerChallengeFinalEtherBalance = await web3.eth.getBalance(powerChallenge.address)
 
         assert.ok(
-          isApproxEqualBN(registryFinalEtherBalance, registryEtherBalance.add(applicantDepositEther)),
+          isApproxEqualBN(registryFinalEtherBalance, registryEtherBalance.add(rewardWei)),
           'application fee ether was moved into the registry'
         )
 
@@ -186,8 +186,8 @@ contract('TILRegistry', (accounts) => {
   describe('withdrawFromChallenge()', () => {
     beforeEach(async () => {
       await registry.applicantLostCoordinationGame(
-        listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake,
-        { from: owner, value: applicantDepositEther }
+        listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake,
+        { from: owner, value: rewardWei }
       )
     })
 
@@ -202,7 +202,7 @@ contract('TILRegistry', (accounts) => {
         let tx = await registry.withdrawFromChallenge(listingHash, { from: user1 })
         const applicantEtherFinishingBalance = await web3.eth.getBalance(user1)
 
-        const initialBalancePlusDeposit = applicantEtherStartingBalance.add(applicantDepositEther)
+        const initialBalancePlusDeposit = applicantEtherStartingBalance.add(rewardWei)
         const finalBalanceWithGas = applicantEtherFinishingBalance.add(new BN(tx.receipt.gasUsed))
 
         debug(`initialBalancePlusDeposit: ${initialBalancePlusDeposit.toString()}`)
@@ -388,8 +388,8 @@ contract('TILRegistry', (accounts) => {
   describe('totalChallengeReward()', () => {
     beforeEach(async () => {
       await registry.applicantLostCoordinationGame(
-        listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake,
-        { from: owner, value: applicantDepositEther }
+        listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake,
+        { from: owner, value: rewardWei }
       )
       await workToken.mint(user1, web3.toWei('10000', 'ether'))
       await workToken.mint(verifier, web3.toWei('10000', 'ether'))

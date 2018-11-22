@@ -159,7 +159,8 @@ contract('CoordinationGame', (accounts) => {
     if (!_secret) { _secret = secret }
     debug(`verifierSubmitSecret`)
     await coordinationGame.verifierSubmitSecret(applicationId, _secret, {
-      from: verification.verifier
+      from: verification.verifier,
+      value: baseApplicationFeeUsdWei.toString()
     })
   }
 
@@ -205,7 +206,7 @@ contract('CoordinationGame', (accounts) => {
       )
 
       assert.equal(
-        storedGame.applicationBalanceInWei.toString(),
+        storedGame.applicationFeeWei.toString(),
         weiPerApplication.toString()
       )
     })
@@ -433,7 +434,7 @@ contract('CoordinationGame', (accounts) => {
 
         game = mapToGame(await coordinationGame.games(applicationId))
 
-        const applicantEtherDeposit = game.applicationBalanceInWei
+        const applicantEtherDeposit = game.applicationFeeWei
 
         debug(`verifier balance: ${verifierStartingBalance.toString()}`)
         debug(`applicant balance: ${applicantStartingBalance.toString()}`)
