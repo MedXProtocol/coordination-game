@@ -14,9 +14,10 @@ import {
   withSaga
 } from 'saga-genesis'
 import {
-  AuditOutline,
-  BarsOutline,
+  FileAddOutline,
+  DatabaseOutline,
   CheckCircleOutline,
+  ThunderboltOutline,
   IssuesCloseOutline,
   SettingOutline,
   WalletOutline
@@ -232,7 +233,7 @@ export const Header = ReactTimeout(
                             className="navbar-item"
                             onClick={this.closeMobileMenu}
                           >
-                            <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
+                            <AntdIcon type={DatabaseOutline} className="antd-icon" />&nbsp;
                             Registry
                           </NavLink>
                         </div>
@@ -243,7 +244,7 @@ export const Header = ReactTimeout(
                             className='navbar-item'
                             onClick={this.closeMobileMenu}
                           >
-                            <AntdIcon type={AuditOutline} className="antd-icon " />&nbsp;
+                            <AntdIcon type={FileAddOutline} className="antd-icon " />&nbsp;
                             Register Token
                           </NavLink>
                         </div>
@@ -255,7 +256,7 @@ export const Header = ReactTimeout(
                             className="navbar-item"
                             onClick={this.closeMobileMenu}
                           >
-                            <AntdIcon type={BarsOutline} className="antd-icon" />&nbsp;
+                            <AntdIcon type={ThunderboltOutline} className="antd-icon" />&nbsp;
                             Challenges
                           </NavLink>
                         </div>
