@@ -57,8 +57,8 @@ contract CoordinationGame is Ownable {
   uint256 public applicationStakeAmount;
   uint256 public baseApplicationFeeUsdWei;
 
-  mapping (address => bytes32[]) public applicantsApplicationIndices;
-  mapping (address => bytes32[]) public verifiersApplicationIndices;
+  mapping (address => IndexedBytes32Array.Data) applicantsApplicationIndices;
+  mapping (address => IndexedBytes32Array.Data) verifiersApplicationIndices;
 
   IndexedBytes32Array.Data gamesIterator;
   mapping (bytes32 => Game) public games;
@@ -230,7 +230,7 @@ contract CoordinationGame is Ownable {
       0 // verifierDepositWei
     );
     gamesIterator.pushValue(bytes32(applicationId));
-    applicantsApplicationIndices[msg.sender].push(applicationId);
+    applicantsApplicationIndices[msg.sender].pushValue(applicationId);
     //
     // applicationBalancesInWei[applicationId] = msg.value;
     // applicants[applicationId] = msg.sender;
@@ -286,6 +286,8 @@ contract CoordinationGame is Ownable {
 
       emit VerifierSubmissionTimedOut(_applicationId, previousVerifier);
 
+      verifiersApplicationIndices[previousVerifier].removeValue(_applicationId);
+
       // If we chose this verifier last time let's choose a different one
       if (selectedVerifier == previousVerifier) {
         selectedVerifier = selectVerifier(msg.sender, randomNum + 1);
@@ -304,7 +306,7 @@ contract CoordinationGame is Ownable {
     game.randomBlockNumber = block.number + 1;
     game.updatedAt = block.timestamp;
 
-    verifiersApplicationIndices[selectedVerifier].push(_applicationId);
+    verifiersApplicationIndices[selectedVerifier].pushValue(_applicationId);
 
     // transfer tokens from verifier's stake in Work contract to here
     require(work.withdrawJobStake(selectedVerifier), 'transferred verifier tokens');
@@ -502,26 +504,34 @@ contract CoordinationGame is Ownable {
   }
 
   function getApplicantsApplicationCount(address _applicant) external view returns (uint256) {
-    return applicantsApplicationIndices[_applicant].length;
+    return applicantsApplicationIndices[_applicant].length();
+  }
+
+  function getApplicantsApplicationAtIndex(address _applicant, uint256 _index) external view returns (bytes32) {
+    return applicantsApplicationIndices[_applicant].valueAtIndex(_index);
   }
 
   function getApplicantsLastApplicationID(address _applicant) external view returns (bytes32) {
-    if (applicantsApplicationIndices[_applicant].length > 0) {
-      uint256 index = applicantsApplicationIndices[_applicant].length.sub(1);
-      return applicantsApplicationIndices[_applicant][index];
+    if (applicantsApplicationIndices[_applicant].length() > 0) {
+      uint256 index = applicantsApplicationIndices[_applicant].length().sub(1);
+      return applicantsApplicationIndices[_applicant].valueAtIndex(index);
     } else {
       return 0;
     }
   }
 
   function getVerifiersApplicationCount(address _verifier) external view returns (uint256) {
-    return verifiersApplicationIndices[_verifier].length;
+    return verifiersApplicationIndices[_verifier].length();
+  }
+
+  function getVerifiersApplicationAtIndex(address _applicant, uint256 _index) external view returns (bytes32) {
+    return verifiersApplicationIndices[_applicant].valueAtIndex(_index);
   }
 
   function getVerifiersLastApplicationID(address _verifier) external view returns (bytes32) {
-    if (verifiersApplicationIndices[_verifier].length > 0) {
-      uint256 index = verifiersApplicationIndices[_verifier].length.sub(1);
-      return verifiersApplicationIndices[_verifier][index];
+    if (verifiersApplicationIndices[_verifier].length() > 0) {
+      uint256 index = verifiersApplicationIndices[_verifier].length().sub(1);
+      return verifiersApplicationIndices[_verifier].valueAtIndex(index);
     } else {
       return 0;
     }
