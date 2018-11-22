@@ -23,7 +23,7 @@ export const verifierApplicationsService = function(state, startIndex, endIndex)
     const applicationId = cacheCallValue(
       state,
       coordinationGameAddress,
-      "verifiersApplicationIndices",
+      "getVerifiersApplicationAtIndex",
       address,
       index
     )

@@ -14,7 +14,7 @@ export const verifierApplicationsSaga = function*({
     const indices = range(applicationCount)
     yield all(
       indices.map(function*(index) {
-        yield cacheCall(coordinationGameAddress, "verifiersApplicationIndices", address, index)
+        yield cacheCall(coordinationGameAddress, "getVerifiersApplicationAtIndex", address, index)
       })
     )
   }

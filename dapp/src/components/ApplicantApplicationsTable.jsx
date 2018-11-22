@@ -51,7 +51,7 @@ function mapStateToProps(state, { currentPage, pageSize }) {
       const applicationId = cacheCallValue(
         state,
         coordinationGameAddress,
-        "applicantsApplicationIndices",
+        "getApplicantsApplicationAtIndex",
         address,
         index
       )
@@ -105,7 +105,7 @@ function* applicantApplicationsTableSaga({
     const indices = range(applicationCount)
     yield all(
       indices.map(function*(index) {
-        const applicationId = yield cacheCall(coordinationGameAddress, "applicantsApplicationIndices", address, index)
+        const applicationId = yield cacheCall(coordinationGameAddress, "getApplicantsApplicationAtIndex", address, index)
 
         if (!isBlank(applicationId)) {
           yield all([
