@@ -482,7 +482,7 @@ contract CoordinationGame is Ownable {
       game.applicantTokenDeposit.add(work.jobStake())
     );
 
-    uint256 totalTransfer = game.applicationFeeWei + verification.verifierDepositWei;
+    uint256 totalTransfer = game.applicationFeeWei.add(verification.verifierDepositWei);
 
     tilRegistry.applicantLostCoordinationGame.value(totalTransfer)(
       _applicationId, game.applicant, game.applicantTokenDeposit, totalTransfer,
