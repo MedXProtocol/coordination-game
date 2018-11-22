@@ -11,8 +11,10 @@ import {
 import { connect } from 'react-redux'
 import { range } from 'lodash'
 import { ListingRow } from '~/components/registry/ListingRow'
+import { PageTitle } from '~/components/PageTitle'
 import { Pagination } from '~/components/Pagination'
-import { formatRoute } from 'react-router-named-routes'
+import { ScrollToTop } from '~/components/ScrollToTop'
+import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
@@ -22,6 +24,7 @@ function mapStateToProps(state, { match }) {
   const currentPage = match.params.currentPage || 1
   const PowerChallenge = contractByName(state, 'PowerChallenge')
   const challengeCount = cacheCallValue(state, PowerChallenge, 'challengeCount')
+  const totalPages = Math.ceil(challengeCount / PAGE_SIZE)
   const startIndex = (parseInt(currentPage, 10) - 1) * PAGE_SIZE
   const endIndex = startIndex + PAGE_SIZE
   const ids = range(startIndex, endIndex).reduce((accumulator, index) => {
@@ -31,11 +34,13 @@ function mapStateToProps(state, { match }) {
     }
     return accumulator
   }, [])
+
   return {
     PowerChallenge,
     challengeCount,
     startIndex,
     endIndex,
+    totalPages,
     ids
   }
 }
@@ -64,20 +69,40 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
     }
 
     render () {
-      const totalPages = parseInt(this.props.challengeCount / PAGE_SIZE, 10)
-
       return (
-        <div className='list--container'>
-          <div className="list">
-            {this.renderApplicationRows(this.props.ids)}
-          </div>
+        <React.Fragment>
+          <ScrollToTop
+            disabled={this.props.currentPage}
+          />
+          <PageTitle title='challenges' />
 
-          <Pagination
-            currentPage={parseInt(this.props.currentPage, 10)}
-            totalPages={totalPages}
-            linkTo={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
+          <h1 className="is-size-1">
+            Challenges
+          </h1>
+
+          <p>
+            A challenge occurs when a submission in the Registry is refuted, or an applicant's submission is rejected. You can vote in favour of or against a challenge using TEX tokens.
+          </p>
+
+          <hr />
+
+          <div className='list--container'>
+            <div className="list">
+              {this.renderApplicationRows(this.props.ids)}
+            </div>
+
+            <Pagination
+              currentPage={parseInt(this.props.currentPage, 10)}
+              totalPages={this.props.totalPages}
+              linkTo={(number, location) => formatPageRouteQueryParams(
+                routes.CHALLENGES,
+                'challengesCurrentPage',
+                number,
+                location
+              )}
             />
-        </div>
+          </div>
+        </React.Fragment>
       )
     }
   }

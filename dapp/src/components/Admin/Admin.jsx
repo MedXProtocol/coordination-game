@@ -25,6 +25,7 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const powerChallengeAddress = contractByName(state, 'PowerChallenge')
   const workAddress = contractByName(state, 'Work')
 
   const applicationStakeAmount = cacheCallValueBigNumber(state, coordinationGameAddress, 'applicationStakeAmount')
@@ -32,6 +33,8 @@ function mapStateToProps(state) {
 
   const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
   const applicantRevealTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+
+  const powerChallengeTimeoutInSeconds = cacheCallValueInt(state, powerChallengeAddress, 'timeout')
 
   const jobStake = cacheCallValueBigNumber(state, workAddress, 'jobStake')
   const requiredStake = cacheCallValueBigNumber(state, workAddress, 'requiredStake')
@@ -47,6 +50,7 @@ function mapStateToProps(state) {
     jobStake,
     requiredStake,
     minimumBalanceToWork,
+    powerChallengeTimeoutInSeconds,
     transactions,
     verifierTimeoutInSeconds,
     workAddress
@@ -55,10 +59,11 @@ function mapStateToProps(state) {
 
 function* adminSaga({
   coordinationGameAddress,
+  powerChallengeAddress,
   workAddress,
   address
 }) {
-  if (!coordinationGameAddress || !workAddress || !address) { return null }
+  if (!coordinationGameAddress || !powerChallengeAddress || !workAddress || !address) { return null }
 
   yield all([
     cacheCall(workAddress, 'jobStake'),
@@ -67,7 +72,8 @@ function* adminSaga({
     cacheCall(coordinationGameAddress, 'applicationStakeAmount'),
     cacheCall(coordinationGameAddress, 'baseApplicationFeeUsdWei'),
     cacheCall(coordinationGameAddress, 'verifierTimeoutInSeconds'),
-    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds')
+    cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),
+    cacheCall(powerChallengeAddress, 'timeout')
   ])
 }
 
@@ -83,6 +89,7 @@ export const Admin = connect(mapStateToProps)(
 
         componentWillReceiveProps (nextProps) {
           this.registerCoordinationGameSettingsHandler(nextProps)
+          this.registerPowerChallengeSettingsHandler(nextProps)
           this.registerWorkSettingsHandler(nextProps)
         }
 
@@ -105,6 +112,25 @@ export const Admin = connect(mapStateToProps)(
           }
         }
 
+        registerPowerChallengeSettingsHandler = (nextProps) => {
+          if (this.state.powerChallengeSettingsHandler) {
+            this.state.powerChallengeSettingsHandler.handle(
+              nextProps.transactions[this.state.powerChallengeSettingsTxId]
+            )
+              .onError((error) => {
+                this.setState({ powerChallengeSettingsHandler: null })
+                toastr.transactionError(error)
+              })
+              .onConfirmed(() => {
+                this.setState({ powerChallengeSettingsHandler: null })
+                toastr.success('Power Challenge contract "Update Settings" confirmed.')
+              })
+              .onTxHash(() => {
+                toastr.success('Power Challenge contract "Update Settings" sent successfully - it will take a few minutes to confirm on the Ethereum network.')
+              })
+          }
+        }
+
         registerWorkSettingsHandler = (nextProps) => {
           if (this.state.workSettingsHandler) {
             this.state.workSettingsHandler.handle(
@@ -115,9 +141,6 @@ export const Admin = connect(mapStateToProps)(
                 toastr.transactionError(error)
               })
               .onConfirmed(() => {
-                // TODO: Why are we not gettin in here? Seems like
-                //       props.transactions[this.state.workSettingsTxId]
-                //       never gets confirmations
                 this.setState({ workSettingsHandler: null })
                 toastr.success('Work contract "Update Settings" confirmed.')
               })
@@ -144,6 +167,23 @@ export const Admin = connect(mapStateToProps)(
           this.setState({
             coordinationGameSettingsHandler: new TransactionStateHandler(),
             coordinationGameSettingsTxId
+          })
+        }
+
+        handleSubmitPowerChallengeSettings = (e) => {
+          e.preventDefault()
+
+          const { send, powerChallengeAddress } = this.props
+
+          const powerChallengeSettingsTxId = send(
+            powerChallengeAddress,
+            'setTimeout',
+            parseFloat(this.newOrCurrentValue('powerChallengeTimeoutInSeconds')) * 86400
+          )()
+
+          this.setState({
+            powerChallengeSettingsHandler: new TransactionStateHandler(),
+            powerChallengeSettingsTxId
           })
         }
 
@@ -286,6 +326,51 @@ export const Admin = connect(mapStateToProps)(
                     )}
                   >
                     Save Coordination Game Settings
+                  </button>
+                </div>
+              </form>
+
+              <hr />
+
+              <h4 className="is-size-4 has-text-grey">
+                Power Challenge Contract
+              </h4>
+
+              <form onSubmit={this.handleSubmitPowerChallengeSettings}>
+                <div className="columns">
+                  <div className="column is-6">
+                    <p className="is-size-7">
+                      <strong>Challenge Round Duration</strong>
+                      <span className="is-size-7 is-block has-text-grey">(in days)</span>
+                    </p>
+                    <input
+                      type="text"
+                      name="powerChallengeTimeoutInSeconds"
+                      className="text-input is-marginless text-input--large text-input--extended-extra"
+                      onChange={this.handleTextInputChange}
+                      value={this.state.powerChallengeTimeoutInSeconds || ''}
+                    />
+                    <span className="help has-text-grey">
+                      Currently: {this.props.powerChallengeTimeoutInSeconds / 86400}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="is-clearfix">
+                  <button
+                    disabled={this.state.powerChallengeSettingsHandler}
+                    className={classnames(
+                      'button',
+                      'is-primary',
+                      'is-small',
+                      'is-outlined',
+                      'is-pulled-right',
+                      {
+                        'is-loading': this.state.powerChallengeSettingsHandler
+                      }
+                    )}
+                  >
+                    Save Power Challenge Settings
                   </button>
                 </div>
               </form>

@@ -193,6 +193,7 @@ export const ApplicationRow = connect(mapStateToProps)(
             date={date}
             status={status}
             view={action}
+            cssClass='list--application-item'
             needsAttention={needsAttention}
             ofInterest={ofInterest && !needsAttention}
           />

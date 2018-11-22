@@ -162,20 +162,20 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               key='withdraw' />
         }
         if (stateLabel === 'challengeFailed') {
-          challengeTitle = "The Listing Challenge was unsuccessful"
+          challengeTitle = "The challenge was unsuccessful"
           challengeMessage =
             <p>
                 {challengeWithdrawMessage}
             </p>
         } else {
-          challengeTitle = "The Listing was successfully Challenged"
+          challengeTitle = "This listing was successfully Challenged"
           challengeMessage =
             <p>
                 {challengeWithdrawMessage}
             </p>
         }
       } else if (stateLabel === 'challenged' && PowerChallenge) {
-        challengeTitle = "The Listing has been Challenged"
+        challengeTitle = "The listing has been Challenged"
         if (!hasNextChallengeAllowance) {
           challengeMessage =
             <p>

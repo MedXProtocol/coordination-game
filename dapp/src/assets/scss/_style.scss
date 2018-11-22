@@ -406,10 +406,10 @@ header {
   padding: 6rem 1.5rem 2rem;
 
   @media screen and (max-width: 1088px) {
-    padding-top: 4rem;
+    padding-top: 3rem;
   }
   @media screen and (max-width: 500px) {
-    padding-top: 2rem;
+    padding: 2rem 2rem;
   }
 }
 
@@ -711,8 +711,8 @@ header {
 
 .column {
   @media screen and (max-width: 500px) {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }
 
@@ -1020,20 +1020,13 @@ header {
   background-color: darken($background-color, 3%);
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 1);
   padding: 2rem;
-
-  position: sticky;
-  top: 160px;
+  position: absolute;
   left: 0;
 
   @media screen and (max-width: 1280px) {
     flex: none;
     width: 100%;
-    top: 100px;
     left: 0;
-  }
-
-  @media screen and (max-width: 1088px) {
-    top: 50px;
   }
 
   @media screen and (max-width: 400px) {

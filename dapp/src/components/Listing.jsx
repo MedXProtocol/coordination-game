@@ -134,7 +134,7 @@ export const Listing = connect(mapStateToProps)(
             </div>
 
             <h6 className="is-size-6 has-text-grey application-num">
-              <AppId applicationId={listingHash} />
+              Challenge <AppId applicationId={listingHash} />
             </h6>
 
             <div className="columns">
@@ -169,11 +169,11 @@ export const Listing = connect(mapStateToProps)(
             </div>
 
             <br />
-            { action }
+            {action}
             <br />
-            { challengeAction }
+            {challengeAction}
             <br />
-            { message }
+            {message}
           </div>
         )
       }

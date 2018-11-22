@@ -304,7 +304,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 </div>
 
                 <h6 className="is-size-6 has-text-grey application-num">
-                  <AppId applicationId={applicationId} />
+                  Submission <AppId applicationId={applicationId} />
                 </h6>
 
                 <div className="columns">

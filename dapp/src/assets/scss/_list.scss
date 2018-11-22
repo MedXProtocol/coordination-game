@@ -179,6 +179,11 @@
 
 .list--item__date {
   color: darken($gray, 50%);
+  font-weight: 700;
+
+  @media (max-width: 468px) {
+    font-size: 0.75rem;
+  }
 }
 
 .list--item:hover .list--item__id,
@@ -194,14 +199,6 @@
 .list--item:hover .button {
   opacity: 1;
   transform: scale3d(1.12);
-}
-
-.list--item__date {
-  font-weight: 700;
-
-  @media (max-width: 468px) {
-    font-size: 0.75rem;
-  }
 }
 
 .list--item:hover .list--item__date {
@@ -290,10 +287,6 @@
   }
 }
 
-.list--registry-list .list--item__id {
-  padding-top: 0.625rem;
-}
-
 .list--application-item .list--item__date {
   background-color: darken($background-color, 4%);
   border-radius: 0.5rem;
@@ -307,5 +300,17 @@
 
 .list--application-item:hover .list--item__date {
   background-color: darken($background-color, 2%);
+  color: darken($text-color, 20%);
+}
+
+.list--listings-item .list--item__date {
+  color: darken($text-color, 10%);
+  font-size: 1.5rem;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+  font-weight: 400;
+}
+
+.list--listings-item:hover .list--item__date {
   color: darken($text-color, 20%);
 }
