@@ -36,37 +36,33 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   const applicantRevealedSecret = !isBlank(applicantsSecret)
   const applicantWon = (applicantsSecret === verifiersSecret)
 
-  const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
-  const needsApplicantReveal = (
-    !applicantRevealedSecret &&
-    verifierSubmittedSecret &&
-    defined(random) &&
-    defined(secret)
-  )
-
   const verifierHasChallenged = (verifierChallengedAt !== 0)
-  const applicantMissedRevealDeadline = (
-    !applicantRevealedSecret &&
-    verifierSubmittedSecret &&
-    (latestBlockTimestamp > applicantRevealExpiresAt)
-  )
 
-  const needsAVerifier = (
-    isBlank(verifier) &&
-    defined(tokenTicker) &&
-    defined(tokenName) &&
-    defined(secret) &&
-    defined(random)
-  )
+  const needsAVerifier = isBlank(verifier)
+
+  const waitingOnVerifier = (!needsAVerifier && !verifierSubmittedSecret)
 
   const needsNewVerifier = (
-    !isBlank(verifier) &&
-    !verifierSubmittedSecret &&
+    waitingOnVerifier &&
     (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
   )
 
+  const needsApplicantReveal = (
+    !applicantRevealedSecret &&
+    verifierSubmittedSecret
+  )
+
+  const applicantMissedRevealDeadline = (
+    needsApplicantReveal &&
+    (latestBlockTimestamp > applicantRevealExpiresAt)
+  )
+
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = !applicantRevealedSecret && noWhistleblower && !isApplicant
+  const canWhistleblow = (
+    !isApplicant &&
+    !applicantRevealedSecret &&
+    noWhistleblower
+  )
 
   const canVerify = (
     isVerifier &&
@@ -83,9 +79,14 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
   )
 
   const isComplete = (
-    (verifierSubmittedSecret && applicantRevealedSecret) ||
+    applicantRevealedSecret ||
+    verifierHasChallenged ||
     !noWhistleblower
   )
+  // const isComplete = (
+  //   (verifierSubmittedSecret && applicantRevealedSecret) ||
+  //   !noWhistleblower
+  // )
 
   // priority can be from 1 to 5, and states how important this (5 is highest importance)
   if (canVerify || (needsApplicantReveal && isApplicant)) {

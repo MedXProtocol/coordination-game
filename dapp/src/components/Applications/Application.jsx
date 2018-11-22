@@ -67,7 +67,8 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
           constructor(props) {
             super(props)
             this.state = {
-              secret: ''
+              secret: '',
+              random: ''
             }
           }
 
@@ -213,10 +214,19 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 </p>
               )
             } else if (applicationState.needsApplicantReveal) {
-              let secretAsHex
+              let hexSecretToSubmit,
+                randomToSubmit
 
               if (secret) {
-                secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
+                hexSecretToSubmit = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
+              } else {
+                hexSecretToSubmit = this.state.secret
+              }
+
+              if (random) {
+                randomToSubmit = random.toString()
+              } else {
+                randomToSubmit = this.state.random
               }
 
               message = (
@@ -230,7 +240,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                   <Web3ActionButton
                     contractAddress={this.props.coordinationGameAddress}
                     method='applicantRevealSecret'
-                    args={[applicationId, secretAsHex, random.toString()]}
+                    args={[applicationId, hexSecretToSubmit, randomToSubmit]}
                     buttonText='Reveal Secret'
                     loadingText='Revealing'
                     confirmationMessage='"Reveal Secret" transaction confirmed.'
