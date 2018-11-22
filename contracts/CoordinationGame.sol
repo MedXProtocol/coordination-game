@@ -395,7 +395,6 @@ contract CoordinationGame is Ownable {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
 
-    require(!applicantRevealExpired(_applicationId), 'applicant can still reveal their secret');
     require(verification.verifierSecret != bytes32(0), 'verifier has submitted their secret');
 
     bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
