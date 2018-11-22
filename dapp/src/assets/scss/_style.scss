@@ -63,6 +63,12 @@ button:active {
   transform: scale3d(1.04, 1.04, 1.04);
 }
 
+button[disabled]:hover,
+button[disabled]:focus,
+button[disabled]:active {
+  transform: scale3d(1, 1, 1);
+}
+
 abbr {
   border-bottom: 1px dotted white;
 }
