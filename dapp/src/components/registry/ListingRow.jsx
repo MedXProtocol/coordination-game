@@ -21,7 +21,6 @@ import { Listing } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { HintStatus } from '~/components/HintStatus'
-const debug = require('debug')('ListingRow.jsx')
 
 function mapStateToProps(state, { listingHash }) {
   const address = state.sagaGenesis.accounts[0]

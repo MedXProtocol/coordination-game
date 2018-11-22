@@ -21,7 +21,7 @@ const txNames = {
   'setBaseApplicationFeeUsdWei': 'Updating case fee',
   'updateSettings': 'Update Settings',
   'verifierSubmitSecret': 'Submitting Secret',
-  'verifierChallenge': 'Challenging Application'
+  'verifierChallenge': 'Closing Application'
 }
 
 function mapStateToProps(state) {

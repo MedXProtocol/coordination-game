@@ -107,7 +107,8 @@ export const IntroModal =
       determineModalState(props) {
         if (!isBlank(props.address) && !props.betaFaucetVisible && props.showIntroModal) {
           this.setState({
-            modalState: true
+            modalState: true,
+            step: 1
           })
         }
       }
@@ -186,7 +187,7 @@ export const IntroModal =
         const gal2 = <GalFrame2 key="gal2" width="240" height="240" className="guy-frame-1" />
 
         const qSpeechBubble = <QSpeechBubble key="q-speech-bubble" width="270" height="230" className="q-speech-bubble" />
-        const qaList = <QAList key="qa-list" width="271" height="230" className="qa-list" />
+        const qaList = <QAList key="qa-list" width="270" height="230" className="qa-list" />
 
         const qa = <QA key="qa" width="101" height="65" className={classnames(
           'qa-word',
