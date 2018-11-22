@@ -246,10 +246,6 @@ contract PowerChallenge is Ownable {
     return result;
   }
 
-  function hasShit(bytes32 _id) public returns (bool) {
-    return challengeIterator.hasValue(_id);
-  }
-
   function removeChallenge(bytes32 _id) public onlyCompleted(_id) {
     if (challengeIterator.hasValue(_id)) {
       challengeIterator.removeValue(_id);

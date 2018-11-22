@@ -273,12 +273,6 @@ contract('TILRegistry', (accounts) => {
           await workToken.balanceOf(registry.address),
           'registry still has the listing deposit'
         )
-
-        assert.equal(
-          '0',
-          await powerChallenge.getState(listingHash),
-          'challenge has been removed'
-        )
       })
 
       it('should do nothing for the verifier', async () => {
