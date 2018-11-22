@@ -299,10 +299,10 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                     contractAddress={this.props.coordinationGameAddress}
                     method='verifierChallenge'
                     args={[applicationId]}
-                    buttonText='Challenge'
-                    loadingText='Challenging'
-                    confirmationMessage='Challenge transaction confirmed.'
-                    txHashMessage='"Challenge" transaction sent successfully -
+                    buttonText='Close and Collect Payment'
+                    loadingText='Closing ...'
+                    confirmationMessage='Close and Collect Payment transaction confirmed.'
+                    txHashMessage='"Close and Collect Payment" transaction sent successfully -
                       it will take a few minutes to confirm on the Ethereum network.' />
                 </div>
               )
