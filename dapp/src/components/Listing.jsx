@@ -20,9 +20,11 @@ import { Listing as ListingModel } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { bytes32ToAddress } from '~/utils/bytes32ToAddress'
+import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
+import { tickerToBytes32 } from '~/utils/tickerToBytes32'
 
 function mapStateToProps(state, { match }) {
-  const listingHash = match.params.listingHash
+  const listingHash = tickerToBytes32(match.params.listingHash)
   const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
   const PowerChallenge = contractByName(state, 'PowerChallenge')
@@ -137,7 +139,8 @@ export const Listing = connect(mapStateToProps)(
           var challengeAction = <ChallengePanel listingHash={listingHash} />
         }
 
-        const [tokenTicker, tokenName] = hexHintToTokenData(hint)
+        const tokenName = hexHintToTokenData(hint)
+        const tokenTicker = bytes32ToTicker(listingHash)
         const tokenAddress = bytes32ToAddress(applicantSecret)
 
         return (

@@ -15,7 +15,7 @@ export const storeApplicationDetailsInLocalStorage = (
     const object = {
       applicationId: application.applicantsLastApplicationId,
       random: state.random.toString(),
-      hint: `${state.tokenTicker.trim()} - $${state.tokenName.trim()}`,
+      hint: state.tokenName.trim(),
       secret: state.secret
     }
 

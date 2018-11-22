@@ -1,9 +1,9 @@
 import React from 'react'
-import { getWeb3 } from '~/utils/getWeb3'
+import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
 export const AppId = function ({applicationId}) {
-  const number = getWeb3().utils.hexToNumber(applicationId)
+  const number = bytes32ToTicker(applicationId)
   return (
-    <span>#{number}</span>
+    <span>${number}</span>
   )
 }

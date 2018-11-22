@@ -182,10 +182,9 @@ export const ApplicationRow = connect(mapStateToProps)(
           ofInterest = applicationState.canChallenge
         }
 
-
         return (
           <ApplicationListPresenter
-            linkTo={formatRoute(routes.APPLICATION, { applicationId })}
+            linkTo={formatRoute(routes.APPLICATION, { applicationId: tokenTicker })}
             id={(
               <React.Fragment>
                 <FontAwesomeIcon icon={faChevronUp} className="list--icon" />

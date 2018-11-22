@@ -25,7 +25,6 @@ contract('CoordinationGame', (accounts) => {
     workToken,
     work,
     tilRegistry,
-    applicationId,
     game,
     applicationVerifier,
     applicantRevealTimeoutInSeconds,
@@ -38,6 +37,8 @@ contract('CoordinationGame', (accounts) => {
   const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const random = new BN("4312341235")
   const hint = web3.toHex("BOGUS")
+
+  const applicationId = web3.toHex('ASDF')
 
   const baseApplicationFeeUsdWei = web3.toWei('25', 'ether') // the cost to apply in Eth
   const applicationStakeAmount = web3.toWei('10', 'ether') // the cost to apply in tokens
@@ -131,6 +132,7 @@ contract('CoordinationGame', (accounts) => {
 
   async function newApplicantStartsGame() {
     await coordinationGame.start(
+      applicationId,
       secretRandomHash,
       randomHash,
       hint,
@@ -139,7 +141,6 @@ contract('CoordinationGame', (accounts) => {
         value: weiPerApplication.toString()
       }
     )
-    applicationId = await coordinationGame.getApplicantsLastApplicationID(applicant)
     game = mapToGame(await coordinationGame.games(applicationId))
   }
 
@@ -214,6 +215,7 @@ contract('CoordinationGame', (accounts) => {
     it('should not allow starting an application without enough ether passed', async () => {
       await expectThrow(async () => {
         await coordinationGame.start(
+          applicationId,
           secretRandomHash,
           randomHash,
           hint,
