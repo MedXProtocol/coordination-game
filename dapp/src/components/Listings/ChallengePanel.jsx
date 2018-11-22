@@ -10,6 +10,7 @@ import {
   contractByName
 } from 'saga-genesis'
 import BN from 'bn.js'
+import { Listing } from '~/models/Listing'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { Challenge } from '~/models/Challenge'
@@ -23,33 +24,39 @@ function mapStateToProps(state, { listingHash }) {
   const timeout = cacheCallValueBigNumber(state, PowerChallenge, 'timeout') || new BN(0)
   const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
   const powerChallengeAllowance = cacheCallValueBigNumber(state, WorkToken, 'allowance', address, PowerChallenge) || new BN(0)
+  const registryAllowance = cacheCallValueBigNumber(state, WorkToken, 'allowance', address, TILRegistry) || new BN(0)
   const nextDepositAmount = cacheCallValueBigNumber(state, PowerChallenge, 'nextDepositAmount', listingHash) || new BN(0)
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const totalWithdrawal = cacheCallValueBigNumber(state, PowerChallenge, 'totalWithdrawal', listingHash, address) || new BN(0)
+  const totalWithdrawal = cacheCallValueBigNumber(state, TILRegistry, 'totalChallengeReward', listingHash, address) || new BN(0)
+  const listing = new Listing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
 
   return {
     TILRegistry,
     WorkToken,
     PowerChallenge,
     powerChallengeAllowance,
+    registryAllowance,
     nextDepositAmount,
     listingHash,
     address,
     challenge,
+    listing,
     latestBlockTimestamp,
     timeout,
     totalWithdrawal
   }
 }
 
-function* challengePanelSaga({ PowerChallenge, WorkToken, address, listingHash }) {
-  if (!PowerChallenge || !WorkToken || !address || !listingHash) { return }
+function* challengePanelSaga({ PowerChallenge, WorkToken, TILRegistry, address, listingHash }) {
+  if (!PowerChallenge || !WorkToken || !TILRegistry || !address || !listingHash) { return }
   yield all([
-    cacheCall(PowerChallenge, 'challenges', listingHash),
     cacheCall(WorkToken, 'allowance', address, PowerChallenge),
+    cacheCall(WorkToken, 'allowance', address, TILRegistry),
+    cacheCall(PowerChallenge, 'challenges', listingHash),
     cacheCall(PowerChallenge, 'nextDepositAmount', listingHash),
     cacheCall(PowerChallenge, 'timeout'),
-    cacheCall(PowerChallenge, 'totalWithdrawal', listingHash, address)
+    cacheCall(TILRegistry, 'totalChallengeReward', listingHash, address),
+    cacheCall(TILRegistry, 'listings', listingHash)
   ])
 }
 
@@ -66,18 +73,22 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         WorkToken,
         PowerChallenge,
         powerChallengeAllowance,
+        registryAllowance,
         nextDepositAmount,
         challenge,
         latestBlockTimestamp,
         timeout,
+        listing,
         totalWithdrawal
       } = this.props
 
-      const hasAllowance = powerChallengeAllowance.gte(nextDepositAmount)
+      const hasNextChallengeAllowance = powerChallengeAllowance.gte(nextDepositAmount)
+      const challengeDeposit = listing.deposit.mul(new BN(2))
+      const hasChallengeAllowance = registryAllowance.gte(challengeDeposit)
 
       var challengeTitle, challengeMessage, challengeAction
 
-      if (!hasAllowance && WorkToken) {
+      if (!hasNextChallengeAllowance && WorkToken) {
         var approvePowerChallenge =
           <Web3ActionButton
             contractAddress={WorkToken}
@@ -95,7 +106,46 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
       const stateLabel = challenge.stateAsLabel()
 
-      if (isTimedOut) {
+      if (challenge.canStart()) {
+        challengeTitle = "Challenge"
+        if (!hasChallengeAllowance) {
+          challengeMessage =
+            <p>
+              <span>You may challenge the validity of this listing</span>
+              <br />
+              <span>First you must approve the contract to spend the tokens.</span>
+            </p>
+          challengeAction =
+            <Web3ActionButton
+              contractAddress={WorkToken}
+              method='approve'
+              args={[TILRegistry, challengeDeposit.toString()]}
+              buttonText={<span>Approve <TEX wei={challengeDeposit} /></span>}
+              loadingText='Approving...'
+              className="button is-small is-info is-outlined"
+              confirmationMessage='You have approved the challenge tokens.'
+              txHashMessage='Approval request sent -
+                it will take a few minutes to confirm on the Ethereum network.'
+              key='challengeApproval' />
+        } else {
+          challengeMessage =
+            <p>
+              <span>You may challenge the validity of this listing.</span>
+            </p>
+          challengeAction =
+            <Web3ActionButton
+              contractAddress={TILRegistry}
+              method='challenge'
+              args={[listingHash]}
+              buttonText={<span>Challange</span>}
+              loadingText='Challenging...'
+              className="button is-small is-info is-outlined"
+              confirmationMessage='You have challenged the listing.'
+              txHashMessage='Challenge request sent -
+                it will take a few minutes to confirm on the Ethereum network.'
+              key='startChallenge' />
+        }
+      } else if (challenge.isChallenging() && isTimedOut) {
         if (totalWithdrawal.gt(new BN(0))) {
           var challengeWithdrawMessage = <span>You have been awarded <TEX wei={totalWithdrawal} />.</span>
           challengeAction =
@@ -126,7 +176,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         }
       } else if (stateLabel === 'challenged' && PowerChallenge) {
         challengeTitle = "The Listing has been Challenged"
-        if (!hasAllowance) {
+        if (!hasNextChallengeAllowance) {
           challengeMessage =
             <p>
               <span>To reject the challenge, you must first approve the Power Challenge contract to spend <TEX wei={nextDepositAmount} /></span>
@@ -150,7 +200,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         }
       } else if (stateLabel === 'approved' && PowerChallenge) {
         challengeTitle = "The Listing Challenge has been Rejected"
-        if (!hasAllowance) {
+        if (!hasNextChallengeAllowance) {
           challengeMessage =
             <p>
               <span>To challenge the listing, you must first approve the Power Challenge contract to spend <TEX wei={nextDepositAmount} /></span>

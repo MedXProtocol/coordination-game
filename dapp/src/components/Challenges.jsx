@@ -75,7 +75,7 @@ export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
           <Pagination
             currentPage={parseInt(this.props.currentPage, 10)}
             totalPages={totalPages}
-            formatPageRoute={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
+            linkTo={(number) => formatRoute(routes.REGISTRY, { currentPage: number })}
             />
         </div>
       )

@@ -17,20 +17,18 @@ import { formatRoute } from 'react-router-named-routes'
 import * as routes from '~/../config/routes'
 import { TEX } from '~/components/TEX'
 import { mapToGame } from '~/services/mapToGame'
-import { mapToListing } from '~/services/mapToListing'
+import { Listing } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { HintStatus } from '~/components/HintStatus'
-const debug = require('debug')('ListingRow.jsx')
 
 function mapStateToProps(state, { listingHash }) {
-  debug(listingHash)
   const address = state.sagaGenesis.accounts[0]
   const TILRegistry = contractByName(state, 'TILRegistry')
   const PowerChallenge = contractByName(state, 'PowerChallenge')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
-  const listing = mapToListing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
+  const listing = new Listing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
   const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
 
   return {
@@ -64,10 +62,6 @@ export const ListingRow = connect(mapStateToProps)(
         } = this.props
 
         const {
-          deposit
-        } = listing || {}
-
-        const {
           hint
         } = game || {}
 
@@ -80,7 +74,7 @@ export const ListingRow = connect(mapStateToProps)(
                 <AppId applicationId={listingHash} />
               </React.Fragment>
             )}
-            date={<TEX wei={deposit} />}
+            date={<TEX wei={listing.deposit} />}
             status={<HintStatus hint={hint} />}
             view={''}
             needsAttention={false}

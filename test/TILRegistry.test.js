@@ -18,7 +18,7 @@ const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 contract('TILRegistry', (accounts) => {
   const [owner, user1, user2, verifier, mysteriousStranger] = accounts
 
-  const listingStake = web3.toWei('10', 'ether')
+  const listingStake = new BN(web3.toWei('10', 'ether'))
   const listingHash = '0x1000000000000000000000000000000000000000000000000000000000000000'
 
   let registry,
@@ -30,8 +30,8 @@ contract('TILRegistry', (accounts) => {
   const jobStake = web3.toWei('20', 'ether')
   const minimumBalanceToWork = web3.toWei('15', 'ether')
   const jobManagerBalance = web3.toWei('1000', 'ether')
-  const applicantDepositEther = web3.toWei('5', 'ether')
-  const depositAndJobAmount = new BN(listingStake).add(new BN(jobStake))
+  const applicantDepositEther = web3.toWei('25', 'ether')
+  const depositAndJobAmount = listingStake.add(new BN(jobStake))
 
   before(async () => {
     workToken = await WorkToken.new()
@@ -68,10 +68,35 @@ contract('TILRegistry', (accounts) => {
     return mapToChallenge(await powerChallenge.challenges(listingHash))
   }
 
+  async function approveListing(user, depositAmount) {
+    if (!depositAmount) {
+      depositAmount = await powerChallenge.nextDepositAmount(listingHash)
+    }
+    debug(`approveListing with ${depositAmount}`)
+    await workToken.approve(
+      powerChallenge.address, depositAmount.toString(), { from: user }
+    )
+    return await powerChallenge.approve(listingHash, { from: user })
+  }
+
+  async function challengeListing(user, depositAmount) {
+    if (!depositAmount) {
+      depositAmount = await powerChallenge.nextDepositAmount(listingHash)
+    }
+    await workToken.approve(
+      powerChallenge.address, depositAmount.toString(), { from: user }
+    )
+    return await powerChallenge.challenge(listingHash, { from: user })
+  }
+
+  async function nextDepositAmount() {
+    return new BN((await powerChallenge.nextDepositAmount(listingHash)).toString())
+  }
+
   describe('applicantWonCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake, { from: user2 })
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), { from: user2 })
       })
     })
 
@@ -80,7 +105,7 @@ contract('TILRegistry', (accounts) => {
 
       beforeEach(async () => {
         registryTokenBalance = await workToken.balanceOf(registry.address)
-        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake)
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
       })
 
       it('should add an applicant', async () => {
@@ -99,7 +124,7 @@ contract('TILRegistry', (accounts) => {
   describe('applicantLostCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake, 0, 0, 0, { from: user2 })
+        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake.toString(), 0, 0, 0, { from: user2 })
       })
     })
 
@@ -115,7 +140,7 @@ contract('TILRegistry', (accounts) => {
         powerChallengeTokenBalance = await workToken.balanceOf(powerChallenge.address)
         powerChallengeEtherBalance = await web3.eth.getBalance(powerChallenge.address)
         await registry.applicantLostCoordinationGame(
-          listingHash, user1, listingStake, applicantDepositEther, verifier, jobStake, {
+          listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake, {
             from: owner,
             value: applicantDepositEther
           }
@@ -145,11 +170,11 @@ contract('TILRegistry', (accounts) => {
         assert.equal(await registry.listingsLength(), 1) // new registry listing
         assert.equal(await registry.listingAt(0), listingHash) // exists
         assert.equal(newListing.owner, user1, 'owner is applicant') // owned by applicant
-        assert.equal(newListing.deposit, listingStake, 'deposit is set')
+        assert.equal(newListing.deposit, listingStake.toString(), 'deposit is set')
 
         const challenge = await getChallenge(listingHash)
 
-        assert.equal(await powerChallenge.notStarted(listingHash), false, 'challenge has started')
+        assert.equal(await powerChallenge.isChallenging(listingHash), true, 'challenge has started')
         assert.equal(challenge.round, 1, 'second round is complete')
         assert.equal(
           challenge.challengeTotal.add(challenge.approveTotal).toString(),
@@ -161,17 +186,14 @@ contract('TILRegistry', (accounts) => {
   describe('withdrawFromChallenge()', () => {
     beforeEach(async () => {
       await registry.applicantLostCoordinationGame(
-        listingHash, user1, listingStake, applicantDepositEther, verifier, jobStake,
+        listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake,
         { from: owner, value: applicantDepositEther }
       )
     })
 
     context('when challenge failed', () => {
       beforeEach(async () => {
-        await workToken.approve(
-          powerChallenge.address, await powerChallenge.nextDepositAmount(listingHash), { from: mysteriousStranger }
-        )
-        await powerChallenge.approve(listingHash, { from: mysteriousStranger })
+        await approveListing(mysteriousStranger)
         await powerChallenge.setTimeout(0)
       })
 
@@ -183,12 +205,8 @@ contract('TILRegistry', (accounts) => {
         const initialBalancePlusDeposit = applicantEtherStartingBalance.add(applicantDepositEther)
         const finalBalanceWithGas = applicantEtherFinishingBalance.add(new BN(tx.receipt.gasUsed))
 
-        const diff = initialBalancePlusDeposit.sub(finalBalanceWithGas)
-        const maxDiff = web3.toWei('0.1', 'ether')
         debug(`initialBalancePlusDeposit: ${initialBalancePlusDeposit.toString()}`)
         debug(`finalBalanceWithGas: ${finalBalanceWithGas.toString()}`)
-        debug(`ETHER: ${web3.fromWei(diff, 'ether')}`)
-        debug(`MAX DIFF: ${maxDiff.toString()}`)
 
         assert.ok(
           isApproxEqualBN(
@@ -197,16 +215,63 @@ contract('TILRegistry', (accounts) => {
           ),
           'Applicant withdrew the fee'
         )
-
         tx = await registry.withdrawFromChallenge(listingHash, { from: user1 })
         const applicantEtherSecondBalance = await web3.eth.getBalance(user1)
 
         assert.ok(
           isApproxEqualBN(
             applicantEtherSecondBalance,
-            applicantEtherFinishingBalance.add(new BN(tx.receipt.gasUsed))
+            applicantEtherFinishingBalance.sub(new BN(tx.receipt.gasUsed))
           ),
-          'balance has not changed'
+          'applicant ether balance has not changed'
+        )
+      })
+
+      it('should allow the approver to withdraw', async () => {
+        const strangerStartingBalance = await workToken.balanceOf(mysteriousStranger)
+        const applicantStartingBalance = await workToken.balanceOf(user1)
+
+        await registry.withdrawFromChallenge(listingHash, { from: mysteriousStranger })
+
+        const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)
+        const applicantFinishingBalance = await workToken.balanceOf(user1)
+
+        const approverDeposit = depositAndJobAmount.mul(new BN(2))
+        const total = listingStake.add(new BN(jobStake)).add(approverDeposit)
+        const approveTotal = listingStake.add(approverDeposit)
+        const approverShare = approverDeposit.mul(total).div(approveTotal)
+        const applicantShare = listingStake.mul(total).div(approveTotal).sub(listingStake)
+
+        // applicant: 10
+        // verifier: 20
+        // stranger: 60
+        // total: 90
+
+        // stranger: 60/70 * 90 = 77.14285714285714
+        // applicant: 10/70 * 90 = 12.857142857142856
+
+        assert.ok(
+          isApproxEqualBN(
+            approverShare.toString(),
+            strangerFinishingBalance.sub(strangerStartingBalance).toString(),
+            1
+          ),
+          'the approver has taken their full share'
+        )
+
+        assert.ok(
+          isApproxEqualBN(
+            applicantShare.toString(),
+            applicantFinishingBalance.sub(applicantStartingBalance).toString(),
+            1
+          ),
+          `the applicant has taken their share less the listing deposit: ${applicantShare.toString()}, ${applicantFinishingBalance.sub(applicantStartingBalance).toString()}`
+        )
+
+        assert.equal(
+          listingStake.toString(),
+          await workToken.balanceOf(registry.address),
+          'registry still has the listing deposit'
         )
       })
 
@@ -237,11 +302,35 @@ contract('TILRegistry', (accounts) => {
         )
       })
     })
+
+    context('when challenge succeeds', () => {
+      beforeEach(async () => {
+        await powerChallenge.setTimeout(0)
+      })
+
+      it('should remove the challenge and listing', async () => {
+        const verifierStartingBalance = await workToken.balanceOf(verifier)
+        await registry.withdrawFromChallenge(listingHash, { from: verifier })
+        const verifierFinishingBalance = await workToken.balanceOf(verifier)
+
+        assert.equal(
+          depositAndJobAmount.toString(),
+          verifierFinishingBalance.sub(verifierStartingBalance).toString(),
+          'verifier has taken all the dough'
+        )
+
+        assert.equal(
+          0,
+          await registry.listingsLength(),
+          'the listing has been removed'
+        )
+      })
+    })
   })
 
   describe('withdrawListing()', () => {
     beforeEach(async () => {
-      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake)
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
     })
 
     it('should allow an applicant to withdraw their listing', async () => {
@@ -266,6 +355,84 @@ contract('TILRegistry', (accounts) => {
       assert.equal(await registry.listingsLength(), 0, 'there are no listings')
       assert.equal(listing[0].toString(), '0x0000000000000000000000000000000000000000', 'there is no owner')
       assert.equal(listing[1].toString(), '0', 'there is no deposit')
+    })
+  })
+
+  describe('challenge()', () => {
+    beforeEach(async () => {
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+    })
+
+    it('should allow someone to challenge that listing', async () => {
+      const strangerStartingBalance = await workToken.balanceOf(mysteriousStranger)
+      await workToken.approve(registry.address, listingStake.mul(new BN(2)).toString(), { from: mysteriousStranger })
+      debug(`starting challenge....`)
+      await registry.challenge(listingHash, { from: mysteriousStranger })
+
+      assert.equal(await powerChallenge.isChallenging(listingHash), true, 'listing is being challenged')
+
+      await powerChallenge.setTimeout(0)
+
+      await registry.withdrawFromChallenge(listingHash, { from: mysteriousStranger })
+
+      const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)
+
+      assert.equal(
+        strangerFinishingBalance.toString(),
+        strangerStartingBalance.add(listingStake).toString(),
+        'challenger has received stake'
+      )
+    })
+  })
+
+  describe('totalChallengeReward()', () => {
+    beforeEach(async () => {
+      await registry.applicantLostCoordinationGame(
+        listingHash, user1, listingStake.toString(), applicantDepositEther, verifier, jobStake,
+        { from: owner, value: applicantDepositEther }
+      )
+      await workToken.mint(user1, web3.toWei('10000', 'ether'))
+      await workToken.mint(verifier, web3.toWei('10000', 'ether'))
+      await workToken.mint(user2, web3.toWei('10000', 'ether'))
+    })
+
+    it('should calculate the rewards', async () => {
+      let initialDeposit = listingStake.add(new BN(jobStake)) // first approve and challenge
+
+      debug('approveListing(user1)...')
+      let secondApproveDeposit = await nextDepositAmount()
+      await approveListing(user1, secondApproveDeposit)
+      debug('challengeListing(mysteriousStranger)...')
+      let secondChallengeDeposit = await nextDepositAmount()
+      await challengeListing(mysteriousStranger, secondChallengeDeposit)
+      debug('approveListing(user2)...')
+      let thirdApproveDeposit = await nextDepositAmount()
+      await approveListing(user2, thirdApproveDeposit)
+      debug('powerChallenge.setTimeout(0)...')
+      await powerChallenge.setTimeout(0)
+
+      debug(`complete: ${typeof secondApproveDeposit}, ${secondApproveDeposit.toString()}`)
+
+      let approveTotal = listingStake.add(secondApproveDeposit).add(thirdApproveDeposit)
+      let total = initialDeposit.add(secondApproveDeposit).add(secondChallengeDeposit).add(thirdApproveDeposit)
+
+      assert.equal(
+        total.mul(listingStake.add(secondApproveDeposit)).div(approveTotal).sub(listingStake).toString(),
+        (await registry.totalChallengeReward(listingHash, user1)).toString(),
+        'The listing owner gets their share less the deposit'
+      )
+
+      assert.equal(
+        (await registry.totalChallengeReward(listingHash, user2)).toString(),
+        total.mul(thirdApproveDeposit).div(approveTotal).toString(),
+        'The second challenger gets their full share'
+      )
+
+      assert.equal(
+        (await registry.totalChallengeReward(listingHash, mysteriousStranger)).toString(),
+        '0',
+        'The challenger gets nothing'
+      )
     })
   })
 })

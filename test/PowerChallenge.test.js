@@ -8,9 +8,10 @@ const expectThrow = require('./helpers/expectThrow')
 const increaseTime = require('./helpers/increaseTime')
 const mineBlock = require('./helpers/mineBlock')
 const mapToChallenge = require('./helpers/mapToChallenge')
+const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 
 contract('PowerChallenge', (accounts) => {
-  const [owner, admin, challenger, approver] = accounts
+  const [owner, admin, challenger, approver, challenger2] = accounts
 
   const firstChallengeAmount = new BN(web3.toWei('30', 'ether'))
   const timeout = 30 //seconds
@@ -22,6 +23,7 @@ contract('PowerChallenge', (accounts) => {
     await powerChallenge.init(owner, token.address, timeout)
     await token.mint(owner, web3.toWei('1000', 'ether'))
     await token.mint(challenger, web3.toWei('1000', 'ether'))
+    await token.mint(challenger2, web3.toWei('1000', 'ether'))
     await token.mint(approver, web3.toWei('1000', 'ether'))
   })
 
@@ -39,9 +41,9 @@ contract('PowerChallenge', (accounts) => {
     return mapToChallenge(await powerChallenge.challenges(challengeId))
   }
 
-  async function startChallenge() {
-    await token.approve(powerChallenge.address, firstChallengeAmount.toString(), { from: challenger })
-    return await powerChallenge.startChallenge(challengeId, firstChallengeAmount.toString(), { from: challenger })
+  async function startChallenge(user = challenger) {
+    await token.approve(powerChallenge.address, firstChallengeAmount.toString(), { from: user })
+    return await powerChallenge.startChallenge(challengeId, firstChallengeAmount.toString(), { from: user })
   }
 
   async function approve(amount) {
@@ -49,9 +51,9 @@ contract('PowerChallenge', (accounts) => {
     return await powerChallenge.approve(challengeId, { from: approver })
   }
 
-  async function challenge(amount) {
-    await token.approve(powerChallenge.address, amount.toString(), { from: challenger })
-    return await powerChallenge.challenge(challengeId, { from: challenger })
+  async function challenge(amount, user = challenger) {
+    await token.approve(powerChallenge.address, amount.toString(), { from: user })
+    return await powerChallenge.challenge(challengeId, { from: user })
   }
 
   async function withdraw(options) {
@@ -81,6 +83,14 @@ contract('PowerChallenge', (accounts) => {
         await expectThrow(async () => {
           await powerChallenge.startChallenge(challengeId, firstChallengeAmount.toString(), { from: challenger })
         })
+      })
+    })
+
+    it('should not allow a second challenge to be started over the first', async () => {
+      await startChallenge()
+
+      await expectThrow(async () => {
+        await startChallenge()
       })
     })
   })
@@ -136,8 +146,6 @@ contract('PowerChallenge', (accounts) => {
   describe('withdraw()', () => {
     beforeEach(async () => {
       await startChallenge()
-      await approve(firstApprovalAmount)
-      await challenge(secondChallengeAmount)
     })
 
     context('when challenge has not timed out', () => {
@@ -149,29 +157,109 @@ contract('PowerChallenge', (accounts) => {
     })
 
     context('when completed', () => {
+      let challengerStartingBalance, tx1
+
       beforeEach(async () => {
+        challengerStartingBalance = await token.balanceOf(challenger)
         await powerChallenge.setTimeout(0)
+        tx1 = await withdraw({ from: challenger })
       })
 
-      it('should withdraw the funds', async () => {
-        const challengerStartingBalance = await token.balanceOf(challenger)
-        const approverStartingBalance = await token.balanceOf(approver)
-
-        const tx1 = await withdraw({ from: challenger })
-        const tx2 = await withdraw({ from: approver })
-
+      it('withdraw should send tokens to the challenger', async () => {
         const challengerFinishingBalance = await token.balanceOf(challenger)
-        const approverFinishingBalance = await token.balanceOf(approver)
 
         assert.equal(tx1.logs[0].event, 'Closed', 'challenger closed event was emitted')
         assert.equal(tx1.logs[1].event, 'Withdrew', 'challenger withdrawal event was emitted')
-        assert.equal(tx2.logs[0].event, 'Withdrew', 'approver withdrawal event was emitted')
 
-        assert.equal(approverFinishingBalance.sub(approverStartingBalance).toString(), 0, 'approver made no money')
         assert.equal(
           challengerFinishingBalance.sub(challengerStartingBalance).toString(),
-          firstChallengeAmount.add(firstApprovalAmount).add(secondChallengeAmount),
+          firstChallengeAmount,
           'challenger made alllll the tokens'
+        )
+      })
+    })
+
+    context('when completed with multiple challengers', () => {
+      const challengeTotal = firstChallengeAmount.add(secondChallengeAmount)
+      const total = challengeTotal.add(firstApprovalAmount)
+      const challenger2Share = total.mul(secondChallengeAmount).div(challengeTotal)
+      const challengerShare = total.mul(firstChallengeAmount).div(challengeTotal)
+
+      debug(`challenger2Share: ${challenger2Share.toString()}`)
+
+      let challengerStartingBalance, challenger2StartingBalance, tx1
+
+      beforeEach(async () => {
+        await approve(firstApprovalAmount)
+        await challenge(secondChallengeAmount, challenger2)
+        challengerStartingBalance = await token.balanceOf(challenger)
+        challenger2StartingBalance = await token.balanceOf(challenger2)
+        await powerChallenge.setTimeout(0)
+        tx1 = await withdraw({ from: challenger })
+      })
+
+      it('should support withdraw for each challenger', async () => {
+        tx2 = await withdraw({ from: challenger2 })
+        const challenger2FinishingBalance = await token.balanceOf(challenger2)
+        challengerFinishingBalance = await token.balanceOf(challenger)
+
+        const c = await getChallenge()
+
+        assert.equal(
+          challengerFinishingBalance.toString(),
+          challengerStartingBalance.add(challengerShare).toString(),
+          'First challenger has withdrawn their share'
+        )
+
+        assert.ok(
+          isApproxEqualBN(
+            challenger2FinishingBalance,
+            challenger2StartingBalance.add(challenger2Share),
+            1
+          ),
+          'Second challenger has withdrawn their share'
+        )
+
+        assert.equal(
+          c.totalWithdrawn.toString(),
+          c.challengeTotal.add(c.approveTotal).toString(),
+          'total withdrawn is correct'
+        )
+      })
+
+      it('should not allow a new challenge until all is withdrawn', async () => {
+        await expectThrow(async () => {
+          await startChallenge()
+        })
+
+        await withdraw({ from: challenger2 })
+
+        const c = await getChallenge()
+
+        await startChallenge()
+      })
+    })
+
+    context('with approval', () => {
+      let approverStartingBalance
+
+      beforeEach(async () => {
+        await approve(firstApprovalAmount)
+        approverStartingBalance = await token.balanceOf(approver)
+        await powerChallenge.setTimeout(0)
+      })
+
+      it('should provide tokens for the approver', async () => {
+        const tx1 = await withdraw({ from: approver })
+        const approverFinishingBalance = await token.balanceOf(approver)
+
+        assert.equal(tx1.logs[0].event, 'Closed', 'approver closed event was emitted')
+        assert.equal(tx1.logs[1].event, 'Withdrew', 'approver withdrawal event was emitted')
+
+        assert.equal(
+          approverFinishingBalance.toString(),
+          approverStartingBalance.add(firstChallengeAmount).add(firstApprovalAmount).toString(),
+          'approver withdrew all of the tokens'
         )
       })
     })

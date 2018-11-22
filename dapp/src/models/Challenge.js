@@ -24,8 +24,20 @@ export class Challenge {
     }
   }
 
+  isBlank () {
+    return this.state === '0'
+  }
+
+  canStart () {
+    return this.isBlank() || this.isComplete()
+  }
+
   isComplete () {
-    return this.state === '0' || this.state === '3' || this.state === '4'
+    return this.state === '3' || this.state === '4'
+  }
+
+  isChallenging () {
+    return this.state === '1' || this.state === '2'
   }
 
   isTimedOut (latestBlockTimestamp, timeout) {

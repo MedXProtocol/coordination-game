@@ -6,7 +6,8 @@ module.exports = function (array) {
     challengeTotal: array[2],
     approveTotal: array[3],
     updatedAt: array[4],
-    state: array[5]
+    state: array[5],
+    totalWithdrawn: array[6]
     // challengeDeposits: array[7],
     // approveDeposits: array[8]
   }

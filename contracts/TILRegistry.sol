@@ -43,8 +43,8 @@ contract TILRegistry is Initializable {
     _;
   }
 
-  modifier onlyNotChallenged(bytes32 _listingHash) {
-    require(powerChallenge.notStarted(_listingHash), 'listing is not being challenged');
+  modifier onlyCompleted(bytes32 _listingHash) {
+    require(powerChallenge.isComplete(_listingHash), 'listing has no open challenges');
     _;
   }
 
@@ -71,17 +71,42 @@ contract TILRegistry is Initializable {
   ) external payable onlyJobManager {
     require(msg.value >= _applicantDepositEther, 'ether has been sent');
     createNewListing(_applicant, _listingHash, _applicantDepositTokens);
-    require(token.transferFrom(msg.sender, this, _applicantDepositTokens.add(_challengerDepositTokens)));
+    require(token.transferFrom(msg.sender, address(this), _applicantDepositTokens.add(_challengerDepositTokens)));
     token.approve(address(powerChallenge), _applicantDepositTokens.add(_challengerDepositTokens));
-    powerChallenge.startApprovalFrom(_listingHash, _applicantDepositTokens, address(this), _applicant);
+    powerChallenge.startApproval(_listingHash, _applicantDepositTokens);
     powerChallenge.challengeFrom(_listingHash, address(this), _challenger);
     deposits[_listingHash] = CoordinationGameEtherDeposit(_challenger, _applicantDepositEther);
   }
 
+  function challenge(bytes32 _listingHash) external onlyCompleted(_listingHash) {
+    Listing storage _listing = listings[_listingHash];
+    uint256 challengeDeposit = _listing.deposit.mul(2);
+    token.transferFrom(msg.sender, address(this), challengeDeposit);
+    token.approve(address(powerChallenge), _listing.deposit.add(challengeDeposit));
+    powerChallenge.startApproval(_listingHash, _listing.deposit);
+    powerChallenge.challengeFrom(_listingHash, address(this), msg.sender);
+  }
+
   function withdrawFromChallenge(bytes32 _listingHash) external {
+    Listing storage _listing = listings[_listingHash];
+    // First withdraw for the registry
+    if (powerChallenge.totalWithdrawal(_listingHash, this) > 0) {
+      // We make sure to reward the listing owner with the winnings, less their deposit
+      uint256 ownerReward = powerChallenge.withdraw(_listingHash) - _listing.deposit;
+      if (ownerReward > 0) {
+        token.transfer(_listing.owner, ownerReward);
+      }
+    }
+    // Withdraw normally from the challenge
     powerChallenge.withdrawFor(_listingHash, msg.sender);
     withdrawFromLostCoordinationGame(_listingHash, msg.sender);
-    checkRemoveListing(_listingHash);
+    PowerChallenge.State state = powerChallenge.getState(_listingHash);
+    if (powerChallenge.isComplete(_listingHash)) {
+      if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
+        listingsIterator.removeValue(_listingHash);
+        delete listings[_listingHash];
+      }
+    }
   }
 
   function withdrawFromLostCoordinationGame(bytes32 _listingHash, address _beneficiary) internal {
@@ -100,12 +125,15 @@ contract TILRegistry is Initializable {
     }
   }
 
-  function checkRemoveListing(bytes32 _listingHash) internal {
-    PowerChallenge.State state = powerChallenge.getState(_listingHash);
-    if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
-      listingsIterator.removeValue(_listingHash);
-      delete listings[_listingHash];
+  function totalChallengeReward(bytes32 _listingHash, address _beneficiary) public view returns (uint256) {
+    uint256 reward = powerChallenge.totalWithdrawal(_listingHash, _beneficiary);
+    if (_beneficiary == listings[_listingHash].owner) {
+      uint256 approveReward = powerChallenge.totalWithdrawal(_listingHash, this);
+      if (approveReward > listings[_listingHash].deposit) {
+        reward += approveReward - listings[_listingHash].deposit;
+      }
     }
+    return reward;
   }
 
   function createNewListing(address _applicant, bytes32 _listingHash, uint256 _deposit) internal {
@@ -122,7 +150,7 @@ contract TILRegistry is Initializable {
     emit NewListing(_applicant, _listingHash);
   }
 
-  function withdrawListing(bytes32 _listingHash) external onlyNotChallenged(_listingHash) {
+  function withdrawListing(bytes32 _listingHash) external onlyCompleted(_listingHash) {
     Listing storage listing = listings[_listingHash];
     require(msg.sender == listing.owner, 'sender is the listing owner');
     require(listingsIterator.hasValue(_listingHash), 'listing is listingsIterator');
