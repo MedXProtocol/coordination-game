@@ -1088,25 +1088,25 @@ header {
 @keyframes attention-grabby--button {
   0% {
     background-color: $accent-color-3;
-    border-color: white;
+    border-color: rgba(100, 100, 100, 0.2);
     color: white;
     transform: scale(1.1);
   }
   20% {
     background-color: $accent-color-1;
-    border-color: white;
+    border-color: rgba(100, 100, 100, 0.2);
     color: white;
     transform: scale(1.05);
   }
   80% {
     background-color: $accent-color-2;
-    border-color: white;
+    border-color: rgba(100, 100, 100, 0.2);
     color: white;
     transform: scale(1.07);
   }
   100% {
     background-color: $accent-color-3;
-    border-color: white;
+    border-color: rgba(100, 100, 100, 0.2);
     color: white;
     transform: scale(1.1);
   }
