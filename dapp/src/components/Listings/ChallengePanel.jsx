@@ -93,6 +93,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
       }
 
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
+      const stateLabel = challenge.stateAsLabel()
 
       if (isTimedOut) {
         if (totalWithdrawal.gt(new BN(0))) {
@@ -110,7 +111,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 it will take a few minutes to confirm on the Ethereum network.'
               key='withdraw' />
         }
-        if (challenge.state === '3') {
+        if (stateLabel === 'challengeFailed') {
           challengeTitle = "The Listing Challenge was unsuccessful"
           challengeMessage =
             <p>
@@ -123,7 +124,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 {challengeWithdrawMessage}
             </p>
         }
-      } else if (challenge.state === '1' && PowerChallenge) { // CHALLENGED
+      } else if (stateLabel === 'challenged' && PowerChallenge) {
         challengeTitle = "The Listing has been Challenged"
         if (!hasAllowance) {
           challengeMessage =
@@ -147,7 +148,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 it will take a few minutes to confirm on the Ethereum network.'
               key='rejectChallenge' />
         }
-      } else if (challenge.state === '2' && PowerChallenge) { // APPROVED
+      } else if (stateLabel === 'approved' && PowerChallenge) {
         challengeTitle = "The Listing Challenge has been Rejected"
         if (!hasAllowance) {
           challengeMessage =

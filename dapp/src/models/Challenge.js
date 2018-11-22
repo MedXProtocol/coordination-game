@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import { stateAsLabel } from './stateAsLabel'
 
 function toBN(value) {
   if (!value) {
@@ -29,5 +30,9 @@ export class Challenge {
 
   isTimedOut (latestBlockTimestamp, timeout) {
     return toBN(latestBlockTimestamp).gt(toBN(timeout).add(toBN(this.updatedAt)))
+  }
+
+  stateAsLabel() {
+    return stateAsLabel(this.state)
   }
 }
