@@ -61,7 +61,8 @@ export const applicationService = function(state, applicationId, coordinationGam
     verifierChallengedAt,
     verifierSubmittedAt,
     verifierSubmitSecretExpiresAt,
-    whistleblower
+    whistleblower,
+    game
   }
 
   applicationObject = retrieveApplicationDetailsFromLocalStorage(

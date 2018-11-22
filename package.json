@@ -18,7 +18,8 @@
     "push-ropsten": "$(npm bin)/zos push --network ropstenAdmin",
     "update-ropsten": "$(npm bin)/zos update --all --network ropstenAdmin",
     "push-local": "$(npm bin)/zos push --network local --from $ADMIN_ACCOUNT",
-    "update-local": "$(npm bin)/zos update --all --network local --from $ADMIN_ACCOUNT"
+    "update-local": "$(npm bin)/zos update --all --network local --from $ADMIN_ACCOUNT",
+    "reset-local": "rm zos.dev-1234.json; rm -rf build; npm run push-local && truffle migrate && npm run bootstrap"
   },
   "author": "",
   "license": "ISC",
