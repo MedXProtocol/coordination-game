@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
+import BN from 'bn.js'
 import {
   cacheCall,
   cacheCallValueInt,
@@ -226,6 +227,19 @@ export const Admin = connect(mapStateToProps)(
         }
 
         render() {
+          var currentJobStake = new BN((this.newOrCurrentBigNumber('jobStake') || '0').toString())
+          var currentApplicationStakeAmount = new BN((this.newOrCurrentBigNumber('applicationStakeAmount') || '0').toString())
+
+          var isJobStakeTwiceAsApplicationStakeAmount = true
+          if (currentJobStake && currentApplicationStakeAmount) {
+            isJobStakeTwiceAsApplicationStakeAmount = currentJobStake.eq(currentApplicationStakeAmount.mul(new BN(2)))
+          }
+
+          if (!isJobStakeTwiceAsApplicationStakeAmount) {
+            var applicationStakeWarning = <p className='help is-danger'>The application stake amount must be half of the job stake</p>
+            var jobStakeWarning = <p className='help is-danger'>The job stake must be twice as large as the application stake</p>
+          }
+
           return (
             <div>
               <PageTitle title='admin' />
@@ -249,10 +263,11 @@ export const Admin = connect(mapStateToProps)(
                     <input
                       type="text"
                       name="applicationStakeAmount"
-                      className="text-input is-marginless text-input--large text-input--extended-extra"
+                      className={classnames('text-input is-marginless text-input--large text-input--extended-extra', { "is-danger": !isJobStakeTwiceAsApplicationStakeAmount })}
                       onChange={this.handleTextInputChange}
                       value={this.state.applicationStakeAmount || ''}
                     />
+                    {applicationStakeWarning}
                     <span className="help has-text-grey">
                       Currently: {displayWeiToEther(this.props.applicationStakeAmount)}
                     </span>
@@ -396,6 +411,7 @@ export const Admin = connect(mapStateToProps)(
                       onChange={this.handleTextInputChange}
                       value={this.state.jobStake || ''}
                     />
+                    {jobStakeWarning}
                     <span className="help has-text-grey">
                       Currently: {displayWeiToEther(this.props.jobStake)}
                     </span>
