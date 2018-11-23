@@ -614,4 +614,19 @@ contract('CoordinationGame', (accounts) => {
       })
     })
   })
+
+  describe('applicationExists()', () => {
+    it('should exist', async () => {
+      await newApplicantStartsGame()
+      const exists = await coordinationGame.applicationExists(applicationId)
+      assert.equal(exists, true, 'does not exist')
+    })
+
+    it('should not exist', async () => {
+      // Doesn't exist yet
+      const exists = await coordinationGame.applicationExists(applicationId)
+      assert.equal(exists, false, 'does exist')
+    })
+  })
+
 })

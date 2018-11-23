@@ -435,4 +435,19 @@ contract('TILRegistry', (accounts) => {
       )
     })
   })
+
+  describe('listingExists()', () => {
+    it('should exist', async () => {
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+      const exists = await registry.listingExists(listingHash)
+      assert.equal(exists, true, 'does not exist')
+    })
+
+    it('should not exist', async () => {
+      // Doesn't exist yet
+      const exists = await registry.listingExists(listingHash)
+      assert.equal(exists, false, 'does exist')
+    })
+  })
+
 })
