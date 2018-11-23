@@ -11,8 +11,11 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
+import {
+  FormOutline
+} from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
 import { get } from 'lodash'
-import { AppId } from '~/components/AppId'
 import { ApplicantRevealForm } from '~/components/Applications/ApplicantRevealForm'
 import { LoadingButton } from '~/components/LoadingButton'
 import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
@@ -306,9 +309,15 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                   </button>
                 </div>
 
-                <h6 className="is-size-6 has-text-grey application-num">
-                  Submission <AppId applicationId={applicationId} />
-                </h6>
+                <div className="columns">
+                  <div className="column is-12">
+                    <AntdIcon type={FormOutline} className="antd-icon paper--icon" />
+
+                    <h6 className="is-size-6 has-text-grey-light application-num">
+                      This submission is not yet in the registry
+                    </h6>
+                  </div>
+                </div>
 
                 <div className="columns">
                   <div className="column is-6">

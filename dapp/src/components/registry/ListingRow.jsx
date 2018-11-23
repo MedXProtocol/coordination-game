@@ -66,6 +66,8 @@ export const ListingRow = connect(mapStateToProps)(
           hint
         } = game || {}
 
+        const action = <button className="button is-primary is-small is-outlined">View Listing</button>
+
         return (
           <ApplicationListPresenter
             linkTo={formatRoute(routes.LISTING, { listingHash: bytes32ToTicker(listingHash) })}
@@ -77,7 +79,7 @@ export const ListingRow = connect(mapStateToProps)(
             )}
             date={<TEX wei={listing.deposit} />}
             status={<HintStatus applicationId={listingHash} hint={hint} />}
-            view={''}
+            view={action}
             cssClass='list--listings-item'
             needsAttention={false}
             ofInterest={false}

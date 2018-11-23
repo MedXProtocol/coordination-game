@@ -1039,6 +1039,19 @@ header {
   }
 }
 
+.paper--icon {
+  font-size: 3rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  height: 3rem;
+  width: 3rem;
+}
+
+.paper--icon path {
+  fill: rgba(170, 170, 170, 0.2);
+}
+
 .paper .delete {
   top: -60px;
   right: -60px;
@@ -1080,7 +1093,13 @@ header {
 }
 
 .application-num {
+  margin-left: 3rem;
+  margin-top: 0.325rem;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-top: -0.125rem;
+  }
 }
 
 .button.is-attention-grabby {
