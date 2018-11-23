@@ -30,7 +30,7 @@ contract('PowerChallenge', (accounts) => {
   let challengeCount = 0
   let challengeId
   const firstApprovalAmount = new BN(firstChallengeAmount).mul(new BN(2))
-  const secondChallengeAmount = firstChallengeAmount.add(firstApprovalAmount).mul(new BN(2))
+  const secondChallengeAmount = firstChallengeAmount.add(firstApprovalAmount)
 
   beforeEach(async () => {
     challengeId = numToBytes32(challengeCount += 1)
