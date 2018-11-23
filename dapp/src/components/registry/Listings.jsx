@@ -51,6 +51,22 @@ function* listingsSaga({ TILRegistry, startIndex, endIndex }) {
 }
 
 export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _Listings extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
+
+  handleTextInputChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+
+  handleSubmitSearch = (e) => {
+    this.props.history.push(this.state.searchQuery)
+  }
+
   render () {
     let loadingLines,
       noListings,

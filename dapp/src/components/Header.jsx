@@ -19,6 +19,7 @@ import {
   CheckCircleOutline,
   ThunderboltOutline,
   IssuesCloseOutline,
+  SearchOutline,
   SettingOutline,
   WalletOutline
 } from '@ant-design/icons'
@@ -205,9 +206,9 @@ export const Header = ReactTimeout(
                       'navbar-menu',
                       { 'is-active': this.state.mobileMenuActive }
                     )}>
-                      {
-                        this.props.isOwner ? (
-                          <div className="navbar-start">
+                      <div className="navbar-start">
+                        {
+                          this.props.isOwner ? (
                             <div className="navbar-item">
                               <NavLink
                                 activeClassName="is-active"
@@ -219,10 +220,36 @@ export const Header = ReactTimeout(
                                 Admin
                               </NavLink>
                             </div>
-                          </div>
-                        )
-                        : null
-                      }
+                          )
+                          : null
+                        }
+
+                        <div className="navbar-item">
+                          <form onSubmit={this.handleSubmitSearch} className="search--form">
+                            <div className="field search--field has-addons">
+                              <div className="control search--control__input has-icons-right">
+                                <input
+                                  name="searchQuery"
+                                  onChange={this.handleTextInputChange}
+                                  className="text-input search--text-input is-marginless is-small"
+                                  type="text"
+                                  placeholder="search for a token ticker symbol"
+                                />
+                              </div>
+                              <div className="control search--control__button has-icons-right">
+                                <button
+                                  className="button is-outlined is-small is-right"
+                                >
+                                  <AntdIcon type={SearchOutline} className="antd-icon" />
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
+
+
 
                       <div className="navbar-end">
                         <div className="navbar-item">

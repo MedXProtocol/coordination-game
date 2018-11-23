@@ -3,7 +3,7 @@
 }
 
 ::placeholder {
-  color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.15);
 }
 
 html,
@@ -1142,4 +1142,48 @@ header {
   background-color: lighten($brand-info, 10%);
   border-color: lighten($brand-info, 20%);
   color: white;
+}
+
+.search--field.field.has-addons {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  position: relative;
+  margin-bottom: 0;
+}
+
+.search--control__input {
+  grid-column: span 10;
+}
+
+.search--text-input {
+  background-color: rgba(50, 30, 70, 0.3);
+  border-bottom-width: 0;
+  font-size: 0.75rem;
+  max-width: 100%;
+  position: relative;
+  padding: 0.4rem 0.5rem 0.25rem 0.5rem;
+  left: -1px;
+  top: -2px;
+  width: 100%;
+}
+
+.search--text-input:hover {
+  background-color: rgba(50, 30, 70, 0.7);
+}
+
+.search--control__button {
+  grid-column: span 2;
+  top: -2px;
+}
+
+.search--control__button .button {
+  background-color: rgba(50, 30, 70, 0.3);
+}
+
+.search--control__button .button:hover {
+  background-color: rgba(50, 30, 70, 0.7);
+}
+
+.search--form {
+  width: 360px;
 }
