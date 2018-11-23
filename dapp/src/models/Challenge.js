@@ -17,8 +17,8 @@ export class Challenge {
     if (array) {
       this.id = array[0]
       this.round = array[1]
-      this.challengeTotal = array[2]
-      this.approveTotal = array[3]
+      this.challengeTotal = toBN(array[2])
+      this.approveTotal = toBN(array[3])
       this.updatedAt = array[4]
       this.state = array[5]
     }
