@@ -2,23 +2,30 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import classnames from 'classnames'
 import Toggle from 'react-toggle'
+import Autocomplete from '~/autocomplete'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Link, NavLink } from 'react-router-dom'
 import { get } from 'lodash'
+import { formatRoute } from 'react-router-named-routes'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import {
+  cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   contractByName,
   withSaga
 } from 'saga-genesis'
 import {
+  BookOutline,
   FileAddOutline,
+  FormOutline,
   DatabaseOutline,
   CheckCircleOutline,
   ThunderboltOutline,
   IssuesCloseOutline,
+  SearchOutline,
   SettingOutline,
   WalletOutline
 } from '@ant-design/icons'
@@ -31,18 +38,38 @@ import { verifierApplicationsService } from '~/services/verifierApplicationsServ
 import { applicationService } from '~/services/applicationService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
 import { applicationSaga } from '~/sagas/applicationSaga'
+import { defined } from '~/utils/defined'
 import { isBlank } from '~/utils/isBlank'
+import { getWeb3 } from '~/utils/getWeb3'
 import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
+
+// const MyItemView = function({ item }) {
+//   return (
+//
+//   );
+// }
 
 function mapStateToProps(state) {
   let applicationsToVerify = 0
   let applicationObjects = []
+  let applicationExists,
+    listingExists
 
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const query = get(state, 'search.query')
+  const hexQuery = getWeb3().utils.asciiToHex(get(state, 'search.query'))
+
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
+
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getVerifiersApplicationCount', address)
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+
+  if (hexQuery !== '0x00') { // blank / undefined is translating to 0x00 in hex
+    listingExists     = cacheCallValue(state, tilRegistryAddress, 'listingExists', hexQuery)
+    applicationExists = cacheCallValue(state, coordinationGameAddress, 'applicationExists', hexQuery)
+  }
 
   if (applicationCount && applicationCount !== 0) {
     applicationObjects = verifierApplicationsService(state, applicationCount)
@@ -61,17 +88,29 @@ function mapStateToProps(state) {
 
   return {
     address,
+    applicationExists,
+    listingExists,
     applicationsToVerify,
     applicationCount,
     applicationObjects,
-    coordinationGameAddress
+    coordinationGameAddress,
+    hexQuery,
+    query,
+    tilRegistryAddress
   }
 }
 
-function* headerSaga({ address, applicationCount, applicationObjects, coordinationGameAddress }) {
-  if (!coordinationGameAddress || !address) { return }
+function* headerSaga({ address, applicationCount, applicationObjects, coordinationGameAddress, tilRegistryAddress, hexQuery }) {
+  if (!coordinationGameAddress || !tilRegistryAddress || !address) { return }
 
   yield verifierApplicationsSaga({ coordinationGameAddress, address, applicationCount })
+
+  if (hexQuery !== '0x00') { // blank / undefined is translating to 0x00 in hex
+    yield all([
+      cacheCall(tilRegistryAddress, 'listingExists', hexQuery),
+      cacheCall(coordinationGameAddress, 'applicationExists', hexQuery)
+    ])
+  }
 
   if (applicationObjects && applicationObjects.length !== 0) {
     yield all(
@@ -82,9 +121,20 @@ function* headerSaga({ address, applicationCount, applicationObjects, coordinati
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchUpdateSearchQuery: ({ query }) => {
+      dispatch({ type: 'UPDATE_SEARCH_QUERY', query })
+    },
+    dispatchClearSearchQuery: () => {
+      dispatch({ type: 'CLEAR_SEARCH_QUERY' })
+    }
+  }
+}
+
 export const Header = ReactTimeout(
   withRouter(
-    connect(mapStateToProps)(
+    connect(mapStateToProps, mapDispatchToProps)(
       withSaga(headerSaga)(
         class _Header extends Component {
 
@@ -111,6 +161,50 @@ export const Header = ReactTimeout(
             }, 600)
           }
 
+          componentWillReceiveProps(nextProps) {
+            if (defined(nextProps.applicationExists) || defined(nextProps.listingExists)) {
+              let items = []
+
+              if (nextProps.listingExists) {
+                items.push({
+                  path: nextProps.listingExists ? formatRoute(routes.LISTING, { listingHash: nextProps.query }) : -1,
+                  name: nextProps.listingExists ? `View Listing: ${nextProps.query}` : '',
+                  icon: nextProps.listingExists ? <AntdIcon type={BookOutline} className="antd-icon" /> : ''
+                })
+              } else if (nextProps.applicationExists) {
+                items.push({
+                  path: nextProps.applicationExists ? formatRoute(routes.APPLICATION, { applicationId: nextProps.query }) : -1,
+                  name: nextProps.applicationExists ? `View Submission: ${nextProps.query}` : '',
+                  icon: nextProps.applicationExists ? <AntdIcon type={FormOutline} className="antd-icon" /> : ''
+                })
+              }
+
+              this.refs.autocomplete.setItems(items);
+            } else if (nextProps.query) {
+              this.refs.autocomplete.setItems([])
+            } else {
+              this.refs.autocomplete.hideItems()
+            }
+          }
+
+          // invoked when the user types something. A delay of 200ms is
+          // already provided to avoid DDoS'ing your own servers
+          handleTextInputChange = (query) => {
+            this.props.dispatchUpdateSearchQuery({ query })
+          }
+
+          // called when the user clicks an option or hits enter
+          // // the returned value will be inserted into the input field.
+          // // Use an empty String to reset the field
+          onSelect = (item) => {
+            if (item && item.path) {
+              this.handleCloseSearchClick()
+              this.props.history.push(item.path)
+            }
+
+            return ''
+          }
+
           toggleMobileMenu = (e) => {
             const mobileMenuActive = !this.state.mobileMenuActive
 
@@ -125,6 +219,34 @@ export const Header = ReactTimeout(
             })
           }
 
+          handleOpenSearchClick = (e) => {
+            e.preventDefault()
+
+            if (this.state.searchActive) { return }
+
+            this.setState({
+              searchActive: true
+            })
+          }
+
+          handleCloseSearchClick = (e) => {
+            if (e) {
+              e.preventDefault()
+            }
+
+            this.props.dispatchClearSearchQuery()
+            this.refs.autocomplete.refs.input.blur()
+
+            const fakeEvent = {
+              target: { value: '' }
+            }
+            this.refs.autocomplete.onChangeInput(fakeEvent)
+
+            this.setState({
+              searchActive: false
+            })
+          }
+
           render () {
             const { applicationsToVerify } = this.props
 
@@ -136,7 +258,7 @@ export const Header = ReactTimeout(
                     'is-fixed-top',
                     'navbar--row-one',
                     'fade-in',
-                    { 'fade-in-start': this.state.oneVisible }
+                    { 'fade-in-start': this.state.oneVisible, 'fade-out': this.state.searchActive }
                   )
                 }>
                   <div className="container is-fluid">
@@ -205,9 +327,9 @@ export const Header = ReactTimeout(
                       'navbar-menu',
                       { 'is-active': this.state.mobileMenuActive }
                     )}>
-                      {
-                        this.props.isOwner ? (
-                          <div className="navbar-start">
+                      <div className="navbar-start">
+                        {
+                          this.props.isOwner ? (
                             <div className="navbar-item">
                               <NavLink
                                 activeClassName="is-active"
@@ -219,10 +341,63 @@ export const Header = ReactTimeout(
                                 Admin
                               </NavLink>
                             </div>
+                          )
+                          : null
+                        }
+
+                        <div className="navbar-item">
+                          <div
+                            onClick={this.handleCloseSearchClick}
+                            className={classnames('search--background', {
+                              'search--background__active': this.state.searchActive
+                            })}>
                           </div>
-                        )
-                        : null
-                      }
+
+                          <form
+                            autoComplete="off"
+                            onSubmit={this.handleSubmitSearch}
+                            className={classnames('search--form', {
+                              'search--form__active': this.state.searchActive
+                            })}
+                          >
+                            <button
+                              className="is-outlined delete"
+                              onClick={this.handleCloseSearchClick}
+                            >
+                            </button>
+
+                            <div className="field search--field has-addons">
+                              <div className="control search--control__input has-icons-right">
+                                <Autocomplete
+                                  name="searchQuery"
+                                  ref="autocomplete"
+                                  renderItem={({ item }) => {
+                                    return <div className="user-data">
+                                      <button>{item.icon} {item.name}</button>
+                                    </div>
+                                  }}
+                                  onSelect={this.onSelect}
+                                  onClick={this.handleOpenSearchClick}
+                                  onChange={this.handleTextInputChange}
+                                  className='text-input search--text-input is-marginless is-small'
+                                  placeholder="search for a token ticker symbol"
+                                />
+                              </div>
+                              <div className="control search--control__button has-icons-right">
+                                <button
+                                  onClick={this.handleOpenSearchClick}
+                                  className="button is-outlined is-small is-right"
+                                >
+                                  <AntdIcon type={SearchOutline} className="antd-icon" />
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
+
+
 
                       <div className="navbar-end">
                         <div className="navbar-item">
