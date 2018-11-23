@@ -12,15 +12,46 @@
 }
 
 .autocomplete-li {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
   font-size: 0.5rem;
   max-width: initial;
   padding: 0.5rem 0.5rem 0.375rem;
 }
 
-.autocomplete-li a:hover {
-  color: #dde6ff;
+.autocomplete-li button {
+  font-size: 0.5rem !important;
+  padding-left: 0rem !important;
+  padding-right: 0rem !important;
 }
 
 .autocomplete-loading {
   display: none;
+}
+
+.autocomplete-li.selected {
+  background-color: #00ebc8;
+}
+
+.autocomplete-li.selected:hover {
+  background-color: #00cba8;
+}
+
+.autocomplete-li.selected button {
+  color: white !important;
+}
+
+.autocomplete-list {
+  background-color: white;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.autocomplete-li svg {
+  position: relative;
+  top: 1px;
+}
+
+.autocomplete-li path {
+  fill: black !important;
 }

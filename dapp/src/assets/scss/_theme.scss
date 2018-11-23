@@ -771,7 +771,15 @@ html.html-light,
     fill: white;
   }
 
-  .autocomplete-li a:hover {
-    color: #7deaff;
+  .autocomplete-li button:hover {
+    color: white;
+  }
+
+  .autocomplete-li.selected {
+    background-color: $accent-color-2--light;
+  }
+
+  .autocomplete-li.selected:hover {
+    background-color: lighten($accent-color-2--light, 6%);
   }
 }

@@ -104,7 +104,7 @@ class Autocomplete extends React.Component {
       isOpen: true,
       loading: false,
       items: items,
-      index: items.length? 0 : -1
+      index: items.length? 1 : -1
     })
   }
 
@@ -178,20 +178,10 @@ class Autocomplete extends React.Component {
   // select the next or previous option
   // @param delta +1 or -1 to move to the next or previous choice
   moveSelectedOption(delta) {
-    var { index, items } = this.state
-    if (!items.length) {
-      index = -1;
-    } else {
-      index = ((index || 0) + delta) % items.length;
-      if (index < 0) {
-        index = 0;
-      }
-    }
     this.setState({
-      index: index,
+      index: 0,
       isOpen: true,
     })
-
   }
 
   renderItems() {
@@ -204,7 +194,7 @@ class Autocomplete extends React.Component {
         { $empty || items.map((item, _index) => {
           return (
             <div
-              className={"autocomplete-li" + (index === _index? ' selected' : '')}
+              className={"autocomplete-li"  + (index === _index? ' selected' : '')}
               key={_index}
               onClick={this.onClickItem}
               data-index={_index}

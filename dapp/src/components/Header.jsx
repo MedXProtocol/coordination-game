@@ -18,7 +18,9 @@ import {
   withSaga
 } from 'saga-genesis'
 import {
+  BookOutline,
   FileAddOutline,
+  FormOutline,
   DatabaseOutline,
   CheckCircleOutline,
   ThunderboltOutline,
@@ -42,16 +44,11 @@ import { getWeb3 } from '~/utils/getWeb3'
 import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
 
-// render one item on the list
-const MyItemView = function({ item }) {
-
-  return (
-    <div className="user-data">
-      <a href={item.path}>{item.name}</a>
-    </div>
-  );
-
-}
+// const MyItemView = function({ item }) {
+//   return (
+//
+//   );
+// }
 
 function mapStateToProps(state) {
   let applicationsToVerify = 0
@@ -172,11 +169,13 @@ export const Header = ReactTimeout(
                 items.push({
                   path: nextProps.listingExists ? formatRoute(routes.LISTING, { listingHash: nextProps.query }) : -1,
                   name: nextProps.listingExists ? `View Listing: ${nextProps.query}` : '',
+                  icon: nextProps.listingExists ? <AntdIcon type={BookOutline} className="antd-icon" /> : ''
                 })
               } else if (nextProps.applicationExists) {
                 items.push({
                   path: nextProps.applicationExists ? formatRoute(routes.APPLICATION, { applicationId: nextProps.query }) : -1,
                   name: nextProps.applicationExists ? `View Submission: ${nextProps.query}` : '',
+                  icon: nextProps.applicationExists ? <AntdIcon type={FormOutline} className="antd-icon" /> : ''
                 })
               }
 
@@ -197,7 +196,12 @@ export const Header = ReactTimeout(
           // called when the user clicks an option or hits enter
           // // the returned value will be inserted into the input field.
           // // Use an empty String to reset the field
-          onSelect = (user) => {
+          onSelect = (item) => {
+            if (item && item.path) {
+              this.handleCloseSearchClick()
+              this.props.history.push(item.path)
+            }
+
             return ''
           }
 
@@ -226,9 +230,12 @@ export const Header = ReactTimeout(
           }
 
           handleCloseSearchClick = (e) => {
-            e.preventDefault()
+            if (e) {
+              e.preventDefault()
+            }
 
             this.props.dispatchClearSearchQuery()
+            this.refs.autocomplete.refs.input.blur()
 
             const fakeEvent = {
               target: { value: '' }
@@ -364,7 +371,11 @@ export const Header = ReactTimeout(
                                 <Autocomplete
                                   name="searchQuery"
                                   ref="autocomplete"
-                                  renderItem={MyItemView}
+                                  renderItem={({ item }) => {
+                                    return <div className="user-data">
+                                      <button>{item.icon} {item.name}</button>
+                                    </div>
+                                  }}
                                   onSelect={this.onSelect}
                                   onClick={this.handleOpenSearchClick}
                                   onChange={this.handleTextInputChange}

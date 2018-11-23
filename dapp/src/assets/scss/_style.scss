@@ -1144,7 +1144,7 @@ header {
 
 .search--form {
   transform: scale3d(1, 1, 1);
-  transition: all 1s ease-in;
+  transition: all 0.7s ease-in;
   position: relative;
   left: 0;
   top: 0;
@@ -1160,7 +1160,7 @@ header {
   left: 220px;
   top: 40px;
   transform: scale3d(3, 3, 3);
-  transition: all 0.9s ease-out;
+  transition: all 0.7s ease-out;
 
   @media (max-width: 1088px) {
     left: 25%;
@@ -1177,13 +1177,14 @@ header {
 
 .search--background {
   background-color: $accent-color-2;
+  cursor: pointer;
   height: 100%;
   left: 0;
   bottom: 0;
   right: 0;
   top: 0;
   opacity: 0;
-  transition: all 1s ease-in-out;
+  transition: all 1.2s ease-in-out;
   pointer-events: none;
   position: fixed;
   width: 100%;
@@ -1235,6 +1236,7 @@ header {
 
 .search--control__button .button {
   background-color: rgba(50, 30, 70, 0.3);
+  padding-top: 0.375rem;
 }
 
 .search--control__button .button:hover {
@@ -1247,7 +1249,7 @@ header {
 
 .search--form__active .search--control__button .button,
 .search--form__active .search--control__button path {
-  background-color: $brand-info;
+  background-color: $accent-color-3;
   fill: white;
   transition: all 0.1s ease-in-out;
 }
