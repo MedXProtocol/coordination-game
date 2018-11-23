@@ -144,7 +144,7 @@ export const Listing = connect(mapStateToProps)(
         const tokenAddress = bytes32ToAddress(applicantSecret)
 
         return (
-          <div className='column is-8-widescreen is-offset-2-widescreen paper'>
+          <div className='column is-10-widescreen is-offset-1-widescreen paper'>
             <ScrollToTop />
 
             <div className="has-text-right">

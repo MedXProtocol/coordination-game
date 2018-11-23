@@ -1,0 +1,33 @@
+.challenge-progress,
+.approve-progress {
+  margin-bottom: 0.5rem;
+}
+
+$progress-bar-bg-color: $accent-color-3;
+
+.challenge-progress progress.progress::-webkit-progress-bar {
+  background-color: $progress-bar-bg-color;
+  width: 100%;
+}
+
+.challenge-progress__progress-container {
+  position: relative;
+}
+
+.challenge-progress__progress-container__approve-label,
+.challenge-progress__progress-container__challenge-label {
+  position: absolute;
+  bottom: 1px;
+  font-size: 0.56rem;
+  font-weight: 1000;
+}
+
+.challenge-progress__progress-container__challenge-label {
+  left: 0.5rem;
+  color: white;
+}
+
+.challenge-progress__progress-container__approve-label {
+  right: 0.5rem;
+  color: black;
+}

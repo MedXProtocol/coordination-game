@@ -23,6 +23,10 @@ $brand-success: $accent-color-3;
 $brand-warning: $yellow;
 $brand-danger: $red;
 
+$success: $brand-success;
+$warning: $brand-warning;
+$danger: $brand-danger;
+
 $gray: #dfe3e4;
 $dark-gray: #2a2a2a;
 
@@ -46,3 +50,6 @@ $pagination-hover-border-color: $accent-color-1;
 $pagination-focus-color: #fff;
 $pagination-focus-border-color: $accent-color-2;
 $pagination-color: #aaa;
+
+$progress-bar-background-color: $background-color--lighter;
+$progress-indeterminate-duration: string 1.5s;
