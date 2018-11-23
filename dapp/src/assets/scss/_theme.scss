@@ -33,6 +33,15 @@ html.html-light,
     color: lighten($accent-color-1--light, 45%);
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: darken($text-color--light, 6%);
+  }
+
   hr {
     background-color: lighten($light-gray--light, 20%);
   }
@@ -355,7 +364,7 @@ html.html-light,
   .button.is-primary.is-outlined:hover,
   .button.is-primary.is-outlined:active,
   .button.is-primary.is-outlined:focus {
-    box-shadow: 0 0 3px 0 lighten($accent-color-1--light, 5%);
+    box-shadow: 0 0 1px 0 darken($accent-color-1--light, 10%);
     background-color: lighten($accent-color-1--light, 5%);
     border-color: $accent-color-1--light;
     color: white;
@@ -571,10 +580,18 @@ html.html-light,
 
   a.navbar-item:hover,
   a.navbar-item.is-active,
+  a.navbar-item:hover .antd-icon path,
+  a.navbar-item:focus .antd-icon path,
+  a.navbar-item.is-active .antd-icon path,
   .navbar-link:hover,
   .navbar-link.is-active {
     background-color: inherit;
     color: darken(saturate($accent-color-1--light, 100%), 15%);
+    fill: $text-color--light;
+  }
+
+  .navbar-item .antd-icon path {
+    fill: lighten(saturate($accent-color-1--light, 50%), 12%);
   }
 
   .navbar.is-fixed-top.navbar--row-one {
@@ -713,5 +730,48 @@ html.html-light,
   .card {
     background-color: lighten($background-color--light, 3%);
     border-color: #f0f0f0;
+  }
+
+  .search--background {
+    background-color: $accent-color-1--light;
+  }
+
+  .search--text-input {
+    background-color: $background-color--light;
+  }
+
+  .search--text-input::placeholder {
+    color: rgba(190, 190, 190, 0.7);
+  }
+
+  .search--text-input:hover {
+    background-color: white;
+  }
+
+  .search--control__button .button {
+    background-color: white;
+    border-color: white;
+  }
+
+  .search--control__button .button:hover,
+  .search--control__button .button:hover path {
+    background-color: $accent-color-2--light;
+    color: white;
+    fill: white;
+  }
+
+  .search--form__active .search--text-input {
+    background-color: white;
+  }
+
+  .search--form__active .search--control__button .button,
+  .search--form__active .search--control__button path {
+    background-color: $accent-color-2--light;
+    border-color: darken($accent-color-2--light, 6%);
+    fill: white;
+  }
+
+  .autocomplete-li a:hover {
+    color: #7deaff;
   }
 }

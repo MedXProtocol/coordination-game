@@ -3,7 +3,7 @@
 }
 
 ::placeholder {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 html,
@@ -408,7 +408,7 @@ header {
     padding-top: 3rem;
   }
   @media screen and (max-width: 500px) {
-    padding: 2rem 2rem;
+    padding: 3rem 2rem;
   }
 }
 
@@ -1141,6 +1141,60 @@ header {
   color: white;
 }
 
+
+.search--form {
+  transform: scale3d(1, 1, 1);
+  transition: all 1s ease-in;
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 2001;
+  width: 360px;
+
+  @media (max-width: 768px) {
+    width: 330px;
+  }
+}
+
+.search--form__active {
+  left: 220px;
+  top: 40px;
+  transform: scale3d(3, 3, 3);
+  transition: all 0.9s ease-out;
+
+  @media (max-width: 1088px) {
+    left: 25%;
+    top: 40%;
+    transform: scale3d(2, 2, 2);
+  }
+
+  @media (max-width: 768px) {
+    left: 6%;
+    top: 40%;
+    transform: scale3d(1.15, 1.15, 1.15);
+  }
+}
+
+.search--background {
+  background-color: $accent-color-2;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  transition: all 1s ease-in-out;
+  pointer-events: none;
+  position: fixed;
+  width: 100%;
+  z-index: 2000;
+}
+
+.search--background__active {
+  opacity: 0.97;
+  pointer-events: all;
+}
+
 .search--field.field.has-addons {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -1155,13 +1209,19 @@ header {
 .search--text-input {
   background-color: rgba(50, 30, 70, 0.3);
   border-bottom-width: 0;
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
   font-size: 0.75rem;
   max-width: 100%;
   position: relative;
-  padding: 0.4rem 0.5rem 0.25rem 0.5rem;
+  padding: 0.4rem 0.5rem 0.27rem 0.5rem;
   left: -1px;
   top: -2px;
   width: 100%;
+}
+
+.search--text-input::placeholder {
+  color: rgba(180, 140, 190, 0.5);
 }
 
 .search--text-input:hover {
@@ -1181,41 +1241,38 @@ header {
   background-color: rgba(50, 30, 70, 0.7);
 }
 
-.search--form {
-  transform: scale3d(1, 1, 1);
-  transition: all 0.5s ease-in-out;
-  position: relative;
-  left: 0;
-  top: 0;
-  z-index: 2001;
-  width: 360px;
+.search--form__active .search--text-input {
+  background-color: rgba(0, 0, 0, 1);
 }
 
-.search--form__active {
-  display: flex;
-  left: 70%;
-  // position: fixed;
-  top: 100%;
-  transform: scale3d(3, 3, 3);
-  transition: all 1s ease-in-out;
+.search--form__active .search--control__button .button,
+.search--form__active .search--control__button path {
+  background-color: $brand-info;
+  fill: white;
+  transition: all 0.1s ease-in-out;
 }
 
-.search--background {
-  background-color: $background-color;
-  height: 100%;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  top: 0;
+.search--form .delete {
+  position: absolute;
   opacity: 0;
-  transition: all 1s ease-in-out;
-  pointer-events: none;
-  position: fixed;
-  width: 100%;
-  z-index: 2000;
+  top: 2px;
+  right: -25px;
+  width: 1rem;
+  height: 1rem;
+  max-width: initial;
+  max-height: initial;
 }
 
-.search--background__active {
-  opacity: 0.97;
-  pointer-events: all;
+.search--form__active .delete {
+  opacity: 1;
+
+  @media (max-width: 1088px) {
+    right: 5.5%;
+    top: 120%;
+  }
+
+  @media (max-width: 768px) {
+    right: 5.5%;
+    top: 120%;
+  }
 }

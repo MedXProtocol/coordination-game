@@ -183,4 +183,8 @@ contract TILRegistry is Initializable {
   function setPowerChallenge(PowerChallenge _powerChallenge) public onlyTokenMinter {
     powerChallenge = _powerChallenge;
   }
+
+  function listingExists(bytes32 _listingHash) public view returns (bool) {
+    return (listings[_listingHash].owner != address(0));
+  }
 }

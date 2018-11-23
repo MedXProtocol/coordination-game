@@ -598,4 +598,8 @@ contract CoordinationGame is Ownable {
   function applicationAt(uint256 _index) public view returns (bytes32) {
     return gamesIterator.valueAtIndex(_index);
   }
+
+  function applicationExists(bytes32 _applicationId) public view returns (bool) {
+    return games[_applicationId].applicant != address(0);
+  }
 }

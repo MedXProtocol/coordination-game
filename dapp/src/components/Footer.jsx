@@ -43,7 +43,7 @@ export const Footer = class _Footer extends Component {
             <div className="level-item has-text-centered">
               <div>
                 <p className="heading is-size-5 has-text-grey-lighter">
-                  What is this?
+                  What is The Token Registry?
                 </p>
                 <p className="title">
                   <Link to={routes.FAQ} className="is-size-7">
