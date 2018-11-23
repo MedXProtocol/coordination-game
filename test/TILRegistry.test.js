@@ -158,8 +158,19 @@ contract('TILRegistry', (accounts) => {
           'application fee ether was moved into the registry'
         )
 
+        debug(`listingStake: ${listingStake.toString()}, depositAndJobAmount: ${depositAndJobAmount.toString()}`)
+
+        const challenge = await getChallenge(listingHash)
+
+        assert.equal(await powerChallenge.isChallenging(listingHash), true, 'challenge has started')
+        assert.equal(challenge.round, 1, 'second round is complete')
         assert.equal(
-          powerChallengeFinalTokenBalance.toString(), powerChallengeTokenBalance.add(depositAndJobAmount).toString(),
+          challenge.challengeTotal.add(challenge.approveTotal).toString(),
+          depositAndJobAmount.toString(), 'total challenge tokens are both deposits')
+
+        assert.equal(
+          powerChallengeFinalTokenBalance.toString(),
+          powerChallengeTokenBalance.add(depositAndJobAmount).toString(),
           'applicant deposit and work stake were moved into the power challenge'
         )
 
@@ -171,14 +182,6 @@ contract('TILRegistry', (accounts) => {
         assert.equal(await registry.listingAt(0), listingHash) // exists
         assert.equal(newListing.owner, user1, 'owner is applicant') // owned by applicant
         assert.equal(newListing.deposit, listingStake.toString(), 'deposit is set')
-
-        const challenge = await getChallenge(listingHash)
-
-        assert.equal(await powerChallenge.isChallenging(listingHash), true, 'challenge has started')
-        assert.equal(challenge.round, 1, 'second round is complete')
-        assert.equal(
-          challenge.challengeTotal.add(challenge.approveTotal).toString(),
-          depositAndJobAmount.toString(), 'total challenge tokens are both deposits')
       })
     })
   })
@@ -236,7 +239,7 @@ contract('TILRegistry', (accounts) => {
         const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)
         const applicantFinishingBalance = await workToken.balanceOf(user1)
 
-        const approverDeposit = depositAndJobAmount.mul(new BN(2))
+        const approverDeposit = depositAndJobAmount
         const total = listingStake.add(new BN(jobStake)).add(approverDeposit)
         const approveTotal = listingStake.add(approverDeposit)
         const approverShare = approverDeposit.mul(total).div(approveTotal)

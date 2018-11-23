@@ -255,7 +255,12 @@ contract PowerChallenge is Ownable {
 
   function nextDepositAmount(bytes32 _id) public view returns (uint256) {
     Challenge storage challengeStore = challenges[_id];
-    return challengeStore.challengeTotal.add(challengeStore.approveTotal).mul(2);
+    uint256 total = challengeStore.challengeTotal.add(challengeStore.approveTotal);
+    if (challengeStore.round == 0) {
+      // second round requires double of the first
+      total = total.mul(2);
+    }
+    return total;
   }
 
   function nextRound(bytes32 _id, address _payer) internal returns (uint256) {
