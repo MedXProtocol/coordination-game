@@ -73,7 +73,7 @@
 }
 
 .navbar.is-fixed-top.navbar--row-one {
-  z-index: 9;
+  z-index: 8;
 
   &:before {
     opacity: 0;
@@ -87,7 +87,7 @@
 
 .navbar.is-fixed-top.navbar--row-two {
   top: $navbar-height;
-  z-index: 8;
+  z-index: 7;
 
   &:before {
     opacity: 0;

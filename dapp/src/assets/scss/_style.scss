@@ -624,9 +624,6 @@ header {
   }
 }
 
-
-
-
 .modal-content {
   overflow: initial;
 }
@@ -1185,5 +1182,40 @@ header {
 }
 
 .search--form {
+  transform: scale3d(1, 1, 1);
+  transition: all 0.5s ease-in-out;
+  position: relative;
+  left: 0;
+  top: 0;
+  z-index: 2001;
   width: 360px;
+}
+
+.search--form__active {
+  display: flex;
+  left: 70%;
+  // position: fixed;
+  top: 100%;
+  transform: scale3d(3, 3, 3);
+  transition: all 1s ease-in-out;
+}
+
+.search--background {
+  background-color: $background-color;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  transition: all 1s ease-in-out;
+  pointer-events: none;
+  position: fixed;
+  width: 100%;
+  z-index: 2000;
+}
+
+.search--background__active {
+  opacity: 0.97;
+  pointer-events: all;
 }

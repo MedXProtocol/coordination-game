@@ -126,6 +126,22 @@ export const Header = ReactTimeout(
             })
           }
 
+          handleOpenSearchClick = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              searchActive: true
+            })
+          }
+
+          handleCloseSearchClick = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              searchActive: false
+            })
+          }
+
           render () {
             const { applicationsToVerify } = this.props
 
@@ -225,11 +241,25 @@ export const Header = ReactTimeout(
                         }
 
                         <div className="navbar-item">
-                          <form onSubmit={this.handleSubmitSearch} className="search--form">
+                          <div
+                            onClick={this.handleCloseSearchClick}
+                            className={classnames('search--background', {
+                              'search--background__active': this.state.searchActive
+                            })}>
+                          </div>
+
+                          <form
+                            autocomplete="off"
+                            onSubmit={this.handleSubmitSearch}
+                            className={classnames('search--form', {
+                              'search--form__active': this.state.searchActive
+                            })}
+                          >
                             <div className="field search--field has-addons">
                               <div className="control search--control__input has-icons-right">
                                 <input
                                   name="searchQuery"
+                                  onClick={this.handleOpenSearchClick}
                                   onChange={this.handleTextInputChange}
                                   className="text-input search--text-input is-marginless is-small"
                                   type="text"
@@ -238,6 +268,7 @@ export const Header = ReactTimeout(
                               </div>
                               <div className="control search--control__button has-icons-right">
                                 <button
+                                  onClick={this.handleOpenSearchClick}
                                   className="button is-outlined is-small is-right"
                                 >
                                   <AntdIcon type={SearchOutline} className="antd-icon" />
