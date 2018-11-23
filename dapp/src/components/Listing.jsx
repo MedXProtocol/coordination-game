@@ -10,7 +10,10 @@ import {
   contractByName
 } from 'saga-genesis'
 import BN from 'bn.js'
-import { AppId } from '~/components/AppId'
+import {
+  BookOutline
+} from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
 import { EtherscanLink } from '~/components/EtherscanLink'
 import { ChallengePanel } from '~/components/Listings/ChallengePanel'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -156,9 +159,15 @@ export const Listing = connect(mapStateToProps)(
               </button>
             </div>
 
-            <h6 className="is-size-6 has-text-grey application-num">
-              Challenge <AppId applicationId={listingHash} />
-            </h6>
+            <div className="columns">
+              <div className="column is-12">
+                <AntdIcon type={BookOutline} className="antd-icon paper--icon" />
+
+                <h6 className="is-size-6 has-text-grey-lighter application-num">
+                  This Listing is in the Registry
+                </h6>
+              </div>
+            </div>
 
             <div className="columns">
               <div className="column is-6">

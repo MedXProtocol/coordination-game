@@ -15,11 +15,8 @@ import { Listing } from '~/models/Listing'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { Challenge } from '~/models/Challenge'
-import { ApproveProgress } from '~/components/Listings/ApproveProgress'
 import { ChallengeProgress } from '~/components/Listings/ChallengeProgress'
 import { ChallengeTimeoutProgress } from '~/components/Listings/ChallengeTimeoutProgress'
-import { ContributionProgress } from '~/components/Listings/ContributionProgress'
-import { stateAsLabel } from '~/models/stateAsLabel'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { listingHash }) {
@@ -103,16 +100,14 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         listing,
         totalWithdrawal,
         challengeDeposit,
-        approveDeposit,
-        winningState
+        approveDeposit
       } = this.props
 
-      const winningStateLabel = stateAsLabel(winningState)
       const hasNextChallengeAllowance = powerChallengeAllowance.gte(nextDepositAmount)
       const startChallengeDeposit = listing.deposit.mul(new BN(2))
       const hasChallengeAllowance = registryAllowance.gte(startChallengeDeposit)
 
-      var challengeTitle, challengeBody, challengeAction
+      var challengeTitle, challengeBody
 
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
       const inProgress = challenge.isChallenging() && !isTimedOut
@@ -121,7 +116,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
       const hasChallengeDeposit = challengeDeposit && challengeDeposit.gt(new BN(0))
 
       if (inProgress) {
-        var challengeTitle = 'Listing Challenged'
+        challengeTitle = 'Listing Challenged'
         var challengeProgress = <ChallengeProgress challenge={challenge} />
         var timeoutProgress =
           <ChallengeTimeoutProgress
@@ -145,7 +140,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         var rejectButtonDisabled = stateLabel !== 'challenged' || !hasNextChallengeAllowance
         var challengeButtonDisabled = stateLabel !== 'approved' || !hasNextChallengeAllowance
 
-        if (stateLabel == 'challenged') {
+        if (stateLabel === 'challenged') {
           var allowanceClassName = 'is-success'
           var actionButton =
             <Web3ActionButton
@@ -203,7 +198,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               <div className='is-inline-block'>
                 {actionButton}
               </div>
-              &nbsp;
+              &nbsp;&nbsp;
               <div className='is-inline-block'>
                 {approvePowerChallenge}
               </div>
@@ -253,7 +248,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                     it will take a few minutes to confirm on the Ethereum network.'
                   key='startChallenge' />
               </div>
-              &nbsp;
+              &nbsp;&nbsp;
               <div className='is-inline-block'>
                 {approveSpendButton}
               </div>

@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import BN from 'bn.js'
 import PropTypes from 'prop-types'
 import distanceInWords from 'date-fns/distance_in_words'
 
