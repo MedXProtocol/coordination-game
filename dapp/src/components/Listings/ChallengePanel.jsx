@@ -18,6 +18,7 @@ import { Challenge } from '~/models/Challenge'
 import { ChallengeProgress } from '~/components/Listings/ChallengeProgress'
 import { ChallengeTimeoutProgress } from '~/components/Listings/ChallengeTimeoutProgress'
 import { get } from 'lodash'
+import { stateAsLabel } from '~/models/stateAsLabel'
 
 function mapStateToProps(state, { listingHash }) {
   const address = state.sagaGenesis.accounts[0]
@@ -115,6 +116,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
 
       var challengeTitle, challengeBody
 
+      const winningStateLabel = stateAsLabel(winningState)
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
       const inProgress = challenge.isChallenging() && !isTimedOut
       const hasApproveDeposit = approveDeposit && approveDeposit.gt(new BN(0))
@@ -149,7 +151,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             </div>
         }
      } else if (inProgress) {
-        var challengeTitle = 'Listing Challenged'
+        challengeTitle = 'Listing Challenged'
         var challengeProgress = <ChallengeProgress challenge={challenge} />
         var timeoutProgress =
           <ChallengeTimeoutProgress
@@ -174,7 +176,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         var rejectButtonDisabled = stateLabel !== 'challenged' || !hasNextChallengeAllowance
         var challengeButtonDisabled = stateLabel !== 'approved' || !hasNextChallengeAllowance
 
-        if (stateLabel == 'challenged' && !hasChallengeDeposit) {
+        if (stateLabel === 'challenged' && !hasChallengeDeposit) {
           var allowanceClassName = 'is-success'
           var actionButton =
             <Web3ActionButton
@@ -189,7 +191,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               txHashMessage='Reject challenge request sent -
                 it will take a few minutes to confirm on the Ethereum network.'
               key='rejectChallenge' />
-        } else if (stateLabel == 'approved' && !hasApproveDeposit) {
+        } else if (stateLabel === 'approved' && !hasApproveDeposit) {
           allowanceClassName = 'is-danger'
           actionButton =
             <Web3ActionButton
