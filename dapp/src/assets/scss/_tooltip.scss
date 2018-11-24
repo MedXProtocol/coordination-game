@@ -15,3 +15,11 @@
   border-top-style: solid;
   border-top-width: 7px;
 }
+
+.__react_component_tooltip.show {
+  opacity: 1;
+}
+
+.__react_component_tooltip:after {
+  opacity: 0;
+}

@@ -299,6 +299,13 @@ contract('TILRegistry', (accounts) => {
 
         debug(`${etherStartingBalance.sub(etherFinishingBalance).toString()}`)
 
+        // still exists because the power challenge state isn't complete
+        assert.equal(
+          true,
+          await powerChallenge.challengeExists(listingHash),
+          "challenge doesn't exist"
+        )
+
         assert.ok(
           isApproxEqualBN(etherStartingBalance, etherFinishingBalance),
           'Owner withdrew nothing'
@@ -313,6 +320,13 @@ contract('TILRegistry', (accounts) => {
 
       it('should remove the challenge and listing', async () => {
         const verifierStartingBalance = await workToken.balanceOf(verifier)
+
+        assert.equal(
+          true,
+          await powerChallenge.challengeExists(listingHash),
+          "challenge doesn't exist"
+        )
+
         await registry.withdrawFromChallenge(listingHash, { from: verifier })
         const verifierFinishingBalance = await workToken.balanceOf(verifier)
 
@@ -326,6 +340,12 @@ contract('TILRegistry', (accounts) => {
           0,
           await registry.listingsLength(),
           'the listing has been removed'
+        )
+
+        assert.equal(
+          false,
+          await powerChallenge.challengeExists(listingHash),
+          'challenge exists'
         )
       })
     })
