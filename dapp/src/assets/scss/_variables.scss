@@ -33,6 +33,27 @@ $dark-gray: #2a2a2a;
 $nav-link-color: #977c9d;
 // END DARK THEME COLOURS
 
+
+// LIGHT THEME COLOURS
+$text-color--light: #333;
+$background-color--light: #f4f4f4;
+$accent-color-1--light: #0893ea; // blue
+$accent-color-2--light: #f8aa2f; // orange
+$accent-color-3--light: #13e99b; // green
+
+$brand-primary--light: $accent-color-2;
+$brand-link--light: $blue;
+$brand-info--light: $cyan;
+$brand-success--light: rgba(0, 220, 220, 1);
+$brand-warning--light: darken($accent-color-2--light, 10%);
+$brand-danger--light: $red;
+
+$gray--light: #afc3c4;
+$light-gray--light: #dedede;
+
+$nav-link-color--light: darken($accent-color-2--light, 40%);
+// END LIGHT THEME COLOURS
+
 $screen-sm: 768px;
 $screen-lg: 1200px;
 
@@ -53,3 +74,4 @@ $pagination-color: #aaa;
 
 $progress-bar-background-color: $background-color--lighter;
 $progress-indeterminate-duration: string 1.5s;
+$progress-bar-bg-color: $brand-success--light;

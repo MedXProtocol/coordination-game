@@ -26,12 +26,21 @@ export class ChallengeTimeoutProgress extends PureComponent {
 
     return (
       <div className='approve-progress'>
-        <h4 className='is-size-6'>Time Remaining <small className='has-text-grey'>{timeRemainingWords}</small></h4>
-        <progress
-          className='progress is-info'
-          value={timePercentage}
-          max='100'>
-        </progress>
+        <br />
+        <h4 className='is-size-6'>
+          Time Remaining
+        </h4>
+        <div className='challenge-progress__progress-container'>
+          <div className='challenge-progress__progress-container__time-label'>
+            {timeRemainingWords}
+          </div>
+          <progress
+            className='progress is-info'
+            value={timePercentage}
+            max='100'>
+          </progress>
+        </div>
+        <br />
       </div>
     )
   }

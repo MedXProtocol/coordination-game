@@ -1,23 +1,3 @@
-// LIGHT THEME COLOURS
-$text-color--light: #333;
-$background-color--light: #f4f4f4;
-$accent-color-1--light: #0893ea; // blue
-$accent-color-2--light: #f8aa2f; // orange
-$accent-color-3--light: #13e99b; // green
-
-$brand-primary--light: $accent-color-2;
-$brand-link--light: $blue;
-$brand-info--light: $cyan;
-$brand-success--light: $brand-primary--light;
-$brand-warning--light: darken($accent-color-2--light, 10%);
-$brand-danger--light: $red;
-
-$gray--light: #afc3c4;
-$light-gray--light: #dedede;
-
-$nav-link-color--light: darken($accent-color-2--light, 40%);
-// END LIGHT THEME COLOURS
-
 html.html-light,
 .html-light body {
   background: $background-color--light;
@@ -810,4 +790,18 @@ html.html-light,
   .autocomplete-li.selected:hover {
     background-color: lighten($accent-color-2--light, 6%);
   }
+
+  .button.is-success {
+    border-color: $brand-success--light;
+    color: $brand-success--light;
+  }
+
+  .button.is-success:hover {
+    background-color: $brand-success--light;
+  }
+
+  .challenge-progress__progress-container__approve-label {
+    color: rgba(0, 120, 80, 0.8);
+  }
+
 }

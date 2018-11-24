@@ -1,0 +1,65 @@
+.progress {
+  border-radius: 2px;
+  height: 1.5rem;
+}
+
+.challenge-progress,
+.approve-progress {
+  margin-bottom: 0.5rem;
+}
+
+.challenge-progress progress.progress::-webkit-progress-bar {
+  background-color: $progress-bar-bg-color;
+  width: 100%;
+}
+
+.challenge-progress__progress-container .progress[value]::-webkit-progress-value {
+  border-right: 3px solid #000;
+}
+
+.challenge-progress__progress-container {
+  position: relative;
+}
+
+.challenge-progress__progress-container__approve-label,
+.challenge-progress__progress-container__challenge-label,
+.challenge-progress__progress-container__time-label {
+  position: absolute;
+  bottom: 5px;
+  font-size: 0.625rem;
+  font-weight: 1000;
+
+  @media (max-width: 1088px) {
+    bottom: -40px;
+    font-size: 0.5rem;
+  }
+}
+
+.challenge-progress__progress-container__challenge-label {
+  color: white;
+  left: 0.5rem;
+
+  @media (max-width: 1088px) {
+    left: 0;
+  }
+}
+
+.challenge-progress__progress-container__time-label {
+  color: white;
+  right: 0.5rem;
+
+  @media (max-width: 1088px) {
+    bottom: -23px;
+    right: 0;
+  }
+}
+
+.challenge-progress__progress-container__approve-label {
+  right: 0.5rem;
+  color: rgba(14, 116, 100, 0.9);
+
+  @media (max-width: 1088px) {
+    color: white;
+    right: 0;
+  }
+}

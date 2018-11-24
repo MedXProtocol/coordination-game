@@ -18,13 +18,21 @@ export class ChallengeProgress extends PureComponent {
 
     return (
       <div className='challenge-progress'>
+        <hr />
+        <h4 className='is-size-6'>
+          Current Vote Weighting:
+        </h4>
         <div className='challenge-progress__progress-container'>
           <div className='challenge-progress__progress-container__challenge-label'>
-            Challenge Listing <br />
+            Remove Listing
+            <br className="is-hidden-desktop" />
+            <span className="is-hidden-touch"> &mdash; </span>
             <TEX wei={challengeTotal} />
           </div>
           <div className='challenge-progress__progress-container__approve-label'>
-            Reject Challenge <br />
+            Keep Listing
+            <br className="is-hidden-desktop" />
+            <span className="is-hidden-touch"> &mdash; </span>
             <TEX wei={approveTotal} />
           </div>
           <progress

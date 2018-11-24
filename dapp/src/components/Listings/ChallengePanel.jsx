@@ -172,18 +172,21 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         }
 
         if (!hasNextChallengeAllowance && WorkToken) {
-          var approvePowerChallenge =
-            <Web3ActionButton
-              contractAddress={WorkToken}
-              method='approve'
-              args={[PowerChallenge, nextDepositAmount.toString()]}
-              buttonText={<span>Approve Spend of <TEX wei={nextDepositAmount} /></span>}
-              loadingText='Approving...'
-              className={classnames("button is-small is-outlined", allowanceClassName)}
-              confirmationMessage='You have approved the challenge tokens.'
-              txHashMessage='Approval request sent -
-                it will take a few minutes to confirm on the Ethereum network.'
-              key='approval' />
+          var approvePowerChallenge = (
+            <React.Fragment>
+              <Web3ActionButton
+                contractAddress={WorkToken}
+                method='approve'
+                args={[PowerChallenge, nextDepositAmount.toString()]}
+                buttonText={<span>Approve Spend of <TEX wei={nextDepositAmount} /></span>}
+                loadingText='Approving...'
+                className={classnames("button is-small is-outlined", allowanceClassName)}
+                confirmationMessage='You have approved the challenge tokens.'
+                txHashMessage='Approval request sent -
+                  it will take a few minutes to confirm on the Ethereum network.'
+                key='approval' />
+            </React.Fragment>
+          )
         }
 
         challengeBody =
@@ -196,11 +199,10 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             </div>
             <div>
               <div className='is-inline-block'>
-                {actionButton}
-              </div>
-              &nbsp;&nbsp;
-              <div className='is-inline-block'>
                 {approvePowerChallenge}
+              </div>
+              <div className='is-inline-block'>
+                {actionButton}
               </div>
             </div>
             {challengeProgress}
@@ -248,7 +250,6 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                     it will take a few minutes to confirm on the Ethereum network.'
                   key='startChallenge' />
               </div>
-              &nbsp;&nbsp;
               <div className='is-inline-block'>
                 {approveSpendButton}
               </div>
@@ -257,9 +258,9 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
 
       } else if (challenge.isChallenging() && isTimedOut) {
         if (stateLabel === 'challengeFailed') {
-          challengeTitle = "The challenge was unsuccessful."
+          challengeTitle = "The challenge was unsuccessful"
         } else {
-          challengeTitle = "This listing was successfully challenged."
+          challengeTitle = "This listing was successfully challenged"
         }
 
         if (totalWithdrawal.gt(new BN(0))) {
