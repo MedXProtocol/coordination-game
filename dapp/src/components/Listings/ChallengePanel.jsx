@@ -18,6 +18,7 @@ import { Challenge } from '~/models/Challenge'
 import { ChallengeProgress } from '~/components/Listings/ChallengeProgress'
 import { ChallengeTimeoutProgress } from '~/components/Listings/ChallengeTimeoutProgress'
 import { get } from 'lodash'
+import { stateAsLabel } from '~/models/stateAsLabel'
 
 function mapStateToProps(state, { listingHash }) {
   const address = state.sagaGenesis.accounts[0]
@@ -30,11 +31,12 @@ function mapStateToProps(state, { listingHash }) {
   const registryAllowance = cacheCallValueBigNumber(state, WorkToken, 'allowance', address, TILRegistry) || new BN(0)
   const nextDepositAmount = cacheCallValueBigNumber(state, PowerChallenge, 'nextDepositAmount', listingHash) || new BN(0)
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
-  const totalWithdrawal = cacheCallValueBigNumber(state, TILRegistry, 'totalChallengeReward', listingHash, address) || new BN(0)
+  const totalWithdrawal = cacheCallValueBigNumber(state, PowerChallenge, 'totalWithdrawal', listingHash, address) || new BN(0)
   const listing = new Listing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
   const challengeDeposit = cacheCallValueBigNumber(state, PowerChallenge, 'challengeBalance', listingHash, address)
   const approveDeposit = cacheCallValueBigNumber(state, PowerChallenge, 'approveBalance', listingHash, address)
   const winningState = cacheCallValue(state, PowerChallenge, 'winningState', listingHash)
+  const isComplete = cacheCallValue(state, PowerChallenge, 'isComplete', listingHash)
 
   return {
     TILRegistry,
@@ -52,7 +54,8 @@ function mapStateToProps(state, { listingHash }) {
     totalWithdrawal,
     challengeDeposit,
     approveDeposit,
-    winningState
+    winningState,
+    isComplete
   }
 }
 
@@ -64,11 +67,13 @@ function* challengePanelSaga({ PowerChallenge, WorkToken, TILRegistry, address, 
     cacheCall(PowerChallenge, 'challenges', listingHash),
     cacheCall(PowerChallenge, 'nextDepositAmount', listingHash),
     cacheCall(PowerChallenge, 'timeout'),
-    cacheCall(TILRegistry, 'totalChallengeReward', listingHash, address),
+    cacheCall(PowerChallenge, 'totalWithdrawal', listingHash, address),
     cacheCall(TILRegistry, 'listings', listingHash),
     cacheCall(PowerChallenge, 'challengeBalance', listingHash, address),
     cacheCall(PowerChallenge, 'approveBalance', listingHash, address),
-    cacheCall(PowerChallenge, 'winningState', listingHash)
+    cacheCall(PowerChallenge, 'winningState', listingHash),
+    cacheCall(PowerChallenge, 'isComplete', listingHash),
+    cacheCall(TILRegistry, 'totalChallengeReward', listingHash, address)
   ])
 }
 
@@ -100,7 +105,9 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         listing,
         totalWithdrawal,
         challengeDeposit,
-        approveDeposit
+        approveDeposit,
+        winningState,
+        isComplete
       } = this.props
 
       const hasNextChallengeAllowance = powerChallengeAllowance.gte(nextDepositAmount)
@@ -109,20 +116,48 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
 
       var challengeTitle, challengeBody
 
+      const winningStateLabel = stateAsLabel(winningState)
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
       const inProgress = challenge.isChallenging() && !isTimedOut
-      const stateLabel = challenge.stateAsLabel()
       const hasApproveDeposit = approveDeposit && approveDeposit.gt(new BN(0))
       const hasChallengeDeposit = challengeDeposit && challengeDeposit.gt(new BN(0))
 
-      if (inProgress) {
+      if (!challenge.isBlank() && isTimedOut) {
+        if (winningStateLabel === 'challengeFailed') {
+          challengeTitle = "The challenge was unsuccessful"
+        } else {
+          challengeTitle = "This listing was successfully challenged"
+        }
+
+        if (totalWithdrawal.gt(new BN(0))) {
+          challengeBody =
+            <div>
+              <div className='columns'>
+                <p className='column'>
+                  <span>You have been awarded <TEX wei={totalWithdrawal} />.</span>
+                </p>
+              </div>
+              <Web3ActionButton
+                contractAddress={TILRegistry}
+                method='withdrawFromChallenge'
+                args={[listingHash]}
+                buttonText={<span>Withdraw <TEX wei={totalWithdrawal} /></span>}
+                loadingText='Withdrawing...'
+                className="button is-small is-info is-outlined"
+                confirmationMessage={<span>You have withdrawn <TEX wei={totalWithdrawal} /></span>}
+                txHashMessage='Withdraw request sent -
+                  it will take a few minutes to confirm on the Ethereum network.'
+                key='withdraw' />
+            </div>
+        }
+     } else if (inProgress) {
         challengeTitle = 'Listing Challenged'
         var challengeProgress = <ChallengeProgress challenge={challenge} />
         var timeoutProgress =
           <ChallengeTimeoutProgress
             challenge={challenge}
-            timeout={timeout}
-            latestBlockTimestamp={latestBlockTimestamp} />
+            timeout={timeout || new BN(0)}
+            latestBlockTimestamp={latestBlockTimestamp || new BN(0)} />
 
         if (hasApproveDeposit) {
           var approveDepositProgress =
@@ -137,10 +172,11 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             </p>
         }
 
+        const stateLabel = challenge.stateAsLabel()
         var rejectButtonDisabled = stateLabel !== 'challenged' || !hasNextChallengeAllowance
         var challengeButtonDisabled = stateLabel !== 'approved' || !hasNextChallengeAllowance
 
-        if (stateLabel === 'challenged') {
+        if (stateLabel === 'challenged' && !hasChallengeDeposit) {
           var allowanceClassName = 'is-success'
           var actionButton =
             <Web3ActionButton
@@ -155,7 +191,7 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               txHashMessage='Reject challenge request sent -
                 it will take a few minutes to confirm on the Ethereum network.'
               key='rejectChallenge' />
-        } else {
+        } else if (stateLabel === 'approved' && !hasApproveDeposit) {
           allowanceClassName = 'is-danger'
           actionButton =
             <Web3ActionButton
@@ -171,22 +207,19 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
               key='approveChallenge' />
         }
 
-        if (!hasNextChallengeAllowance && WorkToken) {
-          var approvePowerChallenge = (
-            <React.Fragment>
-              <Web3ActionButton
-                contractAddress={WorkToken}
-                method='approve'
-                args={[PowerChallenge, nextDepositAmount.toString()]}
-                buttonText={<span>Approve Spend of <TEX wei={nextDepositAmount} /></span>}
-                loadingText='Approving...'
-                className={classnames("button is-small is-outlined", allowanceClassName)}
-                confirmationMessage='You have approved the challenge tokens.'
-                txHashMessage='Approval request sent -
-                  it will take a few minutes to confirm on the Ethereum network.'
-                key='approval' />
-            </React.Fragment>
-          )
+        if (!hasNextChallengeAllowance && WorkToken && actionButton) {
+          var approvePowerChallenge =
+            <Web3ActionButton
+              contractAddress={WorkToken}
+              method='approve'
+              args={[PowerChallenge, nextDepositAmount.toString()]}
+              buttonText={<span>Approve Spend of <TEX wei={nextDepositAmount} /></span>}
+              loadingText='Approving...'
+              className={classnames("button is-small is-outlined", allowanceClassName)}
+              confirmationMessage='You have approved the challenge tokens.'
+              txHashMessage='Approval request sent -
+                it will take a few minutes to confirm on the Ethereum network.'
+              key='approval' />
         }
 
         challengeBody =
@@ -197,19 +230,21 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                 {approveDepositProgress}
               </div>
             </div>
-            <div>
-              <div className='is-inline-block'>
-                {approvePowerChallenge}
+            {actionButton &&
+              <div>
+                <div className='is-inline-block'>
+                  {approvePowerChallenge}
+                </div>
+                <div className='is-inline-block'>
+                  {actionButton}
+                </div>
               </div>
-              <div className='is-inline-block'>
-                {actionButton}
-              </div>
-            </div>
+            }
             {challengeProgress}
             {timeoutProgress}
           </div>
 
-      } else if (challenge.canStart()) {
+      } else if (challenge.isBlank() || isComplete) {
         challengeTitle = "Challenge Listing"
 
         if (!hasChallengeAllowance) {
@@ -256,34 +291,6 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             </div>
           </div>
 
-      } else if (challenge.isChallenging() && isTimedOut) {
-        if (stateLabel === 'challengeFailed') {
-          challengeTitle = "The challenge was unsuccessful"
-        } else {
-          challengeTitle = "This listing was successfully challenged"
-        }
-
-        if (totalWithdrawal.gt(new BN(0))) {
-          challengeBody =
-            <div>
-              <div className='columns'>
-                <p className='column'>
-                  <span>You have been awarded <TEX wei={totalWithdrawal} />.</span>
-                </p>
-              </div>
-              <Web3ActionButton
-                contractAddress={TILRegistry}
-                method='withdrawFromChallenge'
-                args={[listingHash]}
-                buttonText={<span>Withdraw <TEX wei={totalWithdrawal} /></span>}
-                loadingText='Withdrawing...'
-                className="button is-small is-info is-outlined"
-                confirmationMessage={<span>You have withdrawn <TEX wei={totalWithdrawal} /></span>}
-                txHashMessage='Withdraw request sent -
-                  it will take a few minutes to confirm on the Ethereum network.'
-                key='withdraw' />
-            </div>
-        }
       }
 
       return (
