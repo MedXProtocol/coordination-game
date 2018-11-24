@@ -53,7 +53,6 @@ export const ApplicantRevealForm = connect(null, mapDispatchToProps)(
             .onError((error) => {
               this.props.dispatchHideLoadingStatus()
 
-              console.log(error)
               this.setState({ applicantRevealHandler: null })
               toastr.transactionError(error)
             })
@@ -150,8 +149,6 @@ export const ApplicantRevealForm = connect(null, mapDispatchToProps)(
         if (secret) {
           secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
         }
-
-        console.log(this.secretAndRandomFromLocalStorage())
 
         return (
           <React.Fragment>
