@@ -36,4 +36,8 @@ library IndexedAddressArray {
     }
     return self.addresses[_index];
   }
+
+  function length(Data storage self) internal view returns (uint256) {
+    return self.addresses.length;
+  }
 }
