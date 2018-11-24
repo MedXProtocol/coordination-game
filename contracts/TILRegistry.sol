@@ -106,6 +106,8 @@ contract TILRegistry is Initializable {
         listingsIterator.removeValue(_listingHash);
         delete listings[_listingHash];
       }
+
+      powerChallenge.removeChallenge(_listingHash);
     }
   }
 

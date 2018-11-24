@@ -102,7 +102,7 @@ export const Listing = connect(mapStateToProps)(
 
         if (listing.owner === address && TILRegistry) {
           if (challengeStarted) {
-            tip = `There is currently a challenge against this listing preventing you from withdrawing your the deposit you invested in it.`
+            tip = `There is currently a challenge against this listing preventing<br /> you from withdrawing your the deposit you invested in it.`
           } else {
             tip = `You can remove this listing and withdraw the deposit you invested in it.`
           }

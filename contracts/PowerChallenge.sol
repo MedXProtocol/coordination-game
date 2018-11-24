@@ -351,4 +351,8 @@ contract PowerChallenge is Ownable {
     }
     return withdrawal;
   }
+
+  function challengeExists(bytes32 _id) public view returns (bool) {
+    return (challenges[_id].updatedAt != 0);
+  }
 }
