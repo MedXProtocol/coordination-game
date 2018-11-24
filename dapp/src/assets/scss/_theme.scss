@@ -1,23 +1,3 @@
-// LIGHT THEME COLOURS
-$text-color--light: #333;
-$background-color--light: #f4f4f4;
-$accent-color-1--light: #0893ea; // blue
-$accent-color-2--light: #f8aa2f; // orange
-$accent-color-3--light: #13e99b; // green
-
-$brand-primary--light: $accent-color-2;
-$brand-link--light: $blue;
-$brand-info--light: $cyan;
-$brand-success--light: $brand-primary--light;
-$brand-warning--light: darken($accent-color-2--light, 10%);
-$brand-danger--light: $red;
-
-$gray--light: #afc3c4;
-$light-gray--light: #dedede;
-
-$nav-link-color--light: darken($accent-color-2--light, 40%);
-// END LIGHT THEME COLOURS
-
 html.html-light,
 .html-light body {
   background: $background-color--light;
@@ -225,6 +205,10 @@ html.html-light,
     color: white;
   }
 
+  .list--listings-item .list--item__date {
+    color: lighten($text-color--light, 50%);
+  }
+
   .list--item__view {
     color: darken($accent-color-2--light, 10%);
   }
@@ -232,6 +216,17 @@ html.html-light,
   .list--item:hover {
     background-color: $accent-color-1--light;
     color: white;
+  }
+
+  .list--application-item:hover {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.1) 3px,
+        rgba(255, 255, 255, 0.04) 3px,
+        rgba(255, 255, 255, 0.04) 40px /* determines size */
+      );
   }
 
   .list--item:hover .list--item__id,
@@ -287,6 +282,19 @@ html.html-light,
     border-color: $brand-danger--light;
     color: $brand-danger--light;
   }
+
+  .list--item .button.is-danger.is-outlined,
+  .list--item .button.is-info.is-outlined,
+  .list--item .button.is-primary.is-outlined,
+  .list--item .button.is-warning.is-outlined {
+    background-color: white;
+  }
+
+  .list--item .button.is-info.is-outlined:hover,
+  .list--item .button.is-warning.is-outlined:hover {
+    background-color: white;
+  }
+
 
   .list--application-item .list--item__timer {
     background-color: lighten($background-color--light, 3%);
@@ -415,7 +423,7 @@ html.html-light,
   }
 
   .list--icon {
-    color: rgba(220, 220, 220, 0.2);
+    color: rgba(220, 220, 220, 0.05);
   }
 
   .list--item {
@@ -782,4 +790,18 @@ html.html-light,
   .autocomplete-li.selected:hover {
     background-color: lighten($accent-color-2--light, 6%);
   }
+
+  .button.is-success {
+    border-color: $brand-success--light;
+    color: $brand-success--light;
+  }
+
+  .button.is-success:hover {
+    background-color: $brand-success--light;
+  }
+
+  .challenge-progress__progress-container__approve-label {
+    color: rgba(0, 120, 80, 0.8);
+  }
+
 }

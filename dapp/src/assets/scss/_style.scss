@@ -1023,6 +1023,7 @@ header {
 .paper {
   background-color: darken($background-color, 3%);
   box-shadow: 0 0 100px 0 rgba(10, 10, 20, 1);
+  margin-bottom: 10rem;
   padding: 2rem;
   position: absolute;
   left: 0;
@@ -1037,6 +1038,19 @@ header {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+}
+
+.paper--icon {
+  font-size: 3rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  height: 3rem;
+  width: 3rem;
+}
+
+.paper--icon path {
+  fill: rgba(170, 170, 170, 0.2);
 }
 
 .paper .delete {
@@ -1080,7 +1094,13 @@ header {
 }
 
 .application-num {
+  margin-left: 3rem;
+  margin-top: 0.325rem;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-top: -0.125rem;
+  }
 }
 
 .button.is-attention-grabby {
@@ -1277,4 +1297,8 @@ header {
     right: 5.5%;
     top: 120%;
   }
+}
+
+.is-inline-block .button {
+  margin-right: 20px;
 }

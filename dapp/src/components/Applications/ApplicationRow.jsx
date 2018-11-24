@@ -64,7 +64,7 @@ export const ApplicationRow = connect(mapStateToProps)(
         } = applicationObject
 
         action = (
-          <button className="button is-primary is-small is-outlined">View Submission</button>
+          <button className="button is-info is-small is-outlined">View Submission</button>
         )
 
         const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
@@ -73,11 +73,12 @@ export const ApplicationRow = connect(mapStateToProps)(
         if (latestBlockTimestamp && updatedAt) {
           const timeLeft = applicationTimeLeft(latestBlockTimestamp, applicationObject, applicationState)
           if (timeLeft.minutes) {
+            const phaseAction = (applicationState.waitingOnVerifier) ? 'verifier to check validity' : 'applicant to reveal secret'
             date = (
               <span className="list--item__timer">
                 <abbr
                   data-for={`date-tooltip-countdown-${applicationId}`}
-                  data-tip={`Time left until next phase: ${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
+                  data-tip={`Hours remaining for ${phaseAction}: ${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
                 >
                   {timeLeft.hours}:{timeLeft.minutes}
                   <ReactTooltip

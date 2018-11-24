@@ -153,10 +153,12 @@ export const ApplicantRevealForm = connect(null, mapDispatchToProps)(
         return (
           <React.Fragment>
             <div>
-              <h5 className="is-size-5">
-                To complete the application you must reveal your secret before: <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
+              <p className="is-size-6">
+                <strong>To complete the application you must reveal your secret before:</strong>
+                <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
                 <br />
-              </h5>
+                <br />
+              </p>
 
               {this.secretAndRandomFromLocalStorage() ?
                 <Web3ActionButton

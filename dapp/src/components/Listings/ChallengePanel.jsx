@@ -15,11 +15,8 @@ import { Listing } from '~/models/Listing'
 import { Web3ActionButton } from '~/components/Web3ActionButton'
 import { TEX } from '~/components/TEX'
 import { Challenge } from '~/models/Challenge'
-import { ApproveProgress } from '~/components/Listings/ApproveProgress'
 import { ChallengeProgress } from '~/components/Listings/ChallengeProgress'
 import { ChallengeTimeoutProgress } from '~/components/Listings/ChallengeTimeoutProgress'
-import { ContributionProgress } from '~/components/Listings/ContributionProgress'
-import { stateAsLabel } from '~/models/stateAsLabel'
 import { get } from 'lodash'
 
 function mapStateToProps(state, { listingHash }) {
@@ -112,12 +109,11 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         isComplete
       } = this.props
 
-      const winningStateLabel = stateAsLabel(winningState)
       const hasNextChallengeAllowance = powerChallengeAllowance.gte(nextDepositAmount)
       const startChallengeDeposit = listing.deposit.mul(new BN(2))
       const hasChallengeAllowance = registryAllowance.gte(startChallengeDeposit)
 
-      var challengeTitle, challengeBody, challengeAction
+      var challengeTitle, challengeBody
 
       const isTimedOut = challenge.isTimedOut(latestBlockTimestamp, timeout)
       const inProgress = challenge.isChallenging() && !isTimedOut
@@ -126,9 +122,9 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
 
       if (!challenge.isBlank() && isTimedOut) {
         if (winningStateLabel === 'challengeFailed') {
-          challengeTitle = "The challenge was unsuccessful."
+          challengeTitle = "The challenge was unsuccessful"
         } else {
-          challengeTitle = "This listing was successfully challenged."
+          challengeTitle = "This listing was successfully challenged"
         }
 
         if (totalWithdrawal.gt(new BN(0))) {
@@ -235,11 +231,10 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
             {actionButton &&
               <div>
                 <div className='is-inline-block'>
-                  {actionButton}
-                </div>
-                &nbsp;
-                <div className='is-inline-block'>
                   {approvePowerChallenge}
+                </div>
+                <div className='is-inline-block'>
+                  {actionButton}
                 </div>
               </div>
             }
@@ -288,7 +283,6 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
                     it will take a few minutes to confirm on the Ethereum network.'
                   key='startChallenge' />
               </div>
-              &nbsp;
               <div className='is-inline-block'>
                 {approveSpendButton}
               </div>
