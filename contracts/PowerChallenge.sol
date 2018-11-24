@@ -4,10 +4,12 @@ import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "./IndexedBytes32Array.sol";
+import "./IndexedAddressArray.sol";
 
 contract PowerChallenge is Ownable {
   using SafeMath for uint256;
   using IndexedBytes32Array for IndexedBytes32Array.Data;
+  using IndexedAddressArray for IndexedAddressArray.Data;
 
   enum State {
       BLANK,
@@ -27,8 +29,6 @@ contract PowerChallenge is Ownable {
     mapping(address => uint256) challengeDeposits;
     mapping(address => uint256) approveDeposits;
     uint256 totalWithdrawn;
-    uint256 challengerDepositCount;
-    uint256 approverDepositCount;
   }
 
   event ChallengeStarted(bytes32 id, State state);
@@ -41,6 +41,9 @@ contract PowerChallenge is Ownable {
   uint256 public timeout;
   mapping(bytes32 => Challenge) public challenges;
   IndexedBytes32Array.Data challengeIterator;
+
+  mapping(bytes32 => IndexedAddressArray.Data) challengers;
+  mapping(bytes32 => IndexedAddressArray.Data) approvers;
 
   modifier onlyCompleted(bytes32 _id) {
     require(isComplete(_id), "challenge has completed");
@@ -104,14 +107,13 @@ contract PowerChallenge is Ownable {
       0,
       block.timestamp,
       State.CHALLENGED,
-      0,
-      1,
       0
     );
     challenges[_id].challengeDeposits[_beneficiary] = _amount;
     if (!challengeIterator.hasValue(_id)) {
       challengeIterator.pushValue(_id);
     }
+    challengers[_id].pushAddress(_beneficiary);
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -136,14 +138,13 @@ contract PowerChallenge is Ownable {
       _amount,
       block.timestamp,
       State.APPROVED,
-      0,
-      0,
-      1
+      0
     );
     challenges[_id].approveDeposits[_beneficiary] = _amount;
     if (!challengeIterator.hasValue(_id)) {
       challengeIterator.pushValue(_id);
     }
+    approvers[_id].pushAddress(_beneficiary);
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -158,7 +159,9 @@ contract PowerChallenge is Ownable {
     challengeStore.approveTotal = challengeStore.approveTotal.add(deposit);
     challengeStore.approveDeposits[_beneficiary] = challengeStore.approveDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.APPROVED;
-    challengeStore.approverDepositCount = challengeStore.approverDepositCount.add(1);
+    if (!approvers[_id].hasAddress(_beneficiary)) {
+      approvers[_id].pushAddress(_beneficiary);
+    }
 
     emit Approved(_id);
   }
@@ -177,7 +180,9 @@ contract PowerChallenge is Ownable {
     challengeStore.challengeTotal = challengeStore.challengeTotal.add(deposit);
     challengeStore.challengeDeposits[_beneficiary] = challengeStore.challengeDeposits[_beneficiary].add(deposit);
     challengeStore.state = State.CHALLENGED;
-    challengeStore.challengerDepositCount = challengeStore.challengerDepositCount.add(1);
+    if (!challengers[_id].hasAddress(_beneficiary)) {
+      challengers[_id].pushAddress(_beneficiary);
+    }
 
     emit Challenged(_id);
   }
@@ -203,13 +208,17 @@ contract PowerChallenge is Ownable {
     if (_challenge.state == State.CHALLENGE_FAIL) {
       withdrawal = approveWithdrawalOrRemainder(_id, _beneficiary);
       if (withdrawal > 0) {
-        _challenge.approverDepositCount = _challenge.approverDepositCount.sub(1);
+        if (approvers[_id].hasAddress(_beneficiary)) {
+          approvers[_id].removeAddress(_beneficiary);
+        }
       }
       _challenge.approveDeposits[_beneficiary] = 0;
     } else if (_challenge.state == State.CHALLENGE_SUCCESS) {
       withdrawal = challengeWithdrawalOrRemainder(_id, _beneficiary);
       if (withdrawal > 0) {
-        _challenge.challengerDepositCount = _challenge.challengerDepositCount.sub(1);
+        if (challengers[_id].hasAddress(_beneficiary)) {
+          challengers[_id].removeAddress(_beneficiary);
+        }
       }
       _challenge.challengeDeposits[_beneficiary] = 0;
     }
@@ -226,7 +235,7 @@ contract PowerChallenge is Ownable {
     Challenge storage _challenge = challenges[_id];
     uint256 result;
     uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
-    if (_challenge.challengerDepositCount == 1 && _challenge.challengeDeposits[_user] > 0) {
+    if (challengers[_id].length() == 1 && _challenge.challengeDeposits[_user] > 0) {
       result = total.sub(_challenge.totalWithdrawn);
     } else if (_challenge.challengeTotal != 0) {
       result = total.mul(_challenge.challengeDeposits[_user]).div(_challenge.challengeTotal);
@@ -238,7 +247,7 @@ contract PowerChallenge is Ownable {
     Challenge storage _challenge = challenges[_id];
     uint256 result;
     uint256 total = _challenge.challengeTotal.add(_challenge.approveTotal);
-    if (_challenge.approverDepositCount == 1 && _challenge.approveDeposits[_user] > 0) {
+    if (approvers[_id].length() == 1 && _challenge.approveDeposits[_user] > 0) {
       result = total.sub(_challenge.totalWithdrawn);
     } else if (_challenge.approveTotal != 0) {
       result = total.mul(_challenge.approveDeposits[_user]).div(_challenge.approveTotal);
