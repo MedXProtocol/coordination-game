@@ -83,6 +83,8 @@ export const Listing = connect(mapStateToProps)(
         let tip,
           action
 
+        let listingTitle = 'This Listing is in the Registry'
+
         const {
           listingHash,
           TILRegistry,
@@ -98,7 +100,6 @@ export const Listing = connect(mapStateToProps)(
         } = game || {}
 
         const challengeStarted = challenge.isChallenging()
-
 
         if (listing.owner === address && TILRegistry) {
           if (challengeStarted) {
@@ -134,11 +135,14 @@ export const Listing = connect(mapStateToProps)(
         }
 
         if (listing.isDeleted()) {
+          listingTitle = 'This listing has been removed'
           var message =
             <p className="is-size-7 has-text-grey-lighter">
               This listing was challenged and removed.
             </p>
-        } else {
+        } else if (challengeStarted) {
+          listingTitle = 'This listing has been challenged'
+
           var challengeAction = <ChallengePanel listingHash={listingHash} />
         }
 
@@ -164,7 +168,7 @@ export const Listing = connect(mapStateToProps)(
                 <AntdIcon type={BookOutline} className="antd-icon paper--icon" />
 
                 <h6 className="is-size-6 has-text-grey-lighter application-num">
-                  This Listing is in the Registry
+                  {listingTitle}
                 </h6>
               </div>
             </div>

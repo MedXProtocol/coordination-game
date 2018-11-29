@@ -151,6 +151,8 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             let message,
               whistleblowButton
 
+            let submissionTitle = 'This submission is not yet in the registry'
+
             const {
               address,
               applicationObject,
@@ -194,6 +196,12 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 </div>
               )
             } else if (applicationState.isComplete) {
+              if (applicationState.applicantWon) {
+                submissionTitle = 'This submission was added to the registry'
+              } else {
+                submissionTitle = 'This submission was rejected'
+              }
+
               message = (
                 <div>
                   <p>
@@ -314,7 +322,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                     <AntdIcon type={FormOutline} className="antd-icon paper--icon" />
 
                     <h6 className="is-size-6 has-text-grey-light application-num">
-                      This submission is not yet in the registry
+                      {submissionTitle}
                     </h6>
                   </div>
                 </div>
