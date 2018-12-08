@@ -1,7 +1,7 @@
 {
   "contracts": {
     "PowerChallenge": {
-      "address": "0x9f41fd143d0dceefa05013f2b2b350891f542fbb",
+      "address": "0xa7850118c80d5c7b4a5774300a77ae83a5f72983",
       "constructorCode": "608060405234801561001057600080fd5b50613a01806100206000396000f300",
       "bodyBytecodeHash": "203100a9350e3e6664fd3e61e0e98f2cee9cdadaae0f3608f1da8d46622664ed",
       "localBytecodeHash": "d0fbcf4267994c837596ba2d87ef13b1a1adffa79ae740c90c66ac225df2fd1a",
@@ -276,189 +276,8 @@
         "uninitializedBaseContracts": []
       }
     },
-    "Migrations": {
-      "address": "0x5b261ed108aabc370d49180b6f83173987a7b3d5",
-      "constructorCode": "608060405234801561001057600080fd5b506108b3806100206000396000f300",
-      "bodyBytecodeHash": "5a5892b14eaed097ee3613ee24defdce9c3cefef94bf9ef21f61f6772acda7ae",
-      "localBytecodeHash": "0bce075042973d004bbed603fe3caae5a61c6b4a1f3e27a54b58d1075d2ade99",
-      "deployedBytecodeHash": "0bce075042973d004bbed603fe3caae5a61c6b4a1f3e27a54b58d1075d2ade99",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 6338,
-          "type": "t_bool",
-          "src": "749:24:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 6340,
-          "type": "t_bool",
-          "src": "868:25:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 6389,
-          "type": "t_array:50<t_uint256>",
-          "src": "1883:29:23"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 5640,
-          "type": "t_address",
-          "src": "301:22:18"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "______gap",
-          "astId": 5745,
-          "type": "t_array:50<t_uint256>",
-          "src": "2057:29:18"
-        },
-        {
-          "contract": "Migrations",
-          "path": "contracts/Migrations.sol",
-          "label": "last_completed_migration",
-          "astId": 2278,
-          "type": "t_uint256",
-          "src": "121:36:7"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
-      }
-    },
-    "EtherPriceFeed": {
-      "address": "0x47171e551652e42c80e1a99a5786b096f892b171",
-      "constructorCode": "608060405234801561001057600080fd5b506107ec806100206000396000f300",
-      "bodyBytecodeHash": "1065ff59cb19f749feb64166ab35274dc83e3d487ad24db075cb200dd583d823",
-      "localBytecodeHash": "c33bbd391707c08f3e212bfd4ef0e0c95ba9a7c663f922cfe25cc8ad2124edbd",
-      "deployedBytecodeHash": "c33bbd391707c08f3e212bfd4ef0e0c95ba9a7c663f922cfe25cc8ad2124edbd",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_bytes32": {
-          "id": "t_bytes32",
-          "kind": "elementary",
-          "label": "bytes32"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 6338,
-          "type": "t_bool",
-          "src": "749:24:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 6340,
-          "type": "t_bool",
-          "src": "868:25:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 6389,
-          "type": "t_array:50<t_uint256>",
-          "src": "1883:29:23"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 5640,
-          "type": "t_address",
-          "src": "301:22:18"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "______gap",
-          "astId": 5745,
-          "type": "t_array:50<t_uint256>",
-          "src": "2057:29:18"
-        },
-        {
-          "contract": "EtherPriceFeed",
-          "path": "contracts/EtherPriceFeed.sol",
-          "label": "value",
-          "astId": 1847,
-          "type": "t_bytes32",
-          "src": "174:13:2"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
-      }
-    },
     "TILRoles": {
-      "address": "0x930d848e79d5d88bad0e86f69fe6fe1b02a0e58c",
+      "address": "0x9596005f4e3fe44cc2b0653c132a8857db1c3d63",
       "constructorCode": "608060405234801561001057600080fd5b506108eb806100206000396000f300",
       "bodyBytecodeHash": "5766916886e71446b6d58b1c64d495b056fe133f8386e52511b77e8184cfe90f",
       "localBytecodeHash": "f2e4f6dd30393526d941c5a3ca7e93b3a4ff96bc6a2ae8047d1ab12d76a9149a",
@@ -551,184 +370,8 @@
         "uninitializedBaseContracts": []
       }
     },
-    "Work": {
-      "address": "0x4f69da3faa857f74d401cd617516f00b4a38385d",
-      "constructorCode": "608060405234801561001057600080fd5b5061267a806100206000396000f300",
-      "bodyBytecodeHash": "3a004de061272d8d4d745d8fac123f46177f5f10575f2386cbef75e6dd7467cf",
-      "localBytecodeHash": "452c933b9cb793b50ea9c33bac81692fba6f67c069591126dad0866064ef32cf",
-      "deployedBytecodeHash": "452c933b9cb793b50ea9c33bac81692fba6f67c069591126dad0866064ef32cf",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:50<t_uint256>": {
-          "id": "t_array:50<t_uint256>",
-          "valueType": "t_uint256",
-          "length": "50",
-          "kind": "array",
-          "label": "uint256[50]"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_struct<IndexedAddressArray.Data>": {
-          "id": "t_struct<IndexedAddressArray.Data>",
-          "kind": "struct",
-          "label": "IndexedAddressArray.Data",
-          "members": [
-            {
-              "label": "addresses",
-              "astId": 1928,
-              "type": "t_array:dyn<t_address>",
-              "src": "77:19:5"
-            },
-            {
-              "label": "indices",
-              "astId": 1932,
-              "type": "t_mapping<t_uint256>",
-              "src": "102:35:5"
-            }
-          ]
-        },
-        "t_array:dyn<t_address>": {
-          "id": "t_array:dyn<t_address>",
-          "valueType": "t_address",
-          "length": "dyn",
-          "kind": "array",
-          "label": "address[]"
-        },
-        "t_mapping<t_uint256>": {
-          "id": "t_mapping<t_uint256>",
-          "valueType": "t_uint256",
-          "label": "mapping(key => uint256)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 6338,
-          "type": "t_bool",
-          "src": "749:24:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 6340,
-          "type": "t_bool",
-          "src": "868:25:23"
-        },
-        {
-          "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
-          "label": "______gap",
-          "astId": 6389,
-          "type": "t_array:50<t_uint256>",
-          "src": "1883:29:23"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 5640,
-          "type": "t_address",
-          "src": "301:22:18"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
-          "label": "______gap",
-          "astId": 5745,
-          "type": "t_array:50<t_uint256>",
-          "src": "2057:29:18"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "token",
-          "astId": 4614,
-          "type": "t_address",
-          "src": "418:19:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "roles",
-          "astId": 4616,
-          "type": "t_address",
-          "src": "441:21:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "stakers",
-          "astId": 4618,
-          "type": "t_struct<IndexedAddressArray.Data>",
-          "src": "467:32:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "suspendedStakers",
-          "astId": 4620,
-          "type": "t_struct<IndexedAddressArray.Data>",
-          "src": "503:41:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "requiredStake",
-          "astId": 4622,
-          "type": "t_uint256",
-          "src": "549:28:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "jobStake",
-          "astId": 4624,
-          "type": "t_uint256",
-          "src": "581:23:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "balances",
-          "astId": 4628,
-          "type": "t_mapping<t_uint256>",
-          "src": "609:44:11"
-        },
-        {
-          "contract": "Work",
-          "path": "contracts/Work.sol",
-          "label": "minimumBalanceToWork",
-          "astId": 4630,
-          "type": "t_uint256",
-          "src": "658:35:11"
-        }
-      ],
-      "warnings": {
-        "hasConstructor": false,
-        "hasSelfDestruct": false,
-        "hasDelegateCall": false,
-        "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
-      }
-    },
     "CoordinationGame": {
-      "address": "0x6ca497d54d7a88fcad8f8ead5923daa6fc3bc6af",
+      "address": "0x1563018650e067f8a36ad626af98a6f65b466a72",
       "constructorCode": "608060405234801561001057600080fd5b50615c0980620000216000396000f300",
       "bodyBytecodeHash": "3286614da5c69f7691ac3a5f0bc49966886463613d421b9e1e9076ec8560a269",
       "localBytecodeHash": "6ed3a4a539d074fe36c33d0a6f0b1b0b8f803982fa3cb49a11176a0c5fe5721a",
@@ -1085,8 +728,96 @@
         "uninitializedBaseContracts": []
       }
     },
+    "Migrations": {
+      "address": "0x06a985bf670a6789e2f6547f09aa14c261954e44",
+      "constructorCode": "608060405234801561001057600080fd5b506108b3806100206000396000f300",
+      "bodyBytecodeHash": "5a5892b14eaed097ee3613ee24defdce9c3cefef94bf9ef21f61f6772acda7ae",
+      "localBytecodeHash": "0bce075042973d004bbed603fe3caae5a61c6b4a1f3e27a54b58d1075d2ade99",
+      "deployedBytecodeHash": "0bce075042973d004bbed603fe3caae5a61c6b4a1f3e27a54b58d1075d2ade99",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 6338,
+          "type": "t_bool",
+          "src": "749:24:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 6340,
+          "type": "t_bool",
+          "src": "868:25:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 6389,
+          "type": "t_array:50<t_uint256>",
+          "src": "1883:29:23"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5640,
+          "type": "t_address",
+          "src": "301:22:18"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5745,
+          "type": "t_array:50<t_uint256>",
+          "src": "2057:29:18"
+        },
+        {
+          "contract": "Migrations",
+          "path": "contracts/Migrations.sol",
+          "label": "last_completed_migration",
+          "astId": 2278,
+          "type": "t_uint256",
+          "src": "121:36:7"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
     "BetaFaucet": {
-      "address": "0xce6eded110036e9a2f326d4d3fa78067dfdf20e8",
+      "address": "0x347abab7ea216026dcd9c4037ec6bd7c8f62d218",
       "constructorCode": "608060405234801561001057600080fd5b506115d3806100206000396000f300",
       "bodyBytecodeHash": "64f4acc23b82b5d75d6df74039b3b5c7a5b4574dce9305d53ab219e45bbe027d",
       "localBytecodeHash": "64875c50f20d7b9eb0b92ad4077ec60c89fdc1c483c481c99d31492efb950185",
@@ -1196,7 +927,7 @@
       }
     },
     "WorkToken": {
-      "address": "0xbfe8c8a944ede0609fe8b3284bef856c4b40a4dd",
+      "address": "0x41e854443bc358377cb38a13835e73c8ed9f69e2",
       "constructorCode": "608060405234801561001057600080fd5b50611a46806100206000396000f300",
       "bodyBytecodeHash": "2cb9dce79b8d4b92970efd4fa2bde4fbefd93c8e093371e2e7b598fa9569aadf",
       "localBytecodeHash": "f603261bd73ea099618ecff22e780db94476fb73a68a853f2f0b09581c5b35cf",
@@ -1335,8 +1066,277 @@
         "uninitializedBaseContracts": []
       }
     },
+    "EtherPriceFeed": {
+      "address": "0x07813b582f6c558be870977f14f1dcf80e0dee64",
+      "constructorCode": "608060405234801561001057600080fd5b506107ec806100206000396000f300",
+      "bodyBytecodeHash": "1065ff59cb19f749feb64166ab35274dc83e3d487ad24db075cb200dd583d823",
+      "localBytecodeHash": "c33bbd391707c08f3e212bfd4ef0e0c95ba9a7c663f922cfe25cc8ad2124edbd",
+      "deployedBytecodeHash": "c33bbd391707c08f3e212bfd4ef0e0c95ba9a7c663f922cfe25cc8ad2124edbd",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 6338,
+          "type": "t_bool",
+          "src": "749:24:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 6340,
+          "type": "t_bool",
+          "src": "868:25:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 6389,
+          "type": "t_array:50<t_uint256>",
+          "src": "1883:29:23"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5640,
+          "type": "t_address",
+          "src": "301:22:18"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5745,
+          "type": "t_array:50<t_uint256>",
+          "src": "2057:29:18"
+        },
+        {
+          "contract": "EtherPriceFeed",
+          "path": "contracts/EtherPriceFeed.sol",
+          "label": "value",
+          "astId": 1847,
+          "type": "t_bytes32",
+          "src": "174:13:2"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "Work": {
+      "address": "0xe00acd950de4ae40951d13d30e5421bebaad6588",
+      "constructorCode": "608060405234801561001057600080fd5b5061267a806100206000396000f300",
+      "bodyBytecodeHash": "3a004de061272d8d4d745d8fac123f46177f5f10575f2386cbef75e6dd7467cf",
+      "localBytecodeHash": "452c933b9cb793b50ea9c33bac81692fba6f67c069591126dad0866064ef32cf",
+      "deployedBytecodeHash": "452c933b9cb793b50ea9c33bac81692fba6f67c069591126dad0866064ef32cf",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<IndexedAddressArray.Data>": {
+          "id": "t_struct<IndexedAddressArray.Data>",
+          "kind": "struct",
+          "label": "IndexedAddressArray.Data",
+          "members": [
+            {
+              "label": "addresses",
+              "astId": 1928,
+              "type": "t_array:dyn<t_address>",
+              "src": "77:19:5"
+            },
+            {
+              "label": "indices",
+              "astId": 1932,
+              "type": "t_mapping<t_uint256>",
+              "src": "102:35:5"
+            }
+          ]
+        },
+        "t_array:dyn<t_address>": {
+          "id": "t_array:dyn<t_address>",
+          "valueType": "t_address",
+          "length": "dyn",
+          "kind": "array",
+          "label": "address[]"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 6338,
+          "type": "t_bool",
+          "src": "749:24:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 6340,
+          "type": "t_bool",
+          "src": "868:25:23"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 6389,
+          "type": "t_array:50<t_uint256>",
+          "src": "1883:29:23"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5640,
+          "type": "t_address",
+          "src": "301:22:18"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5745,
+          "type": "t_array:50<t_uint256>",
+          "src": "2057:29:18"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "token",
+          "astId": 4614,
+          "type": "t_address",
+          "src": "418:19:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "roles",
+          "astId": 4616,
+          "type": "t_address",
+          "src": "441:21:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "stakers",
+          "astId": 4618,
+          "type": "t_struct<IndexedAddressArray.Data>",
+          "src": "467:32:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "suspendedStakers",
+          "astId": 4620,
+          "type": "t_struct<IndexedAddressArray.Data>",
+          "src": "503:41:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "requiredStake",
+          "astId": 4622,
+          "type": "t_uint256",
+          "src": "549:28:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "jobStake",
+          "astId": 4624,
+          "type": "t_uint256",
+          "src": "581:23:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "balances",
+          "astId": 4628,
+          "type": "t_mapping<t_uint256>",
+          "src": "609:44:11"
+        },
+        {
+          "contract": "Work",
+          "path": "contracts/Work.sol",
+          "label": "minimumBalanceToWork",
+          "astId": 4630,
+          "type": "t_uint256",
+          "src": "658:35:11"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
     "TILRegistry": {
-      "address": "0xbe95a1665c2401478362dc2e621499eb11e4be5e",
+      "address": "0xc8ced4b90002fce4a6f261c51ea7e77c6dd16b3c",
       "constructorCode": "608060405234801561001057600080fd5b50613386806100206000396000f300",
       "bodyBytecodeHash": "38301ba27c642069fbdffe6906e5040146df244fc6b89c8c29cee58815bb9a08",
       "localBytecodeHash": "9ae4abab0bd8929046b94544703d6429fed3c70d44b02bfdcd26f1401568c66b",
@@ -1547,65 +1547,65 @@
   "proxies": {
     "coordination-game/Migrations": [
       {
-        "address": "0xfd0f19387909fee2dcb1b02f5d9f3cff342ddc9d",
+        "address": "0xc7be1f143983faf2e14293742cc09e064cf07ed5",
         "version": "0.2.0",
-        "implementation": "0x5b261ed108aabc370d49180b6f83173987a7b3d5"
+        "implementation": "0x06a985bf670a6789e2f6547f09aa14c261954e44"
       }
     ],
     "coordination-game/TILRoles": [
       {
-        "address": "0xe67c8f0b62fd7fc50a1581532286b9a9af6cae91",
+        "address": "0x51d492518e121e4062433f259316befc8bd0c877",
         "version": "0.2.0",
-        "implementation": "0x930d848e79d5d88bad0e86f69fe6fe1b02a0e58c"
+        "implementation": "0x9596005f4e3fe44cc2b0653c132a8857db1c3d63"
       }
     ],
     "coordination-game/WorkToken": [
       {
-        "address": "0x24f5cf968ce1163cbce0d740ddb6638af4ced60a",
+        "address": "0xc3c749318b2ada336baa23b30e876f90f00c74e3",
         "version": "0.2.0",
-        "implementation": "0xbfe8c8a944ede0609fe8b3284bef856c4b40a4dd"
+        "implementation": "0x41e854443bc358377cb38a13835e73c8ed9f69e2"
       }
     ],
     "coordination-game/Work": [
       {
-        "address": "0x02bd7ddbc589cf0a6da14bb345f2a086923e1ef1",
+        "address": "0x719d0f234fbcfb7118417048c0d7dcc63e9caa4b",
         "version": "0.2.0",
-        "implementation": "0x4f69da3faa857f74d401cd617516f00b4a38385d"
+        "implementation": "0xe00acd950de4ae40951d13d30e5421bebaad6588"
       }
     ],
     "coordination-game/EtherPriceFeed": [
       {
-        "address": "0x1a22f07efab51165bb163dc338c825b41afe4996",
+        "address": "0x04dc1908aec49c7f594da0cacf08a19e24e61444",
         "version": "0.2.0",
-        "implementation": "0x47171e551652e42c80e1a99a5786b096f892b171"
+        "implementation": "0x07813b582f6c558be870977f14f1dcf80e0dee64"
       }
     ],
     "coordination-game/PowerChallenge": [
       {
-        "address": "0x6935ba0326be9037d11fe6a4c5dbd2aaa45dff52",
+        "address": "0x03de66436c54a8ca2a9fb5a99cc95fe5138c19d2",
         "version": "0.2.0",
-        "implementation": "0x9f41fd143d0dceefa05013f2b2b350891f542fbb"
+        "implementation": "0xa7850118c80d5c7b4a5774300a77ae83a5f72983"
       }
     ],
     "coordination-game/TILRegistry": [
       {
-        "address": "0x94ce0ddc2e2f486cebfe0ebc1bb3db1ae9745e2a",
+        "address": "0xca3cf88f391830041530dbbe54f4094e43ca903c",
         "version": "0.2.0",
-        "implementation": "0xbe95a1665c2401478362dc2e621499eb11e4be5e"
+        "implementation": "0xc8ced4b90002fce4a6f261c51ea7e77c6dd16b3c"
       }
     ],
     "coordination-game/BetaFaucet": [
       {
-        "address": "0x55334f150d2a046b1a3e0e008b4faa2c55fce078",
+        "address": "0xbeebeceb24c25b4cfb50c73a90db4ebf984a42ad",
         "version": "0.2.0",
-        "implementation": "0xce6eded110036e9a2f326d4d3fa78067dfdf20e8"
+        "implementation": "0x347abab7ea216026dcd9c4037ec6bd7c8f62d218"
       }
     ],
     "coordination-game/CoordinationGame": [
       {
-        "address": "0x35196ef09c7f189e1e1d6d86737cdc9c76450340",
+        "address": "0xc1e2701470d6212d2258139a7a5e8b29e75ed121",
         "version": "0.2.0",
-        "implementation": "0x6ca497d54d7a88fcad8f8ead5923daa6fc3bc6af"
+        "implementation": "0x1563018650e067f8a36ad626af98a6f65b466a72"
       }
     ]
   },
