@@ -8,11 +8,14 @@ import "./TILRegistry.sol";
 import "./IndexedBytes32Array.sol";
 
 /**
-@title CoordinationGame
-@author Brendan Asselstine, Chuck Bergeron
-@notice This contract stores work tokens in a pool which are applicantTokenDeposits
-        as well as Ether balances in applicationBalancesInWei
-**/
+ * @title The coordination game played to enter a [Token Incentivized List](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027)
+ * @author Brendan Asselstine, Chuck Bergeron
+ * @notice This contract allows two people to play a coordination game.  The game begins when one player
+ * chooses a secret and commits the hash of the secret and a hint to the contract.  The second player needs to
+ * use the hint to guess the secret.  Once the second player commits their guess, the first player reveals
+ * their secret.  If they match then the contract calls the TIL to declare the game won.  Otherwise the game
+ * is lost and the TIL is transferred all tokens and ether and notified.
+*/
 contract CoordinationGame is Ownable {
   using SafeMath for uint256;
   using IndexedBytes32Array for IndexedBytes32Array.Data;
@@ -27,22 +30,16 @@ contract CoordinationGame is Ownable {
     uint256 updatedAt;
     uint256 applicationFeeWei;
     uint256 applicantTokenDeposit;
-    /// @notice the block number whose hash is to be used for randomness
     uint256 randomBlockNumber;
     bytes32 applicantSecret;
     address whistleblower;
   }
 
   struct Verification {
-    /// @notice The time at which the verifier was selected
     uint256 verifierSelectedAt;
-    /// @notice The address of the selected verifier
     address verifier;
-    /// @notice The secret submitted by the verifier
     bytes32 verifierSecret;
-    /// @notice The time at which the verifier submitted their secret
     uint256 verifierSubmittedAt;
-    /// @notice The time at which the verifier challenged the game due to a reveal timeout
     uint256 verifierChallengedAt;
     uint256 verifierDepositWei;
   }
@@ -153,11 +150,11 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-  @notice Creates a new CoordinationGame
-  @param _work the Work contract to select verifiers
-  @param _tilRegistry the Trustless Incentivized List Registry (TCR) contract
-         to add applicants to
-  @param _applicationStakeAmount how much an applicant has to stake when applying
+   * @notice Creates a new CoordinationGame
+   * @param _work the Work contract to select verifiers
+   * @param _tilRegistry the Trustless Incentivized List Registry (TCR) contract
+   * to add applicants to
+   * @param _applicationStakeAmount how much an applicant has to stake when applying
   */
   function init (
     address _owner,
