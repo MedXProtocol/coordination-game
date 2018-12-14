@@ -1,18 +1,24 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# MedX Protocol Token Registry React UI
 
-# Setup
+[![Logo](medx-protocol.png)](https://medxprotocol.com/)
+
+### Setup
+
+Ensure you have set up ZeppelinOS, the smart contracts in the root directory,
+the environment variables (in .envrc) and are running an instance of Ganache
+that the DApp can interact with. Then, install the dependencies with yarn:
 
 `$ yarn`
 
-# Running Webpack Dev server
+### Running the Webpack Dev Server
 
-In root directory:
+In the root directory:
 `$ yarn dapp`
 
-In './dapp' directory:
+In the './dapp' directory:
 `$ yarn start`
 
-# Testing app
+### Testing the DApp Components & Services
 
-In './dapp' directory:
+In the './dapp' directory:
 `$ yarn test`
