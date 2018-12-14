@@ -57,7 +57,7 @@ function* appSaga({ workTokenAddress, address }) {
   yield cacheCall(workTokenAddress, 'isMinter', address)
 }
 
-const App = connect(mapStateToProps)(
+export const App = connect(mapStateToProps)(
   withSaga(appSaga)(
     class extends Component {
       constructor(props) {
