@@ -75,13 +75,11 @@ contract CoordinationGame is Ownable {
     address indexed verifier
   );
 
-  /// Emitted when a Verifier is replaced by another after timing out.
   event VerifierSubmissionTimedOut(
     bytes32 indexed applicationId,
     address indexed verifier
   );
 
-  /// Emitted when a verifier submits their secret
   event VerifierSecretSubmitted(
     bytes32 indexed applicationId,
     address verifier,
@@ -177,6 +175,11 @@ contract CoordinationGame is Ownable {
     applicantRevealTimeoutInSeconds = 259200; // 3 * 86400
   }
 
+  /**
+   * @notice The owner can set the application stake amount, which is the number of tokens required as a
+   * deposit for a new application.  Old applications will not be affected.
+   * @param _applicationStakeAmount The new application stake amount.
+   */
   function setApplicationStakeAmount(uint256 _applicationStakeAmount)
     public
     onlyOwner
@@ -187,11 +190,12 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-  @notice Creates an application on behalf of the message sender, this kicks off
-          the game for the applicant.
-  @param _keccakOfSecretAndRandom The hash of the secret and salt
-  @param _keccakOfRandom The hash of the salt
-  @param _hint The hint the Applicant provided for the Verifier
+   * @notice Starts an application on behalf of the message sender.  Before calling, the sender should have
+   * approved this contract to spend the application stake amount of tokens.  When calling this function the
+   * sender must include the Ether deposit as well, which can be calculated by weiPerApplication().
+   * @param _keccakOfSecretAndRandom The hash of the secret and salt
+   * @param _keccakOfRandom The hash of the salt
+   * @param _hint The hint the Applicant provided for the Verifier
   */
   function start(
     bytes32 _applicationId,
@@ -203,9 +207,6 @@ contract CoordinationGame is Ownable {
     payable
     onlyNewApplication(_applicationId)
   {
-    // make this configurable if we want to lock down 1 application per Eth address
-    // require(applicantsApplicationIndices[msg.sender] == 0, 'the applicant has not yet applied');
-
     uint256 depositWei = weiPerApplication();
     require(msg.value >= depositWei, 'not enough ether');
 
@@ -249,6 +250,12 @@ contract CoordinationGame is Ownable {
     );
   }
 
+  /**
+   * @notice Called by the applicant when they wish to select the verifier.  This step must be done after
+   * starting the application and when one block has been mined.  The mined block hash is used as entropy to
+   * select the verifier.  This function will fail if a verifier has already submitted their guess, or if the
+   * deadline for a verifier to submit their guess is in the future.
+   */
   function applicantRandomlySelectVerifier(bytes32 _applicationId)
     external
     onlyApplicant(_applicationId)
@@ -309,21 +316,27 @@ contract CoordinationGame is Ownable {
     );
   }
 
-  function selectVerifier(address applicant, uint256 randomNum) public view returns (address) {
-    address selectedVerifier = work.selectWorker(randomNum);
+  /**
+   * @notice Selects a verifier from the Work contract
+   * @dev Warning: this function does not take modulo bias into account!
+   * @param _applicant The applicant who is selecting the worker
+   * @param _randomNum The entropy used to select the worker
+   */
+  function selectVerifier(address _applicant, uint256 _randomNum) public view returns (address) {
+    address selectedVerifier = work.selectWorker(_randomNum);
     uint256 workerOffset = 0;
-    while (selectedVerifier == applicant) {
+    while (selectedVerifier == _applicant) {
       workerOffset += 1;
-      selectedVerifier = work.selectWorker(randomNum + workerOffset);
+      selectedVerifier = work.selectWorker(_randomNum + workerOffset);
     }
     return selectedVerifier;
   }
 
   /**
-  @notice Allows the verifier to submit their secret
-  @param _applicationId The application that the verifier is submitting for
-  @param _secret The secret that the verifier is guessing
-  */
+   * @notice Allows the verifier to submit their secret.
+   * @param _applicationId The application that the verifier is submitting for
+   * @param _secret The secret that the verifier is guessing
+   */
   function verifierSubmitSecret(bytes32 _applicationId, bytes32 _secret)
     public
     payable
@@ -346,6 +359,13 @@ contract CoordinationGame is Ownable {
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
+  /**
+   * @notice Allows anyone to 'whistleblow' the applicant.  The whistleblower needs to submit the
+   * applicationId and the applicant's random number.  If they match, the whistleblower takes the applicant's
+   * deposit and fee.
+   * @param _applicationId The application id
+   * @param _randomNumber The random number the applicant used to mask their guess
+   */
   function whistleblow(
     bytes32 _applicationId,
     uint256 _randomNumber
@@ -380,10 +400,10 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-  @notice Allows the applicant to reveal their secret
-  @param _secret The applicant's secret
-  @param _randomNumber The random number the applicant chose to obscure the secret
-  */
+   * @notice Allows the applicant to reveal their secret
+   * @param _secret The applicant's secret
+   * @param _randomNumber The random number the applicant chose to obscure the secret
+   */
   function applicantRevealSecret(
     bytes32 _applicationId,
     bytes32 _secret,
@@ -410,9 +430,9 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-  @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
-  @param _applicationId The application that the verifier is challenging
-  */
+   * @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
+   * @param _applicationId The application that the verifier is challenging
+   */
   function verifierChallenge(
     bytes32 _applicationId
   ) public onlyVerifier(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
@@ -493,14 +513,25 @@ contract CoordinationGame is Ownable {
     verification.verifier.transfer(deposit);
   }
 
+  /**
+   * @notice Returns the number of applications the applicant has made
+   * @param _applicant The applicant
+   */
   function getApplicantsApplicationCount(address _applicant) external view returns (uint256) {
     return applicantsApplicationIndices[_applicant].length();
   }
 
+  /**
+   * @notice Returns a particular applicant's application id at a certain index
+   */
   function getApplicantsApplicationAtIndex(address _applicant, uint256 _index) external view returns (bytes32) {
     return applicantsApplicationIndices[_applicant].valueAtIndex(_index);
   }
 
+  /**
+   * @notice Returns the id of the last application the sender submitted
+   * @param _applicant The applicant
+   */
   function getApplicantsLastApplicationID(address _applicant) external view returns (bytes32) {
     if (applicantsApplicationIndices[_applicant].length() > 0) {
       uint256 index = applicantsApplicationIndices[_applicant].length().sub(1);
