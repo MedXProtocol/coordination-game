@@ -1,3 +1,7 @@
+# MedX Protocol Token Registry React UI
+
+[![Logo](medx-protocol.png)](https://medxprotocol.com/)
+
 # MedX Protocol Coordination Game
 
 $ npm i && truffle install

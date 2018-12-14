@@ -1,6 +1,6 @@
 # MedX Protocol Token Registry React UI
 
-[![Logo](medx-protocol.png)](https://medxprotocol.com/)
+[![Logo](../medx-protocol.png)](https://medxprotocol.com/)
 
 ### Setup
 
