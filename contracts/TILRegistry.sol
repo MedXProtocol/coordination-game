@@ -5,6 +5,7 @@ import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "./IndexedBytes32Array.sol";
 import "./Work.sol";
 import "./PowerChallenge.sol";
+import "./CoordinationGame.sol";
 import "./TILRoles.sol";
 import "zos-lib/contracts/Initializable.sol";
 
@@ -32,9 +33,10 @@ contract TILRegistry is Initializable {
   Work work;
   PowerChallenge powerChallenge;
   mapping(bytes32 => CoordinationGameEtherDeposit) public deposits;
+  CoordinationGame coordinationGame;
 
-  modifier onlyJobManager() {
-    require(roles.hasRole(msg.sender, uint(TILRoles.All.JOB_MANAGER)), "only the job manager");
+  modifier onlyJobManager(address _address) {
+    require(roles.hasRole(_address, uint(TILRoles.All.JOB_MANAGER)), "only the job manager");
     _;
   }
 
@@ -59,7 +61,12 @@ contract TILRegistry is Initializable {
     powerChallenge = PowerChallenge(_powerChallenge);
   }
 
-  function applicantWonCoordinationGame(bytes32 _listingHash, address _applicant, uint256 _deposit) external onlyJobManager {
+  function setCoordinationGame(address _coordinationGame) external onlyTokenMinter onlyJobManager(_coordinationGame) {
+    coordinationGame = CoordinationGame(_coordinationGame);
+    require(coordinationGame.tilRegistry() == address(this), 'CoordinationGame is bound to this registry');
+  }
+
+  function applicantWonCoordinationGame(bytes32 _listingHash, address _applicant, uint256 _deposit) external onlyJobManager(msg.sender) {
     createNewListing(_applicant, _listingHash, _deposit);
     require(token.transferFrom(msg.sender, address(this), _deposit));
   }
@@ -68,7 +75,7 @@ contract TILRegistry is Initializable {
     bytes32 _listingHash,
     address _applicant, uint256 _applicantDepositTokens, uint256 _rewardWei,
     address _challenger, uint256 _challengerDepositTokens
-  ) external payable onlyJobManager {
+  ) external payable onlyJobManager(msg.sender) {
     require(msg.value == _rewardWei, 'ether has been sent');
     createNewListing(_applicant, _listingHash, _applicantDepositTokens);
     require(token.transferFrom(msg.sender, address(this), _applicantDepositTokens.add(_challengerDepositTokens)));
@@ -105,6 +112,7 @@ contract TILRegistry is Initializable {
       if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
         listingsIterator.removeValue(_listingHash);
         delete listings[_listingHash];
+        coordinationGame.removeApplication(_listingHash);
       }
 
       powerChallenge.removeChallenge(_listingHash);

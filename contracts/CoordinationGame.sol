@@ -46,7 +46,7 @@ contract CoordinationGame is Ownable {
 
   EtherPriceFeed etherPriceFeed;
   Work work;
-  TILRegistry tilRegistry;
+  TILRegistry public tilRegistry;
 
   uint256 public verifierTimeoutInSeconds;
   uint256 public applicantRevealTimeoutInSeconds;
@@ -122,6 +122,11 @@ contract CoordinationGame is Ownable {
     _;
   }
 
+  modifier onlyRegistry() {
+    require(msg.sender == address(tilRegistry), 'sender is registry');
+    _;
+  }
+
   modifier randomBlockWasMined(bytes32 _applicationId) {
     require(block.number >= games[_applicationId].randomBlockNumber, 'enough blocks have been mined');
     _;
@@ -145,6 +150,21 @@ contract CoordinationGame is Ownable {
   modifier notWhistleblown(bytes32 _applicationId) {
     require(games[_applicationId].whistleblower == address(0), 'no whistleblower');
     _;
+  }
+
+  modifier onlyApplicationComplete(bytes32 _applicationId) {
+    require(isComplete(_applicationId), 'application is complete');
+    _;
+  }
+
+  function isComplete(bytes32 _applicationId) public view returns (bool) {
+    Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
+    return (
+      game.applicantSecret != 0 || //applicant submitted
+      game.whistleblower != address(0) || // application whistleblown
+      verification.verifierChallengedAt != 0 // verifier challenged
+    );
   }
 
   /**
@@ -519,6 +539,19 @@ contract CoordinationGame is Ownable {
     verification.verifier.transfer(deposit);
   }
 
+  function removeApplication(bytes32 _applicationId) external onlyRegistry onlyApplicationComplete(_applicationId) {
+    Game storage game = games[_applicationId];
+    Verification storage verification = verifications[_applicationId];
+    IndexedBytes32Array.Data storage applicantIndices = applicantsApplicationIndices[game.applicant];
+    IndexedBytes32Array.Data storage verifierIndices = verifiersApplicationIndices[verification.verifier];
+
+    applicantIndices.removeValue(_applicationId);
+    verifierIndices.removeValue(_applicationId);
+
+    gamesIterator.removeValue(_applicationId);
+    delete games[_applicationId];
+    delete verifications[_applicationId];
+  }
   /**
    * @notice Returns the number of applications the applicant has made
    * @param _applicant The applicant

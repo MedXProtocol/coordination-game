@@ -49,38 +49,38 @@ module.exports = {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "1234",       // Any network (default: none)
-      gas: 8000000,
+      gas: 7000000,
       gasPrice: 2 * 1000000000
     },
     development: {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "1234",       // Any network (default: none)
-      gas: 8000000,
+      gas: 7000000,
       gasPrice: 2 * 1000000000
     },
     ropsten: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.REACT_APP_ROPSTEN_PROVIDER_URL),
       network_id: 3,
-      gas: 8000000,
+      gas: 7000000,
       gasPrice: 92 * 1000000000
     },
     ropstenAdmin: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.REACT_APP_ROPSTEN_PROVIDER_URL, 1),
       network_id: 3,
-      gas: 8000000,
+      gas: 7000000,
       gasPrice: 92 * 1000000000
     },
     rinkeby: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.REACT_APP_RINKEBY_PROVIDER_URL),
       network_id: 4,
-      gas: 4700000,
+      gas: 7000000,
       gasPrice: 60 * 1000000000
     },
     mainnet: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC_MAINNET, process.env.REACT_APP_MAINNET_PROVIDER_URL),
       network_id: 1,
-      gas: 4700000,
+      gas: 7000000,
       gasPrice: 2 * 1000000000
     }
   },
