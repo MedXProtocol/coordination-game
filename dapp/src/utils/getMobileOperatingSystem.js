@@ -1,5 +1,5 @@
 export const getMobileOperatingSystem = function() {
-  const userAgent = navigator.userAgent || navigator.vendor || window.opera
+  const userAgent = window.opera || navigator.userAgent || navigator.vendor
 
   if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
     return "iOS"
