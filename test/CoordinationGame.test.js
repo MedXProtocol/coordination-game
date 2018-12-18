@@ -90,6 +90,7 @@ contract('CoordinationGame', (accounts) => {
     await coordinationGame.init(
       owner, etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
     )
+    await tilRegistry.setCoordinationGame(coordinationGame.address)
     debug(`Initialized CoordinationGame`)
 
     weiPerApplication = await coordinationGame.weiPerApplication()
@@ -400,6 +401,24 @@ contract('CoordinationGame', (accounts) => {
         assert.equal(game.applicantSecret, secret, 'the recorded applicant secret is correct')
 
         assert.equal(await tilRegistry.approvals(applicationId), true, 'application was approved')
+      })
+
+      context('when successful', () => {
+
+        beforeEach(async () => {
+          await applicantRevealsTheirSecret()
+        })
+
+        describe('removeApplication()', () => {
+          it('should completely remove the application', async () => {
+            await tilRegistry.callRemoveApplication(applicationId)
+            assert.equal(
+              false,
+              await coordinationGame.applicationExists(applicationId),
+              'application no longer exists'
+            )
+          })
+        })
       })
     })
 

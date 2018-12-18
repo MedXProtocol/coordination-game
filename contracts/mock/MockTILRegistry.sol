@@ -1,13 +1,9 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "../CoordinationGame.sol";
 
 contract MockTILRegistry {
-  IERC20 public token;
-
-  mapping(bytes32 => bool) public challenges;
-  mapping(bytes32 => bool) public approvals;
-
   struct LostCoordinationGame {
     bytes32 _listingHash;
     address _applicant;
@@ -17,11 +13,20 @@ contract MockTILRegistry {
     uint256 _challengerDepositTokens;
   }
 
+  IERC20 public token;
+
+  mapping(bytes32 => bool) public challenges;
+  mapping(bytes32 => bool) public approvals;
   mapping(bytes32 => LostCoordinationGame) public lostCoordinationGames;
+  CoordinationGame coordinationGame;
 
   constructor(address _token) public {
     require(_token != address(0), 'token is defined');
     token = IERC20(_token);
+  }
+
+  function setCoordinationGame(CoordinationGame _coordinationGame) external {
+    coordinationGame = _coordinationGame;
   }
 
   function applicantWonCoordinationGame(bytes32 _listingHash, address, uint256) external {
@@ -42,5 +47,9 @@ contract MockTILRegistry {
       _challenger,
       _challengerDepositTokens
     );
+  }
+
+  function callRemoveApplication(bytes32 _applicationId) external {
+    coordinationGame.removeApplication(_applicationId);
   }
 }
