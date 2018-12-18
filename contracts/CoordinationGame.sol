@@ -6,6 +6,8 @@ import "./EtherPriceFeed.sol";
 import "./Work.sol";
 import "./TILRegistry.sol";
 import "./IndexedBytes32Array.sol";
+import "./CoordinationGameStrategies/VerifierSubmitSecret.sol";
+import "./CoordinationGameStrategies/ApplicantRevealSecret.sol";
 
 /**
  * @title The coordination game played to enter a [Token Incentivized List](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027)
@@ -369,17 +371,7 @@ contract CoordinationGame is Ownable {
   {
     Verification storage verification = verifications[_applicationId];
     Game storage game = games[_applicationId];
-
-    require(msg.value >= game.applicationFeeWei, 'verifier is submitting enough ether');
-    require(gamesIterator.hasValue(_applicationId), 'application has been initialized');
-    require(verification.verifierSecret == bytes32(0), 'verify has not already been called');
-    require(_secret.length > 0, 'secret is not empty');
-
-    verification.verifierSecret = _secret;
-    verification.verifierSubmittedAt = block.timestamp;
-    verification.verifierDepositWei = msg.value;
-    game.updatedAt = block.timestamp;
-
+    VerifierSubmitSecret.execute(game, verification, _secret, msg.value);
     emit VerifierSecretSubmitted(_applicationId, msg.sender, _secret);
   }
 
@@ -436,17 +428,7 @@ contract CoordinationGame is Ownable {
   ) public onlyApplicant(_applicationId) notWhistleblown(_applicationId) secretNotRevealed(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
-
-    require(verification.verifierSecret != bytes32(0), 'verifier has submitted their secret');
-
-    bytes32 srHash = keccak256(abi.encodePacked(_secret, _randomNumber));
-    bytes32 rHash = keccak256(abi.encodePacked(_randomNumber));
-    require(srHash == game.secretAndRandomHash, 'secret and random hash matches');
-    require(rHash == game.randomHash, 'random hash matches');
-
-    game.updatedAt = block.timestamp;
-    game.applicantSecret = _secret;
-
+    ApplicantRevealSecret.execute(game, verification, _secret, _randomNumber);
     if (_secret != verification.verifierSecret) {
       applicantLost(_applicationId);
     } else {
