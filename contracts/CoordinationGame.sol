@@ -148,11 +148,15 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-   * @notice Creates a new CoordinationGame
+   * @notice Initializes a new CoordinationGame contract.
+   * @param _owner The owner of the contract who will have special privileges
+   * @param _etherPriceFeed The ether price feed oracle medianizer to use to calculate fees
    * @param _work the Work contract to select verifiers
    * @param _tilRegistry the Trustless Incentivized List Registry (TCR) contract
    * to add applicants to
    * @param _applicationStakeAmount how much an applicant has to stake when applying
+   * @param _baseApplicationFeeUsdWei The fee for each application expressed in USD.  It will be used with the
+   * _etherPriceFeed to calculate the actual amount of Ether that needs to be sent along with a new application.
   */
   function init (
     address _owner,
@@ -252,7 +256,7 @@ contract CoordinationGame is Ownable {
 
   /**
    * @notice Called by the applicant when they wish to select the verifier.  This step must be done after
-   * starting the application and when one block has been mined.  The mined block hash is used as entropy to
+   * one block has been mined since starting the application.  The mined block hash is used as entropy to
    * select the verifier.  This function will fail if a verifier has already submitted their guess, or if the
    * deadline for a verifier to submit their guess is in the future.
    */
@@ -401,6 +405,7 @@ contract CoordinationGame is Ownable {
 
   /**
    * @notice Allows the applicant to reveal their secret
+   * @param _applicationId The id of the application
    * @param _secret The applicant's secret
    * @param _randomNumber The random number the applicant chose to obscure the secret
    */
@@ -430,7 +435,8 @@ contract CoordinationGame is Ownable {
   }
 
   /**
-   * @notice Allows the verifier to challenge when the applicant reveal timeframe has passed
+   * @notice Allows the verifier to challenge when the applicant reveal timeframe has passed.  The verifier
+   * will collect the application fee and the applicant's deposit will be returned.
    * @param _applicationId The application that the verifier is challenging
    */
   function verifierChallenge(
@@ -541,14 +547,28 @@ contract CoordinationGame is Ownable {
     }
   }
 
+  /**
+   * @notice Returns the number of applications a user is verifying
+   * @param _verifier The verifier
+   */
   function getVerifiersApplicationCount(address _verifier) external view returns (uint256) {
     return verifiersApplicationIndices[_verifier].length();
   }
 
+  /**
+   * @notice Map an applicant's index of an application to the application id.  I.e. the application id for
+   * their fourth application can be looked up by passing the applicant and '3'.
+   * @param _applicant The applicant in question
+   * @param _index The index of the application
+   */
   function getVerifiersApplicationAtIndex(address _applicant, uint256 _index) external view returns (bytes32) {
     return verifiersApplicationIndices[_applicant].valueAtIndex(_index);
   }
 
+  /**
+   * @notice Returns the id of the last application the verifier was assigned to.
+   * @param _verifier The verifier in question
+   */
   function getVerifiersLastApplicationID(address _verifier) external view returns (bytes32) {
     if (verifiersApplicationIndices[_verifier].length() > 0) {
       uint256 index = verifiersApplicationIndices[_verifier].length().sub(1);
@@ -558,10 +578,18 @@ contract CoordinationGame is Ownable {
     }
   }
 
+  /**
+   * @notice Returns whether the verifier is still able to submit their guess.
+   * @param _applicationId The application to check
+   */
   function verifierSubmissionTimedOut(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSelectedAt) > verifierTimeoutInSeconds;
   }
 
+  /**
+   * @notice Returns whether the the applicant is still able to reveal their secret.
+   * @param _applicationId The application to check
+   */
   function applicantRevealExpired(bytes32 _applicationId) public view returns (bool) {
     return (block.timestamp - verifications[_applicationId].verifierSubmittedAt) > applicantRevealTimeoutInSeconds;
   }
@@ -570,6 +598,14 @@ contract CoordinationGame is Ownable {
     return verifications[_applicationId].verifierSecret != 0;
   }
 
+  /**
+   * @notice Allows the owner to update the settings for this contract.  The owner can change the fees or
+   * the timeouts.
+   * @param _applicationStakeAmount The amount of tokens the applicant must deposit for an application.
+   * @param _baseApplicationFeeUsdWei The application fee, expressed in USD wei, that an applicant must pay
+   * @param _verifierTimeoutInSeconds The duration in seconds which the verifier has to submit their guess
+   * @param _applicantRevealTimeoutInSeconds The duration in seconds which the applicant can reveal the secret
+   */
   function updateSettings(
     uint256 _applicationStakeAmount,
     uint256 _baseApplicationFeeUsdWei,
@@ -608,6 +644,10 @@ contract CoordinationGame is Ownable {
     baseApplicationFeeUsdWei = _baseApplicationFeeUsdWei;
   }
 
+  /**
+   * @notice Returns the application fee in Ether, as calculated using the baseApplicationFeeUsdWei and the
+   * etherPriceFeed.
+   */
   function weiPerApplication() public view returns (uint256) {
     uint256 usdPerKwei = usdWeiPerEther().div(1000000000000000);
     uint256 kweiPerApplication = baseApplicationFeeUsdWei.div(usdPerKwei);
@@ -615,18 +655,32 @@ contract CoordinationGame is Ownable {
     return kweiPerApplication.mul(1000);
   }
 
+  /**
+   * @notice Returns the etherPriceFeed value cast to a uint256
+   */
   function usdWeiPerEther() public view returns (uint256) {
     return uint256(etherPriceFeed.read());
   }
 
+  /**
+   * @notice Returns the number of applications
+   */
   function applicationCount() public view returns (uint256) {
     return gamesIterator.length();
   }
 
+  /**
+   * @notice Returns the application id at the given index
+   * @param _index The index to retrieve
+   */
   function applicationAt(uint256 _index) public view returns (bytes32) {
     return gamesIterator.valueAtIndex(_index);
   }
 
+  /**
+   * @notice Returns whether an application id actually exists
+   * @param _applicationId The id to search for
+   */
   function applicationExists(bytes32 _applicationId) public view returns (bool) {
     return games[_applicationId].applicant != address(0);
   }
