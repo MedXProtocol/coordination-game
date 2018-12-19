@@ -77,7 +77,7 @@ export const ListingRow = connect(mapStateToProps)(
                 <AppId applicationId={listingHash} />
               </React.Fragment>
             )}
-            date={<TEX wei={listing.deposit} />}
+            date=''
             status={<HintStatus applicationId={listingHash} hint={hint} />}
             view={action}
             cssClass='list--listings-item'
