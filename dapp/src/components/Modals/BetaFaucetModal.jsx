@@ -11,9 +11,9 @@ import {
   withSaga
 } from 'saga-genesis'
 import { get } from 'lodash'
-import { Modal } from '~/components/Modal'
-import { TEXFaucetAPI } from '~/components/betaFaucet/TEXFaucetAPI'
-import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
+import { Modal } from '~/components/Modals/Modal'
+import { TEXFaucetAPI } from '~/components/BetaFaucet/TEXFaucetAPI'
+import { EthFaucetAPI } from '~/components/BetaFaucet/EthFaucetAPI'
 import { defined } from '~/utils/defined'
 import { weiToEther } from '~/utils/weiToEther'
 

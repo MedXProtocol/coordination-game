@@ -4,9 +4,9 @@ import React, {
 import {
   contractByName
 } from 'saga-genesis'
-import { Modal } from '~/components/Modal'
+import { Modal } from '~/components/Modals/Modal'
 import { connect } from 'react-redux'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { Web3ActionButton } from '~/components/Helpers/Web3ActionButton'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 

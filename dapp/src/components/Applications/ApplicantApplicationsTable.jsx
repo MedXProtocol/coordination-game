@@ -16,9 +16,9 @@ import {
   withSend
 } from 'saga-genesis'
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
-import { ExportCSVControls } from '~/components/ExportCSVControls'
-import { LoadingLines } from '~/components/LoadingLines'
-import { Pagination } from '~/components/Pagination'
+import { ExportCSVControls } from '~/components/Applications/ExportCSVControls'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
+import { Pagination } from '~/components/Helpers/Pagination'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { applicationService } from '~/services/applicationService'
 import { mapApplicationState } from '~/services/mapApplicationState'

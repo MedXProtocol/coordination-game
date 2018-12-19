@@ -10,11 +10,11 @@ import {
 } from 'saga-genesis'
 import { connect } from 'react-redux'
 import { range } from 'lodash'
-import { ListingRow } from '~/components/registry/ListingRow'
-import { LoadingLines } from '~/components/LoadingLines'
-import { PageTitle } from '~/components/PageTitle'
-import { Pagination } from '~/components/Pagination'
-import { ScrollToTop } from '~/components/ScrollToTop'
+import { ListingRow } from '~/components/Registry/ListingRow'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
+import { PageTitle } from '~/components/Helpers/PageTitle'
+import { Pagination } from '~/components/Helpers/Pagination'
+import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
@@ -56,8 +56,8 @@ function* challengesSaga({ PowerChallenge, startIndex, endIndex }) {
   )
 }
 
-export const Challenges = connect(mapStateToProps)(withSaga(challengesSaga)(
-  class _Challenges extends PureComponent {
+export const ChallengesTable = connect(mapStateToProps)(withSaga(challengesSaga)(
+  class _ChallengesTable extends PureComponent {
     renderChallengeRows(ids) {
       return ids.map((challengeId) => {
         return (

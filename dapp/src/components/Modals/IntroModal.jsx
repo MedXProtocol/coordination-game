@@ -13,7 +13,7 @@ import {
 } from 'saga-genesis'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { Modal } from '~/components/Modal'
+import { Modal } from '~/components/Modals/Modal'
 import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
 import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import { defined } from '~/utils/defined'

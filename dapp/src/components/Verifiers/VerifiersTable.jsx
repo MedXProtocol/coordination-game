@@ -12,9 +12,9 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import { EtherscanLink } from '~/components/EtherscanLink'
-import { EthAddress } from '~/components/EthAddress'
-import { LoadingLines } from '~/components/LoadingLines'
+import { EtherscanLink } from '~/components/Helpers/EtherscanLink'
+import { EthAddress } from '~/components/Helpers/EthAddress'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
 
 function mapStateToProps(state) {
   let verifierAddresses = []

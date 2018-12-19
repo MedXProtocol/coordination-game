@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal } from '~/components/Modal'
+import { Modal } from '~/components/Modals/Modal'
 import DownloadMetamaskButtonImg from '~/assets/img/button--download-metamask.png'
 import GetCoinbaseWalletImg from '~/assets/img/getCoinbaseWallet.svg'
 import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
@@ -12,12 +12,6 @@ export const GetWallet = class _GetWallet extends Component {
     this.state = {
       modalState: false
     }
-  }
-
-  toggleModal = () => {
-    // this.setState((prev, props) => {
-    //   return { modalState: !prev.modalState }
-    // })
   }
 
   componentDidMount() {

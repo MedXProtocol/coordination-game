@@ -7,7 +7,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { connect } from 'react-redux'
-import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
+import { RecordTimestampDisplay } from '~/components/Helpers/RecordTimestampDisplay'
 import { applicationService } from '~/services/applicationService'
 import { applicationSaga } from '~/sagas/applicationSaga'
 import { mapApplicationState } from '~/services/mapApplicationState'

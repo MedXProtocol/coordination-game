@@ -7,7 +7,7 @@ import {
   TransactionStateHandler,
   withSend
 } from 'saga-genesis'
-import { LoadingButton } from '~/components/LoadingButton'
+import { LoadingButton } from '~/components/Helpers/LoadingButton'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
 function mapStateToProps(state) {

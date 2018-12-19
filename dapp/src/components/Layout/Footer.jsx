@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { DebugLog } from '~/components/DebugLog'
+import { DebugLog } from '~/components/Layout/DebugLog'
 import * as routes from '~/../config/routes'
 
 export const Footer = class _Footer extends Component {
@@ -12,7 +12,7 @@ export const Footer = class _Footer extends Component {
   }
 
   render() {
-    if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+    if (process.env.REACT_APP_ENABLE_DEBUGGER) {
       if (this.state.debugging) {
         var debugLog =
           <div>
@@ -27,7 +27,9 @@ export const Footer = class _Footer extends Component {
           <button
             onClick={() => this.setState({ debugging: !this.state.debugging })}
             className='button button-primary'
-          >Toggle Log</button>
+          >
+            Toggle Log
+          </button>
           {debugLog}
         </div>
     }

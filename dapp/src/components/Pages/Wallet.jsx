@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { AnimatedWrapper } from "~/components/AnimatedWrapper"
+import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import TILOdometer from 'react-odometerjs'
@@ -10,9 +10,9 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import { Footer } from '~/components/Footer'
-import { PageTitle } from '~/components/PageTitle'
-import { ScrollToTop } from '~/components/ScrollToTop'
+import { Footer } from '~/components/Layout/Footer'
+import { PageTitle } from '~/components/Helpers/PageTitle'
+import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import TEXCoinImg from '~/assets/img/tex-coin.png'
 import TEXCoinImg2x from '~/assets/img/tex-coin.png'

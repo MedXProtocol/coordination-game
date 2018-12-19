@@ -2,7 +2,7 @@ import React, {
   PureComponent
 } from 'react'
 import PropTypes from 'prop-types'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { Web3ActionButton } from '~/components/Helpers/Web3ActionButton'
 
 export class VerifierStakeWithdraw extends PureComponent {
   static propTypes = {

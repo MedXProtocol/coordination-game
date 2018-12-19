@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { Modal } from '~/components/Modal'
+import { Modal } from '~/components/Modals/Modal'
 import { requiredNetworkIds } from '~/services/requiredNetworkIds'
 import { networkIdToName } from '~/utils/networkIdToName'
 

@@ -1,6 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
 
+// Requires 3 labels [0, 1, and 2]
+// Also accepts a 4th label [3], and adds it in if it's passed as a prop
+// This could be refactored
 export function Progress({ progressState, labels }) {
   let step4
 

@@ -12,25 +12,31 @@ import {
   contractByName,
   withSaga
 } from 'saga-genesis'
-import { Admin } from '~/components/Admin/Admin'
-import { ApplicantRegisterTokenContainer } from '~/components/ApplicantRegisterTokenContainer'
+
 import { Application } from '~/components/Applications/Application'
-import { BetaFaucetModal } from '~/components/betaFaucet/BetaFaucetModal'
-import { BodyClass } from '~/components/BodyClass'
-import { FAQ } from '~/components/FAQ'
-import { IntroModal } from '~/components/IntroModal'
-import { FourOhFour } from '~/components/FourOhFour'
-import { GetTEX } from '~/components/GetTEX'
-import { GetWallet } from '~/components/GetWallet'
-import { Header } from '~/components/Header'
-import { Home } from '~/components/Home'
-import { Loading } from '~/components/Loading'
-import { LoginToMetaMask } from '~/components/LoginToMetaMask'
-import { NetworkCheckModal } from '~/components/NetworkCheckModal'
+import { ApplicantRegisterTokenContainer } from '~/components/Applications/ApplicantRegisterTokenContainer'
+import { ChallengesTable } from '~/components/Challenges/ChallengesTable'
+import { Listing } from '~/components/Listings/Listing'
 import { Verify } from '~/components/Verifiers/Verify'
-import { Wallet } from '~/components/Wallet'
-import { Challenges } from '~/components/Challenges'
-import { Listing } from '~/components/Listing'
+
+import { GetTEX } from '~/components/Helpers/GetTEX'
+import { GetWallet } from '~/components/Helpers/GetWallet'
+import { Loading } from '~/components/Helpers/Loading'
+
+import { BodyClass } from '~/components/Layout/BodyClass'
+import { Header } from '~/components/Layout/Header'
+
+import { Admin } from '~/components/Pages/Admin'
+import { Home } from '~/components/Pages/Home'
+import { FAQ } from '~/components/Pages/FAQ'
+import { FourOhFour } from '~/components/Pages/FourOhFour'
+import { Wallet } from '~/components/Pages/Wallet'
+
+import { BetaFaucetModal } from '~/components/Modals/BetaFaucetModal'
+import { IntroModal } from '~/components/Modals/IntroModal'
+import { LoginToMetaMaskModal } from '~/components/Modals/LoginToMetaMaskModal'
+import { NetworkCheckModal } from '~/components/Modals/NetworkCheckModal'
+
 import { retrieveKeyValFromLocalStorage } from '~/services/retrieveKeyValFromLocalStorage'
 import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 import * as routes from '~/../config/routes'
@@ -126,7 +132,7 @@ export const App = connect(mapStateToProps)(
               {introModal}
               <GetWallet />
               <NetworkCheckModal />
-              <LoginToMetaMask />
+              <LoginToMetaMaskModal />
               <Loading />
               <ReduxToastr
                 timeOut={7000}
@@ -157,7 +163,7 @@ export const App = connect(mapStateToProps)(
                             <Route path={routes.VERIFY} component={Verify} />
                             <Route path={routes.REGISTER_TOKEN} component={ApplicantRegisterTokenContainer} />
                             <Route path={routes.WALLET} component={Wallet} />
-                            <Route path={routes.CHALLENGES} component={Challenges} />
+                            <Route path={routes.CHALLENGES} component={ChallengesTable} />
                             <Route path={routes.LISTING} component={Listing} />
 
                             <Route path={routes.FAQ} component={FAQ} />

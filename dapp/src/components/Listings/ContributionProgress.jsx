@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { toBN } from '~/utils/toBN'
-import { TEX } from '~/components/TEX.jsx'
+import { TEX } from '~/components/Helpers/TEX'
 import PropTypes from 'prop-types'
 
 export class ContributionProgress extends PureComponent {

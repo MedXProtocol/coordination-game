@@ -9,8 +9,8 @@ import {
   withSaga
 } from 'saga-genesis'
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
-import { LoadingLines } from '~/components/LoadingLines'
-import { Pagination } from '~/components/Pagination'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
+import { Pagination } from '~/components/Helpers/Pagination'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'

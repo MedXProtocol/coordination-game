@@ -10,7 +10,7 @@ import {
   withSaga,
   contractByName
 } from 'saga-genesis'
-import { AppId } from '~/components/AppId'
+import { AppId } from '~/components/Applications/AppId'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
 import { ApplicationStatus } from '~/components/Applications/ApplicationStatus'
 import { applicationService } from '~/services/applicationService'

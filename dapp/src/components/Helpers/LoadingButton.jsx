@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { LoadingLines } from '~/components/LoadingLines'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
 
 export const LoadingButton = props => (
   <button
