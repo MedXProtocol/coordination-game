@@ -129,7 +129,7 @@ contract CoordinationGame is Ownable {
   }
 
   modifier onlyRegistry() {
-    require(msg.sender == address(tilRegistry), 'sender is self or registry');
+    require(msg.sender == address(tilRegistry), 'sender is registry');
     _;
   }
 
