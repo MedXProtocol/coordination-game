@@ -105,7 +105,7 @@ export const Listings = connect(mapStateToProps)(withSaga(listingsSaga)(class _L
           <div className="columns">
             <div className="column is-6">
               <h6 className="is-size-10 list--title">
-                Registry Listings
+                Active Listings
               </h6>
             </div>
 

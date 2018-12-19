@@ -35,6 +35,7 @@ function mapStateToProps(state, { match }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
   const transactions = get(state, 'sagaGenesis.transactions')
 
   const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
@@ -45,6 +46,7 @@ function mapStateToProps(state, { match }) {
     applicationId,
     applicationObject,
     latestBlockTimestamp,
+    latestBlockNumber,
     transactions
   }
 }
@@ -156,6 +158,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             const {
               address,
               applicationObject,
+              latestBlockNumber,
               latestBlockTimestamp
             } = this.props
 
@@ -176,7 +179,12 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
             const loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-            const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+            const applicationState = mapApplicationState(
+              address,
+              applicationObject,
+              latestBlockNumber,
+              latestBlockTimestamp
+            )
 
             if (applicationState.canWhistleblow) {
               whistleblowButton =
@@ -261,19 +269,31 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 message = (
                   <React.Fragment>
                     <p>
-                      This submission requires a verifier review it:
+                      This submission requires a verifier reviews it:
                       <br />
                       <br />
                     </p>
-                    <Web3ActionButton
-                      contractAddress={this.props.coordinationGameAddress}
-                      method='applicantRandomlySelectVerifier'
-                      args={[applicationId]}
-                      buttonText='Request Verification'
-                      loadingText='Requesting'
-                      confirmationMessage='Verification request confirmed.'
-                      txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.' />
+
+                    <span
+                      data-tip={applicationState.waitingOnBlockToMine ? 'Please wait until the next block has mined' : ''}
+                      data-for={`request-verification-tooltip`}
+                    >
+                      <Web3ActionButton
+                        contractAddress={this.props.coordinationGameAddress}
+                        method='applicantRandomlySelectVerifier'
+                        args={[applicationId]}
+                        buttonText='Request Verification'
+                        loadingText='Requesting'
+                        confirmationMessage='Verification request confirmed.'
+                        disabled={applicationState.waitingOnBlockToMine}
+                        txHashMessage='Verification request sent successfully -
+                          it will take a few minutes to confirm on the Ethereum network.' />
+                      <ReactTooltip
+                        id={`request-verification-tooltip`}
+                        html={true}
+                        wrapper='span'
+                      />
+                    </span>
                   </React.Fragment>
                 )
               }

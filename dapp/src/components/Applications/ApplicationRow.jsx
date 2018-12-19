@@ -23,6 +23,7 @@ function mapStateToProps(state, { applicationId }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
 
   const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
 
@@ -30,7 +31,8 @@ function mapStateToProps(state, { applicationId }) {
     address,
     applicationObject,
     coordinationGameAddress,
-    latestBlockTimestamp
+    latestBlockTimestamp,
+    latestBlockNumber
   }
 }
 
@@ -53,6 +55,7 @@ export const ApplicationRow = connect(mapStateToProps)(
         let {
           address,
           applicationObject,
+          latestBlockNumber,
           latestBlockTimestamp
         } = this.props
 
@@ -67,7 +70,12 @@ export const ApplicationRow = connect(mapStateToProps)(
           <button className="button is-info is-small is-outlined">View Submission</button>
         )
 
-        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+        const applicationState = mapApplicationState(
+          address,
+          applicationObject,
+          latestBlockNumber,
+          latestBlockTimestamp
+        )
 
         /// OBSERVER (defaults, anyone who isn't involved in the application)
         if (latestBlockTimestamp && updatedAt) {

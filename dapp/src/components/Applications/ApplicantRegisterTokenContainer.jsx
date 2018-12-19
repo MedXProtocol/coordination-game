@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
+import ReactTooltip from 'react-tooltip'
 import randomBytes from 'randombytes'
 import queryString from 'query-string'
 import {
@@ -42,16 +43,17 @@ function mapStateToProps(state, { location }) {
   let verifier,
     applicantsLastApplicationCreatedAt,
     applicationExists,
-    listingExists
+    listingExists,
+    waitingOnBlockToMine
 
   const applicantApplicationsTableCurrentPage = queryString.parse(location.search).applicantApplicationsTableCurrentPage
 
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const transactions = get(state, 'sagaGenesis.transactions')
+  const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const transactions = get(state, 'sagaGenesis.transactions')
 
   const query = get(state, 'search.query')
-
   const hexQuery = getWeb3().utils.asciiToHex(get(state, 'search.query'))
 
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
@@ -76,8 +78,11 @@ function mapStateToProps(state, { location }) {
   if (!isBlank(applicantsLastApplicationId)) {
     const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
     verifier = verification.verifier
+
     const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicantsLastApplicationId))
     applicantsLastApplicationCreatedAt = game.createdAt
+
+    waitingOnBlockToMine = (latestBlockNumber < parseInt(game.randomBlockNumber, 10))
   }
 
   return {
@@ -97,6 +102,7 @@ function mapStateToProps(state, { location }) {
     texBalance,
     transactions,
     verifier,
+    waitingOnBlockToMine,
     weiPerApplication,
     workTokenAddress
   }
@@ -402,8 +408,6 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
             const bytes = randomBytes(32)
             const random = Buffer.from(bytes).toString('hex')
-            console.log(random)
-            // const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
             const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret.trim())
 
@@ -740,11 +744,23 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                     </div>
                                   </div>
 
-                                  <LoadingButton
-                                    initialText='Request Verification'
-                                    loadingText='Requesting'
-                                    isLoading={this.state.coordinationGameSelectVerifierHandler}
-                                  />
+                                  <span
+                                    data-tip={this.props.waitingOnBlockToMine ? 'Please wait until the next block has mined' : ''}
+                                    data-for={`register-request-verification-tooltip`}
+                                  >
+                                    <LoadingButton
+                                      initialText='Request Verification'
+                                      loadingText='Requesting'
+                                      disabled={this.props.waitingOnBlockToMine}
+                                      isLoading={this.state.coordinationGameSelectVerifierHandler}
+                                    />
+                                    <ReactTooltip
+                                      id={`register-request-verification-tooltip`}
+                                      html={true}
+                                      wrapper='span'
+                                    />
+                                  </span>
+
                                   <br />
                                   <br />
                                 </form>

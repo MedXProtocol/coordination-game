@@ -100,14 +100,14 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         e.preventDefault()
 
         const { send, contractAddress, method, args } = this.props
-        console.log(...args)
+        // console.log(...args)
 
         const txId = send(
           contractAddress,
           method,
           ...args
         )()
-        console.log(`Making call to ${contractAddress}#${method} with args`, args)
+        // console.log(`Making call to ${contractAddress}#${method} with args`, args)
         // console.log('txid is: ', txId)
 
 
@@ -125,7 +125,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         const classNames = this.props.className || 'is-primary'
 
         return (
-          <form onSubmit={this.handleSend} ref={(ref) => this.formRef = ref}>
+          <form className="is-inline-block" onSubmit={this.handleSend} ref={(ref) => this.formRef = ref}>
             <LoadingButton
               initialText={buttonText}
               loadingText={loadingText}

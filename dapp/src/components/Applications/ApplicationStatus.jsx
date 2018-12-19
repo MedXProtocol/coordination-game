@@ -36,10 +36,16 @@ export const ApplicationStatus = connect(mapStateToProps)(
         const {
           address,
           applicationObject,
+          latestBlockNumber,
           latestBlockTimestamp,
         } = this.props
 
-        const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+        const applicationState = mapApplicationState(
+          address,
+          applicationObject,
+          latestBlockNumber,
+          latestBlockTimestamp
+        )
 
         if (applicationState.needsAVerifier) {
           message = (

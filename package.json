@@ -25,7 +25,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "ganache-cli": "^6.1.8",
+    "ganache-cli": "6.2.4",
     "truffle-hdwallet-provider": "^0.0.6",
     "zos": "^2.0.1"
   },
