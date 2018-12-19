@@ -21,8 +21,9 @@ export const applicationService = function(state, applicationId, coordinationGam
 
   const {
     createdAt,
-    updatedAt,
-    whistleblower
+    randomBlockNumber,
+    whistleblower,
+    updatedAt
   } = game
 
   const {
@@ -55,7 +56,8 @@ export const applicationService = function(state, applicationId, coordinationGam
     applicantsSecret,
     applicantRevealExpiresAt,
     createdAt,
-    updatedAt,
+    game,
+    randomBlockNumber,
     tokenTicker,
     tokenName,
     verifier,
@@ -64,7 +66,7 @@ export const applicationService = function(state, applicationId, coordinationGam
     verifierSubmittedAt,
     verifierSubmitSecretExpiresAt,
     whistleblower,
-    game
+    updatedAt
   }
 
   applicationObject = retrieveApplicationDetailsFromLocalStorage(

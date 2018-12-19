@@ -12,6 +12,7 @@ export const verifierApplicationsService = function(state, startIndex, endIndex)
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
+  const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
 
   // The -1 logic here is weird, range is exclusive not inclusive:
   if (!endIndex) {
@@ -33,7 +34,12 @@ export const verifierApplicationsService = function(state, startIndex, endIndex)
       const { createdAt, updatedAt } = game
 
       const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
-      const applicationState = mapApplicationState(address, applicationObject, latestBlockTimestamp)
+      const applicationState = mapApplicationState(
+        address,
+        applicationObject,
+        latestBlockNumber,
+        latestBlockTimestamp
+      )
 
       const { verifierSubmittedAt } = applicationObject
       const { priority } = applicationState

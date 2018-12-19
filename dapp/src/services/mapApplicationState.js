@@ -11,13 +11,19 @@ const PRIORITIES = {
 
 const DEFAULT_PRIORITY = PRIORITIES['medium']
 
-export function mapApplicationState (address, applicationObject, latestBlockTimestamp) {
+export function mapApplicationState(
+  address,
+  applicationObject,
+  latestBlockNumber,
+  latestBlockTimestamp
+) {
   let priority = DEFAULT_PRIORITY
 
   const {
     applicantRevealExpiresAt,
     applicantsSecret,
     applicant,
+    randomBlockNumber,
     verifierChallengedAt,
     verifier,
     verifiersSecret,
@@ -25,7 +31,7 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     whistleblower
   } = applicationObject
 
-  const waitingOnBlockToMine = true
+  const waitingOnBlockToMine = (latestBlockNumber < parseInt(randomBlockNumber, 10))
 
   const isApplicant = applicant === address
   const isVerifier = verifier === address
