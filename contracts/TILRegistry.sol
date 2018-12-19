@@ -36,7 +36,7 @@ contract TILRegistry is Initializable {
   Work work;
   PowerChallenge powerChallenge;
   mapping(bytes32 => CoordinationGameEtherDeposit) public deposits;
-  CoordinationGame ____coordinationGame____dead___;
+  CoordinationGame coordinationGame;
 
   modifier onlyJobManager(address _address) {
     require(roles.hasRole(_address, uint(TILRoles.All.JOB_MANAGER)), "only the job manager");
@@ -62,6 +62,11 @@ contract TILRegistry is Initializable {
     token = IERC20(_token);
     work = Work(_work);
     powerChallenge = PowerChallenge(_powerChallenge);
+  }
+
+  function setCoordinationGame(address _coordinationGame) external onlyTokenMinter onlyJobManager(_coordinationGame) {
+    coordinationGame = CoordinationGame(_coordinationGame);
+    require(coordinationGame.tilRegistry() == address(this), 'CoordinationGame is bound to this registry');
   }
 
   function applicantWonCoordinationGame(
@@ -121,6 +126,7 @@ contract TILRegistry is Initializable {
       if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
         listingsIterator.removeValue(_listingHash);
         delete listings[_listingHash];
+        coordinationGame.removeApplication(_listingHash);
 
         emit ListingRemoved(_listingHash);
       }
