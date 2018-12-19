@@ -1,5 +1,7 @@
 const EtherPriceFeed = artifacts.require('EtherPriceFeed.sol')
 const CoordinationGame = artifacts.require('CoordinationGame.sol')
+const ApplicantRevealSecret = artifacts.require('CoordinationGameStrategies/ApplicantRevealSecret.sol')
+const VerifierSubmitSecret = artifacts.require('CoordinationGameStrategies/VerifierSubmitSecret.sol')
 const PowerChallenge = artifacts.require('PowerChallenge.sol')
 const MockTILRegistry = artifacts.require('MockTILRegistry.sol')
 const TILRoles = artifacts.require('TILRoles.sol')
@@ -30,7 +32,9 @@ contract('CoordinationGame', (accounts) => {
     applicantRevealTimeoutInSeconds,
     verifierTimeoutInSeconds,
     roles,
-    weiPerApplication
+    weiPerApplication,
+    applicantRevealSecretLibrary,
+    verifierSubmitSecretLibrary
 
   const [owner, admin, applicant, verifier, verifier2] = accounts
 
@@ -58,6 +62,10 @@ contract('CoordinationGame', (accounts) => {
   ).toString('hex')
 
   before(async () => {
+    applicantRevealSecretLibrary = await ApplicantRevealSecret.new()
+    verifierSubmitSecretLibrary = await VerifierSubmitSecret.new()
+    await CoordinationGame.link('ApplicantRevealSecret', applicantRevealSecretLibrary.address)
+    await CoordinationGame.link('VerifierSubmitSecret', verifierSubmitSecretLibrary.address)
     etherPriceFeed = await EtherPriceFeed.new()
     await etherPriceFeed.init(owner, web3.toWei('210.83', 'ether'))
     workToken = await WorkToken.new()
@@ -82,6 +90,7 @@ contract('CoordinationGame', (accounts) => {
     await coordinationGame.init(
       owner, etherPriceFeed.address, work.address, tilRegistry.address, applicationStakeAmount, baseApplicationFeeUsdWei
     )
+    await tilRegistry.setCoordinationGame(coordinationGame.address)
     debug(`Initialized CoordinationGame`)
 
     weiPerApplication = await coordinationGame.weiPerApplication()
@@ -392,6 +401,24 @@ contract('CoordinationGame', (accounts) => {
         assert.equal(game.applicantSecret, secret, 'the recorded applicant secret is correct')
 
         assert.equal(await tilRegistry.approvals(applicationId), true, 'application was approved')
+      })
+
+      context('when successful', () => {
+
+        beforeEach(async () => {
+          await applicantRevealsTheirSecret()
+        })
+
+        describe('removeApplication()', () => {
+          it('should completely remove the application', async () => {
+            await tilRegistry.callRemoveApplication(applicationId)
+            assert.equal(
+              false,
+              await coordinationGame.applicationExists(applicationId),
+              'application no longer exists'
+            )
+          })
+        })
       })
     })
 
