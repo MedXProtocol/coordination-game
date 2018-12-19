@@ -14,6 +14,8 @@
     "@ant-design/icons": "^1.1.15",
     "@ant-design/icons-react": "^1.1.2",
     "@babel/core": "7.1.0",
+    "@bugsnag/js": "^5.1.0",
+    "@bugsnag/plugin-react": "^5.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.6",
     "@fortawesome/free-brands-svg-icons": "^5.4.1",
     "@fortawesome/free-regular-svg-icons": "^5.4.1",
@@ -96,6 +98,7 @@
     "url-loader": "1.1.1",
     "web3": "1.0.0-beta.36",
     "webpack": "^4.0.0",
+    "webpack-bugsnag-plugin": "^0.1.4",
     "webpack-dev-server": "3.1.9",
     "webpack-manifest-plugin": "2.0.4",
     "workbox-webpack-plugin": "3.6.2"
