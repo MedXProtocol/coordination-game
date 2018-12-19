@@ -52,7 +52,6 @@ function mapStateToProps(state, { location }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   const query = get(state, 'search.query')
-  console.log('query', query)
 
   const hexQuery = getWeb3().utils.asciiToHex(get(state, 'search.query'))
 
@@ -225,7 +224,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             ) {
               this.setState({
                 listingOrApplicationExists: nextProps.listingExists || nextProps.applicationExists
-              }, () => { console.log('listingOrApplicationExists', this.state.listingOrApplicationExists) })
+              })
             }
           }
 
