@@ -39,7 +39,9 @@ export function mapApplicationState(
 
   const verifierSubmittedSecret = !isBlank(verifiersSecret)
   const applicantRevealedSecret = !isBlank(applicantsSecret)
-  const applicantWon = (defined(listing.owner) || applicantsSecret === verifiersSecret)
+  const secretsMatch = verifierSubmittedSecret && applicantRevealedSecret && applicantsSecret === verifiersSecret
+  const isListed = !isBlank(listing.owner)
+  const applicantWon = (isListed || secretsMatch)
 
   const needsAVerifier = isBlank(verifier)
   const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
@@ -60,6 +62,8 @@ export function mapApplicationState(
     (latestBlockTimestamp > verifierSubmitSecretExpiresAt)
   )
 
+  const noWhistleblower = isBlank(whistleblower)
+
   const canVerify = (
     isVerifier &&
     !verifierSubmittedSecret &&
@@ -75,13 +79,12 @@ export function mapApplicationState(
   )
 
   const isComplete = (
-    defined(listing.owner) ||
+    isListed ||
     applicantRevealedSecret ||
     verifierHasChallenged ||
     !noWhistleblower
   )
 
-  const noWhistleblower = isBlank(whistleblower)
   const canWhistleblow = (
     !isApplicant &&
     !verifierSubmittedSecret &&
