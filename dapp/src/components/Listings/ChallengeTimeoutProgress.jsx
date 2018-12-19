@@ -10,6 +10,8 @@ export class ChallengeTimeoutProgress extends PureComponent {
   }
 
   render () {
+    let timePercentage
+    
     const {
       challenge,
       latestBlockTimestamp,
@@ -22,7 +24,10 @@ export class ChallengeTimeoutProgress extends PureComponent {
     const timeRemainingWords = distanceInWords(new Date(currentTime * 1000), new Date(roundEndAt * 1000))
     const timeRemaining = roundEndAt - currentTime
 
-    const timePercentage = parseInt((timeRemaining * 100) / timeout, 10)
+    timePercentage = parseInt((timeRemaining * 100) / timeout, 10)
+    if (isNaN(timePercentage)) {
+      timePercentage = 0
+    }
 
     return (
       <div className='approve-progress'>
@@ -37,7 +42,8 @@ export class ChallengeTimeoutProgress extends PureComponent {
           <progress
             className='progress is-info'
             value={timePercentage}
-            max='100'>
+            max='100'
+          >
           </progress>
         </div>
         <br />
