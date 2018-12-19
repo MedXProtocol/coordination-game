@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
-import { Modal } from '~/components/Modal'
+import { Modal } from '~/components/Modals/Modal'
 import MetaMaskFoxAndWordmarkImg from '~/assets/img/metamask-fox-and-wordmark.svg'
 import { defined } from '~/utils/defined'
 
@@ -13,10 +13,10 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export const LoginToMetaMask =
+export const LoginToMetaMaskModal =
   connect(mapStateToProps)(
     ReactTimeout(
-      class _LoginToMetaMask extends Component {
+      class _LoginToMetaMaskModal extends Component {
 
       constructor(props) {
         super(props)

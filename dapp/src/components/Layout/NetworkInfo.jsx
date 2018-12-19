@@ -8,8 +8,8 @@ import {
   cacheCall,
   withSaga
 } from 'saga-genesis'
-import { EthAddress } from '~/components/EthAddress'
-import { TILOdometer } from '~/components/TILOdometer'
+import { EthAddress } from '~/components/Helpers/EthAddress'
+import { TILOdometer } from '~/components/Helpers/TILOdometer'
 import { networkIdToName } from '~/utils/networkIdToName'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
 

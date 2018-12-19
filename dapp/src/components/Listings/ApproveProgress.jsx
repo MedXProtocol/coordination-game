@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import BN from 'bn.js'
-import { TEX } from '~/components/TEX.jsx'
+import { TEX } from '~/components/Helpers/TEX'
 import PropTypes from 'prop-types'
 
 export class ApproveProgress extends PureComponent {

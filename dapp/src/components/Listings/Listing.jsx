@@ -14,10 +14,10 @@ import {
   BookOutline
 } from '@ant-design/icons'
 import AntdIcon from '@ant-design/icons-react'
-import { EtherscanLink } from '~/components/EtherscanLink'
+import { EtherscanLink } from '~/components/Helpers/EtherscanLink'
 import { ChallengePanel } from '~/components/Listings/ChallengePanel'
-import { ScrollToTop } from '~/components/ScrollToTop'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
+import { Web3ActionButton } from '~/components/Helpers/Web3ActionButton'
 import { mapToGame } from '~/services/mapToGame'
 import { Listing as ListingModel } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'

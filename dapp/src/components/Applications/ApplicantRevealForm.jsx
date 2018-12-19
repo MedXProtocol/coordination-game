@@ -6,9 +6,9 @@ import {
   TransactionStateHandler,
   withSend
 } from 'saga-genesis'
-import { LoadingButton } from '~/components/LoadingButton'
-import { RecordTimestampDisplay } from '~/components/RecordTimestampDisplay'
-import { Web3ActionButton } from '~/components/Web3ActionButton'
+import { LoadingButton } from '~/components/Helpers/LoadingButton'
+import { RecordTimestampDisplay } from '~/components/Helpers/RecordTimestampDisplay'
+import { Web3ActionButton } from '~/components/Helpers/Web3ActionButton'
 import { defined } from '~/utils/defined'
 import { getWeb3 } from '~/utils/getWeb3'
 

@@ -10,17 +10,17 @@ import {
   contractByName
 } from 'saga-genesis'
 import { connect } from 'react-redux'
-import { AppId } from '~/components/AppId'
+import { AppId } from '~/components/Applications/AppId'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { formatRoute } from 'react-router-named-routes'
 import * as routes from '~/../config/routes'
-import { TEX } from '~/components/TEX'
+import { TEX } from '~/components/Helpers/TEX'
 import { mapToGame } from '~/services/mapToGame'
 import { Listing } from '~/models/Listing'
 import { Challenge } from '~/models/Challenge'
 import { ApplicationListPresenter } from '~/components/Applications/ApplicationListPresenter'
-import { HintStatus } from '~/components/HintStatus'
+import { HintStatus } from '~/components/Registry/HintStatus'
 import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
 function mapStateToProps(state, { listingHash }) {

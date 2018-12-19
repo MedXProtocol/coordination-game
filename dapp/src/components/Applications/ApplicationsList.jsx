@@ -12,7 +12,7 @@ import {
   cacheCallValue
 } from 'saga-genesis'
 import { ApplicationRow } from '~/components/Applications/ApplicationRow'
-import { Pagination } from '~/components/Pagination'
+import { Pagination } from '~/components/Helpers/Pagination'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'

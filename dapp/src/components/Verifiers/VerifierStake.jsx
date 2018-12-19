@@ -14,8 +14,8 @@ import {
   withSaga,
   withSend
 } from 'saga-genesis'
-import { GetTEXLink } from '~/components/GetTEXLink'
-import { Progress } from '~/components/Progress'
+import { GetTEXLink } from '~/components/Helpers/GetTEXLink'
+import { Progress } from '~/components/Helpers/Progress'
 import { VerifierStakeStep1 } from '~/components/VerifierStake/VerifierStakeStep1'
 import { VerifierStakeStep2 } from '~/components/VerifierStake/VerifierStakeStep2'
 import { defined } from '~/utils/defined'

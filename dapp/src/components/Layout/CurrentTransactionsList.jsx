@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
-import { EtherscanLink } from '~/components/EtherscanLink'
+import { EtherscanLink } from '~/components/Helpers/EtherscanLink'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { txErrorToCode } from '~/services/txErrorToCode'
 

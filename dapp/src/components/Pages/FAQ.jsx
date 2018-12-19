@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { AnimatedWrapper } from "~/components/AnimatedWrapper"
-import { Footer } from '~/components/Footer'
-import { PageTitle } from '~/components/PageTitle'
-import { ScrollToTop } from '~/components/ScrollToTop'
+import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
+import { Footer } from '~/components/Layout/Footer'
+import { PageTitle } from '~/components/Helpers/PageTitle'
+import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { storeKeyValInLocalStorage } from '~/services/storeKeyValInLocalStorage'
 
 function mapDispatchToProps(dispatch) {

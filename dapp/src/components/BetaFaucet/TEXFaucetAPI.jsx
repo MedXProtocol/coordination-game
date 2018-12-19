@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import PropTypes from 'prop-types'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { toastr } from '~/toastr'
-import { EthAddress } from '~/components/EthAddress'
-import { EtherFlip } from '~/components/EtherFlip'
-import { LoadingButton } from '~/components/LoadingButton'
+import { EthAddress } from '~/components/Helpers/EthAddress'
+import { TEX } from '~/components/Helpers/TEX'
+import { LoadingButton } from '~/components/Helpers/LoadingButton'
 import { axiosInstance } from '~/../config/axiosConfig'
+import TEXCoinImg from '~/assets/img/tex-coin.png'
+import TEXCoinImg2x from '~/assets/img/tex-coin.png'
 
-export const EthFaucetAPI = ReactTimeout(
-  class _EthFaucetAPI extends Component {
+export const TEXFaucetAPI = ReactTimeout(
+  class _TEXFaucetAPI extends Component {
 
-    faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendEther`
+    faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendTEX`
 
     constructor(props) {
       super(props)
@@ -22,11 +22,11 @@ export const EthFaucetAPI = ReactTimeout(
       }
     }
 
-    handleSendEther = (event) => {
+    handleMintTEX = (event) => {
       event.preventDefault()
       this.setState({
         isSending: true
-      }, this.doSendEther)
+      }, this.doMintTEX)
     }
 
     englishErrorMessage = (message) => {
@@ -42,18 +42,18 @@ export const EthFaucetAPI = ReactTimeout(
       )
     }
 
-    doSendEther = async () => {
+    doMintTEX = async () => {
       try {
         const response = await axiosInstance.get(`${this.faucetLambdaURI}?ethAddress=${this.props.address}`)
 
-        const txId = this.props.sendExternalTransaction('sendEther')
+        const txId = this.props.sendExternalTransaction('sendTEX')
 
         if (response.status === 200) {
           this.setState({
             txHash: response.data.txHash
           })
 
-          toastr.success("We're sending you Ether - It will take a few moments to arrive.")
+          toastr.success("We're sending you TEX. It will take a few moments to arrive.")
 
           this.props.dispatchSagaGenesisTxHash(txId, response.data.txHash)
 
@@ -85,10 +85,14 @@ export const EthFaucetAPI = ReactTimeout(
 
       return (
         <div>
-          <FontAwesomeIcon icon={faEthereum} width="100" />
+          <img
+            src={TEXCoinImg}
+            alt="TEX Token Icon"
+            srcSet={`${TEXCoinImg} 1x, ${TEXCoinImg2x} 2x`}
+          />
+
           <h5 className="is-size-5">
-            Current Balance:
-            &nbsp; <EtherFlip wei={this.props.ethBalance} />
+            Current Balance: <TEX wei={this.props.texBalance} />
           </h5>
           <p className="small">
             <span className="eth-address has-text-grey-light">For address:&nbsp;
@@ -97,17 +101,19 @@ export const EthFaucetAPI = ReactTimeout(
           </p>
           <br />
           <p className="is-size-5">
-            You're low on Ether
+            You're low on TEX
             <br />
             <span className="is-size-7 has-text-grey-light">
-              Not to worry! We can have some sent to your account:
+              TEX is necessary for staking a deposit and submitting tokens. We can send some to you now:
             </span>
           </p>
+
           <p>
             <br />
+
             <LoadingButton
-              handleClick={this.handleSendEther}
-              initialText='Send Me Ether'
+              handleClick={this.handleMintTEX}
+              initialText='Send Me TEX'
               loadingText='Sending'
               isLoading={isSending}
             />
@@ -116,7 +122,7 @@ export const EthFaucetAPI = ReactTimeout(
           <p>
             <button
               onClick={this.props.handleMoveToNextStep}
-              className="button is-light is-text is-small"
+              className="button is-light is-text is-size-7"
             >skip this for now</button>
           </p>
         </div>
@@ -125,7 +131,7 @@ export const EthFaucetAPI = ReactTimeout(
   }
 )
 
-EthFaucetAPI.propTypes = {
-  ethBalance: PropTypes.string,
+TEXFaucetAPI.propTypes = {
+  texBalance: PropTypes.object,
   address: PropTypes.string
 }

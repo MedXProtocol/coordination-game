@@ -9,7 +9,7 @@ import { withRouter } from 'react-router'
 import { Link, NavLink } from 'react-router-dom'
 import { get } from 'lodash'
 import { formatRoute } from 'react-router-named-routes'
-import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
+import { CurrentTransactionsList } from '~/components/Layout/CurrentTransactionsList'
 import {
   cacheCall,
   cacheCallValue,
@@ -33,7 +33,7 @@ import AntdIcon from '@ant-design/icons-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon } from '@fortawesome/free-solid-svg-icons'
 import { faSun } from '@fortawesome/free-regular-svg-icons'
-import { NetworkInfo } from '~/components/NetworkInfo'
+import { NetworkInfo } from '~/components/Layout/NetworkInfo'
 import { verifierApplicationsService } from '~/services/verifierApplicationsService'
 import { applicationService } from '~/services/applicationService'
 import { verifierApplicationsSaga } from '~/sagas/verifierApplicationsSaga'
@@ -43,12 +43,6 @@ import { isBlank } from '~/utils/isBlank'
 import { getWeb3 } from '~/utils/getWeb3'
 import TokenRegistryLogo from '~/assets/img/the-token-registry.svg'
 import * as routes from '~/../config/routes'
-
-// const MyItemView = function({ item }) {
-//   return (
-//
-//   );
-// }
 
 function mapStateToProps(state) {
   let applicationsToVerify = 0

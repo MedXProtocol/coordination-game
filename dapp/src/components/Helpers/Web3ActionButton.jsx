@@ -7,7 +7,7 @@ import {
 } from 'saga-genesis'
 import { get } from 'lodash'
 import { toastr } from '~/toastr'
-import { LoadingButton } from '~/components/LoadingButton'
+import { LoadingButton } from '~/components/Helpers/LoadingButton'
 
 function mapStateToProps(state) {
   const transactions = get(state, 'sagaGenesis.transactions')
