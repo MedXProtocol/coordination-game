@@ -251,8 +251,8 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             const timestampChanged = lastCreatedAt !== newCreatedAt
 
             return (
-              !defined(lastCreatedAt) &&
-                defined(newCreatedAt) &&
+              isBlank(lastCreatedAt) &&
+                !isBlank(newCreatedAt) &&
                 timestampChanged      &&
                 defined(this.state.random)
             )
