@@ -101,6 +101,10 @@ contract CoordinationGame is Ownable {
     bytes32 indexed applicationId
   );
 
+  event ApplicationRemoved(
+    bytes32 indexed applicationId
+  );
+
   event SettingsUpdated(
     uint256 applicationStakeAmount,
     uint256 baseApplicationFeeUsdWei,
@@ -159,6 +163,11 @@ contract CoordinationGame is Ownable {
     _;
   }
 
+  /**
+   * @notice Returns whether an application is complete.  An application is complete if it has been won or
+   * lost, if it has been whistleblown, or if it has been challenged by the verifier.
+   * @param _applicationId The application to check
+   */
   function isComplete(bytes32 _applicationId) public view returns (bool) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
@@ -521,6 +530,10 @@ contract CoordinationGame is Ownable {
     verification.verifier.transfer(deposit);
   }
 
+  /**
+   * @notice Removes an application from the contract.  Only applications that have completed are eligible.
+   * @param _applicationId The id of the application to remove
+   */
   function removeApplication(bytes32 _applicationId) external onlyRegistry onlyApplicationComplete(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
@@ -533,7 +546,10 @@ contract CoordinationGame is Ownable {
     gamesIterator.removeValue(_applicationId);
     delete games[_applicationId];
     delete verifications[_applicationId];
+
+    emit ApplicationRemoved(_applicationId);
   }
+
   /**
    * @notice Returns the number of applications the applicant has made
    * @param _applicant The applicant
