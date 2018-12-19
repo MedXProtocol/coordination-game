@@ -28,8 +28,7 @@ contract('TILRegistry', (accounts) => {
   let registry,
       workToken,
       work,
-      roles,
-      coordinationGame
+      roles
 
   const requiredStake = web3.toWei('20', 'ether')
   const jobStake = web3.toWei('20', 'ether')
@@ -39,14 +38,12 @@ contract('TILRegistry', (accounts) => {
   const depositAndJobAmount = listingStake.add(new BN(jobStake))
 
   before(async () => {
-    coordinationGame = await MockCoordinationGame.new()
     workToken = await WorkToken.new()
     await workToken.init(owner)
     roles = await TILRoles.new()
     await roles.init(owner)
     await roles.setRole(owner, 0, true) // owner is the token minter
     await roles.setRole(owner, 1, true) // owner is the job manager
-    await roles.setRole(coordinationGame.address, 1, true) // coordinationgame is the job manager
     work = await Work.new()
     await workToken.mint(mysteriousStranger, web3.toWei('10000', 'ether'))
     await work.init(
@@ -63,9 +60,7 @@ contract('TILRegistry', (accounts) => {
     powerChallenge = await PowerChallenge.new()
     await powerChallenge.init(owner, workToken.address, 60)
     registry = await TILRegistry.new()
-    await coordinationGame.setRegistry(registry.address)
     await registry.initialize(workToken.address, roles.address, work.address, powerChallenge.address)
-    await registry.setCoordinationGame(coordinationGame.address)
     await workToken.mint(owner, depositAndJobAmount.toString())
     await workToken.approve(registry.address, depositAndJobAmount.toString())
   })
@@ -339,11 +334,6 @@ contract('TILRegistry', (accounts) => {
 
         await registry.withdrawFromChallenge(listingHash, { from: verifier })
         const verifierFinishingBalance = await workToken.balanceOf(verifier)
-
-        assert.ok(
-          await coordinationGame.removed(listingHash),
-          'coordination game was removed'
-        )
 
         assert.equal(
           depositAndJobAmount.toString(),

@@ -527,6 +527,8 @@ contract CoordinationGame is Ownable {
     );
 
     emit ApplicantLost(_applicationId);
+
+    doRemoveApplication(_applicationId);
   }
 
   function returnVerifierJobStake(bytes32 _applicationId) internal {
