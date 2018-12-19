@@ -21,3 +21,5 @@ export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
 export REACT_APP_ENABLE_DEBUGGER=true
 
 export ADMIN_ACCOUNT=0x8a23c3556fa6a8fd38c86597acfd0151ac62861c
+
+# export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>

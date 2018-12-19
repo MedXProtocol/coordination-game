@@ -1,5 +1,5 @@
 'use strict';
-
+const { BugsnagSourceMapPlugin } = require('webpack-bugsnag-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -408,6 +408,12 @@ module.exports = {
     ],
   },
   plugins: [
+    new BugsnagSourceMapPlugin({
+      apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
+      publicPath: `${process.env.DEPLOY_URL}`,
+      appVersion: '1.0.0',
+    }),
+
     new CopyWebpackPlugin([
       { from: './config/_redirects' }
     ]),

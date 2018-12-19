@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
+import { ErrorBoundary } from '~/components/Layout/ErrorBoundary'
 import { Provider } from 'react-redux'
 import { AppContainer } from '~/components/App'
 import { store } from '~/store'
@@ -11,11 +12,13 @@ import './index.scss'
 
 window.addEventListener('load', () => {
   let coreApp =
-    <Provider store={store}>
-      <BrowserRouter>
-        <AppContainer />
-      </BrowserRouter>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <BrowserRouter>
+          <AppContainer />
+        </BrowserRouter>
+      </Provider>
+    </ErrorBoundary>
 
   ReactDOM.render(coreApp, document.getElementById('root'))
 })
