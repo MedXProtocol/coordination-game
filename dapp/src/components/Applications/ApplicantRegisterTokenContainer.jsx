@@ -3,11 +3,11 @@ import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
-import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { toastr } from '~/toastr'
 import { transactionFinders } from '~/finders/transactionFinders'
+import randomBytes from 'randombytes'
 import queryString from 'query-string'
 import {
   cacheCall,
@@ -400,8 +400,10 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             const { send, coordinationGameAddress } = this.props
             const web3 = getWeb3()
 
-            // scrap leading 0's in tokenTicker, tokenName and secret!
-            const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
+            const bytes = randomBytes(32)
+            const random = Buffer.from(bytes).toString('hex')
+            console.log(random)
+            // const random = new BN(Math.ceil(Math.random() * 1000000000 + 1000000000))
 
             const secretAsHex = web3.eth.abi.encodeParameter('uint256', this.state.secret.trim())
 
