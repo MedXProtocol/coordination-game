@@ -25,6 +25,7 @@ contract TILRegistry is Initializable {
 
   event NewListing(address owner, bytes32 listingHash);
   event ListingWithdrawn(address owner, bytes32 listingHash);
+  event ListingRemoved(bytes32 listingHash);
 
   mapping(bytes32 => Listing) public listings;
   IndexedBytes32Array.Data listingsIterator;
@@ -113,6 +114,8 @@ contract TILRegistry is Initializable {
         listingsIterator.removeValue(_listingHash);
         delete listings[_listingHash];
         coordinationGame.removeApplication(_listingHash);
+
+        emit ListingRemoved(_listingHash);
       }
 
       powerChallenge.removeChallenge(_listingHash);

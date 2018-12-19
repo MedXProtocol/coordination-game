@@ -33,6 +33,8 @@ export const GetWallet = class _GetWallet extends Component {
     })
   }
 
+  noop = () => {}
+
   render () {
     const itunesLink = 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
     const androidLink = 'https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA'
@@ -41,7 +43,7 @@ export const GetWallet = class _GetWallet extends Component {
 
     return (
       <Modal
-        closeModal={this.toggleModal}
+        closeModal={this.noop}
         modalState={this.state.modalState}
         title="Example modal title"
       >

@@ -69,6 +69,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
             nextProps.transactions[this.state.txId]
           )
             .onError((error) => {
+              if (!this.formRef) { return } // component was unmounted
               this.props.dispatchHideLoadingStatus()
               this.setState({ txHandler: null })
               toastr.transactionError(error)
@@ -77,6 +78,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               }
             })
             .onConfirmed(() => {
+              if (!this.formRef) { return } // component was unmounted
               this.setState({ txHandler: null })
               toastr.success(nextProps.confirmationMessage)
               if (this.props.onConfirmed) {
@@ -84,6 +86,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
               }
             })
             .onTxHash(() => {
+              if (!this.formRef) { return } // component was unmounted
               this.props.dispatchHideLoadingStatus()
               toastr.success(nextProps.txHashMessage)
               if (this.props.onTxHash) {
@@ -122,7 +125,7 @@ export const Web3ActionButton = connect(mapStateToProps, mapDispatchToProps)(
         const classNames = this.props.className || 'is-primary'
 
         return (
-          <form onSubmit={this.handleSend}>
+          <form onSubmit={this.handleSend} ref={(ref) => this.formRef = ref}>
             <LoadingButton
               initialText={buttonText}
               loadingText={loadingText}
