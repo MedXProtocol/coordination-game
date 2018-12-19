@@ -18,9 +18,13 @@
 @import './assets/scss/_loading.scss';
 @import './assets/scss/_loading-lines.scss';
 @import './assets/scss/_navbar.scss';
+@import './assets/scss/_pagination.scss';
 @import './assets/scss/_progress.scss';
 @import './assets/scss/_style.scss';
 @import './assets/scss/_theme.scss';
 @import './assets/scss/_tooltip.scss';
 @import './assets/scss/_react-toggle.scss';
 @import './assets/scss/_challenge-graph.scss';
+
+// These files need to come after _style.scss
+@import './assets/scss/_search.scss';
