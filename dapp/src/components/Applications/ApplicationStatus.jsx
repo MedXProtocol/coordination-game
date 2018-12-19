@@ -14,15 +14,17 @@ import { mapApplicationState } from '~/services/mapApplicationState'
 
 function mapStateToProps(state, { applicationId }) {
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
 
-  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
 
   return {
     address,
     applicationObject,
     coordinationGameAddress,
+    tilRegistryAddress,
     latestBlockTimestamp
   }
 }

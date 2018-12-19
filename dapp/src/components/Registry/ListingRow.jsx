@@ -28,7 +28,6 @@ function mapStateToProps(state, { listingHash }) {
   const TILRegistry = contractByName(state, 'TILRegistry')
   const PowerChallenge = contractByName(state, 'PowerChallenge')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
-  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
   const listing = new Listing(cacheCallValue(state, TILRegistry, 'listings', listingHash))
   const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
 
@@ -38,8 +37,7 @@ function mapStateToProps(state, { listingHash }) {
     PowerChallenge,
     listing,
     address,
-    challenge,
-    game
+    challenge
   }
 }
 
@@ -47,7 +45,6 @@ function* listingRowSaga({ TILRegistry, CoordinationGame, PowerChallenge, listin
   if (!TILRegistry || !CoordinationGame || !PowerChallenge || !listingHash) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'games', listingHash),
     cacheCall(PowerChallenge, 'challenges', listingHash)
   ])
 }
@@ -58,13 +55,8 @@ export const ListingRow = connect(mapStateToProps)(
       render () {
         const {
           listingHash,
-          listing,
-          game
+          listing
         } = this.props
-
-        const {
-          hint
-        } = game || {}
 
         const action = <button className="button is-primary is-small is-outlined">View Listing</button>
 
@@ -78,7 +70,7 @@ export const ListingRow = connect(mapStateToProps)(
               </React.Fragment>
             )}
             date=''
-            status={<HintStatus applicationId={listingHash} hint={hint} />}
+            status={<HintStatus applicationId={listingHash} hint={listing.hint} />}
             view={action}
             cssClass='list--listings-item'
             needsAttention={false}

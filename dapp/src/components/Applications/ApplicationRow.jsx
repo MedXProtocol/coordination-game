@@ -22,15 +22,17 @@ import * as routes from '~/../config/routes'
 function mapStateToProps(state, { applicationId }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
 
-  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
 
   return {
     address,
     applicationObject,
     coordinationGameAddress,
+    tilRegistryAddress,
     latestBlockTimestamp,
     latestBlockNumber
   }

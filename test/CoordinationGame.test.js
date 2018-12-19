@@ -398,26 +398,24 @@ contract('CoordinationGame', (accounts) => {
         )
 
         game = mapToGame(await coordinationGame.games(applicationId))
-        assert.equal(game.applicantSecret, secret, 'the recorded applicant secret is correct')
 
+        const wonGame = await tilRegistry.wonCoordinationGames(applicationId)
+
+        assert.equal(wonGame[3], secret, 'the recorded applicant secret is correct')
         assert.equal(await tilRegistry.approvals(applicationId), true, 'application was approved')
       })
 
       context('when successful', () => {
-
         beforeEach(async () => {
           await applicantRevealsTheirSecret()
         })
 
-        describe('removeApplication()', () => {
-          it('should completely remove the application', async () => {
-            await tilRegistry.callRemoveApplication(applicationId)
-            assert.equal(
-              false,
-              await coordinationGame.applicationExists(applicationId),
-              'application no longer exists'
-            )
-          })
+        it('should completely remove the application', async () => {
+          assert.equal(
+            false,
+            await coordinationGame.applicationExists(applicationId),
+            'application no longer exists'
+          )
         })
       })
     })
@@ -447,7 +445,7 @@ contract('CoordinationGame', (accounts) => {
 
         const game = await tilRegistry.lostCoordinationGames(applicationId)
 
-        assert.equal(game[3].toString(), rewardWei.toString(), 'registry has recorded the reward wei');
+        assert.equal(game[5].toString(), rewardWei.toString(), 'registry has recorded the reward wei');
         assert.equal(await tilRegistry.challenges(applicationId), true, 'application was challenged')
       })
     })

@@ -11,6 +11,7 @@ import { isBlank } from '~/utils/isBlank'
 export const verifierApplicationsService = function(state, startIndex, endIndex) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
 
@@ -33,7 +34,7 @@ export const verifierApplicationsService = function(state, startIndex, endIndex)
       const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
       const { createdAt, updatedAt } = game
 
-      const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+      const applicationObject = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
       const applicationState = mapApplicationState(
         address,
         applicationObject,

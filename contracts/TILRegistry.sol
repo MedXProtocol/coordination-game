@@ -14,8 +14,10 @@ contract TILRegistry is Initializable {
   using SafeMath for uint256;
 
   struct Listing {
-    address owner;          // Owner of Listing
+    address owner;  // Owner of Listing
     uint deposit;   // Number of tokens staked in the listing
+    bytes32 secret; // Token address
+    bytes hint;     // Token description
   }
 
   struct CoordinationGameEtherDeposit {
@@ -67,18 +69,29 @@ contract TILRegistry is Initializable {
     require(coordinationGame.tilRegistry() == address(this), 'CoordinationGame is bound to this registry');
   }
 
-  function applicantWonCoordinationGame(bytes32 _listingHash, address _applicant, uint256 _deposit) external onlyJobManager(msg.sender) {
-    createNewListing(_applicant, _listingHash, _deposit);
+  function applicantWonCoordinationGame(
+    bytes32 _listingHash,
+    address _applicant,
+    uint256 _deposit,
+    bytes32 _secret,
+    bytes _hint
+  ) external onlyJobManager(msg.sender) {
+    createNewListing(_applicant, _listingHash, _deposit, _secret, _hint);
     require(token.transferFrom(msg.sender, address(this), _deposit));
   }
 
   function applicantLostCoordinationGame(
     bytes32 _listingHash,
-    address _applicant, uint256 _applicantDepositTokens, uint256 _rewardWei,
-    address _challenger, uint256 _challengerDepositTokens
+    address _applicant,
+    uint256 _applicantDepositTokens,
+    bytes32 _secret,
+    bytes _hint,
+    uint256 _rewardWei,
+    address _challenger,
+    uint256 _challengerDepositTokens
   ) external payable onlyJobManager(msg.sender) {
     require(msg.value == _rewardWei, 'ether has been sent');
-    createNewListing(_applicant, _listingHash, _applicantDepositTokens);
+    createNewListing(_applicant, _listingHash, _applicantDepositTokens, _secret, _hint);
     require(token.transferFrom(msg.sender, address(this), _applicantDepositTokens.add(_challengerDepositTokens)));
     token.approve(address(powerChallenge), _applicantDepositTokens.add(_challengerDepositTokens));
     powerChallenge.startApproval(_listingHash, _applicantDepositTokens);
@@ -149,15 +162,16 @@ contract TILRegistry is Initializable {
     return reward;
   }
 
-  function createNewListing(address _applicant, bytes32 _listingHash, uint256 _deposit) internal {
+  function createNewListing(address _applicant, bytes32 _listingHash, uint256 _deposit, bytes32 _secret, bytes _hint) internal {
     require(!appWasMade(_listingHash), "application was not made");
 
     // Sets owner
-    Listing storage listing = listings[_listingHash];
-    listing.owner = _applicant;
-
-    // Sets apply stage end time
-    listing.deposit = _deposit;
+    listings[_listingHash] = Listing(
+      _applicant,
+      _deposit,
+      _secret,
+      _hint
+    );
 
     listingsIterator.pushValue(_listingHash);
     emit NewListing(_applicant, _listingHash);

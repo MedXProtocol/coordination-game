@@ -129,7 +129,7 @@ contract CoordinationGame is Ownable {
   }
 
   modifier onlyRegistry() {
-    require(msg.sender == address(tilRegistry), 'sender is registry');
+    require(msg.sender == address(tilRegistry), 'sender is self or registry');
     _;
   }
 
@@ -490,7 +490,7 @@ contract CoordinationGame is Ownable {
     tilRegistry.token().approve(address(tilRegistry), game.applicantTokenDeposit);
 
     tilRegistry.applicantWonCoordinationGame(
-      _applicationId, game.applicant, game.applicantTokenDeposit
+      _applicationId, game.applicant, game.applicantTokenDeposit, game.applicantSecret, game.hint
     );
 
     /// Return the verifier's job stake
@@ -499,6 +499,8 @@ contract CoordinationGame is Ownable {
     verification.verifier.transfer(game.applicationFeeWei);
 
     emit ApplicantWon(_applicationId);
+
+    doRemoveApplication(_applicationId);
   }
 
   function applicantLost(bytes32 _applicationId) internal {
@@ -514,8 +516,14 @@ contract CoordinationGame is Ownable {
     uint256 totalTransfer = game.applicationFeeWei.add(verification.verifierDepositWei);
 
     tilRegistry.applicantLostCoordinationGame.value(totalTransfer)(
-      _applicationId, game.applicant, game.applicantTokenDeposit, totalTransfer,
-      verification.verifier, work.jobStake()
+      _applicationId,
+      game.applicant,
+      game.applicantTokenDeposit,
+      game.applicantSecret,
+      game.hint,
+      totalTransfer,
+      verification.verifier,
+      work.jobStake()
     );
 
     emit ApplicantLost(_applicationId);
@@ -534,7 +542,11 @@ contract CoordinationGame is Ownable {
    * @notice Removes an application from the contract.  Only applications that have completed are eligible.
    * @param _applicationId The id of the application to remove
    */
-  function removeApplication(bytes32 _applicationId) external onlyRegistry onlyApplicationComplete(_applicationId) {
+  function removeApplication(bytes32 _applicationId) external onlyRegistry {
+    doRemoveApplication(_applicationId);
+  }
+
+  function doRemoveApplication(bytes32 _applicationId) internal onlyApplicationComplete(_applicationId) {
     Game storage game = games[_applicationId];
     Verification storage verification = verifications[_applicationId];
     IndexedBytes32Array.Data storage applicantIndices = applicantsApplicationIndices[game.applicant];

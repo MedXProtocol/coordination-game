@@ -1,7 +1,5 @@
+import { Listing } from '~/models/Listing'
+
 export function mapToListing (array) {
-  if (!array) return {}
-  return {
-    owner: array[0],
-    deposit: array[1]
-  }
+  return new Listing(array)
 }

@@ -72,7 +72,7 @@ function mapStateToProps(state) {
   for (let i = 0; i < applicationObjects.length; i++) {
     const applicationId = applicationObjects[i].applicationId
 
-    const application = applicationService(state, applicationId, coordinationGameAddress)
+    const application = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
     const verifierSubmittedSecret = !isBlank(application.verifiersSecret)
 
     if (!verifierSubmittedSecret && (latestBlockTimestamp < application.verifierSubmitSecretExpiresAt)) {
@@ -109,7 +109,7 @@ function* headerSaga({ address, applicationCount, applicationObjects, coordinati
   if (applicationObjects && applicationObjects.length !== 0) {
     yield all(
       applicationObjects.map(function* (applicationObject) {
-        yield applicationSaga({ coordinationGameAddress, applicationId: applicationObject.applicationId })
+        yield applicationSaga({ coordinationGameAddress, tilRegistryAddress, applicationId: applicationObject.applicationId })
       })
     )
   }

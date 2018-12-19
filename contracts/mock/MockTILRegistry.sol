@@ -8,9 +8,19 @@ contract MockTILRegistry {
     bytes32 _listingHash;
     address _applicant;
     uint256 _applicantDepositTokens;
+    bytes32 _secret;
+    bytes   _hint;
     uint256 _rewardWei;
     address _challenger;
     uint256 _challengerDepositTokens;
+  }
+
+  struct WonCoordinationGame {
+    bytes32 _listingHash;
+    address _owner;
+    uint256 _deposit;
+    bytes32 _secret;
+    bytes _hint;
   }
 
   IERC20 public token;
@@ -18,6 +28,7 @@ contract MockTILRegistry {
   mapping(bytes32 => bool) public challenges;
   mapping(bytes32 => bool) public approvals;
   mapping(bytes32 => LostCoordinationGame) public lostCoordinationGames;
+  mapping(bytes32 => WonCoordinationGame) public wonCoordinationGames;
   CoordinationGame coordinationGame;
 
   constructor(address _token) public {
@@ -29,20 +40,34 @@ contract MockTILRegistry {
     coordinationGame = _coordinationGame;
   }
 
-  function applicantWonCoordinationGame(bytes32 _listingHash, address, uint256) external {
+  function applicantWonCoordinationGame(bytes32 _listingHash, address _owner, uint256 _deposit, bytes32 _secret, bytes _hint) external {
     approvals[_listingHash] = true;
+    wonCoordinationGames[_listingHash] = WonCoordinationGame(
+      _listingHash,
+      _owner,
+      _deposit,
+      _secret,
+      _hint
+    );
   }
 
   function applicantLostCoordinationGame(
     bytes32 _listingHash,
-    address _applicant, uint256 _applicantDepositTokens, uint256 _rewardWei,
-    address _challenger, uint256 _challengerDepositTokens
+    address _applicant,
+    uint256 _applicantDepositTokens,
+    bytes32 _secret,
+    bytes   _hint,
+    uint256 _rewardWei,
+    address _challenger,
+    uint256 _challengerDepositTokens
   ) external payable {
     challenges[_listingHash] = true;
     lostCoordinationGames[_listingHash] = LostCoordinationGame(
       _listingHash,
       _applicant,
       _applicantDepositTokens,
+      _secret,
+      _hint,
       _rewardWei,
       _challenger,
       _challengerDepositTokens
