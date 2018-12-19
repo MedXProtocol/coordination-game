@@ -261,19 +261,31 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 message = (
                   <React.Fragment>
                     <p>
-                      This submission requires a verifier review it:
+                      This submission requires a verifier reviews it:
                       <br />
                       <br />
                     </p>
-                    <Web3ActionButton
-                      contractAddress={this.props.coordinationGameAddress}
-                      method='applicantRandomlySelectVerifier'
-                      args={[applicationId]}
-                      buttonText='Request Verification'
-                      loadingText='Requesting'
-                      confirmationMessage='Verification request confirmed.'
-                      txHashMessage='Verification request sent successfully -
-                        it will take a few minutes to confirm on the Ethereum network.' />
+
+                    <span
+                      data-tip={applicationState.waitingOnBlockToMine ? 'Please wait until the next block has mined' : ''}
+                      data-for={`request-verification-tooltip`}
+                    >
+                      <Web3ActionButton
+                        contractAddress={this.props.coordinationGameAddress}
+                        method='applicantRandomlySelectVerifier'
+                        args={[applicationId]}
+                        buttonText='Request Verification'
+                        loadingText='Requesting'
+                        confirmationMessage='Verification request confirmed.'
+                        disabled={applicationState.waitingOnBlockToMine}
+                        txHashMessage='Verification request sent successfully -
+                          it will take a few minutes to confirm on the Ethereum network.' />
+                      <ReactTooltip
+                        id={`request-verification-tooltip`}
+                        html={true}
+                        wrapper='span'
+                      />
+                    </span>
                   </React.Fragment>
                 )
               }

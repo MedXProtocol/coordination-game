@@ -25,6 +25,8 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     whistleblower
   } = applicationObject
 
+  const waitingOnBlockToMine = true
+
   const isApplicant = applicant === address
   const isVerifier = verifier === address
 
@@ -104,6 +106,7 @@ export function mapApplicationState (address, applicationObject, latestBlockTime
     needsNewVerifier,
     noWhistleblower,
     priority,
+    waitingOnBlockToMine,
     waitingOnVerifier,
     verifierHasChallenged,
     verifierSubmittedSecret,

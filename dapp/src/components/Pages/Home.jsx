@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import queryString from 'query-string'
 import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
-import { ApplicationsList } from '~/components/Applications/ApplicationsList'
+// import { ApplicationsList } from '~/components/Applications/ApplicationsList'
 import { PageTitle } from '~/components/Helpers/PageTitle'
 import { Footer } from '~/components/Layout/Footer'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
@@ -34,6 +34,7 @@ export const Home = connect(mapStateToProps)(
             <br />
             <br />
 
+            {/*
             <div className="is-clearfix">
               <h6 className="is-size-6">
                 All Token Submissions
@@ -43,6 +44,7 @@ export const Home = connect(mapStateToProps)(
             <ApplicationsList
               currentPage={this.props.applicationsListCurrentPage}
             />
+            */}
 
             <Footer />
           </React.Fragment>
