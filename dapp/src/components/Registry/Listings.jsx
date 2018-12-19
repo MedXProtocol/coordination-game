@@ -16,6 +16,7 @@ import { LoadingLines } from '~/components/Helpers/LoadingLines'
 import { Pagination } from '~/components/Helpers/Pagination'
 import { ListingRow } from './ListingRow'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { currentPage, pageSize }) {
@@ -25,7 +26,7 @@ function mapStateToProps(state, { currentPage, pageSize }) {
   const endIndex = startIndex + pageSize
   const listingHashes = range(startIndex, endIndex).reduce((accumulator, index) => {
     const hash = cacheCallValue(state, TILRegistry, 'listingAt', index)
-    if (hash) {
+    if (!isBlank(hash)) {
       accumulator.push(hash)
     }
     return accumulator

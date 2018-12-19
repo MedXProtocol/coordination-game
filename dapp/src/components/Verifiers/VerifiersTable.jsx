@@ -15,6 +15,7 @@ import {
 import { EtherscanLink } from '~/components/Helpers/EtherscanLink'
 import { EthAddress } from '~/components/Helpers/EthAddress'
 import { LoadingLines } from '~/components/Helpers/LoadingLines'
+import { isBlank } from '~/utils/isBlank'
 
 function mapStateToProps(state) {
   let verifierAddresses = []
@@ -32,7 +33,7 @@ function mapStateToProps(state) {
     verifierAddresses = range(verifierCount, -1).reduce((accumulator, index) => {
       const verifierAddress = cacheCallValue(state, workAddress, "getVerifierByIndex", index)
 
-      if (verifierAddress) {
+      if (!isBlank(verifierAddress)) {
         accumulator.push(verifierAddress)
       }
 
