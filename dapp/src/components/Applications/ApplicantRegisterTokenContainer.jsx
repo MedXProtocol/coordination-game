@@ -41,15 +41,23 @@ import { tickerToBytes32 } from '~/utils/tickerToBytes32'
 
 function mapStateToProps(state, { location }) {
   let verifier,
-    applicantsLastApplicationCreatedAt
+    applicantsLastApplicationCreatedAt,
+    applicationExists,
+    listingExists
 
   const applicantApplicationsTableCurrentPage = queryString.parse(location.search).applicantApplicationsTableCurrentPage
 
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const transactions = get(state, 'sagaGenesis.transactions')
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
-  const address = get(state, 'sagaGenesis.accounts[0]')
+  const query = get(state, 'search.query')
+  console.log('query', query)
+
+  const hexQuery = getWeb3().utils.asciiToHex(get(state, 'search.query'))
+
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
   const workTokenAddress = contractByName(state, 'WorkToken')
 
   const coordinationGameAllowance = cacheCallValueBigNumber(state, workTokenAddress, 'allowance', address, coordinationGameAddress)
@@ -62,6 +70,11 @@ function mapStateToProps(state, { location }) {
   const applicantsLastApplicationId = cacheCallValue(state, coordinationGameAddress, 'getApplicantsLastApplicationID', address)
   const weiPerApplication = cacheCallValueBigNumber(state, coordinationGameAddress, 'weiPerApplication')
 
+  if (hexQuery !== '0x00') { // blank / undefined is translating to 0x00 in hex
+    listingExists     = cacheCallValue(state, tilRegistryAddress, 'listingExists', hexQuery)
+    applicationExists = cacheCallValue(state, coordinationGameAddress, 'applicationExists', hexQuery)
+  }
+
   if (!isBlank(applicantsLastApplicationId)) {
     const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
     verifier = verification.verifier
@@ -73,13 +86,16 @@ function mapStateToProps(state, { location }) {
     applicantsApplicationCount,
     applicantsLastApplicationCreatedAt,
     applicantsLastApplicationId,
+    applicationExists,
     applicationStakeAmount,
     applicantApplicationsTableCurrentPage,
     approveTx,
     address,
     coordinationGameAddress,
     coordinationGameAllowance,
+    listingExists,
     networkId,
+    query,
     texBalance,
     transactions,
     verifier,
@@ -95,6 +111,9 @@ function mapDispatchToProps(dispatch) {
     },
     dispatchHideLoadingStatus: () => {
       dispatch({ type: 'HIDE_LOADING_STATUS' })
+    },
+    dispatchUpdateSearchQuery: ({ query }) => {
+      dispatch({ type: 'UPDATE_SEARCH_QUERY', query })
     }
   }
 }
@@ -185,12 +204,8 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
           }
 
           componentWillReceiveProps (nextProps) {
-            if (this.newApplication(nextProps)) {
-              this.setState({
-                applicationCreated: true
-              })
-              storeApplicationDetailsInLocalStorage(nextProps, this.state)
-            }
+            this.observeExistance(nextProps)
+            this.observeNewApplication(nextProps)
 
             this.registerWorkTokenApproveHandlers(nextProps)
             this.registerCoordinationGameStartHandler(nextProps)
@@ -200,6 +215,27 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
           componentWillUnmount () {
             if (window) {
               window.onbeforeunload = null
+            }
+          }
+
+          observeExistance = (nextProps) => {
+            if (
+                 (this.props.listingExists !== nextProps.listingExists)
+              || (this.props.applicationExists !== nextProps.applicationExists)
+            ) {
+              this.setState({
+                listingOrApplicationExists: nextProps.listingExists || nextProps.applicationExists
+              }, () => { console.log('listingOrApplicationExists', this.state.listingOrApplicationExists) })
+            }
+          }
+
+          observeNewApplication = (nextProps) => {
+            if (this.newApplication(nextProps)) {
+              this.setState({
+                applicationCreated: true
+              })
+
+              storeApplicationDetailsInLocalStorage(nextProps, this.state)
             }
           }
 
@@ -331,7 +367,8 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
           formReady = () => {
             return (
-              this.state.tokenName !== ''
+              !this.state.listingOrApplicationExists
+              && this.state.tokenName !== ''
               && this.tokenTickerValid()
               && this.state.tokenTicker !== ''
               && this.secretValid()
@@ -430,6 +467,10 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             this.setState({
               [e.target.name]: e.target.value
             })
+          }
+
+          checkExistance = (e) => {
+            this.props.dispatchUpdateSearchQuery({ query: e.target.value })
           }
 
           tokenTickerValid = () => {
@@ -601,53 +642,46 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                             placeholder="MANA"
                                             onChange={this.handleTextInputChange}
                                             value={this.state.tokenTicker}
+                                            onBlur={this.checkExistance}
                                           />
                                         </p>
                                       </div>
                                       {(!this.tokenTickerValid() && this.state.tokenTicker !== '') ? <span className="help has-text-grey">Please enter only alphanumeric characters</span> : null }
+
+                                      {this.state.listingOrApplicationExists ? <span className="help has-text-warning">An application or listing token with this ticker already exists</span> : null }
                                     </div>
 
-                                    {(this.tokenTickerValid() && this.state.tokenTicker !== '' && this.state.tokenName !== '') ?
-                                        (
-                                          <Flipped flipId="wat">
-                                            <React.Fragment>
-                                              <h6 className="is-size-6">
-                                                c. Token's Contract Address:
-                                              </h6>
-                                              <div className="field">
-                                                <div className="control">
-                                                  <input
-                                                    name="secret"
-                                                    type="text"
-                                                    maxLength="42"
-                                                    placeholder="0x..."
-                                                    className="text-input text-input--large text-input--extended-extra is-marginless"
-                                                    pattern="^(0x)?[0-9a-fA-F]{40}$"
-                                                    onChange={this.handleTextInputChange}
-                                                  />
-                                                </div>
-                                                {(!this.secretValid() && this.state.secret !== '') ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
-                                              </div>
-                                            </React.Fragment>
-                                          </Flipped>
-                                        )
-                                      : null
-                                    }
-
-                                    <Flipped flipId="coolDiv">
-                                      <div className={this.formReady() ? 'is-visible' : 'is-hidden'}>
-                                        <LoadingButton
-                                          initialText='Submit Hint &amp; Secret'
-                                          loadingText='Submitting'
-                                          isLoading={this.state.coordinationGameStartHandler}
+                                    <h6 className="is-size-6">
+                                      c. Token's Contract Address:
+                                    </h6>
+                                    <div className="field">
+                                      <div className="control">
+                                        <input
+                                          name="secret"
+                                          type="text"
+                                          maxLength="42"
+                                          placeholder="0x..."
+                                          className="text-input text-input--large text-input--extended-extra is-marginless"
+                                          pattern="^(0x)?[0-9a-fA-F]{40}$"
+                                          onChange={this.handleTextInputChange}
                                         />
-
-                                        <br />
-                                        <p className="help has-text-grey">
-                                          <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
-                                        </p>
                                       </div>
-                                    </Flipped>
+                                      {(!this.secretValid() && this.state.secret !== '') ? <span className="help has-text-grey">Please enter a valid contract address</span> : null }
+                                    </div>
+
+                                    <div>
+                                      <LoadingButton
+                                        disabled={!this.formReady()}
+                                        initialText='Submit Hint &amp; Secret'
+                                        loadingText='Submitting'
+                                        isLoading={this.state.coordinationGameStartHandler}
+                                      />
+
+                                      <br />
+                                      <p className="help has-text-grey">
+                                        <EtherFlip wei={this.props.weiPerApplication} /> to submit an application
+                                      </p>
+                                    </div>
 
                                   </form>
                                 </div>
@@ -729,7 +763,8 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
 
 
 
-
+                <br />
+                <br />
                 <div className="is-clearfix">
                   <h6 className="is-size-6">
                     Your Current Applications:
