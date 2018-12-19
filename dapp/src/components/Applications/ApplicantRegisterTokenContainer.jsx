@@ -4,7 +4,6 @@ import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
 import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
 import BN from 'bn.js'
-import { Flipper, Flipped } from 'react-flip-toolkit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { toastr } from '~/toastr'
@@ -486,7 +485,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             }
 
             return (
-              <Flipper flipKey={`${this.state.tokenName}-${this.state.tokenTicker}-${this.state.secret}-${this.state.applicationCount}`}>
+              <React.Fragment>
                 <PageTitle title='registerToken' />
                 <ScrollToTop disabled={this.props.applicantApplicationsTableCurrentPage} />
 
@@ -808,7 +807,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                 </Modal>
 
                 <Footer />
-              </Flipper>
+              </React.Fragment>
             )
           }
         }
