@@ -33,7 +33,6 @@ function mapStateToProps(state, { match }) {
   const PowerChallenge = contractByName(state, 'PowerChallenge')
   const CoordinationGame = contractByName(state, 'CoordinationGame')
   const WorkToken = contractByName(state, 'WorkToken')
-  const game = mapToGame(cacheCallValue(state, CoordinationGame, 'games', listingHash))
   const listing = new ListingModel(cacheCallValue(state, TILRegistry, 'listings', listingHash))
   const challenge = new Challenge(cacheCallValue(state, PowerChallenge, 'challenges', listingHash))
   const powerChallengeAllowance = cacheCallValueBigNumber(state, WorkToken, 'allowance', address, PowerChallenge) || new BN(0)
@@ -49,8 +48,7 @@ function mapStateToProps(state, { match }) {
     listingHash,
     listing,
     address,
-    challenge,
-    game
+    challenge
   }
 }
 
@@ -58,7 +56,6 @@ function* listingSaga({ TILRegistry, CoordinationGame, PowerChallenge, WorkToken
   if (!TILRegistry || !CoordinationGame || !PowerChallenge || !listingHash || !address || !WorkToken) { return }
   yield all([
     cacheCall(TILRegistry, 'listings', listingHash),
-    cacheCall(CoordinationGame, 'games', listingHash),
     cacheCall(PowerChallenge, 'challenges', listingHash),
     cacheCall(WorkToken, 'allowance', address, PowerChallenge),
     cacheCall(PowerChallenge, 'nextDepositAmount', listingHash)
@@ -88,16 +85,10 @@ export const Listing = connect(mapStateToProps)(
         const {
           listingHash,
           TILRegistry,
-          game,
           address,
           listing,
           challenge
         } = this.props
-
-        const {
-          hint,
-          applicantSecret
-        } = game || {}
 
         const challengeStarted = challenge.isChallenging()
 
@@ -147,9 +138,9 @@ export const Listing = connect(mapStateToProps)(
           var challengeAction = <ChallengePanel listingHash={listingHash} />
         }
 
-        const tokenName = hexHintToTokenData(hint)
+        const tokenName = hexHintToTokenData(listing.hint)
         const tokenTicker = bytes32ToTicker(listingHash)
-        const tokenAddress = bytes32ToAddress(applicantSecret)
+        const tokenAddress = bytes32ToAddress(listing.secret)
 
         return (
           <div className='column is-10-widescreen is-offset-1-widescreen paper'>

@@ -19,6 +19,9 @@ const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 contract('TILRegistry', (accounts) => {
   const [owner, user1, user2, verifier, mysteriousStranger] = accounts
 
+  const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
+  const hint = web3.toHex("BOGUS")
+
   const listingStake = new BN(web3.toWei('10', 'ether'))
   const listingHash = '0x1000000000000000000000000000000000000000000000000000000000000000'
 
@@ -103,7 +106,7 @@ contract('TILRegistry', (accounts) => {
   describe('applicantWonCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), { from: user2 })
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint, { from: user2 })
       })
     })
 
@@ -112,7 +115,7 @@ contract('TILRegistry', (accounts) => {
 
       beforeEach(async () => {
         registryTokenBalance = await workToken.balanceOf(registry.address)
-        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+        await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint)
       })
 
       it('should add an applicant', async () => {
@@ -131,7 +134,7 @@ contract('TILRegistry', (accounts) => {
   describe('applicantLostCoordinationGame()', () => {
     it('should only be called by the job manager', async () => {
       expectThrow(async () => {
-        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake.toString(), 0, 0, 0, { from: user2 })
+        await registry.applicantLostCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint, 0, 0, 0, { from: user2 })
       })
     })
 
@@ -147,7 +150,7 @@ contract('TILRegistry', (accounts) => {
         powerChallengeTokenBalance = await workToken.balanceOf(powerChallenge.address)
         powerChallengeEtherBalance = await web3.eth.getBalance(powerChallenge.address)
         await registry.applicantLostCoordinationGame(
-          listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake, {
+          listingHash, user1, listingStake.toString(), secret, hint, rewardWei, verifier, jobStake, {
             from: owner,
             value: rewardWei
           }
@@ -196,7 +199,7 @@ contract('TILRegistry', (accounts) => {
   describe('withdrawFromChallenge()', () => {
     beforeEach(async () => {
       await registry.applicantLostCoordinationGame(
-        listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake,
+        listingHash, user1, listingStake.toString(), secret, hint, rewardWei, verifier, jobStake,
         { from: owner, value: rewardWei }
       )
     })
@@ -365,7 +368,7 @@ contract('TILRegistry', (accounts) => {
 
   describe('withdrawListing()', () => {
     beforeEach(async () => {
-      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint)
     })
 
     it('should allow an applicant to withdraw their listing', async () => {
@@ -395,7 +398,7 @@ contract('TILRegistry', (accounts) => {
 
   describe('challenge()', () => {
     beforeEach(async () => {
-      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint)
     })
 
     it('should allow someone to challenge that listing', async () => {
@@ -423,7 +426,7 @@ contract('TILRegistry', (accounts) => {
   describe('totalChallengeReward()', () => {
     beforeEach(async () => {
       await registry.applicantLostCoordinationGame(
-        listingHash, user1, listingStake.toString(), rewardWei, verifier, jobStake,
+        listingHash, user1, listingStake.toString(), secret, hint, rewardWei, verifier, jobStake,
         { from: owner, value: rewardWei }
       )
       await workToken.mint(user1, web3.toWei('10000', 'ether'))
@@ -473,7 +476,7 @@ contract('TILRegistry', (accounts) => {
 
   describe('listingExists()', () => {
     it('should exist', async () => {
-      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString())
+      await registry.applicantWonCoordinationGame(listingHash, user1, listingStake.toString(), secret, hint)
       const exists = await registry.listingExists(listingHash)
       assert.equal(exists, true, 'does not exist')
     })

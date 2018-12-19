@@ -37,6 +37,7 @@ function mapStateToProps(state, { currentPage, pageSize }) {
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
 
   const applicationCount = cacheCallValueInt(state, coordinationGameAddress, 'getApplicantsApplicationCount', address)
   const verifierTimeoutInSeconds = cacheCallValueInt(state, coordinationGameAddress, 'verifierTimeoutInSeconds')
@@ -61,13 +62,8 @@ function mapStateToProps(state, { currentPage, pageSize }) {
       const { createdAt, updatedAt } = game
 
       if (!isBlank(applicationId) && createdAt) {
-        const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
-        const applicationState = mapApplicationState(
-          address,
-          applicationObject,
-          latestBlockNumber,
-          latestBlockTimestamp
-        )
+        const applicationObject = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
+        const applicationState = mapApplicationState(address, applicationObject, latestBlockNumber, latestBlockTimestamp)
 
         const { verifierSubmittedAt } = applicationObject
         const { priority } = applicationState

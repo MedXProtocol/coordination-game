@@ -28,7 +28,8 @@ export function mapApplicationState(
     verifier,
     verifiersSecret,
     verifierSubmitSecretExpiresAt,
-    whistleblower
+    whistleblower,
+    listing
   } = applicationObject
 
   const waitingOnBlockToMine = (latestBlockNumber < parseInt(randomBlockNumber, 10))
@@ -38,7 +39,9 @@ export function mapApplicationState(
 
   const verifierSubmittedSecret = !isBlank(verifiersSecret)
   const applicantRevealedSecret = !isBlank(applicantsSecret)
-  const applicantWon = (applicantsSecret === verifiersSecret)
+  const secretsMatch = verifierSubmittedSecret && applicantRevealedSecret && applicantsSecret === verifiersSecret
+  const isListed = !isBlank(listing.owner)
+  const applicantWon = (isListed || secretsMatch)
 
   const needsAVerifier = isBlank(verifier)
   const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)
@@ -60,11 +63,6 @@ export function mapApplicationState(
   )
 
   const noWhistleblower = isBlank(whistleblower)
-  const canWhistleblow = (
-    !isApplicant &&
-    !verifierSubmittedSecret
-    && noWhistleblower
-  )
 
   const canVerify = (
     isVerifier &&
@@ -81,9 +79,16 @@ export function mapApplicationState(
   )
 
   const isComplete = (
+    isListed ||
     applicantRevealedSecret ||
     verifierHasChallenged ||
     !noWhistleblower
+  )
+
+  const canWhistleblow = (
+    !isApplicant &&
+    !verifierSubmittedSecret &&
+    !isComplete
   )
 
   // priority can be from 1 to 5, and states how important this (5 is highest importance)

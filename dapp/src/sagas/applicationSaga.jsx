@@ -3,11 +3,13 @@ import { cacheCall } from 'saga-genesis'
 
 export const applicationSaga = function*({
   coordinationGameAddress,
-  applicationId
+  applicationId,
+  tilRegistryAddress
 }) {
-  if (!coordinationGameAddress || !applicationId) { return }
+  if (!coordinationGameAddress || !tilRegistryAddress || !applicationId) { return }
 
   yield all([
+    cacheCall(tilRegistryAddress, 'listings', applicationId),
     cacheCall(coordinationGameAddress, 'games', applicationId),
     cacheCall(coordinationGameAddress, 'verifications', applicationId),
     cacheCall(coordinationGameAddress, 'applicantRevealTimeoutInSeconds'),

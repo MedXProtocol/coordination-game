@@ -34,15 +34,17 @@ function mapStateToProps(state, { match }) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const coordinationGameAddress = contractByName(state, 'CoordinationGame')
+  const tilRegistryAddress = contractByName(state, 'TILRegistry')
   const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const latestBlockNumber = get(state, 'sagaGenesis.block.latestBlock.number')
   const transactions = get(state, 'sagaGenesis.transactions')
 
-  const applicationObject = applicationService(state, applicationId, coordinationGameAddress)
+  const applicationObject = applicationService(state, applicationId, coordinationGameAddress, tilRegistryAddress)
 
   return {
     address,
     coordinationGameAddress,
+    tilRegistryAddress,
     applicationId,
     applicationObject,
     latestBlockTimestamp,
@@ -172,12 +174,33 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
               verifierSubmitSecretExpiresAt
             } = applicationObject
 
-            const updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={`@`} />
+            if (createdAt) {
+              var createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
+              var updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
+              var updatedAtDisplay = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} delimiter={`@`} />
+              var loadingOrUpdatedAtTimestamp = updatedAtDisplay
 
-            const createdAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={createdAt} />
-            const updatedAtTooltip = <RecordTimestampDisplay timeInUtcSecondsSinceEpoch={updatedAt} />
+              var lastUpdatedTime =
+                <React.Fragment>
+                  <br />
+                  <br />
 
-            const loadingOrUpdatedAtTimestamp = updatedAtDisplay
+                  <p className="is-size-7 has-text-grey-lighter">
+                    <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+                        ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+                        Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+                      <ReactTooltip
+                        html={true}
+                        effect='solid'
+                        place={'top'}
+                        wrapper='span'
+                      />
+                      <strong>Last Updated:</strong> {loadingOrUpdatedAtTimestamp}
+                    </span>
+                  </p>
+                </React.Fragment>
+            }
+
 
             const applicationState = mapApplicationState(
               address,
@@ -416,22 +439,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
                 <br />
                 {whistleblowButton}
-                <br />
-                <br />
-
-                <p className="is-size-7 has-text-grey-lighter">
-                  <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
-                      ${ReactDOMServer.renderToStaticMarkup(<br/>)}
-                      Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
-                    <ReactTooltip
-                      html={true}
-                      effect='solid'
-                      place={'top'}
-                      wrapper='span'
-                    />
-                    <strong>Last Updated:</strong> {loadingOrUpdatedAtTimestamp}
-                  </span>
-                </p>
+                {lastUpdatedTime}
               </div>
             )
           }

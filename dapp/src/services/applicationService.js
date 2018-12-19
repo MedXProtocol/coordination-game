@@ -3,11 +3,12 @@ import { get } from 'lodash'
 import { retrieveApplicationDetailsFromLocalStorage } from '~/services/retrieveApplicationDetailsFromLocalStorage'
 import { hexHintToTokenData } from '~/utils/hexHintToTokenData'
 import { isBlank } from '~/utils/isBlank'
+import { mapToListing } from '~/services/mapToListing'
 import { mapToGame } from '~/services/mapToGame'
 import { mapToVerification } from '~/services/mapToVerification'
 import { bytes32ToTicker } from '~/utils/bytes32ToTicker'
 
-export const applicationService = function(state, applicationId, coordinationGameAddress) {
+export const applicationService = function(state, applicationId, coordinationGameAddress, tilRegistryAddress) {
   let applicationObject,
     applicantRevealExpiresAt,
     verifierSubmitSecretExpiresAt,
@@ -16,6 +17,7 @@ export const applicationService = function(state, applicationId, coordinationGam
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
+  const listing = mapToListing(cacheCallValue(state, tilRegistryAddress, 'listings', applicationId))
   const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicationId))
   const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifications', applicationId))
 
@@ -32,7 +34,7 @@ export const applicationService = function(state, applicationId, coordinationGam
     verifierChallengedAt
   } = verification
 
-  const hexHint = game.hint
+  const hexHint = isBlank(game.hint) ? listing.hint : game.hint
   // Parse and convert the generic hint field to our DApp-specific data
   const tokenName = hexHintToTokenData(hexHint)
   const tokenTicker = bytes32ToTicker(applicationId)
@@ -66,6 +68,7 @@ export const applicationService = function(state, applicationId, coordinationGam
     verifierSubmittedAt,
     verifierSubmitSecretExpiresAt,
     whistleblower,
+    listing,
     updatedAt
   }
 
