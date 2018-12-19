@@ -140,9 +140,10 @@ export const Listing = connect(mapStateToProps)(
             <p className="is-size-7 has-text-grey-lighter">
               This listing was challenged and removed.
             </p>
-        } else if (challengeStarted) {
-          listingTitle = 'This listing has been challenged'
-
+        } else {
+          if (challengeStarted) {
+            listingTitle = 'This listing has been challenged'
+          }
           var challengeAction = <ChallengePanel listingHash={listingHash} />
         }
 
