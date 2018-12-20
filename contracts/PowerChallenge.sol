@@ -188,9 +188,7 @@ contract PowerChallenge is Ownable {
   }
 
   function close(bytes32 _id) internal onlyTimedOut(_id) {
-    Challenge storage challengeStore = challenges[_id];
-    challengeStore.state = winningState(_id);
-    challengeStore.updatedAt = block.timestamp;
+    challenges[_id].state = winningState(_id);
 
     emit Closed(_id);
   }
