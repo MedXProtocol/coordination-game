@@ -111,7 +111,7 @@ export const ApplicationRow = connect(mapStateToProps)(
           if (tokenName && tokenTicker) {
             statusText = (
               <React.Fragment>
-                Token Name: <strong>{tokenName}</strong>
+                Project Name: <strong>{tokenName}</strong>
                 <br />
                 Token Ticker: <strong>{tokenTicker}</strong>
               </React.Fragment>
