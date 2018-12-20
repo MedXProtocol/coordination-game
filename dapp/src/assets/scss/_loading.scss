@@ -8,7 +8,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 998;
+  z-index: 2998;
 }
 
 .loading--overlay.anim-fade-in {
@@ -26,7 +26,12 @@
   bottom: 0;
   right: 0;
   text-align: center;
-  z-index: 999;
+  width: 90%;
+  z-index: 2999;
+
+  @media screen and (max-width: 520px) {
+    top: -120px;
+  }
 }
 
 .loading p {

@@ -407,8 +407,9 @@ header {
   @media screen and (max-width: 1088px) {
     padding-top: 3rem;
   }
-  @media screen and (max-width: 500px) {
-    padding: 3rem 2rem;
+
+  @media screen and (max-width: 520px) {
+    padding: 3rem 1.5rem;
   }
 }
 
@@ -423,6 +424,10 @@ header {
   padding-top: calc(0.5em - 1px);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+
+  @media screen and (max-width: 520px) {
+    font-size: 0.75rem;
+  }
 }
 
 .button.is-light:hover,
@@ -566,6 +571,11 @@ header {
 
 .footer {
   background-color: inherit;
+
+  @media screen and (max-width: 769px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .section--footer {
@@ -581,7 +591,7 @@ header {
 }
 
 .column {
-  @media screen and (max-width: 500px) {
+  @media screen and (max-width: 520px) {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
@@ -599,6 +609,11 @@ header {
   @media screen and (max-width: 769px) {
     display: inline-block;
   }
+}
+
+.level {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .level-item {
@@ -670,6 +685,7 @@ header {
   grid-template-areas:
     ". a a ."
     ". a a .";
+  padding: 1rem;
 }
 
 .blank-state--inner {
@@ -677,6 +693,7 @@ header {
   grid-area: a;
   justify-self: center;
   margin-top: -10px;
+  text-align: center;
 }
 
 .icon-circle {
@@ -751,7 +768,7 @@ header {
   width: 320px;
 
   @media screen and (max-width: 768px) {
-    width: 194px;
+    width: 144px;
   }
 }
 
@@ -759,7 +776,7 @@ header {
   width: 320px;
 
   @media screen and (max-width: 768px) {
-    width: 194px;
+    width: 144px;
   }
 }
 
@@ -771,6 +788,10 @@ header {
 .is-addon {
   font-size: 0.875rem;
   padding: 2px 20px;
+
+  @media screen and (max-width: 768px) {
+    font-size: 0.6rem;
+  }
 }
 
 .text-input--filename-button {
@@ -778,6 +799,10 @@ header {
   border-top: none;
   border-top-right-radius: 0;
   height: 42px;
+
+  @media screen and (max-width: 768px) {
+    height: 37px;
+  }
 }
 
 .button.text-input--filename-button.is-primary.is-outlined:hover,
@@ -933,7 +958,7 @@ header {
   right: -60px;
   transform: scale3d(1, 1, 1);
   transition: all 0.1s ease-in-out;
-  z-index: 80;
+  z-index: 9;
 
   @media (max-width: 1280px) {
     top: 0;
@@ -941,8 +966,8 @@ header {
   }
 
   @media (max-width: 1088px) {
-    top: -6px;
-    right: -6px;
+    top: -30px;
+    right: -10px;
   }
 }
 

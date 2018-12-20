@@ -6,6 +6,7 @@ const debug = require('debug')('custom-provider-web3')
 export const customProviderWeb3 = function(networkId) {
   if (customWeb3) {
     debug("using memoized")
+    console.warn('using memoized')
 
     return customWeb3
   }
@@ -20,6 +21,7 @@ export const customProviderWeb3 = function(networkId) {
   } else if (networkId === 4) {
     customProvider = process.env.REACT_APP_RINKEBY_PROVIDER_URL
   } else if (networkId === 1234) {
+    console.warn('using local')
     customProvider = process.env.REACT_APP_LOCALHOST_PROVIDER_URL
   } else {
     customProvider = window.web3.currentProvider

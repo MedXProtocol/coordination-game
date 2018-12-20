@@ -6,7 +6,7 @@
   font-size: .75rem;
   margin-bottom: 0;
   padding: 0;
-  z-index: 3;
+  z-index: 10;
 
   transition: all 1s ease-in-out;
 
@@ -73,7 +73,7 @@
 }
 
 .navbar.is-fixed-top.navbar--row-one {
-  z-index: 8;
+  z-index: 11;
 
   &:before {
     opacity: 0;
