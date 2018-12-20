@@ -27,7 +27,7 @@ contract TILRegistry is Initializable {
 
   event NewListing(address owner, bytes32 listingHash);
   event ListingWithdrawn(address owner, bytes32 listingHash);
-  event ListingRemoved(bytes32 listingHash);
+  event ListingRemoved(address owner, bytes32 listingHash);
 
   mapping(bytes32 => Listing) public listings;
   IndexedBytes32Array.Data listingsIterator;
@@ -37,6 +37,8 @@ contract TILRegistry is Initializable {
   PowerChallenge powerChallenge;
   mapping(bytes32 => CoordinationGameEtherDeposit) public deposits;
   CoordinationGame coordinationGame;
+
+  mapping (address => IndexedBytes32Array.Data) ownerListingIndices;
 
   modifier onlyJobManager(address _address) {
     require(roles.hasRole(_address, uint(TILRoles.All.JOB_MANAGER)), "only the job manager");
@@ -109,30 +111,39 @@ contract TILRegistry is Initializable {
   }
 
   function withdrawFromChallenge(bytes32 _listingHash) external {
-    Listing storage _listing = listings[_listingHash];
+    Listing storage listing = listings[_listingHash];
+
     // First withdraw for the registry
     if (powerChallenge.totalWithdrawal(_listingHash, this) > 0) {
       // We make sure to reward the listing owner with the winnings, less their deposit
-      uint256 ownerReward = powerChallenge.withdraw(_listingHash) - _listing.deposit;
+      uint256 ownerReward = powerChallenge.withdraw(_listingHash) - listing.deposit;
       if (ownerReward > 0) {
-        token.transfer(_listing.owner, ownerReward);
+        token.transfer(listing.owner, ownerReward);
       }
     }
     // Withdraw normally from the challenge
     powerChallenge.withdrawFor(_listingHash, msg.sender);
     withdrawFromLostCoordinationGame(_listingHash, msg.sender);
     PowerChallenge.State state = powerChallenge.getState(_listingHash);
+
     if (powerChallenge.isComplete(_listingHash)) {
       if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
-        listingsIterator.removeValue(_listingHash);
-        delete listings[_listingHash];
-        coordinationGame.removeApplication(_listingHash);
-
-        emit ListingRemoved(_listingHash);
+        removeListing(listing, _listingHash);
       }
 
       powerChallenge.removeChallenge(_listingHash);
     }
+  }
+
+  function removeListing(Listing _listing, bytes32 _listingHash) internal {
+    listingsIterator.removeValue(_listingHash);
+    delete listings[_listingHash];
+
+    coordinationGame.removeApplication(_listingHash);
+
+    ownerListingIndices[_listing.owner].removeValue(_listingHash);
+
+    emit ListingRemoved(_listing.owner, _listingHash);
   }
 
   function withdrawFromLostCoordinationGame(bytes32 _listingHash, address _beneficiary) internal {
@@ -173,6 +184,8 @@ contract TILRegistry is Initializable {
       _hint
     );
 
+    ownerListingIndices[_applicant].pushValue(_listingHash);
+
     listingsIterator.pushValue(_listingHash);
     emit NewListing(_applicant, _listingHash);
   }
@@ -181,9 +194,11 @@ contract TILRegistry is Initializable {
     Listing storage listing = listings[_listingHash];
     require(msg.sender == listing.owner, 'sender is the listing owner');
     require(listingsIterator.hasValue(_listingHash), 'listing is listingsIterator');
-    listingsIterator.removeValue(_listingHash);
+
     uint256 stake = listing.deposit;
-    delete listings[_listingHash];
+
+    removeListing(listing, _listingHash);
+
     token.transfer(msg.sender, stake);
 
     emit ListingWithdrawn(msg.sender, _listingHash);
@@ -214,4 +229,25 @@ contract TILRegistry is Initializable {
   function listingExists(bytes32 _listingHash) public view returns (bool) {
     return (listings[_listingHash].owner != address(0));
   }
+
+  /**
+   * @notice Returns the number of listings are owned by the address
+   * @param _owner The owner of the listings
+   */
+  function getOwnerListingsCount(address _owner) external view returns (uint256) {
+    return ownerListingIndices[_owner].length();
+  }
+
+  /**
+   * @notice Return owner's listing hash of a registry listing. (ie. the listing id for
+   * their fourth listing can be looked up by passing the owner address and '3'.
+   * @param _owner The owner of the listing
+   * @param _index The index of the listing
+   */
+  function getOwnerListingAtIndex(address _owner, uint256 _index)
+    external view returns (bytes32)
+  {
+    return ownerListingIndices[_owner].valueAtIndex(_index);
+  }
+
 }
