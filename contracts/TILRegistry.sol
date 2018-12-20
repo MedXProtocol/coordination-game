@@ -129,6 +129,8 @@ contract TILRegistry is Initializable {
     if (powerChallenge.isComplete(_listingHash)) {
       if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
         removeListing(listing, _listingHash);
+
+        emit ListingRemoved(listing.owner, _listingHash);
       }
 
       powerChallenge.removeChallenge(_listingHash);
@@ -142,8 +144,6 @@ contract TILRegistry is Initializable {
     coordinationGame.removeApplication(_listingHash);
 
     ownerListingIndices[_listing.owner].removeValue(_listingHash);
-
-    emit ListingRemoved(_listing.owner, _listingHash);
   }
 
   function withdrawFromLostCoordinationGame(bytes32 _listingHash, address _beneficiary) internal {

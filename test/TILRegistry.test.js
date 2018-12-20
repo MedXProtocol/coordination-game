@@ -380,10 +380,7 @@ contract('TILRegistry', (accounts) => {
 
       debug(`withdrawListing() tx.logs: `, tx.logs)
 
-      const ListingRemoved = tx.logs[0]
-      assert.equal(ListingRemoved.event, 'ListingRemoved')
-
-      const ListingWithdrawn = tx.logs[1]
+      const ListingWithdrawn = tx.logs[0]
       assert.equal(ListingWithdrawn.event, 'ListingWithdrawn')
 
       expect(ListingWithdrawn.args).to.deep.equal({

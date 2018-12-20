@@ -7,6 +7,7 @@ import { PageTitle } from '~/components/Helpers/PageTitle'
 import { Footer } from '~/components/Layout/Footer'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { Listings } from '~/components/Registry/Listings'
+import { OwnerListings } from '~/components/Registry/OwnerListings'
 import * as routes from '~/../config/routes'
 
 function mapStateToProps(state, { location }) {
@@ -46,7 +47,6 @@ export const Home = connect(mapStateToProps)(
             </div>
             <Listings
               currentPage={this.props.listingsCurrentPage}
-              pageParamName='listingsCurrentPage'
             />
 
             <br />
@@ -62,9 +62,8 @@ export const Home = connect(mapStateToProps)(
                 </div>
               </div>
             </div>
-            <Listings
+            <OwnerListings
               currentPage={this.props.ownerListingsCurrentPage}
-              pageParamName='ownerListingsCurrentPage'
             />
 
             <Footer />

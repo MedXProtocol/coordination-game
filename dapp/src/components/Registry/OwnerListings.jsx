@@ -22,12 +22,12 @@ import * as routes from '~/../config/routes'
 function mapStateToProps(state, { currentPage, pageSize }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const tilRegistryAddress = contractByName(state, 'TILRegistry')
-  const listingsCount = cacheCallValue(state, tilRegistryAddress, 'listingsLength')
+  const listingsCount = cacheCallValue(state, tilRegistryAddress, 'getOwnerListingsCount', address)
 
   const startIndex = (parseInt(currentPage, 10) - 1) * pageSize
   const endIndex = startIndex + pageSize
   const listingHashes = range(startIndex, endIndex).reduce((accumulator, index) => {
-    const hash = cacheCallValue(state, tilRegistryAddress, 'listingAt', index)
+    const hash = cacheCallValue(state, tilRegistryAddress, 'getOwnerListingAtIndex', address, index)
 
     if (!isBlank(hash)) {
       accumulator.push(hash)
@@ -45,21 +45,21 @@ function mapStateToProps(state, { currentPage, pageSize }) {
   }
 }
 
-function* listingsSaga({ tilRegistryAddress, startIndex, endIndex }) {
-  if (!tilRegistryAddress) { return }
+function* ownerListingsSaga({ tilRegistryAddress, startIndex, endIndex, address }) {
+  if (!address || !tilRegistryAddress) { return }
 
-  const listingsCount = yield cacheCall(tilRegistryAddress, 'listingsLength')
+  const listingsCount = yield cacheCall(tilRegistryAddress, 'getOwnerListingsCount', address)
 
   yield all(range(startIndex, endIndex).map(function* (index) {
     if (index < listingsCount) {
-      yield cacheCall(tilRegistryAddress, 'listingAt', index)
+      yield cacheCall(tilRegistryAddress, 'getOwnerListingAtIndex', address, index)
     }
   }))
 }
 
-export const Listings = connect(mapStateToProps)(
-  withSaga(listingsSaga)(
-    class _Listings extends Component {
+export const OwnerListings = connect(mapStateToProps)(
+  withSaga(ownerListingsSaga)(
+    class _OwnerListings extends Component {
 
       constructor(props) {
         super(props)
@@ -98,7 +98,7 @@ export const Listings = connect(mapStateToProps)(
             <div className="blank-state">
               <div className="blank-state--inner has-text-grey-lighter">
                 <span className="is-size-6">
-                  You have no listings yet -&nbsp;
+                  There are no listings -&nbsp;
                   <Link to={routes.REGISTER_TOKEN}>
                     Register a Token Now
                   </Link>
@@ -126,7 +126,7 @@ export const Listings = connect(mapStateToProps)(
                 totalPages={totalPages}
                 linkTo={(number, location) => formatPageRouteQueryParams(
                   routes.REGISTRY,
-                  'listingsCurrentPage',
+                  'ownerListingsCurrentPage',
                   number,
                   location
                 )}
@@ -139,12 +139,12 @@ export const Listings = connect(mapStateToProps)(
   )
 )
 
-Listings.propTypes = {
+OwnerListings.propTypes = {
   pageSize: PropTypes.number.isRequired,
   currentPage: PropTypes.any
 }
 
-Listings.defaultProps = {
+OwnerListings.defaultProps = {
   pageSize: 5,
   currentPage: 1
 }
