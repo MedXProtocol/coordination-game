@@ -382,6 +382,7 @@ contract('TILRegistry', (accounts) => {
 
       const ListingWithdrawn = tx.logs[0]
       assert.equal(ListingWithdrawn.event, 'ListingWithdrawn')
+
       expect(ListingWithdrawn.args).to.deep.equal({
         owner: user1,
         listingHash: listingHash
