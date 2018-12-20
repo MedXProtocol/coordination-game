@@ -98,7 +98,7 @@ export const Listings = connect(mapStateToProps)(
             <div className="blank-state">
               <div className="blank-state--inner has-text-grey-lighter">
                 <span className="is-size-6">
-                  You have no listings yet -&nbsp;
+                  Currently no listings in the registry -&nbsp;
                   <Link to={routes.REGISTER_TOKEN}>
                     Register a Token Now
                   </Link>
