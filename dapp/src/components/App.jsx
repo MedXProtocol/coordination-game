@@ -58,7 +58,7 @@ function mapStateToProps (state) {
 }
 
 function* appSaga({ workTokenAddress, address }) {
-  if (!workTokenAddress) { return }
+  if (!address || !workTokenAddress) { return }
 
   yield cacheCall(workTokenAddress, 'isMinter', address)
 }
