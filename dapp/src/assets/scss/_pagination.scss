@@ -1,17 +1,17 @@
 .pagination-previous,
 .pagination-next,
 .pagination-link {
-  border-color: lighten($brand-info, 20%);
+  border-color: lighten($background-color, 20%);
   padding-bottom: 3px;
 }
 
 .pagination-link.is-current {
-  background-color: lighten($brand-info, 20%);
-  border-color: lighten($brand-info, 20%);
+  background-color: lighten($background-color, 20%);
+  border-color: lighten($background-color, 20%);
 }
 
 .pagination-link:hover {
-  background-color: lighten($brand-info, 10%);
-  border-color: lighten($brand-info, 20%);
+  background-color: lighten($background-color, 10%);
+  border-color: lighten($background-color, 5%);
   color: white;
 }

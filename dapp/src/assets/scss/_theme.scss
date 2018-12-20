@@ -724,9 +724,18 @@ html.html-light,
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
   }
 
+  .pagination-previous,
+  .pagination-next,
+  .pagination-link {
+    background-color: white;
+    border-color: lighten($accent-color-1--light, 30%);
+    color: lighten($accent-color-1--light, 20%);
+  }
+
   .pagination-link.is-current {
     background-color: lighten($accent-color-1--light, 30%);
     border-color: lighten($accent-color-1--light, 20%);
+    color: white;
   }
 
   .pagination-link:hover {

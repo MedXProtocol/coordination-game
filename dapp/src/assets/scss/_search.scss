@@ -5,11 +5,7 @@
   left: 0;
   top: 0;
   z-index: 2001;
-  width: 360px;
-
-  @media (max-width: 768px) {
-    width: 330px;
-  }
+  width: 330px;
 }
 
 .search--form__active {
@@ -17,6 +13,10 @@
   top: 20px;
   transform: scale3d(3, 3, 3);
   transition: all 0.7s ease-out;
+
+  @media (max-width: 1520px) {
+    left: 160px;
+  }
 
   @media (max-width: 1088px) {
     left: 25%;
@@ -68,7 +68,8 @@
   border-bottom-width: 0;
   border-bottom-left-radius: 2px;
   border-top-left-radius: 2px;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
+  height: 34px;
   max-width: 100%;
   position: relative;
   padding: 0.4rem 0.5rem 0.27rem 0.5rem;
@@ -113,8 +114,8 @@
 .search--form .delete {
   position: absolute;
   opacity: 0;
-  top: 2px;
-  right: -25px;
+  top: 4px;
+  right: -28px;
   width: 1rem;
   height: 1rem;
   max-width: initial;
@@ -123,16 +124,6 @@
 
 .search--form__active .delete {
   opacity: 1;
-
-  @media (max-width: 1088px) {
-    right: 5.5%;
-    top: 120%;
-  }
-
-  @media (max-width: 768px) {
-    right: 5.5%;
-    top: 120%;
-  }
 }
 
 .autocomplete-list {
