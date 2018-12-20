@@ -13,3 +13,4 @@ lambda/functions/*
 
 zos.dev*.json
 .zos.session
+.zos.lock
