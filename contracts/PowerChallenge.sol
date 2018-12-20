@@ -24,7 +24,7 @@ contract PowerChallenge is Ownable {
     uint256 round;
     uint256 challengeTotal;
     uint256 approveTotal;
-    uint256 updatedAt;
+    uint256 lastRoundOccurredAt;
     State state;
     mapping(address => uint256) challengeDeposits;
     mapping(address => uint256) approveDeposits;
@@ -188,9 +188,7 @@ contract PowerChallenge is Ownable {
   }
 
   function close(bytes32 _id) internal onlyTimedOut(_id) {
-    Challenge storage challengeStore = challenges[_id];
-    challengeStore.state = winningState(_id);
-    challengeStore.updatedAt = block.timestamp;
+    challenges[_id].state = winningState(_id);
 
     emit Closed(_id);
   }
@@ -277,13 +275,13 @@ contract PowerChallenge is Ownable {
     uint256 deposit = nextDepositAmount(_id);
     require(token.transferFrom(_payer, address(this), deposit), 'transferred tokens');
     challengeStore.round = challengeStore.round.add(1);
-    challengeStore.updatedAt = block.timestamp;
+    challengeStore.lastRoundOccurredAt = block.timestamp;
     return deposit;
   }
 
   function isTimedOut(bytes32 _id) public view returns (bool) {
     Challenge storage challengeStore = challenges[_id];
-    return block.timestamp >= challengeStore.updatedAt.add(timeout);
+    return block.timestamp >= challengeStore.lastRoundOccurredAt.add(timeout);
   }
 
   function setTimeout(uint256 _timeout) external onlyOwner {
@@ -353,6 +351,6 @@ contract PowerChallenge is Ownable {
   }
 
   function challengeExists(bytes32 _id) public view returns (bool) {
-    return (challenges[_id].updatedAt != 0);
+    return (challenges[_id].lastRoundOccurredAt != 0);
   }
 }

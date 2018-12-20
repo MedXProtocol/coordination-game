@@ -543,7 +543,9 @@ contract CoordinationGame is Ownable {
    * @param _applicationId The id of the application to remove
    */
   function removeApplication(bytes32 _applicationId) external onlyRegistry {
-    doRemoveApplication(_applicationId);
+    if (applicationExists(_applicationId)) {
+      doRemoveApplication(_applicationId);
+    }
   }
 
   function doRemoveApplication(bytes32 _applicationId) internal onlyApplicationComplete(_applicationId) {

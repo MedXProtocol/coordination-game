@@ -94,6 +94,11 @@
   height: 100%;
 
   transition: all .4s ease-in-out;
+
+  @media screen and (max-width: 1520px) {
+    top: 95%;
+    width: 100px;
+  }
 }
 
 .list--item:hover .list--icon {
@@ -101,6 +106,15 @@
   left: 84%;
   font-size: 5rem;
   transform: rotate(90deg);
+
+  @media screen and (max-width: 1520px) {
+    left: 99%;
+  }
+
+  @media screen and (max-width: 768px) {
+    left: 90%;
+    top: 80%;
+  }
 }
 
 .list--item__id {
@@ -111,27 +125,36 @@
   font-size: 1.75rem;
   text-align: left;
 
+  @media screen and (max-width: 1520px) {
+    grid-column: span 9;
+    padding: 1rem 0 2rem;
+  }
+
   @media screen and (max-width: 1200px) {
-    grid-column: span 2;
-    text-align: left;
+    grid-column: span 8;
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 4;
+    grid-column: span 6;
   }
 }
 
 .list--item__date {
   grid-column: span 2;
 
-  @media screen and (max-width: 1200px) {
+  @media screen and (max-width: 1520px) {
     grid-column: span 3;
+    padding-top: 0;
+  }
+
+  @media screen and (max-width: 1200px) {
+    grid-column: span 4;
     padding-top: 0.75rem;
     text-align: right;
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 8;
+    grid-column: span 6;
   }
 }
 
@@ -139,13 +162,17 @@
   grid-column: span 5;
   padding-top: 0.75rem;
 
+  @media screen and (max-width: 1520px) {
+    grid-column: span 6;
+    padding-bottom: 0.75rem;
+  }
+
   @media screen and (max-width: 1200px) {
-    grid-column: span 7;
+    grid-column: span 6;
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 12;
-    word-break: break-all;
+    grid-column: span 6;
   }
 }
 
@@ -154,14 +181,19 @@
   padding-top: 1rem;
   text-align: right;
 
+  @media screen and (max-width: 1520px) {
+    grid-column: span 6;
+    text-align: right;
+  }
+
   @media screen and (max-width: 1200px) {
-    grid-column: span 12;
+    grid-column: span 6;
     text-align: right;
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 12;
-    text-align: left;
+    grid-column: span 6;
+    text-align: right;
   }
 }
 
@@ -313,6 +345,7 @@
 
 .list--application-item .list--item__timer {
   background-color: darken($background-color, 4%);
+  // background-color: pink;
   border-radius: 0.5rem;
   color: darken($text-color, 10%);
   display: block;

@@ -162,7 +162,7 @@ export const VerifierStake = connect(mapStateToProps)(
                 : (
                     <React.Fragment>
                       <p>
-                        Stake TEX to begin receiving submissions (minimum 1000 TEX)
+                        Stake TEX to begin receiving submissions (required 1000 TEX)
                       </p>
                       <Progress
                         disabled={needsTEXMessage}

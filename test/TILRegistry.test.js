@@ -17,7 +17,7 @@ const mapToChallenge = require('./helpers/mapToChallenge')
 const isApproxEqualBN = require('./helpers/isApproxEqualBN')
 
 contract('TILRegistry', (accounts) => {
-  const [owner, user1, user2, verifier, mysteriousStranger] = accounts
+  const [owner, user1, user2, verifier, mysteriousStranger, stranger2] = accounts
 
   const secret = leftPadHexString(web3.toHex(new BN(600)), 32)
   const hint = web3.toHex("BOGUS")
@@ -49,6 +49,8 @@ contract('TILRegistry', (accounts) => {
     await roles.setRole(coordinationGame.address, 1, true) // coordinationgame is the job manager
     work = await Work.new()
     await workToken.mint(mysteriousStranger, web3.toWei('10000', 'ether'))
+    await workToken.mint(stranger2, web3.toWei('10000', 'ether'))
+    await workToken.mint(user1, web3.toWei('10000', 'ether'))
     await work.init(
       owner,
       workToken.address,
@@ -407,7 +409,8 @@ contract('TILRegistry', (accounts) => {
 
     it('should allow someone to challenge that listing', async () => {
       const strangerStartingBalance = await workToken.balanceOf(mysteriousStranger)
-      await workToken.approve(registry.address, listingStake.mul(new BN(2)).toString(), { from: mysteriousStranger })
+      const firstChallenge = new BN(web3.toWei('30', 'ether'))
+      await workToken.approve(registry.address, firstChallenge.toString(), { from: mysteriousStranger })
       debug(`starting challenge....`)
       await registry.challenge(listingHash, { from: mysteriousStranger })
 
@@ -423,6 +426,58 @@ contract('TILRegistry', (accounts) => {
         strangerFinishingBalance.toString(),
         strangerStartingBalance.add(listingStake).toString(),
         'challenger has received stake'
+      )
+    })
+
+    it('should allow multiple people to withdraw from a challenge', async () => {
+      const strangerStartingBalance = await workToken.balanceOf(mysteriousStranger)
+      const stranger2StartingBalance = await workToken.balanceOf(stranger2)
+
+      debug(`starting first challenge...`)
+
+      const firstChallenge = new BN(web3.toWei('20', 'ether'))
+      await workToken.approve(registry.address, firstChallenge.toString(), { from: mysteriousStranger })
+      await registry.challenge(listingHash, { from: mysteriousStranger })
+
+      debug(`starting first approval...`)
+
+      const firstApproval = new BN(web3.toWei('30', 'ether'))
+      assert.equal(firstApproval.toString(), (await powerChallenge.nextDepositAmount(listingHash)).toString())
+      assert.equal(false, await powerChallenge.isTimedOut(listingHash))
+      assert.equal(true, await powerChallenge.isChallenging(listingHash))
+      await workToken.approve(powerChallenge.address, firstApproval.toString(), { from: user1 })
+      await powerChallenge.approve(listingHash, { from: user1 })
+
+      const secondChallenge = firstApproval.mul(new BN(2))
+      assert.equal(secondChallenge.toString(), (await powerChallenge.nextDepositAmount(listingHash)).toString())
+      assert.equal(false, await powerChallenge.isTimedOut(listingHash))
+      assert.equal(true, await powerChallenge.isChallenging(listingHash))
+
+      debug(`starting second challenge...`)
+
+      await workToken.approve(powerChallenge.address, secondChallenge.toString(), { from: stranger2 })
+      await powerChallenge.challenge(listingHash, { from: stranger2 })
+      await powerChallenge.setTimeout(0)
+
+      debug(`starting withdrawal from challenge...`)
+
+      assert.equal(await powerChallenge.isTimedOut(listingHash), true)
+      await registry.withdrawFromChallenge(listingHash, { from: mysteriousStranger })
+      await registry.withdrawFromChallenge(listingHash, { from: stranger2 })
+
+      const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)
+      const stranger2FinishingBalance = await workToken.balanceOf(stranger2)
+
+      assert.equal(
+        strangerFinishingBalance.toString(),
+        strangerStartingBalance.add(web3.toWei('10', 'ether')).toString(),
+        'first challenger has received stake'
+      )
+
+      assert.equal(
+        stranger2FinishingBalance.toString(),
+        stranger2StartingBalance.add(web3.toWei('30', 'ether')).toString(),
+        'second challenger has received stake'
       )
     })
   })

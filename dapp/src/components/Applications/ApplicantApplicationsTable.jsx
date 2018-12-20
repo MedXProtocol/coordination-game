@@ -153,6 +153,8 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                 applicationObject.createdAt
               )
 
+              appObject.random = appObject.random.toString()
+
               data.push(appObject)
             })
 

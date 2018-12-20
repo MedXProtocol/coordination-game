@@ -500,7 +500,9 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                 </h1>
 
                 <p>
-                  <strong>Information you need:</strong> Token Name, Symbol and Contract owner address. <br className="is-hidden-touch" />Register a token in less than a minute.
+                  <strong>Information you need:</strong> Project Name, Symbol and Contract owner address.
+                  <br /><strong>Payment Needed:</strong> 10 TEX and $25 USD equivalent of ETH.
+                  <br />Register a token in less than a minute.
                 </p>
 
                 <Progress
@@ -554,7 +556,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                 <div className='columns'>
                                   <div className='column is-8'>
                                     <p>
-                                      The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token. If your application is successful, half of this amount will be returned to you.
+                                      The Trustless Incentivized List contract needs your permission to put down a deposit of <strong>{displayWeiToEther(this.props.applicationStakeAmount)} TEX</strong> to register a token.
                                     </p>
                                   </div>
                                 </div>
@@ -603,7 +605,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                 <div className="multistep-form--step-child">
                                   <form onSubmit={this.handleSubmit} className="form--submit-token">
                                     <h6 className="is-size-6">
-                                      a. Token Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
+                                      a. Project Name <span className="has-text-grey-dark">(capitalize only first letter of every word):</span>
                                     </h6>
 
                                     <div className="field">
