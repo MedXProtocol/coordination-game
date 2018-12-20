@@ -15,6 +15,7 @@ import { LoadingLines } from '~/components/Helpers/LoadingLines'
 import { PageTitle } from '~/components/Helpers/PageTitle'
 import { Pagination } from '~/components/Helpers/Pagination'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
+import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
 import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
@@ -56,87 +57,89 @@ function* challengesSaga({ PowerChallenge, startIndex, endIndex }) {
   )
 }
 
-export const ChallengesTable = connect(mapStateToProps)(withSaga(challengesSaga)(
-  class _ChallengesTable extends PureComponent {
-    renderChallengeRows(ids) {
-      return ids.map((challengeId) => {
-        return (
-          <ListingRow
-            listingHash={challengeId}
-            key={`applications-list-application-row-${challengeId}`}
-          />
-        )
-      })
-    }
-
-    render () {
-      let noChallenges,
-        loadingLines,
-        challengeRows
-
-      const { ids, challengeCount } = this.props
-      const loading = challengeCount === undefined
-
-      if (loading) {
-        loadingLines = (
-          <div className="blank-state">
-            <div className="blank-state--inner has-text-grey">
-              <LoadingLines visible={true} />
-            </div>
-          </div>
-        )
-      } else if (!ids.length) {
-        noChallenges = (
-          <div className="blank-state">
-            <div className="blank-state--inner has-text-grey">
-              <span className="is-size-6">There are currently no challenges to vote on.</span>
-            </div>
-          </div>
-        )
-      } else {
-        challengeRows = (
-          this.renderChallengeRows(ids)
-        )
+export const ChallengesTable = AnimatedWrapper(
+  connect(mapStateToProps)(withSaga(challengesSaga)(
+    class _ChallengesTable extends PureComponent {
+      renderChallengeRows(ids) {
+        return ids.map((challengeId) => {
+          return (
+            <ListingRow
+              listingHash={challengeId}
+              key={`applications-list-application-row-${challengeId}`}
+            />
+          )
+        })
       }
 
-      return (
-        <React.Fragment>
-          <ScrollToTop
-            disabled={this.props.currentPage}
-          />
-          <PageTitle title='challenges' />
+      render () {
+        let noChallenges,
+          loadingLines,
+          challengeRows
 
-          <h1 className="is-size-1">
-            Challenges
-          </h1>
+        const { ids, challengeCount } = this.props
+        const loading = challengeCount === undefined
 
-          <p>
-            A challenge occurs when a submission in the Registry is refuted, or an applicant's submission is rejected. You can vote in favour of or against a challenge using TEX tokens.
-          </p>
-
-          <hr />
-
-          <div className='list--container'>
-            {loadingLines}
-            {noChallenges}
-
-            <div className="list">
-              {challengeRows}
+        if (loading) {
+          loadingLines = (
+            <div className="blank-state">
+              <div className="blank-state--inner has-text-grey">
+                <LoadingLines visible={true} />
+              </div>
             </div>
+          )
+        } else if (!ids.length) {
+          noChallenges = (
+            <div className="blank-state">
+              <div className="blank-state--inner has-text-grey">
+                <span className="is-size-6">There are currently no challenges to vote on.</span>
+              </div>
+            </div>
+          )
+        } else {
+          challengeRows = (
+            this.renderChallengeRows(ids)
+          )
+        }
 
-            <Pagination
-              currentPage={parseInt(this.props.currentPage, 10)}
-              totalPages={this.props.totalPages}
-              linkTo={(number, location) => formatPageRouteQueryParams(
-                routes.CHALLENGES,
-                'challengesCurrentPage',
-                number,
-                location
-              )}
+        return (
+          <React.Fragment>
+            <ScrollToTop
+              disabled={this.props.currentPage}
             />
-          </div>
-        </React.Fragment>
-      )
+            <PageTitle title='challenges' />
+
+            <h1 className="is-size-1">
+              Challenges
+            </h1>
+
+            <p>
+              A challenge occurs when a submission in the Registry is refuted, or an applicant's submission is rejected. You can vote in favour of or against a challenge using TEX tokens.
+            </p>
+
+            <hr />
+
+            <div className='list--container'>
+              {loadingLines}
+              {noChallenges}
+
+              <div className="list">
+                {challengeRows}
+              </div>
+
+              <Pagination
+                currentPage={parseInt(this.props.currentPage, 10)}
+                totalPages={this.props.totalPages}
+                linkTo={(number, location) => formatPageRouteQueryParams(
+                  routes.CHALLENGES,
+                  'challengesCurrentPage',
+                  number,
+                  location
+                )}
+              />
+            </div>
+          </React.Fragment>
+        )
+      }
     }
-  }
+  )
 ))

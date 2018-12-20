@@ -75,6 +75,10 @@
       animation-fill-mode: forwards;
     }
   }
+
+  @media screen and (max-width: 500px) {
+    font-size: 11px;
+  }
 }
 
 @keyframes pulse {
