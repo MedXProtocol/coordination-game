@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import { CSVLink } from 'react-csv'
+import { CSVLink, CSVDownload } from 'react-csv'
 
 // This is a bugfix for react-csv which can be removed when they fix it upstream:
 class PropDataUpdatedCSVLink extends CSVLink {
@@ -27,6 +27,20 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
     })
   }
 
+	handleMountCsv = (e) => {
+		this.setState({
+			mountCsvDownload: true
+		})
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (this.state.mountCsvDownload) {
+			this.setState({
+				mountCsvDownload: false
+			})
+		}
+	}
+
   render () {
     return (
       <div
@@ -46,19 +60,26 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
             />
           </div>
           <div className="control">
-            <PropDataUpdatedCSVLink
-              data={this.props.csvData}
-              headers={[
-                { label: "Application ID#", key: "applicationId" },
-                { label: "Hint", key: "hint" },
-                { label: "Random #", key: "random" },
-                { label: "Secret", key: "secret" }
-              ]}
-              filename={this.state.filename}
+            <button
+							onClick={this.handleMountCsv}
               className="button is-primary is-addon text-input--filename-button"
             >
               Download
-            </PropDataUpdatedCSVLink>
+            </button>
+
+						{this.state.mountCsvDownload
+							? <CSVDownload
+									data={this.props.csvData}
+									headers={[
+										{ label: "Application ID#", key: "applicationId" },
+										{ label: "Hint", key: "hint" },
+										{ label: "Random #", key: "random" },
+										{ label: "Secret", key: "secret" }
+									]}
+									filename={this.state.filename}
+								/>
+							: null
+						}
           </div>
         </div>
       </div>
