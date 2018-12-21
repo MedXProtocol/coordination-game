@@ -1,11 +1,11 @@
 {
   "contracts": {
     "PowerChallenge": {
-      "address": "0x4fbac9f8013f8ae425aabd023d6d209c678c13ac",
-      "constructorCode": "608060405234801561001057600080fd5b506139f2806100206000396000f300",
-      "bodyBytecodeHash": "5ca28f3e76edcc8dbcc1efdad75834c1aa05bbceb62aa55299f561891dd67bb6",
-      "localBytecodeHash": "26136e8fc84491c36a452fc42f01ff954bcecd720a0c05d15b67e5bd5ffd9f32",
-      "deployedBytecodeHash": "26136e8fc84491c36a452fc42f01ff954bcecd720a0c05d15b67e5bd5ffd9f32",
+      "address": "0x876a680289dc2f223e59bc7583a7f6316bb6c1a3",
+      "constructorCode": "608060405234801561001057600080fd5b506140c6806100206000396000f300",
+      "bodyBytecodeHash": "ff50c568fa334e1357853916bc9204bbf1a8a65db8e3616cc4b2ab365c48c083",
+      "localBytecodeHash": "1df0632981092c8f3118caab490e8297ae6b8140722d4b656bc2f7d7468bb7ff",
+      "deployedBytecodeHash": "1df0632981092c8f3118caab490e8297ae6b8140722d4b656bc2f7d7468bb7ff",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -36,57 +36,57 @@
           "members": [
             {
               "label": "id",
-              "astId": 2563,
+              "astId": 2564,
               "type": "t_bytes32",
-              "src": "595:10:10"
+              "src": "610:10:10"
             },
             {
               "label": "round",
-              "astId": 2565,
+              "astId": 2566,
               "type": "t_uint256",
-              "src": "611:13:10"
+              "src": "626:13:10"
             },
             {
               "label": "challengeTotal",
-              "astId": 2567,
+              "astId": 2568,
               "type": "t_uint256",
-              "src": "630:22:10"
+              "src": "645:22:10"
             },
             {
               "label": "approveTotal",
-              "astId": 2569,
+              "astId": 2570,
               "type": "t_uint256",
-              "src": "658:20:10"
+              "src": "673:20:10"
             },
             {
               "label": "lastRoundOccurredAt",
-              "astId": 2571,
+              "astId": 2572,
               "type": "t_uint256",
-              "src": "684:27:10"
+              "src": "699:27:10"
             },
             {
               "label": "state",
-              "astId": 2573,
+              "astId": 2574,
               "type": "t_enum<PowerChallenge.State>",
-              "src": "717:11:10"
+              "src": "732:11:10"
             },
             {
               "label": "challengeDeposits",
-              "astId": 2577,
+              "astId": 2578,
               "type": "t_mapping<t_uint256>",
-              "src": "734:45:10"
+              "src": "749:45:10"
             },
             {
               "label": "approveDeposits",
-              "astId": 2581,
+              "astId": 2582,
               "type": "t_mapping<t_uint256>",
-              "src": "785:43:10"
+              "src": "800:43:10"
             },
             {
               "label": "totalWithdrawn",
-              "astId": 2583,
+              "astId": 2584,
               "type": "t_uint256",
-              "src": "834:22:10"
+              "src": "849:22:10"
             }
           ]
         },
@@ -176,6 +176,12 @@
           "valueType": "t_struct<IndexedAddressArray.Data>",
           "label": "mapping(key => IndexedAddressArray.Data)",
           "kind": "mapping"
+        },
+        "t_mapping<t_struct<IndexedBytes32Array.Data>>": {
+          "id": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+          "valueType": "t_struct<IndexedBytes32Array.Data>",
+          "label": "mapping(key => IndexedBytes32Array.Data)",
+          "kind": "mapping"
         }
       },
       "storage": [
@@ -183,7 +189,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 6699,
+          "astId": 6974,
           "type": "t_bool",
           "src": "749:24:26"
         },
@@ -191,7 +197,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 6701,
+          "astId": 6976,
           "type": "t_bool",
           "src": "868:25:26"
         },
@@ -199,7 +205,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 6750,
+          "astId": 7025,
           "type": "t_array:50<t_uint256>",
           "src": "1883:29:26"
         },
@@ -207,7 +213,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 6001,
+          "astId": 6276,
           "type": "t_address",
           "src": "301:22:21"
         },
@@ -215,7 +221,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 6106,
+          "astId": 6381,
           "type": "t_array:50<t_uint256>",
           "src": "2057:29:21"
         },
@@ -223,49 +229,65 @@
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "token",
-          "astId": 2612,
+          "astId": 2613,
           "type": "t_address",
-          "src": "1072:19:10"
+          "src": "1087:19:10"
         },
         {
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "timeout",
-          "astId": 2614,
+          "astId": 2615,
           "type": "t_uint256",
-          "src": "1095:22:10"
+          "src": "1110:22:10"
         },
         {
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "challenges",
-          "astId": 2618,
+          "astId": 2619,
           "type": "t_mapping<t_struct<PowerChallenge.Challenge>>",
-          "src": "1121:47:10"
+          "src": "1136:47:10"
         },
         {
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "challengeIterator",
-          "astId": 2620,
+          "astId": 2621,
           "type": "t_struct<IndexedBytes32Array.Data>",
-          "src": "1172:42:10"
+          "src": "1187:42:10"
         },
         {
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "challengers",
-          "astId": 2624,
+          "astId": 2625,
           "type": "t_mapping<t_struct<IndexedAddressArray.Data>>",
-          "src": "1219:56:10"
+          "src": "1234:56:10"
         },
         {
           "contract": "PowerChallenge",
           "path": "contracts/PowerChallenge.sol",
           "label": "approvers",
-          "astId": 2628,
+          "astId": 2629,
           "type": "t_mapping<t_struct<IndexedAddressArray.Data>>",
-          "src": "1279:54:10"
+          "src": "1294:54:10"
+        },
+        {
+          "contract": "PowerChallenge",
+          "path": "contracts/PowerChallenge.sol",
+          "label": "userChallenges",
+          "astId": 2633,
+          "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+          "src": "1352:59:10"
+        },
+        {
+          "contract": "PowerChallenge",
+          "path": "contracts/PowerChallenge.sol",
+          "label": "roles",
+          "astId": 2635,
+          "type": "t_address",
+          "src": "1416:21:10"
         }
       ],
       "warnings": {
@@ -279,36 +301,69 @@
             "contract": "PowerChallenge",
             "path": "contracts/PowerChallenge.sol",
             "label": "challenges",
-            "astId": 2618,
+            "astId": 2619,
             "type": "t_mapping<t_struct<PowerChallenge.Challenge>>",
-            "src": "1121:47:10"
+            "src": "1136:47:10"
           },
           {
             "contract": "PowerChallenge",
             "path": "contracts/PowerChallenge.sol",
             "label": "challengeIterator",
-            "astId": 2620,
+            "astId": 2621,
             "type": "t_struct<IndexedBytes32Array.Data>",
-            "src": "1172:42:10"
+            "src": "1187:42:10"
           },
           {
             "contract": "PowerChallenge",
             "path": "contracts/PowerChallenge.sol",
             "label": "challengers",
-            "astId": 2624,
+            "astId": 2625,
             "type": "t_mapping<t_struct<IndexedAddressArray.Data>>",
-            "src": "1219:56:10"
+            "src": "1234:56:10"
           },
           {
             "contract": "PowerChallenge",
             "path": "contracts/PowerChallenge.sol",
             "label": "approvers",
-            "astId": 2628,
+            "astId": 2629,
             "type": "t_mapping<t_struct<IndexedAddressArray.Data>>",
-            "src": "1279:54:10"
+            "src": "1294:54:10"
+          },
+          {
+            "contract": "PowerChallenge",
+            "path": "contracts/PowerChallenge.sol",
+            "label": "userChallenges",
+            "astId": 2633,
+            "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+            "src": "1352:59:10"
           }
         ],
-        "storageDiff": []
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 11,
+              "contract": "PowerChallenge",
+              "path": "contracts/PowerChallenge.sol",
+              "label": "userChallenges",
+              "astId": 2633,
+              "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+              "src": "1352:59:10"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 12,
+              "contract": "PowerChallenge",
+              "path": "contracts/PowerChallenge.sol",
+              "label": "roles",
+              "astId": 2635,
+              "type": "t_address",
+              "src": "1416:21:10"
+            }
+          }
+        ]
       }
     },
     "TILRoles": {
@@ -1414,11 +1469,11 @@
       }
     },
     "TILRegistry": {
-      "address": "0xdbad4975110d3202f9e89f24c13f02f631010327",
-      "constructorCode": "608060405234801561001057600080fd5b5061415a806100206000396000f300",
-      "bodyBytecodeHash": "14726d4e582c3af7720b9cc5cd1112294d165bcd86e0f6c450396d7b08fd3cbe",
-      "localBytecodeHash": "b1937e588d4e81bc8486d8599b4f739d518e3cd66d12df9dc8eb905046991efb",
-      "deployedBytecodeHash": "b1937e588d4e81bc8486d8599b4f739d518e3cd66d12df9dc8eb905046991efb",
+      "address": "0x43a57b0687be696eadffa60faa5bfd0e4a02f5c0",
+      "constructorCode": "608060405234801561001057600080fd5b50614396806100206000396000f300",
+      "bodyBytecodeHash": "ae550707dc7d4e2496b786f5113941cc867dcdbdb8d874079c1d3d9aa8c86903",
+      "localBytecodeHash": "c4265c6f97a98de7a720eb3122e5d3433cd6551ae3385d8979f7f747e4d89aea",
+      "deployedBytecodeHash": "c4265c6f97a98de7a720eb3122e5d3433cd6551ae3385d8979f7f747e4d89aea",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1444,25 +1499,25 @@
           "members": [
             {
               "label": "owner",
-              "astId": 3969,
+              "astId": 4141,
               "type": "t_address",
               "src": "486:13:11"
             },
             {
               "label": "deposit",
-              "astId": 3971,
+              "astId": 4143,
               "type": "t_uint256",
               "src": "526:12:11"
             },
             {
               "label": "secret",
-              "astId": 3973,
+              "astId": 4145,
               "type": "t_bytes32",
               "src": "588:14:11"
             },
             {
               "label": "hint",
-              "astId": 3975,
+              "astId": 4147,
               "type": "t_bytes",
               "src": "625:10:11"
             }
@@ -1528,13 +1583,13 @@
           "members": [
             {
               "label": "verifier",
-              "astId": 3978,
+              "astId": 4150,
               "type": "t_address",
               "src": "711:16:11"
             },
             {
               "label": "rewardWei",
-              "astId": 3980,
+              "astId": 4152,
               "type": "t_uint256",
               "src": "733:17:11"
             }
@@ -1558,7 +1613,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 6760,
+          "astId": 6974,
           "type": "t_bool",
           "src": "749:24:26"
         },
@@ -1566,7 +1621,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 6762,
+          "astId": 6976,
           "type": "t_bool",
           "src": "868:25:26"
         },
@@ -1574,7 +1629,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 6811,
+          "astId": 7025,
           "type": "t_array:50<t_uint256>",
           "src": "1883:29:26"
         },
@@ -1582,7 +1637,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "listings",
-          "astId": 4003,
+          "astId": 4175,
           "type": "t_mapping<t_struct<TILRegistry.Listing>>",
           "src": "938:43:11"
         },
@@ -1590,7 +1645,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "listingsIterator",
-          "astId": 4005,
+          "astId": 4177,
           "type": "t_struct<IndexedBytes32Array.Data>",
           "src": "985:41:11"
         },
@@ -1598,7 +1653,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "token",
-          "astId": 4007,
+          "astId": 4179,
           "type": "t_address",
           "src": "1030:19:11"
         },
@@ -1606,7 +1661,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "roles",
-          "astId": 4009,
+          "astId": 4181,
           "type": "t_address",
           "src": "1053:14:11"
         },
@@ -1614,7 +1669,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "work",
-          "astId": 4011,
+          "astId": 4183,
           "type": "t_address",
           "src": "1071:9:11"
         },
@@ -1622,7 +1677,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "powerChallenge",
-          "astId": 4013,
+          "astId": 4185,
           "type": "t_address",
           "src": "1084:29:11"
         },
@@ -1630,7 +1685,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "deposits",
-          "astId": 4017,
+          "astId": 4189,
           "type": "t_mapping<t_struct<TILRegistry.CoordinationGameEtherDeposit>>",
           "src": "1117:64:11"
         },
@@ -1638,7 +1693,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "coordinationGame",
-          "astId": 4019,
+          "astId": 4191,
           "type": "t_address",
           "src": "1185:33:11"
         },
@@ -1646,7 +1701,7 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "ownerListingIndices",
-          "astId": 4023,
+          "astId": 4195,
           "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
           "src": "1223:65:11"
         }
@@ -1662,7 +1717,7 @@
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "listings",
-            "astId": 4003,
+            "astId": 4175,
             "type": "t_mapping<t_struct<TILRegistry.Listing>>",
             "src": "938:43:11"
           },
@@ -1670,7 +1725,7 @@
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "listingsIterator",
-            "astId": 4005,
+            "astId": 4177,
             "type": "t_struct<IndexedBytes32Array.Data>",
             "src": "985:41:11"
           },
@@ -1678,7 +1733,7 @@
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "deposits",
-            "astId": 4017,
+            "astId": 4189,
             "type": "t_mapping<t_struct<TILRegistry.CoordinationGameEtherDeposit>>",
             "src": "1117:64:11"
           },
@@ -1686,25 +1741,12 @@
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "ownerListingIndices",
-            "astId": 4023,
+            "astId": 4195,
             "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
             "src": "1223:65:11"
           }
         ],
-        "storageDiff": [
-          {
-            "action": "append",
-            "updated": {
-              "index": 11,
-              "contract": "TILRegistry",
-              "path": "contracts/TILRegistry.sol",
-              "label": "ownerListingIndices",
-              "astId": 4023,
-              "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
-              "src": "1223:65:11"
-            }
-          }
-        ]
+        "storageDiff": []
       }
     }
   },
@@ -1727,63 +1769,63 @@
   "proxies": {
     "coordination-game/Migrations": [
       {
-        "address": "0xf8043b663964ebb4e888f56fbf6bed535ae479c8",
+        "address": "0x5781661b4647fb69a27f89d807ceb068d9d15acf",
         "version": "0.2.0",
         "implementation": "0x06a985bf670a6789e2f6547f09aa14c261954e44"
       }
     ],
     "coordination-game/TILRoles": [
       {
-        "address": "0x523378f7cf5de562d84100af6c7e2fd03d2b0a9d",
+        "address": "0x9659084ed225de330f1370ecb3a31a405b33f21b",
         "version": "0.2.0",
         "implementation": "0x9596005f4e3fe44cc2b0653c132a8857db1c3d63"
       }
     ],
     "coordination-game/WorkToken": [
       {
-        "address": "0x0b090b76c8ce3050a980872bd794561a6ba60b5a",
+        "address": "0xbb61dfa87f480188145f2e1f1e4b2f047141f462",
         "version": "0.2.0",
         "implementation": "0x41e854443bc358377cb38a13835e73c8ed9f69e2"
       }
     ],
     "coordination-game/Work": [
       {
-        "address": "0xf3b3ecc2e2b3ff082f5e1c32b74a7bc2766a6459",
+        "address": "0x43f896698a29dbbcd8e200bb0fe2d28fcfad01b6",
         "version": "0.2.0",
         "implementation": "0xe00acd950de4ae40951d13d30e5421bebaad6588"
       }
     ],
     "coordination-game/EtherPriceFeed": [
       {
-        "address": "0x24abfda10c850e886454c9311d11e0ec4dde0f66",
+        "address": "0x2080cbd9dc9b0e5487b3b8017c5ed7f4ff559fc6",
         "version": "0.2.0",
         "implementation": "0x07813b582f6c558be870977f14f1dcf80e0dee64"
       }
     ],
     "coordination-game/PowerChallenge": [
       {
-        "address": "0xc28954cc4188da16438945f0135dc02f1b826abf",
+        "address": "0x079587fd2f97258f821aee9594bed194ea01d70f",
         "version": "0.2.0",
-        "implementation": "0x4fbac9f8013f8ae425aabd023d6d209c678c13ac"
+        "implementation": "0x876a680289dc2f223e59bc7583a7f6316bb6c1a3"
       }
     ],
     "coordination-game/TILRegistry": [
       {
-        "address": "0x619c180b7eb9f4915ba713c4ab9b724a2a13552a",
+        "address": "0x6fd73d3f6526bde5004969e5606e4cc2bb1acff6",
         "version": "0.2.0",
-        "implementation": "0xdbad4975110d3202f9e89f24c13f02f631010327"
+        "implementation": "0x43a57b0687be696eadffa60faa5bfd0e4a02f5c0"
       }
     ],
     "coordination-game/BetaFaucet": [
       {
-        "address": "0xb94a53e9d8e54a9a927e41c15c75ea6cbe948c79",
+        "address": "0xd6b4744f0a41ea7a12abaee5e02093c6f43e5194",
         "version": "0.2.0",
         "implementation": "0x347abab7ea216026dcd9c4037ec6bd7c8f62d218"
       }
     ],
     "coordination-game/CoordinationGame": [
       {
-        "address": "0x8242546772199ec1e9530b7526ff5b41877891b1",
+        "address": "0x57a75759aab35bf3c214011b3d308b32b2a4563e",
         "version": "0.2.0",
         "implementation": "0x305fdbd3006970618ac243d448fcddf9203c0a49"
       }
