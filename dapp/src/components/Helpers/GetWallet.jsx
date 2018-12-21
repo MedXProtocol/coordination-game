@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Modal } from '~/components/Modals/Modal'
 import DownloadMetamaskButtonImg from '~/assets/img/button--download-metamask.png'
-import GetCoinbaseWalletImg from '~/assets/img/getCoinbaseWallet.svg'
-import GetOperaImg from '~/assets/img/getOpera.svg'
+import getCoinbaseImg from '~/assets/img/getCoinbase.png'
+import getOperaImg from '~/assets/img/getOpera.png'
 import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
 
 export const GetWallet = class _GetWallet extends Component {
@@ -39,17 +39,17 @@ export const GetWallet = class _GetWallet extends Component {
   render () {
     let mobileBrowser
 
-    if (getMobileOperatingSystem() === 'iOS') {
+    if (getMobileOperatingSystem() === 'Android') {
       mobileBrowser = {
-        img: <GetCoinbaseWalletImg />,
-        name: 'Coinbase Wallet',
-        link: 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
+        img: <img src={getOperaImg} alt="Get the Opera Browser" />,
+        name: 'Opera',
+        link: 'https://play.google.com/store/apps/details?id=com.opera.browser'
       }
     } else {
       mobileBrowser = {
-        img: <GetOperaImg />,
-        name: 'Opera',
-        link: 'https://play.google.com/store/apps/details?id=com.opera.browser'
+        img: <img src={getCoinbaseImg} alt="Get Coinbase Wallet" />,
+        name: 'Coinbase Wallet',
+        link: 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
       }
     }
 
