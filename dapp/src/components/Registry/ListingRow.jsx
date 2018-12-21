@@ -56,7 +56,7 @@ export const ListingRow = connect(mapStateToProps)(
           listing
         } = this.props
 
-        const action = <button className="button is-primary is-small is-outlined">View Listing</button>
+        const action = <button className="button is-info is-small is-outlined">View Listing</button>
 
         return (
           <ApplicationListPresenter

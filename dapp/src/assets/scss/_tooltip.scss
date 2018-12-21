@@ -3,6 +3,13 @@
   line-height: 1.7;
   padding: 1rem;
   text-align: center;
+
+  @media screen and (max-width: 520px) {
+    font-size: 0.6rem;
+    max-width: 300px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
 }
 
 .__react_component_tooltip.type-dark {

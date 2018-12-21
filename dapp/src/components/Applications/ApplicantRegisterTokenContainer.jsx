@@ -500,9 +500,9 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                 </h1>
 
                 <p>
-                  <strong>Information you need:</strong> Project Name, Symbol and Contract owner address.
+                  Register a token in less than a minute.
+                  <br /><strong>Information you need:</strong> Project Name, Symbol and Contract owner address.
                   <br /><strong>Payment Needed:</strong> 10 TEX and $25 USD equivalent of ETH.
-                  <br />Register a token in less than a minute.
                 </p>
 
                 <Progress

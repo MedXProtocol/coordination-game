@@ -168,7 +168,7 @@ export const Listing = connect(mapStateToProps)(
             <div className="columns">
               <div className="column is-6">
                 <h5 className="is-size-5 has-text-grey-lighter">
-                  Token Name:
+                  Project Name:
                 </h5>
                 <h3 className="is-size-3 has-text-grey">
                   {tokenName}

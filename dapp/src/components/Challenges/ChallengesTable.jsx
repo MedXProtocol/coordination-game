@@ -3,8 +3,9 @@ import { PageTitle } from '~/components/Helpers/PageTitle'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { AllChallengesList } from '~/components/Challenges/AllChallengesList'
 import { UserChallengesList } from '~/components/Challenges/UserChallengesList'
+import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
 
-export const ChallengesTable = function ({
+export const ChallengesTable = AnimatedWrapper(function ({
   match
 }) {
 
@@ -45,4 +46,4 @@ export const ChallengesTable = function ({
 
     </React.Fragment>
   )
-}
+})

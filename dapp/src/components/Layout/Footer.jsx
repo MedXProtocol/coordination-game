@@ -85,7 +85,8 @@ export const Footer = class _Footer extends Component {
             <div className='columns'>
               <div className='column is-half-tablet is-offset-one-quarter'>
                 <p className="text-footer">
-                  &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
+                  &copy; Copyright 2018 Medical Exchange Protocols.
+                  <br />All Rights Reserved.
                 </p>
                 <br />
                 <br />

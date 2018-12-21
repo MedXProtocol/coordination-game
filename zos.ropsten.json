@@ -1414,11 +1414,11 @@
       }
     },
     "TILRegistry": {
-      "address": "0x6f2d1c038eb683d3bcd61cccca4f4ab5deda86fc",
-      "constructorCode": "608060405234801561001057600080fd5b50613cfb806100206000396000f300",
-      "bodyBytecodeHash": "6fc69dd7100af7e26dd6366cd030b855fa7059c22c893040104caed97489dac0",
-      "localBytecodeHash": "94f5935c454ae407ebfa43331c8a8b04774f379410b65993b50c8c9a312d1a2b",
-      "deployedBytecodeHash": "94f5935c454ae407ebfa43331c8a8b04774f379410b65993b50c8c9a312d1a2b",
+      "address": "0xdbad4975110d3202f9e89f24c13f02f631010327",
+      "constructorCode": "608060405234801561001057600080fd5b5061415a806100206000396000f300",
+      "bodyBytecodeHash": "14726d4e582c3af7720b9cc5cd1112294d165bcd86e0f6c450396d7b08fd3cbe",
+      "localBytecodeHash": "b1937e588d4e81bc8486d8599b4f739d518e3cd66d12df9dc8eb905046991efb",
+      "deployedBytecodeHash": "b1937e588d4e81bc8486d8599b4f739d518e3cd66d12df9dc8eb905046991efb",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1444,25 +1444,25 @@
           "members": [
             {
               "label": "owner",
-              "astId": 3976,
+              "astId": 3969,
               "type": "t_address",
               "src": "486:13:11"
             },
             {
               "label": "deposit",
-              "astId": 3978,
+              "astId": 3971,
               "type": "t_uint256",
               "src": "526:12:11"
             },
             {
               "label": "secret",
-              "astId": 3980,
+              "astId": 3973,
               "type": "t_bytes32",
               "src": "588:14:11"
             },
             {
               "label": "hint",
-              "astId": 3982,
+              "astId": 3975,
               "type": "t_bytes",
               "src": "625:10:11"
             }
@@ -1496,13 +1496,13 @@
           "members": [
             {
               "label": "values",
-              "astId": 2309,
+              "astId": 2314,
               "type": "t_array:dyn<t_bytes32>",
               "src": "77:16:8"
             },
             {
               "label": "indices",
-              "astId": 2313,
+              "astId": 2318,
               "type": "t_mapping<t_uint256>",
               "src": "99:35:8"
             }
@@ -1528,13 +1528,13 @@
           "members": [
             {
               "label": "verifier",
-              "astId": 3985,
+              "astId": 3978,
               "type": "t_address",
               "src": "711:16:11"
             },
             {
               "label": "rewardWei",
-              "astId": 3987,
+              "astId": 3980,
               "type": "t_uint256",
               "src": "733:17:11"
             }
@@ -1545,6 +1545,12 @@
           "valueType": "t_struct<TILRegistry.CoordinationGameEtherDeposit>",
           "label": "mapping(key => TILRegistry.CoordinationGameEtherDeposit)",
           "kind": "mapping"
+        },
+        "t_mapping<t_struct<IndexedBytes32Array.Data>>": {
+          "id": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+          "valueType": "t_struct<IndexedBytes32Array.Data>",
+          "label": "mapping(key => IndexedBytes32Array.Data)",
+          "kind": "mapping"
         }
       },
       "storage": [
@@ -1552,7 +1558,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 6706,
+          "astId": 6760,
           "type": "t_bool",
           "src": "749:24:26"
         },
@@ -1560,7 +1566,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 6708,
+          "astId": 6762,
           "type": "t_bool",
           "src": "868:25:26"
         },
@@ -1568,7 +1574,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 6757,
+          "astId": 6811,
           "type": "t_array:50<t_uint256>",
           "src": "1883:29:26"
         },
@@ -1576,65 +1582,73 @@
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "listings",
-          "astId": 4008,
+          "astId": 4003,
           "type": "t_mapping<t_struct<TILRegistry.Listing>>",
-          "src": "923:43:11"
+          "src": "938:43:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "listingsIterator",
-          "astId": 4010,
+          "astId": 4005,
           "type": "t_struct<IndexedBytes32Array.Data>",
-          "src": "970:41:11"
+          "src": "985:41:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "token",
-          "astId": 4012,
+          "astId": 4007,
           "type": "t_address",
-          "src": "1015:19:11"
+          "src": "1030:19:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "roles",
-          "astId": 4014,
+          "astId": 4009,
           "type": "t_address",
-          "src": "1038:14:11"
+          "src": "1053:14:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "work",
-          "astId": 4016,
+          "astId": 4011,
           "type": "t_address",
-          "src": "1056:9:11"
+          "src": "1071:9:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "powerChallenge",
-          "astId": 4018,
+          "astId": 4013,
           "type": "t_address",
-          "src": "1069:29:11"
+          "src": "1084:29:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "deposits",
-          "astId": 4022,
+          "astId": 4017,
           "type": "t_mapping<t_struct<TILRegistry.CoordinationGameEtherDeposit>>",
-          "src": "1102:64:11"
+          "src": "1117:64:11"
         },
         {
           "contract": "TILRegistry",
           "path": "contracts/TILRegistry.sol",
           "label": "coordinationGame",
-          "astId": 4024,
+          "astId": 4019,
           "type": "t_address",
-          "src": "1170:33:11"
+          "src": "1185:33:11"
+        },
+        {
+          "contract": "TILRegistry",
+          "path": "contracts/TILRegistry.sol",
+          "label": "ownerListingIndices",
+          "astId": 4023,
+          "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+          "src": "1223:65:11"
         }
       ],
       "warnings": {
@@ -1648,28 +1662,49 @@
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "listings",
-            "astId": 4008,
+            "astId": 4003,
             "type": "t_mapping<t_struct<TILRegistry.Listing>>",
-            "src": "923:43:11"
+            "src": "938:43:11"
           },
           {
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "listingsIterator",
-            "astId": 4010,
+            "astId": 4005,
             "type": "t_struct<IndexedBytes32Array.Data>",
-            "src": "970:41:11"
+            "src": "985:41:11"
           },
           {
             "contract": "TILRegistry",
             "path": "contracts/TILRegistry.sol",
             "label": "deposits",
-            "astId": 4022,
+            "astId": 4017,
             "type": "t_mapping<t_struct<TILRegistry.CoordinationGameEtherDeposit>>",
-            "src": "1102:64:11"
+            "src": "1117:64:11"
+          },
+          {
+            "contract": "TILRegistry",
+            "path": "contracts/TILRegistry.sol",
+            "label": "ownerListingIndices",
+            "astId": 4023,
+            "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+            "src": "1223:65:11"
           }
         ],
-        "storageDiff": []
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 11,
+              "contract": "TILRegistry",
+              "path": "contracts/TILRegistry.sol",
+              "label": "ownerListingIndices",
+              "astId": 4023,
+              "type": "t_mapping<t_struct<IndexedBytes32Array.Data>>",
+              "src": "1223:65:11"
+            }
+          }
+        ]
       }
     }
   },
@@ -1729,14 +1764,14 @@
       {
         "address": "0xc28954cc4188da16438945f0135dc02f1b826abf",
         "version": "0.2.0",
-        "implementation": "0xa7850118c80d5c7b4a5774300a77ae83a5f72983"
+        "implementation": "0x4fbac9f8013f8ae425aabd023d6d209c678c13ac"
       }
     ],
     "coordination-game/TILRegistry": [
       {
         "address": "0x619c180b7eb9f4915ba713c4ab9b724a2a13552a",
         "version": "0.2.0",
-        "implementation": "0x6f2d1c038eb683d3bcd61cccca4f4ab5deda86fc"
+        "implementation": "0xdbad4975110d3202f9e89f24c13f02f631010327"
       }
     ],
     "coordination-game/BetaFaucet": [

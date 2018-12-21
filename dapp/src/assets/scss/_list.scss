@@ -135,7 +135,9 @@
   }
 
   @media screen and (max-width: 768px) {
+    font-size: 1.25rem;
     grid-column: span 6;
+    padding: 1.5rem 0 1rem;
   }
 }
 
@@ -155,6 +157,7 @@
 
   @media screen and (max-width: 768px) {
     grid-column: span 6;
+    padding-top: 0;
   }
 }
 
@@ -172,7 +175,7 @@
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 6;
+    grid-column: span 12;
   }
 }
 
@@ -192,8 +195,10 @@
   }
 
   @media screen and (max-width: 768px) {
-    grid-column: span 6;
-    text-align: right;
+    grid-column: span 12;
+    padding-bottom: 1rem;
+    padding-top: 0;
+    text-align: left;
   }
 }
 
@@ -322,13 +327,14 @@
   @media (max-width: 768px) {
     float: none;
     margin-bottom: 30px;
+    margin-top: -10px;
   }
 }
 
 .list--title {
   @media (max-width: 768px) {
     margin-bottom: 0;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
   }
 }
 

@@ -9,7 +9,7 @@ export const HintStatus = function ({ applicationId, hint }) {
   if (tokenName && tokenTicker) {
     var statusText = (
       <React.Fragment>
-        Token Name: <strong>{tokenName}</strong>
+        Project Name: <strong>{tokenName}</strong>
         <br />
         Token Ticker: <strong>{tokenTicker}</strong>
       </React.Fragment>

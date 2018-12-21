@@ -9923,9 +9923,9 @@ safe-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-saga-genesis@MedXProtocol/saga-genesis#b08c353:
+saga-genesis@MedXProtocol/saga-genesis#1.0.0-pre:
   version "0.1.0"
-  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/b08c35317b94238bd31b5d2c64bd882bb8fa0290"
+  resolved "https://codeload.github.com/MedXProtocol/saga-genesis/tar.gz/f0f0b718fb9a08f9231d85ce88742cdb01e70b57"
   dependencies:
     debug "^4.1.0"
     ethjs-abi "^0.2.1"
