@@ -13,8 +13,9 @@
 }
 
 .__react_component_tooltip.type-dark {
-  background-color: white;
-  color: #333;
+  background-color: lighten($background-color, 20%);
+  border: 2px solid lighten($background-color, 10%);
+  color: white;
 }
 
 .__react_component_tooltip.type-dark.place-top:after {
