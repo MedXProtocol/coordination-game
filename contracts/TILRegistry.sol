@@ -126,24 +126,33 @@ contract TILRegistry is Initializable {
     withdrawFromLostCoordinationGame(_listingHash, msg.sender);
     PowerChallenge.State state = powerChallenge.getState(_listingHash);
 
+    if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
+      makeListingInactive(_listingHash);
+    }
+
     if (powerChallenge.isComplete(_listingHash)) {
+      powerChallenge.removeChallenge(_listingHash);
+
       if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
         removeListing(listing, _listingHash);
-
         emit ListingRemoved(listing.owner, _listingHash);
       }
-
-      powerChallenge.removeChallenge(_listingHash);
     }
   }
 
   function removeListing(Listing _listing, bytes32 _listingHash) internal {
-    listingsIterator.removeValue(_listingHash);
+    makeListingInactive(_listingHash);
     delete listings[_listingHash];
 
     coordinationGame.removeApplication(_listingHash);
 
     ownerListingIndices[_listing.owner].removeValue(_listingHash);
+  }
+
+  function makeListingInactive(bytes32 _listingHash) internal {
+    if (listingsIterator.hasValue(_listingHash)) {
+      listingsIterator.removeValue(_listingHash);
+    }
   }
 
   function withdrawFromLostCoordinationGame(bytes32 _listingHash, address _beneficiary) internal {

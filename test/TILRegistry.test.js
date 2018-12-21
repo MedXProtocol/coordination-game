@@ -458,8 +458,13 @@ contract('TILRegistry', (accounts) => {
 
       debug(`starting withdrawal from challenge...`)
 
+      const listingsCount = await registry.listingsLength()
+
       assert.equal(await powerChallenge.isTimedOut(listingHash), true)
       await registry.withdrawFromChallenge(listingHash, { from: mysteriousStranger })
+
+      assert.equal((await registry.listingsLength()).toString(), listingsCount.sub(1).toString(), 'listing is no longer active')
+      
       await registry.withdrawFromChallenge(listingHash, { from: stranger2 })
 
       const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)
