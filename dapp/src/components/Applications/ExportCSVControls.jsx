@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import { CSVLink } from 'react-csv'
+import { mailtoCsvLink } from '~/utils/mailtoCsvLink'
 
 // This is a bugfix for react-csv which can be removed when they fix it upstream:
 class PropDataUpdatedCSVLink extends CSVLink {
@@ -16,8 +17,7 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
     super(props)
 
     this.state = {
-      downloadClicked: false,
-      filename: 'coordinationGame-applications.csv'
+      filename: 'token-reg-applications.csv'
     }
   }
 
@@ -26,6 +26,18 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
       [e.target.name]: e.target.value
     })
   }
+
+	handleMailCsv = (e) => {
+		e.preventDefault()
+
+		if (window) {
+			window.location.href = mailtoCsvLink(
+				'Token Registry Applications Export CSV',
+				["Application ID#", "Hint", "Random #", "Secret"],
+				this.props.csvData
+			)
+		}
+	}
 
   render () {
     return (
@@ -46,6 +58,13 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
             />
           </div>
           <div className="control">
+						<button
+							onClick={this.handleMailCsv}
+							className="button is-info is-addon text-input--filename-button"
+						>
+							Email
+						</button>
+
             <PropDataUpdatedCSVLink
               data={this.props.csvData}
               headers={[
