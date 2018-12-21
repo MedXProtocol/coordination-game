@@ -47,6 +47,7 @@ export const Home = connect(mapStateToProps)(
             </div>
             <Listings
               currentPage={this.props.listingsCurrentPage}
+              currentPageParamName='listingsCurrentPage'
             />
 
             <br />
@@ -64,6 +65,7 @@ export const Home = connect(mapStateToProps)(
             </div>
             <OwnerListings
               currentPage={this.props.ownerListingsCurrentPage}
+              currentPageParamName='ownerListingsCurrentPage'
             />
 
             <Footer />

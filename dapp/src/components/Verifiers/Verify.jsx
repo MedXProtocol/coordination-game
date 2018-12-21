@@ -44,6 +44,7 @@ export const Verify = connect(mapStateToProps)(
 
             <VerifierApplicationsTable
               currentPage={this.props.verifierApplicationsTableCurrentPage}
+              currentPageParamName='verifierApplicationsTableCurrentPage'
             />
 
             <br />

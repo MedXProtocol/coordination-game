@@ -790,6 +790,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                 </div>
                 <ApplicantApplicationsTable
                   currentPage={this.props.applicantApplicationsTableCurrentPage}
+                  currentPageParamName='applicantApplicationsTableCurrentPage'
                 />
 
                 <Modal

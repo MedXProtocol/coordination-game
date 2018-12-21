@@ -50,6 +50,7 @@ function* challengesSaga({ PowerChallenge, startIndex, endIndex }) {
 export const AllChallengesList = connect(mapStateToProps)(withSaga(challengesSaga)(
   function ({
     currentPage,
+    currentPageParamName,
     totalPages,
     challengeCount,
     ids
@@ -60,7 +61,7 @@ export const AllChallengesList = connect(mapStateToProps)(withSaga(challengesSag
         challengeCount={challengeCount}
         totalPages={totalPages}
         currentPage={currentPage}
-        currentPageParamName='currentPage'
+        currentPageParamName={currentPageParamName}
         />
     )
   }

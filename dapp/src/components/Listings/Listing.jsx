@@ -135,7 +135,11 @@ export const Listing = connect(mapStateToProps)(
           if (challengeStarted) {
             listingTitle = 'This listing has been challenged'
           }
-          var challengeAction = <ChallengePanel listingHash={listingHash} />
+          var challengeAction =
+            <React.Fragment>
+              <hr />
+              <ChallengePanel listingHash={listingHash} />
+            </React.Fragment>
         }
 
         const tokenName = hexHintToTokenData(listing.hint)

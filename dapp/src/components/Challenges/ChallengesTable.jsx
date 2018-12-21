@@ -1,4 +1,5 @@
 import React from 'react'
+import queryString from 'query-string'
 import { PageTitle } from '~/components/Helpers/PageTitle'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { AllChallengesList } from '~/components/Challenges/AllChallengesList'
@@ -6,21 +7,23 @@ import { UserChallengesList } from '~/components/Challenges/UserChallengesList'
 import { AnimatedWrapper } from "~/components/Layout/AnimatedWrapper"
 
 export const ChallengesTable = AnimatedWrapper(function ({
-  match
+  match, location
 }) {
 
-  const {
-    currentPage,
-    userPage
-  } = match.params
+  const queryParams = queryString.parse(location.search)
 
-  const currentPageValue = currentPage || 1
+  const {
+    page,
+    userPage
+  } = queryParams
+
+  const currentPageValue = page || 1
   const userPageValue = userPage || 1
 
   return (
     <React.Fragment>
       <ScrollToTop
-        disabled={!!currentPage || !!userPage}
+        disabled={!!page || !!userPage}
       />
       <PageTitle title='challenges' />
 
@@ -36,7 +39,7 @@ export const ChallengesTable = AnimatedWrapper(function ({
 
       <h6 className='list--title'>All Challenges</h6>
 
-      <AllChallengesList currentPage={currentPageValue} currentPageParamName='currentPage' />
+      <AllChallengesList currentPage={currentPageValue} currentPageParamName='page' />
 
       <br />
 

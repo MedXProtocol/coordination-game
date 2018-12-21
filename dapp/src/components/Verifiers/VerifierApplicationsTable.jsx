@@ -64,9 +64,16 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
 
       render() {
         let noApplications, loadingLines, applicationRows
-        const { applicationObjects, applicationCount } = this.props
+        const {
+          applicationObjects,
+          applicationCount,
+          pageSize,
+          currentPage,
+          currentPageParamName,
+          topBorderless
+        } = this.props
         const loading = applicationCount === undefined
-        const totalPages = Math.ceil(this.props.applicationCount / this.props.pageSize)
+        const totalPages = Math.ceil(applicationCount / pageSize)
 
         if (loading) {
           loadingLines = (
@@ -101,7 +108,7 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
             <div className={classnames(
               'list--container',
               {
-                'list--container__top-borderless': this.props.topBorderless
+                'list--container__top-borderless': topBorderless
               }
             )}>
               {loadingLines}
@@ -112,11 +119,11 @@ export const VerifierApplicationsTable = connect(mapStateToProps)(
               </div>
 
               <Pagination
-                currentPage={parseInt(this.props.currentPage, 10)}
+                currentPage={parseInt(currentPage, 10)}
                 totalPages={totalPages}
                 linkTo={(number, location) => formatPageRouteQueryParams(
                   routes.VERIFY,
-                  'verifierApplicationsTableCurrentPage',
+                  currentPageParamName,
                   number,
                   location
                 )}
