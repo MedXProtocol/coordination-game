@@ -5,6 +5,7 @@ import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
 import "./IndexedBytes32Array.sol";
 import "./IndexedAddressArray.sol";
+import "./TILRoles.sol";
 
 contract PowerChallenge is Ownable {
   using SafeMath for uint256;
@@ -12,11 +13,11 @@ contract PowerChallenge is Ownable {
   using IndexedAddressArray for IndexedAddressArray.Data;
 
   enum State {
-      BLANK,
-      CHALLENGED,
-      APPROVED,
-      CHALLENGE_FAIL,
-      CHALLENGE_SUCCESS
+    BLANK,
+    CHALLENGED,
+    APPROVED,
+    CHALLENGE_FAIL,
+    CHALLENGE_SUCCESS
   }
 
   struct Challenge {
@@ -44,6 +45,9 @@ contract PowerChallenge is Ownable {
 
   mapping(bytes32 => IndexedAddressArray.Data) challengers;
   mapping(bytes32 => IndexedAddressArray.Data) approvers;
+  mapping(address => IndexedBytes32Array.Data) userChallenges;
+
+  TILRoles public roles;
 
   modifier onlyCompleted(bytes32 _id) {
     require(isComplete(_id), "challenge has completed");
@@ -76,6 +80,11 @@ contract PowerChallenge is Ownable {
     _;
   }
 
+  modifier onlyChallengeManager(address _address) {
+    require(roles.hasRole(_address, uint(TILRoles.All.CHALLENGE_MANAGER)), "only the challenge manager");
+    _;
+  }
+
   function init(
     address _owner, IERC20 _token, uint256 _timeout
   ) public initializer {
@@ -85,6 +94,11 @@ contract PowerChallenge is Ownable {
     Ownable.initialize(_owner);
     token = _token;
     timeout = _timeout;
+  }
+
+  function setRoles(TILRoles _roles) external onlyOwner {
+    require(_roles != address(0), 'roles is defined');
+    roles = _roles;
   }
 
   function startChallenge(bytes32 _id, uint256 _amount) external {
@@ -114,6 +128,7 @@ contract PowerChallenge is Ownable {
       challengeIterator.pushValue(_id);
     }
     challengers[_id].pushAddress(_beneficiary);
+    addUserChallenge(_beneficiary, _id);
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -145,6 +160,7 @@ contract PowerChallenge is Ownable {
       challengeIterator.pushValue(_id);
     }
     approvers[_id].pushAddress(_beneficiary);
+    addUserChallenge(_beneficiary, _id);
 
     emit ChallengeStarted(_id, challenges[_id].state);
   }
@@ -161,6 +177,7 @@ contract PowerChallenge is Ownable {
     challengeStore.state = State.APPROVED;
     if (!approvers[_id].hasAddress(_beneficiary)) {
       approvers[_id].pushAddress(_beneficiary);
+      addUserChallenge(_beneficiary, _id);
     }
 
     emit Approved(_id);
@@ -182,6 +199,7 @@ contract PowerChallenge is Ownable {
     challengeStore.state = State.CHALLENGED;
     if (!challengers[_id].hasAddress(_beneficiary)) {
       challengers[_id].pushAddress(_beneficiary);
+      addUserChallenge(_beneficiary, _id);
     }
 
     emit Challenged(_id);
@@ -208,6 +226,7 @@ contract PowerChallenge is Ownable {
       if (withdrawal > 0) {
         if (approvers[_id].hasAddress(_beneficiary)) {
           approvers[_id].removeAddress(_beneficiary);
+          removeUserChallenge(_beneficiary, _id);
         }
       }
       _challenge.approveDeposits[_beneficiary] = 0;
@@ -216,6 +235,7 @@ contract PowerChallenge is Ownable {
       if (withdrawal > 0) {
         if (challengers[_id].hasAddress(_beneficiary)) {
           challengers[_id].removeAddress(_beneficiary);
+          removeUserChallenge(_beneficiary, _id);
         }
       }
       _challenge.challengeDeposits[_beneficiary] = 0;
@@ -352,5 +372,29 @@ contract PowerChallenge is Ownable {
 
   function challengeExists(bytes32 _id) public view returns (bool) {
     return (challenges[_id].lastRoundOccurredAt != 0);
+  }
+
+  function managerAddUserChallenge(address _user, bytes32 _id) external onlyChallengeManager(msg.sender) {
+    addUserChallenge(_user, _id);
+  }
+
+  function addUserChallenge(address _user, bytes32 _id) internal {
+    if (!userChallenges[_user].hasValue(_id)) {
+      userChallenges[_user].pushValue(_id);
+    }
+  }
+
+  function removeUserChallenge(address _user, bytes32 _id) internal {
+    if (userChallenges[_user].hasValue(_id)) {
+      userChallenges[_user].removeValue(_id);
+    }
+  }
+
+  function userChallengesCount(address _user) public view returns (uint256) {
+    return userChallenges[_user].length();
+  }
+
+  function userChallengeAt(address _user, uint256 _index) public view returns (bytes32) {
+    return userChallenges[_user].valueAtIndex(_index);
   }
 }

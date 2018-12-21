@@ -1,4 +1,5 @@
 const PowerChallenge = artifacts.require('PowerChallenge.sol')
+const TILRoles = artifacts.require('TILRoles.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
 
 const BN = require('bn.js')
@@ -17,10 +18,12 @@ contract('PowerChallenge', (accounts) => {
   const timeout = 30 //seconds
 
   before(async () => {
+    roles = await TILRoles.new()
     token = await WorkToken.new()
     await token.init(owner)
     powerChallenge = await PowerChallenge.new()
     await powerChallenge.init(owner, token.address, timeout)
+    await powerChallenge.setRoles(roles.address)
     await token.mint(owner, web3.toWei('1000', 'ether'))
     await token.mint(challenger, web3.toWei('1000', 'ether'))
     await token.mint(challenger2, web3.toWei('1000', 'ether'))
@@ -63,6 +66,7 @@ contract('PowerChallenge', (accounts) => {
   describe('startChallenge()', () => {
     it('should create a new challenge', async () => {
       debug('startChallenge()')
+      const startingChallengeCount = await powerChallenge.userChallengesCount(challenger)
       const tx = await startChallenge()
       debug(tx)
       const challenge = await getChallenge()
@@ -70,6 +74,8 @@ contract('PowerChallenge', (accounts) => {
       assert.equal(challenge.round, 0, 'initial round')
       assert.equal(challenge.id, challengeId, 'id matches')
       assert.equal(tx.logs[0].event, 'ChallengeStarted', 'event was emitted')
+      assert.equal((await powerChallenge.userChallengesCount(challenger)).toString(), startingChallengeCount.add(1).toString(), 'challenge count matches')
+      assert.equal(await powerChallenge.userChallengeAt(challenger, 0), challengeId, 'challenge id is correct')
       assert.equal(
         (await powerChallenge.challengeBalance(challengeId, challenger)).toString(), firstChallengeAmount,
         'first challenge amount matches'
@@ -108,8 +114,10 @@ contract('PowerChallenge', (accounts) => {
       })
 
       it('should approve of the listing', async () => {
+        const startingApprovalCount = await powerChallenge.userChallengesCount(approver)
         const tx = await approve(firstApprovalAmount)
         debug(tx)
+        assert.equal((await powerChallenge.userChallengesCount(approver)).toString(), startingApprovalCount.add(1).toString(), 'approval count is one')
         const challenge = await getChallenge()
         assert.equal(challenge.state, 2, 'state is approved')
         assert.equal(challenge.round, 1, 'second round')
@@ -129,7 +137,9 @@ contract('PowerChallenge', (accounts) => {
     })
 
     it('should challenge the listing', async () => {
+      const beforeChallengeCount = await powerChallenge.userChallengesCount(challenger)
       const tx = await challenge(secondChallengeAmount)
+      assert.equal((await powerChallenge.userChallengesCount(challenger)).toString(), beforeChallengeCount.toString(), 'challenge count is still one')
       debug(tx)
       const storage = await getChallenge()
       debug(storage)

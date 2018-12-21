@@ -64,7 +64,9 @@ contract('TILRegistry', (accounts) => {
   beforeEach(async () => {
     powerChallenge = await PowerChallenge.new()
     await powerChallenge.init(owner, workToken.address, 60)
+    await powerChallenge.setRoles(roles.address)
     registry = await TILRegistry.new()
+    await roles.setRole(registry.address, 2, true) // Registry is the challenge manager
     await coordinationGame.setRegistry(registry.address)
     await registry.initialize(workToken.address, roles.address, work.address, powerChallenge.address)
     await registry.setCoordinationGame(coordinationGame.address)
