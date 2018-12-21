@@ -82,7 +82,12 @@ export const OwnerListings = connect(mapStateToProps)(
           listingRows
 
         const totalPages = Math.ceil(this.props.listingsCount / this.props.pageSize)
-        const { listingsCount } = this.props
+        const {
+          listingsCount,
+          currentPage,
+          currentPageParamName,
+          listingHashes
+        } = this.props
         const loading = listingsCount === undefined
 
         if (loading) {
@@ -107,7 +112,7 @@ export const OwnerListings = connect(mapStateToProps)(
             </div>
           )
         } else {
-          listingRows = this.props.listingHashes.map(
+          listingRows = listingHashes.map(
             (listingHash) => <ListingRow listingHash={listingHash} key={listingHash} />
           )
         }
@@ -122,11 +127,11 @@ export const OwnerListings = connect(mapStateToProps)(
                 {listingRows}
               </div>
               <Pagination
-                currentPage={parseInt(this.props.currentPage, 10)}
+                currentPage={parseInt(currentPage, 10)}
                 totalPages={totalPages}
                 linkTo={(number, location) => formatPageRouteQueryParams(
                   routes.REGISTRY,
-                  'ownerListingsCurrentPage',
+                  currentPageParamName,
                   number,
                   location
                 )}

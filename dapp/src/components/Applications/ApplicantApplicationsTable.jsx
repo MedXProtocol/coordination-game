@@ -184,7 +184,14 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
 
           render() {
             let noApplications, loadingLines, applicationRows
-            const { applicationObjects, applicationCount } = this.props
+            const {
+              applicationObjects,
+              applicationCount,
+              totalPages,
+              currentPage,
+              currentPageParamName,
+              topBorderless
+            } = this.props
             const loading = applicationCount === undefined
 
             if (loading) {
@@ -212,7 +219,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                 <div className={classnames(
                   'list--container',
                   {
-                    'list--container__top-borderless': this.props.topBorderless
+                    'list--container__top-borderless': topBorderless
                   }
                 )}>
                   {loadingLines}
@@ -223,11 +230,11 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                   </div>
 
                   <Pagination
-                    currentPage={parseInt(this.props.currentPage, 10)}
-                    totalPages={this.props.totalPages}
+                    currentPage={parseInt(currentPage, 10)}
+                    totalPages={totalPages}
                     linkTo={(number, location) => formatPageRouteQueryParams(
                       routes.REGISTER_TOKEN,
-                      'applicantApplicationsTableCurrentPage',
+                      currentPageParamName,
                       number,
                       location
                     )}
@@ -237,7 +244,7 @@ export const ApplicantApplicationsTable = connect(mapStateToProps)(
                 <div
                   className={classnames(
                     'is-pulled-right',
-                    { 'is-hidden': this.state.showCsvLink || !this.props.applicationCount || this.props.applicationCount === 0 }
+                    { 'is-hidden': this.state.showCsvLink || !applicationCount || applicationCount === 0 }
                   )}
                 >
                   <button onClick={this.exportAll} className="is-size-7">
