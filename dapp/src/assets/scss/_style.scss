@@ -206,6 +206,8 @@ header {
   display: flex;
   flex-grow: 1;
   flex-basis: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .field > .help {
