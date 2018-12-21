@@ -60,7 +60,7 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
           <div className="control">
 						<button
 							onClick={this.handleMailCsv}
-							className="button is-info is-addon text-input--filename-button"
+							className="button is-info is-addon text-input--filename-button is-hidden-desktop"
 						>
 							Email
 						</button>
@@ -74,7 +74,7 @@ export const ExportCSVControls = class _ExportCSVControls extends Component {
                 { label: "Secret", key: "secret" }
               ]}
               filename={this.state.filename}
-              className="button is-primary is-addon text-input--filename-button"
+              className="button is-primary is-addon text-input--filename-button is-hidden-touch"
             >
               Download
             </PropDataUpdatedCSVLink>
