@@ -461,11 +461,11 @@
       }
     },
     "CoordinationGame": {
-      "address": "0x305fdbd3006970618ac243d448fcddf9203c0a49",
+      "address": "0xf537c19728ebbd82172a14ceb6f5df91f00a6e48",
       "constructorCode": "608060405234801561001057600080fd5b50615efc80620000216000396000f300",
-      "bodyBytecodeHash": "98b264af1328ffefac331a0c01dd24328729113891cd414bc7887dc20a37499e",
+      "bodyBytecodeHash": "202339bafff3ff969677fa7b889ec1b78e0e26fa614133e8ebd648b65f69fbfe",
       "localBytecodeHash": "fe03f422354721c0df4359fa4fa884d89999ae8095a598970f6dfb97fa2462fa",
-      "deployedBytecodeHash": "95a1fea94942f9b852af5f25896cfe3e19552b477ba5d6381394ef2502470b9f",
+      "deployedBytecodeHash": "71893ae62341dc8b1bd7556fe1e9018cef48ccd306ddd5eb5777215d5b11e10a",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -496,13 +496,13 @@
           "members": [
             {
               "label": "values",
-              "astId": 2314,
+              "astId": 2306,
               "type": "t_array:dyn<t_bytes32>",
               "src": "77:16:8"
             },
             {
               "label": "indices",
-              "astId": 2318,
+              "astId": 2310,
               "type": "t_mapping<t_uint256>",
               "src": "99:35:8"
             }
@@ -677,7 +677,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 6711,
+          "astId": 6966,
           "type": "t_bool",
           "src": "749:24:26"
         },
@@ -685,7 +685,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 6713,
+          "astId": 6968,
           "type": "t_bool",
           "src": "868:25:26"
         },
@@ -693,7 +693,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 6762,
+          "astId": 7017,
           "type": "t_array:50<t_uint256>",
           "src": "1883:29:26"
         },
@@ -701,7 +701,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 6013,
+          "astId": 6268,
           "type": "t_address",
           "src": "301:22:21"
         },
@@ -709,7 +709,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 6118,
+          "astId": 6373,
           "type": "t_array:50<t_uint256>",
           "src": "2057:29:21"
         },
@@ -1759,11 +1759,11 @@
       "deployedBytecodeHash": "ce3ed7d1205afa55c3f6cf26e714fda494c6419c90964e597efbbea6391d00a4"
     },
     "VerifierSubmitSecret": {
-      "address": "0x0a9602254a4159f891ef75e4201f2218b0cc03de",
-      "constructorCode": "6102d1610030600b82828239805160001a6073146000811461002057610022565bfe5b5030600052607381538281f300",
-      "bodyBytecodeHash": "826d1a28b0a4ff186133601d91d35ce0c7153613bf9724610b6f258b56e4b1f0",
-      "localBytecodeHash": "697ade602847f98ec5a5f658f003cb3d43483ae8717de0063ee0c64a01f328a4",
-      "deployedBytecodeHash": "697ade602847f98ec5a5f658f003cb3d43483ae8717de0063ee0c64a01f328a4"
+      "address": "0x0a44bd8d34f5f5ddee1f1db935188b8aa207526d",
+      "constructorCode": "610255610030600b82828239805160001a6073146000811461002057610022565bfe5b5030600052607381538281f300",
+      "bodyBytecodeHash": "690ba2fbe0aee1e3b474cadd994d3fabae4c8692369386ff5c217527d102911b",
+      "localBytecodeHash": "288b5d039badd0d25f20f972a363bb8da99b7650b61000425ae97b855d29bc13",
+      "deployedBytecodeHash": "288b5d039badd0d25f20f972a363bb8da99b7650b61000425ae97b855d29bc13"
     }
   },
   "proxies": {
