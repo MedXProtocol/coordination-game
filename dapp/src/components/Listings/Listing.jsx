@@ -100,6 +100,7 @@ export const Listing = connect(mapStateToProps)(
           action = <abbr
             data-for={`listing-withdrawal`}
             data-tip={tip}
+            className='no-border-bottom'
           >
             <Web3ActionButton
               contractAddress={TILRegistry}

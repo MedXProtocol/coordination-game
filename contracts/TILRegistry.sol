@@ -96,6 +96,7 @@ contract TILRegistry is Initializable {
     createNewListing(_applicant, _listingHash, _applicantDepositTokens, _secret, _hint);
     require(token.transferFrom(msg.sender, address(this), _applicantDepositTokens.add(_challengerDepositTokens)));
     token.approve(address(powerChallenge), _applicantDepositTokens.add(_challengerDepositTokens));
+    powerChallenge.managerAddUserChallenge(_applicant, _listingHash);
     powerChallenge.startApproval(_listingHash, _applicantDepositTokens);
     powerChallenge.challengeFrom(_listingHash, address(this), _challenger);
     deposits[_listingHash] = CoordinationGameEtherDeposit(_challenger, _rewardWei);
@@ -106,6 +107,7 @@ contract TILRegistry is Initializable {
     uint256 challengeDeposit = _listing.deposit.mul(2);
     token.transferFrom(msg.sender, address(this), challengeDeposit);
     token.approve(address(powerChallenge), _listing.deposit.add(challengeDeposit));
+    powerChallenge.managerAddUserChallenge(_listing.owner, _listingHash);
     powerChallenge.startApproval(_listingHash, _listing.deposit);
     powerChallenge.challengeFrom(_listingHash, address(this), msg.sender);
   }

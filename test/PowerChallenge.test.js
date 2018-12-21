@@ -1,4 +1,5 @@
 const PowerChallenge = artifacts.require('PowerChallenge.sol')
+const TILRoles = artifacts.require('TILRoles.sol')
 const WorkToken = artifacts.require('WorkToken.sol')
 
 const BN = require('bn.js')
@@ -17,10 +18,12 @@ contract('PowerChallenge', (accounts) => {
   const timeout = 30 //seconds
 
   before(async () => {
+    roles = await TILRoles.new()
     token = await WorkToken.new()
     await token.init(owner)
     powerChallenge = await PowerChallenge.new()
     await powerChallenge.init(owner, token.address, timeout)
+    await powerChallenge.setRoles(roles.address)
     await token.mint(owner, web3.toWei('1000', 'ether'))
     await token.mint(challenger, web3.toWei('1000', 'ether'))
     await token.mint(challenger2, web3.toWei('1000', 'ether'))

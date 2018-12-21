@@ -33,13 +33,13 @@ export const ChallengesTable = function ({
 
       <hr />
 
-      <h2>All Challenges</h2>
+      <h6 className='list--title'>All Challenges</h6>
 
       <AllChallengesList currentPage={currentPageValue} currentPageParamName='currentPage' />
 
-      <hr />
+      <br />
 
-      <h2>Your Challenges</h2>
+      <h6 className='list--title'>Your Challenges</h6>
 
       <UserChallengesList currentPage={userPageValue} currentPageParamName='userPage' />
 
