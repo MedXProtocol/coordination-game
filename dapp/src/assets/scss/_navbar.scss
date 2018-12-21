@@ -105,6 +105,8 @@
 
   // max
   @media screen and (max-width: 1088px) {
+    pointer-events: none;
+    
     a.navbar-item:hover,
     a.navbar-item.is-active,
     .navbar-link:hover,
@@ -117,6 +119,7 @@
 .navbar-menu.is-active {
   @media screen and (max-width: 1088px) {
     background-color: lighten($background-color, 3%);
+    pointer-events: initial;
   }
 }
 
