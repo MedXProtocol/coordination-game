@@ -9925,7 +9925,7 @@ safe-regex@^1.1.0:
 
 "saga-genesis@https://github.com/medxprotocol/saga-genesis#1.0.0-pre":
   version "0.1.0"
-  resolved "https://github.com/medxprotocol/saga-genesis#369200bdceb227d23d7c61cfb00877827072baa2"
+  resolved "https://github.com/medxprotocol/saga-genesis#9c3dc94a1f0d4081b7436bab777c430456cafa88"
   dependencies:
     debug "^4.1.0"
     ethjs-abi "^0.2.1"
