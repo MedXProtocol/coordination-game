@@ -35,13 +35,14 @@ function createTextLine(values) {
   return result.join(SEPERATOR)
 }
 
+// const link = mailtoCsvLink(subject, headers, entries)
+// window.location.href = link
+//
+// and if that doesn't work, try this instead:
+// window.open(link)
+//
 export const mailtoCsvLink = function(subject, headers, entries) {
   const body = mailtoCSV(headers, entries)
 
   return `mailto:?subject=${subject}&body=${body}`
 }
-
-// window.location.href =
-
-// and if that doesn't work, try this instead:
-// window.open(link)
