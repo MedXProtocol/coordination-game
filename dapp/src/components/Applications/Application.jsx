@@ -28,6 +28,7 @@ import { mapApplicationState } from '~/services/mapApplicationState'
 import { getWeb3 } from '~/utils/getWeb3'
 import * as routes from '~/../config/routes'
 import { tickerToBytes32 } from '~/utils/tickerToBytes32'
+import RejectApplicationModal from '~/components/Applications/RejectApplicationModal'
 
 function mapStateToProps(state, { match }) {
   const applicationId = tickerToBytes32(match.params.applicationId)
@@ -77,7 +78,8 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
           constructor(props) {
             super(props)
             this.state = {
-              secret: ''
+              secret: '',
+              isRejectModalOpen: false
             }
           }
 
@@ -111,28 +113,24 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             }
           }
 
+          handleReject = (e) => {
+            e.preventDefault()
+            this.setState({
+              isRejectModalOpen: true
+            })
+          }
+
+          handleConfirmReject = (e) => {
+            e.preventDefault()
+            this.setState({
+              isRejectModalOpen: false
+            })
+            this.submitSecret('0x0000000000000000000000000000000000000000')
+          }
+
           handleVerifierSecretSubmit = (e) => {
             e.preventDefault()
-
-            const { send, coordinationGameAddress, applicationId, applicationObject } = this.props
-
-            const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', this.state.secret.toString())
-
-            const verifierSubmitSecretTxId = send(
-              coordinationGameAddress,
-              'verifierSubmitSecret',
-              applicationId,
-              secretAsHex
-            )({
-              value: applicationObject.game.applicationFeeWei
-            })
-
-            this.setState({
-              verifierSubmitSecretHandler: new TransactionStateHandler(),
-              verifierSubmitSecretTxId
-            })
-
-            this.props.dispatchShowLoadingStatus()
+            this.submitSecret(this.state.secret)
           }
 
           handleTextInputChange = (e) => {
@@ -149,6 +147,28 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
           secretValid = () => {
             return this.state.secret.length === 42 && this.state.secret.match(/^(0x)?[0-9a-fA-F]{40}$/)
+          }
+
+          submitSecret (secret) {
+            const { send, coordinationGameAddress, applicationId, applicationObject } = this.props
+
+            const secretAsHex = getWeb3().eth.abi.encodeParameter('uint256', secret.toString())
+
+            const verifierSubmitSecretTxId = send(
+              coordinationGameAddress,
+              'verifierSubmitSecret',
+              applicationId,
+              secretAsHex
+            )({
+              value: applicationObject.game.applicationFeeWei
+            })
+
+            this.setState({
+              verifierSubmitSecretHandler: new TransactionStateHandler(),
+              verifierSubmitSecretTxId
+            })
+
+            this.props.dispatchShowLoadingStatus()
           }
 
           render () {
@@ -400,6 +420,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                         Enter this token's contract address to verify:
                       </h6>
 
+
                       <div className="field">
                         <div className="control">
                           <input
@@ -422,6 +443,16 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                         isLoading={this.state.verifierSubmitSecretHandler}
                         disabled={!this.secretValid() || this.state.verifierSubmitSecretHandler}
                       />
+
+                      &nbsp;
+                      <LoadingButton
+                        className='button is-outlined is-danger'
+                        initialText='Reject Application'
+                        loadingText='Rejecting...'
+                        handleClick={this.handleReject}
+                        isLoading={this.state.verifierSubmitSecretHandler}
+                        disabled={!!this.state.verifierSubmitSecretHandler}
+                      />
                     </form>
                   ) : (
                     <React.Fragment>
@@ -440,6 +471,11 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 <br />
                 {whistleblowButton}
                 {lastUpdatedTime}
+
+                <RejectApplicationModal
+                  handleCloseModal={() => this.setState({isRejectModalOpen: false})}
+                  modalState={this.state.isRejectModalOpen}
+                  onConfirm={this.handleConfirmReject} />
               </div>
             )
           }
