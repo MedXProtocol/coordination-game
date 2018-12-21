@@ -25,7 +25,7 @@ function createTextLine(values) {
   values.forEach(function(value) {
     const text = value.toString()
 
-    if (text.indexOf(SEPERATOR) == -1 && text.indexOf('"') == -1) {
+    if (text.indexOf(SEPERATOR) === -1 && text.indexOf('"') === -1) {
       result.push(text)
     } else {
       result.push('"' + text.replace(/"/g, '""') + '"')
