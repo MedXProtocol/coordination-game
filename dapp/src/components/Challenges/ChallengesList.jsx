@@ -1,22 +1,10 @@
 import React, {
   PureComponent
 } from 'react'
-import { all } from 'redux-saga/effects'
-import {
-  withSaga,
-  cacheCall,
-  contractByName,
-  cacheCallValue
-} from 'saga-genesis'
-import { connect } from 'react-redux'
-import { range } from 'lodash'
 import { ListingRow } from '~/components/Registry/ListingRow'
 import { LoadingLines } from '~/components/Helpers/LoadingLines'
-import { PageTitle } from '~/components/Helpers/PageTitle'
 import { Pagination } from '~/components/Helpers/Pagination'
-import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { formatPageRouteQueryParams } from '~/services/formatPageRouteQueryParams'
-import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/../config/routes'
 
 export class ChallengesList extends PureComponent {
