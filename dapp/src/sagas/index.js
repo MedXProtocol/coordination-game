@@ -9,12 +9,14 @@ import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 import { sagaMiddleware } from '~/sagaMiddleware'
 
 function* catchSagaGenesisErrorSaga(error) {
-  yield console.log(error)
+  yield console.error(error)
 }
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_NETWORK_ID', function* ({ web3, networkId }) {
-    sagaMiddleware.setContext({ readWeb3: customProviderWeb3(networkId) })
+
+    const readWeb3 = customProviderWeb3(networkId)
+    sagaMiddleware.setContext({ readWeb3 })
 
     yield addContractsSaga({ web3 })
 
