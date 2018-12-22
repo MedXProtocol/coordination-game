@@ -21,18 +21,22 @@ export default function ({ handleCloseModal, modalState, onConfirm }) {
         <p>
           <br />
           <button
-            onClick={onConfirm}
-            className="button is-danger is-outlined"
-          >
-            Reject Application
-          </button>
-          &nbsp;
-          &nbsp;
-          <button
             onClick={handleCloseModal}
             className="button is-primary is-outlined"
           >
             Cancel
+          </button>
+          <span className="is-hidden-touch">
+            &nbsp;
+            &nbsp;
+          </span>
+          <br className="is-hidden-desktop" />
+          <br className="is-hidden-desktop" />
+          <button
+            onClick={onConfirm}
+            className="button is-danger is-outlined"
+          >
+            Reject Application
           </button>
         </p>
       </div>

@@ -445,14 +445,26 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                       />
 
                       &nbsp;
-                      <LoadingButton
-                        className='button is-outlined is-danger'
-                        initialText='Reject Application'
-                        loadingText='Rejecting...'
-                        handleClick={this.handleReject}
-                        isLoading={this.state.verifierSubmitSecretHandler}
-                        disabled={!!this.state.verifierSubmitSecretHandler}
-                      />
+                      <br />
+                      <br />
+                      <div className='columns'>
+                        <div className='column is-6'>
+                          <p>
+                            If you don't believe there is a valid contract address for this token you can reject the application outright:
+                            <br />
+                            <br />
+                            <LoadingButton
+                              className='button is-outlined is-danger is-small'
+                              initialText='Reject Application'
+                              loadingText='Rejecting...'
+                              handleClick={this.handleReject}
+                              isLoading={this.state.verifierSubmitSecretHandler}
+                              disabled={!!this.state.verifierSubmitSecretHandler}
+                            />
+                          </p>
+                        </div>
+                      </div>
+
                     </form>
                   ) : (
                     <React.Fragment>
@@ -469,13 +481,19 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 }
 
                 <br />
-                {whistleblowButton}
+                <div className='columns'>
+                  <div className='column is-6'>
+                    {whistleblowButton}
+                  </div>
+                </div>
+
                 {lastUpdatedTime}
 
                 <RejectApplicationModal
                   handleCloseModal={() => this.setState({isRejectModalOpen: false})}
                   modalState={this.state.isRejectModalOpen}
-                  onConfirm={this.handleConfirmReject} />
+                  onConfirm={this.handleConfirmReject}
+                />
               </div>
             )
           }
