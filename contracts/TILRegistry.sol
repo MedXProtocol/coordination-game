@@ -79,6 +79,7 @@ contract TILRegistry is Initializable {
     bytes _hint
   ) external onlyJobManager(msg.sender) {
     createNewListing(_applicant, _listingHash, _deposit, _secret, _hint);
+    makeListingActive(_listingHash);
     require(token.transferFrom(msg.sender, address(this), _deposit));
   }
 
@@ -130,6 +131,8 @@ contract TILRegistry is Initializable {
 
     if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
       makeListingInactive(_listingHash);
+    } else {
+      makeListingActive(_listingHash);
     }
 
     if (powerChallenge.isComplete(_listingHash)) {
@@ -154,6 +157,12 @@ contract TILRegistry is Initializable {
   function makeListingInactive(bytes32 _listingHash) internal {
     if (listingsIterator.hasValue(_listingHash)) {
       listingsIterator.removeValue(_listingHash);
+    }
+  }
+
+  function makeListingActive(bytes32 _listingHash) internal {
+    if (!listingsIterator.hasValue(_listingHash)) {
+      listingsIterator.pushValue(_listingHash);
     }
   }
 
@@ -197,7 +206,6 @@ contract TILRegistry is Initializable {
 
     ownerListingIndices[_applicant].pushValue(_listingHash);
 
-    listingsIterator.pushValue(_listingHash);
     emit NewListing(_applicant, _listingHash);
   }
 
