@@ -77,7 +77,6 @@ export const ApplicationStatus = connect(mapStateToProps)(
             </React.Fragment>
           )
         } else if (applicationState.verifierSubmittedSecret) {
-
           message = (
             <React.Fragment>
               <strong>Waiting on applicant to reveal secret before:</strong>

@@ -186,6 +186,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
             let {
               applicationId,
+              applicantRevealExpiresAt,
               createdAt,
               updatedAt,
               tokenTicker,
@@ -274,6 +275,13 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                 <p>
                   <strong>Waiting on <abbr data-tip={verifier} data-for='message-tooltip'>Verifier</abbr> until:</strong>
                   <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={verifierSubmitSecretExpiresAt} />
+                </p>
+              )
+            } else if (applicationState.verifierSubmittedSecret) {
+              message = (
+                <p>
+                  <strong>Waiting on applicant to reveal secret before:</strong>
+                  <br /><RecordTimestampDisplay timeInUtcSecondsSinceEpoch={applicantRevealExpiresAt} />
                 </p>
               )
             }
