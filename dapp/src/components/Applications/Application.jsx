@@ -125,7 +125,7 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             this.setState({
               isRejectModalOpen: false
             })
-            this.submitSecret('0x0000000000000000000000000000000000000000')
+            this.submitSecret('0x0000000000000000000000000000000000000001')
           }
 
           handleVerifierSecretSubmit = (e) => {

@@ -10,6 +10,7 @@ library VerifierSubmitSecret {
     uint256 _msgValue) public {
     require(_msgValue >= game.applicationFeeWei, 'verifier is submitting enough ether');
     require(verification.verifierSecret == bytes32(0), 'verify has not already been called');
+    require(_secret > 0, 'secret must be defined');
 
     verification.verifierSecret = _secret;
     verification.verifierSubmittedAt = block.timestamp;
