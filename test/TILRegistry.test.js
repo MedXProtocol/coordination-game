@@ -192,8 +192,6 @@ contract('TILRegistry', (accounts) => {
 
         debug(`applicantLostCoordinationGame(): ${newListing}`)
 
-        assert.equal(await registry.listingsLength(), 1) // new registry listing
-        assert.equal(await registry.listingAt(0), listingHash) // exists
         assert.equal(newListing.owner, user1, 'owner is applicant') // owned by applicant
         assert.equal(newListing.deposit, listingStake.toString(), 'deposit is set')
       })
@@ -241,6 +239,12 @@ contract('TILRegistry', (accounts) => {
             applicantEtherFinishingBalance.sub(new BN(tx.receipt.gasUsed))
           ),
           'applicant ether balance has not changed'
+        )
+
+        assert.equal(
+          await registry.listingsLength(),
+          1,
+          'record is now listed'
         )
       })
 
@@ -466,7 +470,7 @@ contract('TILRegistry', (accounts) => {
       await registry.withdrawFromChallenge(listingHash, { from: mysteriousStranger })
 
       assert.equal((await registry.listingsLength()).toString(), listingsCount.sub(1).toString(), 'listing is no longer active')
-      
+
       await registry.withdrawFromChallenge(listingHash, { from: stranger2 })
 
       const strangerFinishingBalance = await workToken.balanceOf(mysteriousStranger)

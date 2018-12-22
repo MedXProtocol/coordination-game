@@ -79,6 +79,7 @@ contract TILRegistry is Initializable {
     bytes _hint
   ) external onlyJobManager(msg.sender) {
     createNewListing(_applicant, _listingHash, _deposit, _secret, _hint);
+    makeListingActive(_listingHash);
     require(token.transferFrom(msg.sender, address(this), _deposit));
   }
 
@@ -130,6 +131,8 @@ contract TILRegistry is Initializable {
 
     if (state == PowerChallenge.State.CHALLENGE_SUCCESS) {
       makeListingInactive(_listingHash);
+    } else {
+      makeListingActive(_listingHash);
     }
 
     if (powerChallenge.isComplete(_listingHash)) {
@@ -147,13 +150,25 @@ contract TILRegistry is Initializable {
     delete listings[_listingHash];
 
     coordinationGame.removeApplication(_listingHash);
-
-    ownerListingIndices[_listing.owner].removeValue(_listingHash);
   }
 
   function makeListingInactive(bytes32 _listingHash) internal {
     if (listingsIterator.hasValue(_listingHash)) {
       listingsIterator.removeValue(_listingHash);
+    }
+    Listing storage listing = listings[_listingHash];
+    if (ownerListingIndices[listing.owner].hasValue(_listingHash)) {
+      ownerListingIndices[listing.owner].removeValue(_listingHash);
+    }
+  }
+
+  function makeListingActive(bytes32 _listingHash) internal {
+    if (!listingsIterator.hasValue(_listingHash)) {
+      listingsIterator.pushValue(_listingHash);
+    }
+    Listing storage listing = listings[_listingHash];
+    if (!ownerListingIndices[listing.owner].hasValue(_listingHash)) {
+      ownerListingIndices[listing.owner].pushValue(_listingHash);
     }
   }
 
@@ -195,9 +210,7 @@ contract TILRegistry is Initializable {
       _hint
     );
 
-    ownerListingIndices[_applicant].pushValue(_listingHash);
 
-    listingsIterator.pushValue(_listingHash);
     emit NewListing(_applicant, _listingHash);
   }
 
