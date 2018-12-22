@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Modal } from '~/components/Modals/Modal'
 import DownloadMetamaskButtonImg from '~/assets/img/button--download-metamask.png'
-import GetCoinbaseWalletImg from '~/assets/img/getCoinbaseWallet.svg'
+import getCoinbaseImg from '~/assets/img/getCoinbase.png'
+import getOperaImg from '~/assets/img/getOpera.png'
 import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
 
 export const GetWallet = class _GetWallet extends Component {
@@ -36,10 +37,21 @@ export const GetWallet = class _GetWallet extends Component {
   noop = () => {}
 
   render () {
-    const itunesLink = 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
-    const androidLink = 'https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA'
+    let mobileBrowser
 
-    const link = getMobileOperatingSystem() === 'iOS' ? itunesLink : androidLink
+    if (getMobileOperatingSystem() === 'Android') {
+      mobileBrowser = {
+        img: <img src={getOperaImg} alt="Get the Opera Browser" />,
+        name: 'Opera',
+        link: 'https://play.google.com/store/apps/details?id=com.opera.browser'
+      }
+    } else {
+      mobileBrowser = {
+        img: <img src={getCoinbaseImg} alt="Get Coinbase Wallet" />,
+        name: 'Coinbase Wallet',
+        link: 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
+      }
+    }
 
     return (
       <Modal
@@ -53,19 +65,20 @@ export const GetWallet = class _GetWallet extends Component {
           </h5>
 
           <p>
-            Any mobile DApp browser like Coinbase Wallet is supported.
-            If you're new to cryptocurrency we recommend Coinbase Wallet
-            so you can easily purchase Ether:
+            Mobile DApp browsers such as {mobileBrowser.name} are supported.
+            If you're new to cryptocurrency we recommend {mobileBrowser.name} so
+            you can easily purchase Ether:
           </p>
           <br />
           <a
-            href={link}
+            href={mobileBrowser.link}
             target="_blank"
             rel="noopener noreferrer"
-            title="Get Coinbase Wallet"
+            title={`Get ${mobileBrowser.name}`}
           >
-            <GetCoinbaseWalletImg />
+            {mobileBrowser.img}
           </a>
+
           <br />
           <br />
 
