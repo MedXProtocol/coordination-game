@@ -87,7 +87,7 @@
 
 .navbar.is-fixed-top.navbar--row-two {
   top: $navbar-height;
-  z-index: 2000;
+  z-index: 10;
 
   &:before {
     opacity: 0;
@@ -106,7 +106,7 @@
   // max
   @media screen and (max-width: 1088px) {
     pointer-events: none;
-    
+
     a.navbar-item:hover,
     a.navbar-item.is-active,
     .navbar-link:hover,
