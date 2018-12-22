@@ -41,7 +41,7 @@ export function mapApplicationState(
   const applicantRevealedSecret = !isBlank(applicantsSecret)
   const secretsMatch = verifierSubmittedSecret && applicantRevealedSecret && applicantsSecret === verifiersSecret
   const isListed = !isBlank(listing.owner)
-  const applicantWon = (isListed || secretsMatch)
+  const applicantWon = secretsMatch
 
   const needsAVerifier = isBlank(verifier)
   const waitingOnVerifier = (!isBlank(verifier) && !verifierSubmittedSecret)

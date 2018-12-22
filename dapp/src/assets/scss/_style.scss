@@ -1049,3 +1049,27 @@ header {
 .is-inline-block .button {
   margin-right: 20px;
 }
+
+.dropdown.has-dropdown button:hover {
+  transform: scale3d(1, 1, 1);
+}
+
+.dropdown-content {
+  background-color: lighten($background-color, 10%);
+  border-top-left-radius: 0;
+}
+
+.dropdown-menu {
+  top: 45px;
+  left: -1px;
+}
+
+.dropdown-menu .dropdown-item {
+  color: white;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: lighten($background-color, 20%);
+  color: white;
+  transform: scale3d(1, 1, 1);
+}

@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
+import { formatRoute } from 'react-router-named-routes'
 import {
   contractByName,
   TransactionStateHandler,
@@ -173,7 +175,8 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
 
           render () {
             let message,
-              whistleblowButton
+              whistleblowButton,
+              viewListingText
 
             let submissionTitle = 'This submission is not yet in the registry'
 
@@ -250,8 +253,10 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
             } else if (applicationState.isComplete) {
               if (applicationState.applicantWon) {
                 submissionTitle = 'This submission was added to the registry'
+                viewListingText = 'View this listing in the registry'
               } else {
-                submissionTitle = 'This submission was rejected'
+                submissionTitle = 'This submission has been challenged'
+                viewListingText = 'View the challenged listing'
               }
 
               message = (
@@ -267,6 +272,10 @@ export const Application = connect(mapStateToProps, mapDispatchToProps)(
                         {applicationState.applicantWon ? `Contract Addresses Matched` : `Contract Addresses Did Not Match`}
                       </abbr>
                     </strong>
+
+                    <br />
+                    <br />
+                    <Link to={formatRoute(routes.LISTING, { listingHash: tokenTicker })}>{viewListingText}</Link>
                   </p>
                 </div>
               )

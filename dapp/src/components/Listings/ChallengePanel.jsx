@@ -297,9 +297,9 @@ export const ChallengePanel = connect(mapStateToProps)(withSaga(challengePanelSa
         <React.Fragment>
           <div className="columns">
             <div className="column is-8">
-              <h4 className="is-size-3">
+              <h5 className="is-size-5">
                 {challengeTitle}
-              </h4>
+              </h5>
               {challengeBody}
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
 import { get } from 'lodash'
@@ -10,6 +11,10 @@ import { transactionFinders } from '~/finders/transactionFinders'
 import ReactTooltip from 'react-tooltip'
 import randomBytes from 'randombytes'
 import queryString from 'query-string'
+import {
+  CaretDownOutline
+} from '@ant-design/icons'
+import AntdIcon from '@ant-design/icons-react'
 import {
   cacheCall,
   cacheCallValue,
@@ -23,6 +28,7 @@ import {
 import { ApplicantApplicationsTable } from '~/components/Applications/ApplicantApplicationsTable'
 import { EtherFlip } from '~/components/Helpers/EtherFlip'
 import { Footer } from '~/components/Layout/Footer'
+import { LoadingLines } from '~/components/Helpers/LoadingLines'
 import { GetTEXLink } from '~/components/Helpers/GetTEXLink'
 import { LoadingButton } from '~/components/Helpers/LoadingButton'
 import { Modal } from '~/components/Modals/Modal'
@@ -31,6 +37,7 @@ import { Progress } from '~/components/Helpers/Progress'
 import { ScrollToTop } from '~/components/Helpers/ScrollToTop'
 import { storeApplicationDetailsInLocalStorage } from '~/services/storeApplicationDetailsInLocalStorage'
 import { displayWeiToEther } from '~/utils/displayWeiToEther'
+import { etherToWei } from '~/utils/etherToWei'
 import { getWeb3 } from '~/utils/getWeb3'
 import { isBlank } from '~/utils/isBlank'
 import { defined } from '~/utils/defined'
@@ -76,7 +83,9 @@ function mapStateToProps(state, { location }) {
   }
 
   if (!isBlank(applicantsLastApplicationId)) {
-    const verification = mapToVerification(cacheCallValue(state, coordinationGameAddress, 'verifiers', applicantsLastApplicationId))
+    const verification = mapToVerification(
+      cacheCallValue(state, coordinationGameAddress, 'verifications', applicantsLastApplicationId)
+    )
     verifier = verification.verifier
 
     const game = mapToGame(cacheCallValue(state, coordinationGameAddress, 'games', applicantsLastApplicationId))
@@ -159,7 +168,9 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
               secret: '',
               stepManual: 0,
               applicationCreated: false,
-              beforeUnloadTriggered: false
+              beforeUnloadTriggered: false,
+              approveDropdownActive: false,
+              amountToApprove: null
             }
 
             this.tokenNameRef = React.createRef()
@@ -353,10 +364,10 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             const { coordinationGameAllowance, applicationStakeAmount } = this.props
 
             const valuesDefined = (defined(coordinationGameAllowance) && defined(applicationStakeAmount))
-            const valuesAreEqual = (weiToEther(coordinationGameAllowance) === weiToEther(applicationStakeAmount))
+            const approvedGtApplicationStakeAmount = coordinationGameAllowance.gte(applicationStakeAmount)
 
             return (this.state.stepManual > 0) ||
-              (this.step2Completed() || (valuesDefined && valuesAreEqual))
+              (this.step2Completed() || (valuesDefined && approvedGtApplicationStakeAmount))
           }
 
           step2Completed = () => {
@@ -389,7 +400,7 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
               workTokenAddress,
               'approve',
               coordinationGameAddress,
-              this.props.applicationStakeAmount
+              etherToWei(this.state.amountToApprove) || this.props.applicationStakeAmount
             )()
 
             this.setState({
@@ -485,6 +496,70 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
             return this.state.secret.match(/^(0x)?[0-9a-fA-F]{40}$/)
           }
 
+          startAgain = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              applicationCreated: false,
+              amountToApprove: null,
+              tokenTicker: '',
+              tokenName: '',
+              secret: ''
+            })
+          }
+
+          handleActivateApproveDropdown = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              approveDropdownActive: true
+            })
+          }
+
+          handleDeactivateApproveDropdown = (e) => {
+            e.preventDefault()
+
+            this.setState({
+              approveDropdownActive: false
+            })
+          }
+
+          handleApprove10 = (e) => {
+            e.preventDefault()
+            e.persist()
+
+            this.handleApproveAmount(e, 10)
+          }
+
+          handleApprove20 = (e) => {
+            e.preventDefault()
+            e.persist()
+
+            this.handleApproveAmount(e, 20)
+          }
+
+          handleApprove50 = (e) => {
+            e.preventDefault()
+            e.persist()
+
+            this.handleApproveAmount(e, 50)
+          }
+
+          handleApprove100 = (e) => {
+            e.preventDefault()
+            e.persist()
+
+            this.handleApproveAmount(e, 100)
+          }
+
+          handleApproveAmount = (e, amount) => {
+            this.setState({
+              amountToApprove: amount
+            }, () => {
+              this.handleSubmitApproval(e)
+            })
+          }
+
           render() {
             if (!this.dataReady()) {
               return null
@@ -561,11 +636,60 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                   </div>
                                 </div>
 
-                                <LoadingButton
-                                  initialText='Approve'
-                                  loadingText='Approving'
-                                  isLoading={this.state.workTokenApproveHandler}
-                                />
+                                <div className={classnames('dropdown', 'has-dropdown', {
+                                    'is-active': this.state.approveDropdownActive
+                                  })}
+                                  onMouseOver={this.handleActivateApproveDropdown}
+                                  onMouseOut={this.handleDeactivateApproveDropdown}
+                                >
+                                  <div className="dropdown-trigger">
+                                    <button
+                                      className="button is-primary is-outlined"
+                                      disabled={this.state.workTokenApproveHandler}
+                                    >
+                                      <span>{
+                                        this.state.workTokenApproveHandler
+                                          ? (
+                                            <React.Fragment>
+                                              Approving <LoadingLines visible={true} />
+                                            </React.Fragment>
+                                          )
+                                          : 'Approve'
+                                      }</span>
+                                      <span className="icon is-small">
+                                        <AntdIcon type={CaretDownOutline} className="antd-icon" />
+                                      </span>
+                                    </button>
+                                  </div>
+                                  <div className="dropdown-menu" id="dropdown-menu" role="menu">
+                                    <div className="dropdown-content">
+                                      <button
+                                        className="dropdown-item"
+                                        onClick={this.handleApprove10}
+                                      >
+                                        Approve 10 TEX
+                                      </button>
+                                      <button
+                                        className="dropdown-item"
+                                        onClick={this.handleApprove20}
+                                      >
+                                        Approve 20 TEX
+                                      </button>
+                                      <button
+                                        className="dropdown-item"
+                                        onClick={this.handleApprove50}
+                                      >
+                                        Approve 50 TEX
+                                      </button>
+                                      <button
+                                        className="dropdown-item"
+                                        onClick={this.handleApprove100}
+                                      >
+                                        Approve 100 TEX
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
                                 <br />
                                 <br />
                               </form>
@@ -733,7 +857,9 @@ export const ApplicantRegisterTokenContainer = connect(mapStateToProps, mapDispa
                                       after which you will need to come back and reveal your secret.
                                     </p>
                                     <br />
-                                    <br />
+                                    <button onClick={this.startAgain} className="button is-info">
+                                      Register Another Token
+                                    </button>
                                   </div>
                                 </div>
                               ) : (
