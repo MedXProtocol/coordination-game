@@ -4,6 +4,8 @@
 
 The Token Registry is a proof-of-concept of a [Trustless Incentivized List](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027).  A TIL is a list of entries whose membership is governed by rules.  If an applicant wants to add an entry they must win the Coordination Game.  If an entry's membership is challenged then the entry must pass the Power Challenge.  You can read about the algorithm in detail [here](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027).
 
+The Token Registry is deployed to Ropsten and the dapp is running at [tokenregistry.medxprotocol.com](https://tokenregistry.medxprotocol.com/)
+
 # Installation
 
 Install dependencies
