@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "install-deps": "yarn; cd dapp && yarn && cd ..; cd lambda && npm i && cd ..",
     "dapp": "cd dapp && npm run start",
     "migrate": "$(npm bin)/truffle migrate",
     "staging-build": "./scripts/build.sh ropsten",
     "test": "NODE_ENV=test $(npm bin)/truffle test --migrations_directory .migrations_null",
+    "dapp-test-watch": "cd dapp && yarn test",
     "start": "./scripts/ganache.sh",
     "lambda": "cd lambda && ./lambda-serve.sh",
     "bootstrap": "truffle exec scripts/bootstrap-faucet.js",

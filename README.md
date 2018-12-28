@@ -1,137 +1,105 @@
-# MedX Protocol Coordination Game
+# The Token Registry
 
 [![Logo](medx-protocol.png)](https://medxprotocol.com/)
 
-### Local Setup
+The Token Registry is a proof-of-concept of a [Trustless Incentivized List](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027).  A TIL is a list of entries whose membership is governed by rules.  If an applicant wants to add an entry they must win the Coordination Game.  If an entry's membership is challenged then the entry must pass the Power Challenge.  You can read about the algorithm in detail [here](https://medium.com/medxprotocol/a-tcr-protocol-design-for-objective-content-6abb04aac027).
+
+# Installation
+
+Install dependencies
 
 ```
-$ npm i && truffle install
+$ yarn install-deps
 ```
 
-These smart contracts implement the MedX Protocol coordination game.  This game allows applicants to be added to a Registry by providing a hint and committing a secret.
-
-This project uses ZeppelinOS.  It's important to remember that the accounts that create the contracts are not able to interact with them.  The account that creates the contracts is called the **admin**.
-
-It's best to use the *second* account in the Coordination Game owner mnemonic, because truffle likes to use the first account by default.
-
-First start a local ZeppelinOS session using the admin account:
+Copy over the default environment variables:
 
 ```
-$ zos session --from $ADMIN_ACCOUNT --expires 10000 --network local
+$ cp .envrc.example .envrc
 ```
 
-Now push instances of the contracts to the network specified in the session
+Set environment variables with [direnv](https://direnv.net/):
 
 ```
-$ zos push
+$ direnv allow
 ```
 
-Ensure your artifacts have the latest addresses (if you've previously deployed):
+**Alternatively**, you can simply source the .envrc file:
 
 ```
-$ npm run merge-local
+$ source .envrc
 ```
 
-Now you'll want to make sure all of your migrations are up-to-date
+# Initial Setup
+
+This project uses ZeppelinOS.  It's important to remember that the **admin** account that creates the contracts is not able to interact with them. It's best to use the *second* account in the Coordination Game owner mnemonic as the admin, because truffle likes to use the first account by default.  The `ADMIN_ACCOUNT` env var is already configured to be the second account from the mnemonic.
+
+Start the local ganache node:
+
+```
+$ yarn start
+```
+
+Push the contracts to ganache:
+
+```
+$ zos push --from $ADMIN_ACCOUNT --network local
+```
+
+Migrate the contracts:
 
 ```
 $ truffle migrate
 ```
 
-Next, run the tests to make sure everything works
+Bootstrap the faucet with Ether and tokens:
 
 ```
-npm test
+$ yarn bootstrap
 ```
 
-Once the contracts are compiled and migrated, run bootstrap to mint tokens and fill the faucet:
+Start the dapp dev server:
 
 ```
-$ npm run bootstrap
+$ yarn dapp
 ```
 
-To close the session:
+Start the lambda dev server:
 
 ```
-$ zos session --close
+$ yarn lambda
 ```
 
-### Starting from a Fresh Compile
+# Testing
 
-**Note:** If you delete the contract artifacts in the `build` directory they will no longer contain the proxy addresses.
-
-You will need to first compile the contracts:
+To test the contracts run:
 
 ```
-$ truffle compile
+$ yarn test
 ```
 
-Then merge the latest ZOS proxy addresses.  If its for the local network you can run:
+To run the Dapp test watcher run:
 
 ```
-$ npm run merge
+$ yarn dapp-test-watch
 ```
 
 ### Deploying to Ropsten
 
-First make sure all of the ropsten contracts are up-to-date:
+Make sure all of the Ropsten contracts are up-to-date:
 
 ```
 $ npm run push-ropsten
 ```
 
-Next, ensure that the ropsten proxy addresses are merged into the build artifacts
+Next, ensure that the Ropsten proxy addresses are merged into the build artifacts
 
 ```
 $ npm run merge-ropsten
 ```
 
-Now run the migrations against ropsten:
+Now run the migrations against Ropsten:
 
 ```
 $ truffle migrate --network ropsten
 ```
-
-### Usage
-
-1. The Applicant creates a secret, a hint, and generates a random number.  The hash of the secret + random number is stored on-chain.  The hash of the random number is also stored on-chain. The hint is stored on-chain. They pay an Application Fee (Reward) in DAI, and a Deposit (in Tokens?).
-2. The selected Verifier uses the hint to search for the secret
-3. The Verifier commits their answer to the blockchain within the timeframe.  The Applicant reveals their secret at this time.
-4. If the Verifier’s secret matches the applicant’s secret
-   1. The Applicant is admitted to the registry
-   2. The Verifier receives their reward
-   3. (The Applicant is refunded a portion of their deposit?)
-5. Otherwise the Verifier rejects the Applicant
-   1. The application would then go to vote.  All of the verifiers would then vote on whether the Applicant is legitimate and that the hint was enough to establish their identity.
-   2. If the vote approves the application
-      1. The Voters split the entire Applicant’s deposit and the Applicant is accepted.  The Verifier’s deposit is sent to a reserve pool.  The voters in the minority lose half of their tokens, which are sent to the majority.
-   3. Otherwise the voters reject the application
-      1. The Voters split the entire Applicant’s deposit, the Verifier gets the Reward, and the Applicant is rejected. The voters in the minority lose half of their tokens, which are sent to the majority.
-
-## Exploits and Collusions
-
-### Applicant
-
-**Problem**: An Applicant can divulge their secret to the Verifier, potentially speeding up the approval process.
-
-An applicant can be incentivized to give the Verifier a good hint so that they are charged less for the application because if it goes to vote, it costs them more.
-
-An Applicant could potentially coerce a Verifier by giving them the secret along with a bribe that is greater than the Verifier’s deposit, assuring the Verifier that even if the Applicant is lying they will be covered financially.
-
-The applicant needs to give the Verifier a good hint.  In the case of a bad hint the verifier could “pass” on the application.  The application would go directly to a vote, and the Verifier would not be punished or rewarded.  The vote would cost more than if the Verifier had simply approved.
-
-### Verifier
-
-If a Verifier submits the secret and random number they act as a whistleblower and the applicant will be rejected and they will receive an award larger than the approval.
-User Experience
-Involving the doctor in the game theory side of things requires a lot of education, and is a strange experience. We need to make sure they know that if they are asked for their information to instead lie.
-
-Additionally, to incentivize them to do so we may have to partially refund them money.  Which is unfair to the system and should go towards the verifiers doing the work.
-
-## Voter
-
-Since the majority voters get 50% of the minority token voters tokens, there’s an interesting incentive to misdirect a small group of other voters:
-
-The maximum amount of rewards are earned if the majority is 51% and minority is 49%. So it’s actually in a voters interest to deceive a fellow voter if they think they’ll still get a >51% majority.
-
-The voters can't trust anyone.

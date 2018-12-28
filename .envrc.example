@@ -4,22 +4,23 @@
 export HDWALLET_MNEMONIC="rescue tree music reform symbol caught adult sand sentence belt tooth later"
 export HDWALLET_MNEMONIC_MAINNET="rescue tree music reform symbol caught adult sand sentence belt tooth later"
 
-export LAMBDA_CONFIG_CORS_ORIGIN="*"
-export LAMBDA_CONFIG_PRIVKEY="<YOUR PRIVATE KEY WITH 0x IN FRONT>"
+# The owner's private key
+export LAMBDA_CONFIG_PRIVKEY=0xcb682ff06b67c99769f648b297b07f9df291eed0e20d9e1f193630d03db1f354
 export LAMBDA_CONFIG_PROVIDER_URL=http://localhost:8545
 export LAMBDA_CONFIG_NETWORK_ID=1234
+export LAMBDA_CONFIG_CORS_ORIGIN="*"
 
 # Space-separated list of one or more required network ids
 export REACT_APP_REQUIRED_NETWORK_IDS="1234"
 
-export REACT_APP_ROPSTEN_PROVIDER_URL=https://ropsten.infura.io/<YOUR INFURA KEY>
-export REACT_APP_RINKEBY_PROVIDER_URL=https://rinkeby.infura.io/<YOUR INFURA KEY>
-export REACT_APP_MAINNET_PROVIDER_URL=https://mainnet.infura.io/<YOUR INFURA KEY>
+export REACT_APP_ROPSTEN_PROVIDER_URL="https://ropsten.infura.io/<YOUR INFURA KEY>"
+export REACT_APP_RINKEBY_PROVIDER_URL="https://rinkeby.infura.io/<YOUR INFURA KEY>"
+export REACT_APP_MAINNET_PROVIDER_URL="https://mainnet.infura.io/<YOUR INFURA KEY>"
 export REACT_APP_LOCALHOST_PROVIDER_URL=http://localhost:8545
 
 export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
 export REACT_APP_ENABLE_DEBUGGER=true
 
-export ADMIN_ACCOUNT=0x8a23c3556fa6a8fd38c86597acfd0151ac62861c
+export ADMIN_ACCOUNT=0xff536c5497c7b244c25ca6b31a5af1545d0c6184
 
 # export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
